@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML İleri Teknikleri</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="techniques.js" defer></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="#techniques">Teknikler</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="techniques">
+            <h1>HTML İleri Teknikleri</h1>
+            <p>Bu sayfada modern web geliştirmede kullanılan çeşitli ileri HTML tekniklerini detaylı olarak inceliyoruz.</p>
+
+            <article id="web-components" class="technique">
+                <h2>Web Components</h2>
+                <p>Web Components, yeniden kullanılabilir ve kapsüllenmiş HTML elementleri oluşturmamızı sağlayan bir teknolojidir. Shadow DOM, Custom Elements ve HTML Templates'i içerir.</p>
+                <h3>Custom Elements</h3>
+                <p>Kendi HTML elementlerinizi tanımlayabilirsiniz:</p>
+                <pre><code>&lt;custom-element&gt;&lt;/custom-element&gt;</code></pre>
+                <h3>Shadow DOM</h3>
+                <p>Element'in iç yapısını dışardan erişilemez hale getirir:</p>
+                <pre><code>this.attachShadow({ mode: 'open' });</code></pre>
+                <div class="demo">
+                    <h4>Demo: Custom Counter</h4>
+                    <custom-counter target="50" duration="3000"></custom-counter>
+                </div>
+            </article>
+
+            <article id="service-workers" class="technique">
+                <h2>Service Workers</h2>
+                <p>Service Workers, web uygulamasının arka planda çalışmasını sağlayan JavaScript dosyalarıdır. Offline destek, push notifications ve background sync sağlar.</p>
+                <h3>Kullanım Alanları</h3>
+                <ul>
+                    <li>Offline caching</li>
+                    <li>Background sync</li>
+                    <li>Push notifications</li>
+                    <li>Network interception</li>
+                </ul>
+                <h3>Örnek Kod</h3>
+                <pre><code>navigator.serviceWorker.register('/sw.js')
+  .then(registration => console.log('SW registered'));</code></pre>
+                <div class="demo">
+                    <h4>Demo: Cache Durumu</h4>
+                    <p id="cache-status">Cache kontrol ediliyor...</p>
+                    <button id="check-cache">Cache'i Kontrol Et</button>
+                </div>
+            </article>
+
+            <article id="pwa" class="technique">
+                <h2>Progressive Web Apps (PWA)</h2>
+                <p>PWA'lar, native app benzeri deneyim sunan web uygulamalarıdır. Manifest dosyası ve Service Worker ile çalışır.</p>
+                <h3>Manifest Özellikleri</h3>
+                <ul>
+                    <li>App icons</li>
+                    <li>Theme colors</li>
+                    <li>Display mode (standalone, fullscreen)</li>
+                    <li>Start URL</li>
+                </ul>
+                <h3>Örnek Manifest</h3>
+                <pre><code>{
+  "name": "My App",
+  "short_name": "App",
+  "start_url": "/",
+  "display": "standalone"
+}</code></pre>
+                <div class="demo">
+                    <h4>Demo: Install Prompt</h4>
+                    <button id="install-btn" style="display:none">Uygulamayı Yükle</button>
+                    <p id="install-status">PWA install durumu kontrol ediliyor...</p>
+                </div>
+            </article>
+
+            <article id="webgl" class="technique">
+                <h2>WebGL</h2>
+                <p>WebGL, web tarayıcılarında 3D grafikler oluşturmak için kullanılan JavaScript API'sidir. OpenGL ES 2.0 tabanlıdır.</p>
+                <h3>Temel Bileşenler</h3>
+                <ul>
+                    <li>Vertex Shader</li>
+                    <li>Fragment Shader</li>
+                    <li>Buffers</li>
+                    <li>Textures</li>
+                </ul>
+                <h3>Örnek Shader</h3>
+                <pre><code>attribute vec2 a_position;
+void main() {
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}</code></pre>
+                <div class="demo">
+                    <h4>Demo: WebGL Küp</h4>
+                    <canvas id="webgl-demo" width="300" height="300"></canvas>
+                </div>
+            </article>
+
+            <article id="microdata" class="technique">
+                <h2>Microdata</h2>
+                <p>Microdata, HTML içeriğine makine tarafından okunabilir metadata eklemek için kullanılan bir spesifikasyondur. Arama motorları için semantik bilgi sağlar.</p>
+                <h3>Schema.org</h3>
+                <p>En yaygın kullanılan vocabulary'dir:</p>
+                <pre><code>&lt;div itemscope itemtype="https://schema.org/Person"&gt;
+  &lt;span itemprop="name"&gt;John Doe&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+                <h3>Yararları</h3>
+                <ul>
+                    <li>Rich snippets in search results</li>
+                    <li>Better SEO</li>
+                    <li>Structured data for crawlers</li>
+                </ul>
+                <div class="demo">
+                    <h4>Demo: Structured Data</h4>
+                    <div itemscope itemtype="https://schema.org/Event">
+                        <h5 itemprop="name">Web Teknolojileri Konferansı</h5>
+                        <p itemprop="description">Modern web geliştirme tekniklerini öğrenin.</p>
+                        <time itemprop="startDate" datetime="2026-06-01">1 Haziran 2026</time>
+                    </div>
+                </div>
+            </article>
+
+            <article id="constraint-validation" class="technique">
+                <h2>Constraint Validation API</h2>
+                <p>HTML5 form validation için kullanılan native API. JavaScript olmadan client-side validation sağlar.</p>
+                <h3>Validation Attributes</h3>
+                <ul>
+                    <li><code>required</code> - Zorunlu alan</li>
+                    <li><code>minlength</code>/<code>maxlength</code> - Uzunluk sınırlaması</li>
+                    <li><code>pattern</code> - Regex pattern</li>
+                    <li><code>min</code>/<code>max</code> - Sayısal sınırlar</li>
+                </ul>
+                <h3>JavaScript API</h3>
+                <pre><code>if (!form.checkValidity()) {
+  form.reportValidity();
+}</code></pre>
+                <div class="demo">
+                    <h4>Demo: Validation Form</h4>
+                    <form id="validation-form" novalidate>
+                        <input type="text" required minlength="3" placeholder="En az 3 karakter">
+                        <input type="email" required placeholder="Geçerli e-posta">
+                        <input type="number" min="18" max="100" placeholder="18-100 arası sayı">
+                        <button type="submit">Doğrula</button>
+                    </form>
+                </div>
+            </article>
+
+            <article id="cors" class="technique">
+                <h2>CORS (Cross-Origin Resource Sharing)</h2>
+                <p>CORS, web sayfalarının farklı origin'lerden kaynak yüklemesine izin veren bir mekanizmadır.</p>
+                <h3>CORS Headers</h3>
+                <ul>
+                    <li><code>Access-Control-Allow-Origin</code></li>
+                    <li><code>Access-Control-Allow-Methods</code></li>
+                    <li><code>Access-Control-Allow-Headers</code></li>
+                </ul>
+                <h3>HTML'de Kullanım</h3>
+                <pre><code>&lt;img src="https://example.com/image.jpg" crossorigin="anonymous"&gt;</code></pre>
+                <div class="demo">
+                    <h4>Demo: CORS Image</h4>
+                    <img id="cors-image" src="" alt="CORS demo" style="max-width:200px;">
+                    <button id="load-cors-image">CORS Resmi Yükle</button>
+                </div>
+            </article>
+
+            <article id="data-attributes" class="technique">
+                <h2>Data Attributes</h2>
+                <p><code>data-*</code> attributes, HTML elementlerine özel data depolamak için kullanılır. JavaScript ile erişilebilir.</p>
+                <h3>Kullanım</h3>
+                <pre><code>&lt;div data-user-id="123" data-role="admin"&gt;&lt;/div&gt;</code></pre>
+                <h3>JavaScript Erişim</h3>
+                <pre><code>element.dataset.userId // "123"
+element.dataset.role // "admin"</code></pre>
+                <div class="demo">
+                    <h4>Demo: Data Attributes</h4>
+                    <div id="data-demo" data-count="0" data-color="blue">Tıkla: 0</div>
+                    <button id="increment-data">Artır</button>
+                    <button id="change-color">Renk Değiştir</button>
+                </div>
+            </article>
+
+            <article id="intersection-observer" class="technique">
+                <h2>Intersection Observer API</h2>
+                <p>Elementlerin viewport ile kesişimini gözlemlemek için kullanılan API. Lazy loading ve scroll animasyonları için idealdir.</p>
+                <h3>Temel Kullanım</h3>
+                <pre><code>const observer = new IntersectionObserver(callback, options);
+observer.observe(element);</code></pre>
+                <h3>Options</h3>
+                <ul>
+                    <li><code>root</code> - Gözlem root'u</li>
+                    <li><code>rootMargin</code> - Margin</li>
+                    <li><code>threshold</code> - Kesişim oranı</li>
+                </ul>
+                <div class="demo">
+                    <h4>Demo: Scroll Animasyonu</h4>
+                    <div class="scroll-demo">
+                        <div class="animated-box">Box 1</div>
+                        <div class="animated-box">Box 2</div>
+                        <div class="animated-box">Box 3</div>
+                    </div>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 HTML Teknikleri Rehberi</p>
+    </footer>
+</body>
+</html>

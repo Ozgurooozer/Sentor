@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas OS — Knowledge</title>
+
+  <!--
+    Load order matters:
+    1. style.css  — defines .hidden { display:none !important } + layout rules
+    2. Tailwind   — injects utilities after style.css in the cascade
+    3. tailwind.config — extends palette with design-system tokens
+    4. Fuse.js    — fuzzy search engine
+    5. pages.js   — window.ATLAS_INDEX (loaded as <script>, bypasses file:// CORS)
+    6. app.js     — all logic, runs after DOM is ready
+  -->
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            base:     '#0a0a0a',
+            surface:  '#111111',
+            elevated: '#1a1a1a',
+            subtle:   '#2a2a2a',
+            mid:      '#404040',
+            ink:      '#f5f5f5',
+            dim:      '#888888',
+            muted:    '#555555',
+            accent:   { DEFAULT: '#5b8def', hi: '#4a7de0' },
+            warn:     '#f5a623',
+          }
+        }
+      }
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.1.0/dist/fuse.min.js"></script>
+  <script src="../.index/pages.js"></script>
+</head>
+<body class="bg-base text-ink min-h-screen">
+
+
+  <!-- ══ HEADER ══════════════════════════════════════════════════════════ -->
+
+  <header class="sticky top-0 z-10 bg-base border-b border-subtle">
+    <div class="max-w-5xl mx-auto px-8 h-14 flex items-center gap-6">
+
+      <span class="text-accent font-semibold text-sm tracking-tight shrink-0 select-none">
+        atlas os
+      </span>
+
+      <!-- Search input -->
+      <div class="flex-1 max-w-xl">
+        <input
+          id="search-input"
+          type="search"
+          placeholder="Search knowledge..."
+          autocomplete="off"
+          spellcheck="false"
+          class="atlas-search-input"
+          aria-label="Search knowledge base"
+        >
+      </div>
+
+      <!-- Live result count, hidden until a query is active -->
+      <span
+        id="result-count"
+        class="text-xs text-muted tabular-nums shrink-0 hidden"
+        aria-live="polite"
+        aria-atomic="true"
+      ></span>
+
+    </div>
+  </header>
+
+
+  <!-- ══ BODY LAYOUT ═════════════════════════════════════════════════════ -->
+
+  <div class="max-w-5xl mx-auto px-8 flex gap-8 pt-8">
+
+
+    <!-- ── SIDEBAR ────────────────────────────────────────────────────── -->
+
+    <aside class="w-56 shrink-0">
+      <p class="text-xs text-muted uppercase tracking-widest mb-3 select-none">
+        Categories
+      </p>
+      <nav
+        id="category-nav"
+        class="flex flex-col gap-0.5"
+        role="navigation"
+        aria-label="Filter by category"
+      >
+        <!-- app.js renders category filter buttons here -->
+      </nav>
+    </aside>
+
+
+    <!-- ── MAIN ───────────────────────────────────────────────────────── -->
+
+    <main class="flex-1 min-w-0 pb-16">
+
+      <!-- Empty state: shown on initial load with no query -->
+      <section id="empty-state" class="pt-24 text-center" aria-label="Empty state">
+        <p class="text-dim text-sm">Type to search or browse categories</p>
+        <!-- Shown by app.js when window.ATLAS_INDEX is missing -->
+        <p id="no-index-msg" class="hidden mt-3 text-warn text-xs">
+          Index not found — run
+          <code class="font-mono bg-surface border border-subtle rounded px-1.5 py-0.5 text-xs text-ink">
+            atlas index
+          </code>
+          to build it.
+        </p>
+      </section>
+
+      <!-- Shown by app.js when a query returns zero matches -->
+      <p id="no-results-msg" class="hidden pt-24 text-center text-dim text-sm">
+        No results found.
+      </p>
+
+      <!-- Result cards rendered by app.js -->
+      <ul
+        id="results-list"
+        class="atlas-results-list hidden"
+        role="list"
+        aria-live="polite"
+        aria-label="Search results"
+      >
+      </ul>
+
+    </main>
+  </div>
+
+
+  <script src="app.js"></script>
+</body>
+</html>

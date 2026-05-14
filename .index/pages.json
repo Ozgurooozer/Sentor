@@ -1,0 +1,50 @@
+{
+  "generated": "2026-05-14T17:39:04",
+  "count": 2,
+  "pages": [
+    {
+      "id": "home/start",
+      "slug": "start",
+      "title": "Atlas OS — Home",
+      "description": "Atlas OS is a zero-dependency personal knowledge base. Pages live in the vault, indexed locally, searchable from any browser or terminal.",
+      "category": "home",
+      "path": "vault/home/start/index.html",
+      "url": "../vault/home/start/",
+      "text": "Atlas OS / Personal knowledge base Your knowledge, always local. Atlas OS is a zero-dependency knowledge base. Write pages as HTML, index them in one command, then search from the browser or terminal. Open Search UI How to use Project status Complete Phase 1 — Browser UI Indexer + Fuse.js search UI with category nav and dark theme. Complete Phase 2 — CLI + API atlas CLI with search, list, open, serve. REST API for AI agents. Active Phase 3 — Ollama Tool-calling integration. Local AI can query the knowledge base. Complete Phase 4 — Polish Vault landing page. Design system applied throughout. How to use Add a page Create vault/{category}/{slug}/index.html , then re-index. python tools/indexer.py Search in browser Open ui/index.html — no server needed, works on file://. ui/index.html Search in terminal Full-text search with ANSI output and category filters. atlas search \"query\" Start the API Serves the knowledge base over HTTP for AI agents and scripts. atlas serve Chat with AI Ollama agent queries your vault and cites sources from it. atlas chat Browser shortcuts / Focus search input Esc Clear search and return to empty state ↑ ↓ Navigate between result cards (planned) Atlas OS — Search UI · Built with Python stdlib & zero npm.",
+      "headings": [
+        "Your knowledge,always local.",
+        "Phase 1 — Browser UI",
+        "Phase 2 — CLI + API",
+        "Phase 3 — Ollama",
+        "Phase 4 — Polish"
+      ],
+      "links": [],
+      "backlinks": [],
+      "modified": "2026-05-14T16:43:20"
+    },
+    {
+      "id": "html/html-quality",
+      "slug": "html-quality",
+      "title": "Qtlas — HTML Kalitesi",
+      "description": "",
+      "category": "html",
+      "path": "vault/html/html-quality/index.html",
+      "url": "../vault/html/html-quality/",
+      "text": "Qtlas Zarafet Temizlik Optimizasyon HTML Kalite Rehberi Kod zarifse , her şey yerli yerindedir. İyi HTML; şişirilmemiş, okunabilir ve amacına sadık koddur. Elegance temizlikten, temizlik optimizasyondan doğar. Örneklere Bak Optimizasyon Bölüm 01 Zarafet — Semantic HTML Doğru etiketi kullanmak, hem tarayıcıya hem insana anlam taşır. Gereksiz div yığını zarafeti öldürür. Kötü <div class = \"header\" > <div class = \"nav\" > <div class = \"nav-item\" > Ana Sayfa </div> <div class = \"nav-item\" > Hakkında </div> </div> </div> <div class = \"main\" > <div class = \"article\" > <div class = \"title\" > Başlık </div> </div> </div> Anlamsız div'ler — ekran okuyucu kör, SEO zayıf. İyi <header> <nav> <a href = \"/\" > Ana Sayfa </a> <a href = \"/hakkinda\" > Hakkında </a> </nav> </header> <main> <article> <h1> Başlık </h1> </article> </main> Semantic etiketler — erişilebilir, SEO dostu, zarif. Bölüm 02 Temizlik — Gereksiz Kod Yok Temiz kod; inline style, gereksiz class ve tekrar eden niteliklerden arınmış koddur. Kirli <button style = \"color:white;background:blue; padding:10px 20px;border:none; border-radius:5px;cursor:pointer;\" onclick = \"doSomething()\" class = \"btn btn-blue btn-main btn-action btn-submit\" > Gönder </button> Inline style + class karmaşası + davranış HTML'de. Temiz <button class = \"btn-primary\" type = \"submit\" > Gönder </button> /* CSS'de: */ .btn-primary { padding: .75rem 1.5rem; background: var(--accent); border-radius: 8px; } Tek class, stil CSS'de, davranış JS'de. Sorumluluk ayrımı. Bölüm 03 Optimizasyon — Hız ve Verimlilik Optimize HTML; gereksiz istek yapmaz, render'ı bloklamaz, kaynakları doğru yükler. Yavaş <head> <!-- render bloklayan script --> <script src = \"app.js\" ></script> <script src = \"utils.js\" ></script> </head> <body> <!-- optimize edilmemiş resim --> <img src = \"photo.png\" > </body> Script head'de → sayfa donuyor. Resimde boyut/format yok. Hızlı <head> <!-- preload kritik kaynak --> <link rel = \"preload\" href = \"app.js\" as = \"script\" > </head> <body> <img src = \"photo.webp\" width = \"800\" height = \"600\" loading = \"lazy\" alt = \"Açıklama\" > <script src = \"app.js\" defer ></script> </body> defer + lazy loading + webp + boyut → hızlı, CLS yok. Özet 4 Temel İlke Kaliteli HTML'in özü dört ilkeye sığar. 🏗️ Semantic Yapı Her etiket anlamını taşısın. header, main, article, section — div değil. ✂️ Minimal Kod Gereksiz wrapper, tekrar eden class ve inline style olmadan yaz. ♿ Erişilebilirlik alt, aria-label, role — ekran okuyucu ve klavye kullanıcısını unutma. ⚡ Performans defer, async, lazy loading, webp — her byte'ın sebebi olsun. Yapıldı Qtlas ile — Zarafet, Temizlik, Hız.",
+      "headings": [
+        "Kod zarifse,her şey yerli yerindedir.",
+        "Zarafet — Semantic HTML",
+        "Temizlik — Gereksiz Kod Yok",
+        "Optimizasyon — Hız ve Verimlilik",
+        "4 Temel İlke",
+        "Semantic Yapı",
+        "Minimal Kod",
+        "Erişilebilirlik",
+        "Performans"
+      ],
+      "links": [],
+      "backlinks": [],
+      "modified": "2026-05-14T10:44:46"
+    }
+  ]
+}

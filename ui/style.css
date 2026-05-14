@@ -1,0 +1,237 @@
+/* ============================================================
+   Atlas OS — UI Design System
+   Colors, typography, and spacing follow system.md exactly.
+   Tailwind CDN handles layout utilities (flex, grid, spacing).
+   This file owns: global resets, atlas-* components, .hidden.
+   ============================================================ */
+
+
+/* ── Reset ──────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* ── .hidden — must win over all layout rules ───────────────────────── */
+
+.hidden {
+  display: none !important;
+}
+
+
+/* ── Scrollbar ──────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #404040; }
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEARCH INPUT
+   Spec: bg-surface, border-subtle → border-accent on focus,
+         focus ring allowed as the one box-shadow exception.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.atlas-search-input {
+  width: 100%;
+  background: #111111;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: #f5f5f5;
+  outline: none;
+  transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+.atlas-search-input::placeholder {
+  color: #555555;
+}
+
+.atlas-search-input:focus {
+  border-color: #5b8def;
+  box-shadow: 0 0 0 2px rgba(91, 141, 239, 0.2);
+}
+
+/* Strip browser chrome from type="search" */
+.atlas-search-input::-webkit-search-decoration,
+.atlas-search-input::-webkit-search-cancel-button,
+.atlas-search-input::-webkit-search-results-button {
+  -webkit-appearance: none;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   RESULTS LIST
+   flex + gap applied here so app.js only needs classList.remove('hidden')
+   ══════════════════════════════════════════════════════════════════════ */
+
+.atlas-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  list-style: none;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   RESULT CARD
+   Spec: bg-surface, border-subtle → border-mid on hover, rounded-lg,
+         p-4, transition 150ms. No box-shadow.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.atlas-card {
+  list-style: none;
+}
+
+.atlas-card-link {
+  display: block;
+  background: #111111;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  padding: 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 150ms ease-out;
+}
+
+.atlas-card-link:hover {
+  border-color: #404040;
+}
+
+/* Title row: title left, badge right, aligned to first line */
+.atlas-card-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.atlas-card-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #f5f5f5;
+  line-height: 1.4;
+}
+
+/* Category badge — neutral variant from spec */
+.atlas-badge {
+  flex-shrink: 0;
+  display: inline-block;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  color: #888888;
+  font-size: 0.6875rem;
+  letter-spacing: 0.01em;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+/* Description — secondary text, 2-line clamp for long descriptions */
+.atlas-card-desc {
+  margin-top: 6px;
+  font-size: 0.8125rem;
+  color: #888888;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Matched headings — tertiary, bullet-separated, rendered as a single line */
+.atlas-card-headings {
+  margin-top: 10px;
+  font-size: 0.75rem;
+  letter-spacing: 0.01em;
+  color: #555555;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Modified date — mono, sub-small, tertiary */
+.atlas-card-meta {
+  margin-top: 10px;
+  font-size: 0.6875rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  letter-spacing: 0.01em;
+  color: #555555;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   CATEGORY SIDEBAR BUTTONS
+   Spec: ghost button variant, accent/10 bg when active.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.atlas-cat-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  color: #888888;
+  text-align: left;
+  transition: background 150ms ease-out, color 150ms ease-out;
+}
+
+.atlas-cat-btn:hover {
+  background: #1a1a1a;
+  color: #f5f5f5;
+}
+
+.atlas-cat-btn--active {
+  background: rgba(91, 141, 239, 0.1);
+  color: #5b8def;
+}
+
+.atlas-cat-btn--active:hover {
+  background: rgba(91, 141, 239, 0.14);
+  color: #5b8def;
+}
+
+.atlas-cat-label {
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.atlas-cat-count {
+  flex-shrink: 0;
+  font-size: 0.6875rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: #555555;
+  min-width: 18px;
+  text-align: right;
+}
+
+.atlas-cat-btn--active .atlas-cat-count {
+  color: rgba(91, 141, 239, 0.6);
+}

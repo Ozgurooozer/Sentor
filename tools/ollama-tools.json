@@ -1,0 +1,55 @@
+{
+  "_meta": {
+    "description": "Ollama function-calling tool definitions for the Atlas OS knowledge API.",
+    "usage": "Include the 'tools' array in your /api/chat request body. Start the API first with: atlas serve",
+    "api_base": "http://localhost:4242",
+    "recommended_workflow": "1. Call search_knowledge to find relevant pages. 2. Call get_page on the top result to read full content."
+  },
+
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "search_knowledge",
+        "description": "Search the local Atlas OS knowledge base. Returns ranked pages whose title, headings, description, or body text match the query. Use this first to discover what is available, then call get_page for the full content of a specific page.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Search terms, e.g. 'semantic HTML' or 'service workers offline'."
+            },
+            "limit": {
+              "type": "integer",
+              "description": "Maximum number of results to return. Range: 1–50. Default: 5.",
+              "default": 5
+            },
+            "category": {
+              "type": "string",
+              "description": "Optional. Filter results to a single category folder, e.g. 'html' or 'ai-tools'. Omit to search all categories."
+            }
+          },
+          "required": ["query"]
+        }
+      }
+    },
+
+    {
+      "type": "function",
+      "function": {
+        "name": "get_page",
+        "description": "Retrieve the full plain-text content of a knowledge page by its ID. The text is HTML-stripped and ready for inclusion in a context window. Obtain the page ID from search_knowledge results.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Page ID in the format category/slug, e.g. 'html/html-quality'. Returned as the 'id' field in search_knowledge results."
+            }
+          },
+          "required": ["id"]
+        }
+      }
+    }
+  ]
+}

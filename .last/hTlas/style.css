@@ -1,0 +1,339 @@
+/* CSS Variables for themes */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --text-color: #333;
+    --bg-color: #fff;
+    --shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+[data-theme="dark"] {
+    --primary-color: #2980b9;
+    --secondary-color: #27ae60;
+    --text-color: #f4f4f4;
+    --bg-color: #121212;
+}
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Header and Navigation */
+header {
+    background-color: var(--primary-color);
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+}
+
+nav ul li {
+    margin-left: 2rem;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: var(--secondary-color);
+}
+
+#theme-toggle {
+    background: none;
+    border: 1px solid white;
+    color: white;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#theme-toggle:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+/* Main content */
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+section {
+    margin-bottom: 3rem;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    background-color: var(--bg-color);
+}
+
+h1, h2 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+h1 {
+    font-size: 2.5rem;
+    text-align: center;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+/* Canvas styling */
+#canvas {
+    display: block;
+    margin: 1rem auto;
+    border: 1px solid var(--text-color);
+    border-radius: 5px;
+}
+
+/* Project grid using CSS Grid */
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.project {
+    padding: 1rem;
+    border: 1px solid var(--primary-color);
+    border-radius: 5px;
+    transition: transform 0.3s;
+}
+
+.project:hover {
+    transform: translateY(-5px);
+}
+
+/* Form styling */
+form {
+    display: grid;
+    gap: 1rem;
+}
+
+label {
+    font-weight: bold;
+}
+
+input, textarea {
+    padding: 0.5rem;
+    border: 1px solid var(--primary-color);
+    border-radius: 5px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+button[type="submit"] {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #229954;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+    }
+    
+    nav ul {
+        margin-top: 1rem;
+    }
+    
+    nav ul li {
+        margin-left: 0;
+        margin-right: 1rem;
+    }
+    
+    main {
+        padding: 1rem;
+    }
+    
+    section {
+        padding: 1rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+section {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Technique articles */
+.technique {
+    margin-bottom: 3rem;
+    padding: 2rem;
+    border: 1px solid var(--primary-color);
+    border-radius: 10px;
+    background-color: var(--bg-color);
+}
+
+.technique h2 {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+}
+
+.technique h3 {
+    color: var(--secondary-color);
+    margin-top: 1.5rem;
+}
+
+.technique pre {
+    background-color: #f4f4f4;
+    padding: 1rem;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.technique code {
+    font-family: 'Courier New', monospace;
+    background-color: #e8e8e8;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+}
+
+.technique ul {
+    margin: 1rem 0;
+    padding-left: 2rem;
+}
+
+.technique li {
+    margin-bottom: 0.5rem;
+}
+
+/* Demo sections */
+.demo {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.demo h4 {
+    margin-bottom: 1rem;
+    color: var(--secondary-color);
+}
+
+/* WebGL canvas */
+#webgl-demo {
+    border: 1px solid var(--text-color);
+    border-radius: 5px;
+}
+
+/* Validation form */
+#validation-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 300px;
+}
+
+#validation-form input {
+    padding: 0.5rem;
+    border: 1px solid var(--primary-color);
+    border-radius: 5px;
+}
+
+#validation-form button {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Data demo */
+#data-demo {
+    padding: 1rem;
+    border: 2px solid blue;
+    border-radius: 5px;
+    display: inline-block;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+/* Scroll demo */
+.scroll-demo {
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--primary-color);
+    padding: 1rem;
+    border-radius: 5px;
+}
+
+.animated-box {
+    padding: 1rem;
+    margin: 1rem 0;
+    background-color: var(--secondary-color);
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .technique pre {
+    background-color: #333;
+    color: #f4f4f4;
+}
+
+[data-theme="dark"] .technique code {
+    background-color: #555;
+    color: #f4f4f4;
+}
+
+[data-theme="dark"] .demo {
+    background-color: #333;
+}
