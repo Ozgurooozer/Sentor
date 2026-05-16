@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Proje Karşılaştırma Platformu</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#0f0f1a;color:#e0e0e0}
+nav{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:15px 40px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+nav .logo{font-size:24px;font-weight:bold;color:#00d9ff}
+nav ul{list-style:none;display:flex;gap:25px}
+nav ul li a{color:#ccc;text-decoration:none;font-size:14px;transition:.3s}
+nav ul li a:hover{color:#00d9ff}
+.hero{text-align:center;padding:100px 20px;background:linear-gradient(135deg,#0f0f1a,#1a1a3e)}
+.hero h1{font-size:48px;background:linear-gradient(90deg,#00d9ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:20px}
+.hero p{font-size:18px;color:#aaa;max-width:600px;margin:0 auto 30px}
+.hero button{padding:12px 30px;background:linear-gradient(135deg,#00d9ff,#7b2ff7);border:none;color:white;font-size:16px;border-radius:25px;cursor:pointer;transition:.3s}
+.hero button:hover{transform:scale(1.05);box-shadow:0 0 20px rgba(0,217,255,.4)}
+section{padding:60px 40px;max-width:1200px;margin:0 auto}
+section h2{font-size:32px;margin-bottom:30px;color:#00d9ff}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{padding:14px 18px;text-align:center;border:1px solid #2a2a4a}
+th{background:#1a1a2e;color:#00d9ff;font-size:14px}
+td{font-size:14px}
+tr:nth-child(even){background:#12122a}
+.badge{padding:4px 10px;border-radius:12px;font-size:12px}
+.badge-yes{background:#1b4332;color:#52b788}
+.badge-no{background:#3b1010;color:#e63946}
+.badge-partial{background:#3b2e0a;color:#f4a261}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:25px}
+.card{background:linear-gradient(145deg,#1a1a2e,#16213e);border-radius:15px;padding:30px;border:1px solid #2a2a4a;transition:.3s}
+.card:hover{transform:translateY(-5px);border-color:#00d9ff}
+.card h3{color:#7b2ff7;margin-bottom:10px;font-size:20px}
+.card p{font-size:14px;color:#aaa;line-height:1.7}
+.card .tag{display:inline-block;padding:3px 10px;background:#2a2a4a;border-radius:10px;font-size:12px;margin:5px 3px;color:#ccc}
+.pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.pros-list,.cons-list{background:#12122a;border-radius:15px;padding:25px;border:1px solid #2a2a4a}
+.pros-list h3{color:#52b788;margin-bottom:15px}
+.cons-list h3{color:#e63946;margin-bottom:15px}
+.pros-list li,.cons-list li{list-style:none;padding:8px 0;border-bottom:1px solid #1f1f3a;font-size:14px}
+.pros-list li::before{content:"✅ "}
+.cons-list li::before{content:"❌ "}
+.radar-container{text-align:center;margin:40px 0}
+.accordion{max-width:800px;margin:0 auto}
+.accordion-item{background:#12122a;border-radius:10px;margin-bottom:10px;overflow:hidden;border:1px solid #2a2a4a}
+.accordion-item .question{padding:18px 20px;cursor:pointer;font-weight:bold;color:#ccc;font-size:15px}
+.accordion-item .question:hover{color:#00d9ff}
+.accordion-item .answer{padding:0 20px;max-height:0;overflow:hidden;transition:.4s;font-size:14px;color:#aaa;line-height:1.8}
+.accordion-item.active .answer{padding:15px 20px;max-height:500px}
+footer{text-align:center;padding:40px;background:#0a0a1a;color:#555;font-size:13px}
+footer a{color:#00d9ff;text-decoration:none}
+.highlight{background:linear-gradient(135deg,#1a1a2e,#2d1b69;border-radius:15px;padding:30px;margin:20px 0;border:1px solid #7b2ff7}
+.highlight h3{color:#7b2ff7;margin-bottom:10px}
+@media(max-width:768px){.hero h1{font-size:28px}.pros-cons{grid-template-columns:1fr}section{padding:40px 15px}}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">🤖 AI Proje Karşılaştır</div>
+<ul>
+<li><a href="#karsilastirma">Karşılaştırma</a></li>
+<li><a href="#projeler">Projeler</a></li>
+<li><a href="#arties">Artılar/Eksiler</a></li>
+<li><a href="#tipler">Proje Tipleri</a></li>
+<li><a href="#sorular">Sorular</a></li>
+</ul>
+</nav>
+
+<div class="hero">
+<h1>AI Geliştirme Araçlarını Karşılaştırın</h1>
+<p>Opencode, Continue.dev, Cursor ve benzeri AI projelerini detaylı analiz ederek size en uygun aracı seçin.</p>
+<button onclick="document.getElementById('karsilastirma').scrollIntoView()">Karşılaştırmaya Başla ▶</button>
+</div>
+
+<section id="karsilastirma">
+<h2>📊 Detaylı Karşılaştırma Tablosu</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Özellik</th><th>Opencode</th><th>Continue.dev</th><th>Cursor</th></tr></thead>
+<tbody>
+<tr><td>Fiyat</td><td><span class="badge badge-yes">Ücretsiz</span></td><td><span class="badge badge-yes">Ücretsiz</span></td><td><span class="badge badge-partial">Freemium</span></td></tr>
+<tr><td>Açık Kaynak</td><td><span class="badge badge-yes">Evet</span></td><td><span class="badge badge-yes">Evet</span></td><td><span class="badge badge-no">Hayır</span></td></tr>
+<tr><td>Platforma</td><td>CLI</td><td>VS Code / JetBrains</td><td>Bağımsız IDE</td></tr>
+<tr><td>Çoklu LLM</td><td><span class="badge badge-no">Sınırlı</span></td><td><span class="badge badge-yes">Evet</span></td><td><span class="badge badge-partial">Sınırlı</span></td></tr>
+<tr><td>Görsel Arayüz</td><td><span class="badge badge-no">Terminal</span></td><td><span class="badge badge-yes">IDE</span></td><td><span class="badge badge-yes">Tam IDE</span></td></tr>
+<tr><td>Kod Tamamlama</td><td><span class="badge badge-no">Yok</span></td><td><span class="badge badge-yes">Evet</span></td><td><span class="badge badge-yes">Gelişmiş</span></td></tr>
+<tr><td>Codebase Analizi</td><td><span class="badge badge-no">Temel</span></td><td><span class="badge badge-yes">Indexleme</span></td><td><span class="badge badge-yes">Derin</span></td></tr>
+<tr><td>Multi-file Edit</td><td><span class="badge badge-no">Sınırlı</span></td><td><span class="badge badge-partial">Sınırlı</span></td><td><span class="badge badge-yes">Evet</span></td></tr>
+<tr><td>Kurulum Kolaylığı</td><td>Orta (terminal)</td><td>Kolay (market)</td><td>Kolay (indir)</td></tr>
+<tr><td>Topluluk</td><td>Orta</td><td>Büyük</td><td>Pazar lideri</td></tr>
+<tr><td>Özelleştirme</td><td><span class="badge badge-yes">Yüksek</span></td><td><span class="badge badge-yes">Orta</span></td><td><span class="badge badge-no">Düşük</span></td></tr>
+</tbody></table>
+</div>
+</section>
+
+<section id="projeler">
+<h2>🔍 Projelerin Özeti</h2>
+<div class="cards">
+<div class="card">
+<h3>Opencode</h3>
+<p>Açık kaynaklı CLI tabanlı AI yardımcısı. Araç merkezli mimari ile genişletilebilir. Terminal bilen geliştiriciler için hızlı ve öz.</p>
+<div><span class="tag">CLI</span><span class="tag">Açık Kaynak</span><span class="tag">Araç Merkezli</span><span class="tag">GPT Odaklı</span></div>
+</div>
+<div class="card">
+<h3>Continue.dev</h3>
+<p>IDE eklentisi olarak çalışan, çoklu model destekli AI asistanı. @ ile bağlam ekleme, codebase indexleme gibi güçlü özellikler sunar.</p>
+<div><span class="tag">IDE Eklentisi</span><span class="tag">Açık Kaynak</span><span class="tag">Çoklu Model</span><span class="tag">Kolay Kurulum</span></div>
+</div>
+<div class="card">
+<h3>Cursor</h3>
+<p>AI-first kod editörü. En sofistike AI entegrasyonu sunar ancak kapalı kaynak ve freemium modeliyle gelir.</p>
+<div><span class="tag">Bağımsız IDE</span><span class="tag">Kapalı Kaynak</span><span class="tag">Premium</span><span class="tag">AI-Native</span></div>
+</div>
+</div>
+</section>
+
+<section id="arties">
+<h2>⚖️ Artılar ve Eksiler Analizi</h2>
+
+<div class="highlight">
+<h3>🔵 Opencode - Değerlendirme</h3>
+<div class="pros-cons">
+<div class="pros-list"><h3>✅ Artılar</h3><ul>
+<li>Tamamen açık kaynak, tamamen özelleştirilebilir</li>
+<li>CLI ortamında hızlı ve hafif çalışır</li>
+<li>Araç merkezli mimari = sınırsız genişletilebilirlik</li>
+<li>Herhangi bir IDE bağımlılığı yok</li>
+<li>Terminal bilen geliştiriciler için verimli</li>
+</ul></div>
+<div class="cons-list"><h3>❌ Eksileri</h3><ul>
+<li>Görsel arayüz yok (sadece terminal)</li>
+<li>IDE entegrasyonu eksik (kod tamamlama yok)</li>
+<li>Tek model desteği (genellikle GPT)</li>
+<li>Kurulum için terminal bilgisi şart</li>
+<li>Bağlam yönetimi sınırlı</li>
+</ul></div>
+</div>
+</div>
+
+<div class="highlight">
+<h3>🟣 Continue.dev - Değerlendirme</h3>
+<div class="pros-cons">
+<div class="pros-list"><h3>✅ Artılar</h3><ul>
+<li>IDE içinde doğrudan çalışır, köprüsüz erişim</li>
+<li>Çoklu LLM desteği (OpenAI, Claude, local)</li>
+<li>Codebase indexleme ile derin bağlam bilinci</li>
+<li>Aktif topluluk ve hızlı geliştirme</li>
+<li>@ sistemi ile esnek bağlam yönetimi</li>
+</ul></div>
+<div class="cons-list"><h3>❌ Eksileri</h3><ul>
+<li>VS Code'a bağımlı (JetBrains desteği sınırlı)</li>
+<li>Büyük codebase'de performans düşüşü</li>
+<li>Bazı özellikler deneysel</li>
+<li>Ağ bağlantısı şart (offline kısıtlı)</li>
+<li>Kurumsal özellikler yetersiz</li>
+</ul></div>
+</div>
+</div>
+
+<div class="highlight">
+<h3>🟠 Cursor - Değerlendirme</h3>
+<div class="pros-cons">
+<div class="pros-list"><h3>✅ Artılar</h3><ul>
+<li>En sofistike AI entegrasyonu</li>
+<li>Multi-file düzenleme yeteneği</li>
+<li>Güçlü codebase awareness</li>
+<li>Profesyonel ve kullanıcı dostu arayüz</li>
+<li>Hızlı kod üretimi ve düzenleme</li>
+</ul></div>
+<div class="cons-list"><h3>❌ Eksileri</h3><ul>
+<li>Kapalı kaynak (veri gizliliği riski)</li>
+<li>Ücretli (freemium zorunlu abonelik)</li>
+<li>VS Code fork = güncelleme gecikmesi</li>
+<li>Vendor lock-in riski</li>
+<li>Özelleştirme imkânları çok sınırlı</li>
+</ul></div>
+</div>
+</div>
+</section>
+
+<section id="tipler">
+<h2>🎯 Kullanılabilecek Proje Tipleri ve Amaçları</h2>
+<div class="cards">
+<div class="card"><h3>1. Kişisel AI Asistanı</h3><p><strong>Amaç:</strong> Tek kullanıcının iş akışını hızlandırmak<br><strong>Kullanım:</strong> Kod yazımı, hata ayıklama, öğrenme<br><strong>Örnek:</strong> Opencode CLI</p></div>
+<div class="card"><h3>2. Eğitim Platformu</h3><p><strong>Amaç:</strong> Yeni programcıların AI ile öğrenmesini sağlamak<br><strong>Kullanım:</strong> Adım adım açıklama, soru-cevap, mentorluk<br><strong>Örnek:</strong> Sohbet tabanlı AI tutor</p></div>
+<div class="card"><h3>3. Ekip İşbirliği</h3><p><strong>Amaç:</strong> Ekiplerin codebase üzerinde AI destekli çalışması<br><strong>Kullanım:</strong> Code review, standardizasyon, dokümantasyon<br><strong>Örnek:</strong> Continue.dev + shared config</p></div>
+<div class="card"><h3>4. Otomasyon Botu</h3><p><strong>Amaç:</strong> Tekrarlayan görevlerin otomatikleştirilmesi<br><strong>Kullanım:</strong> CI/CD, test yazımı, migration<br><strong>Örnek:</strong> Pipeline entegre AI</p></div>
+<div class="card"><h3>5. Web IDE Asistanı</h3><p><strong>Amaç:</strong> Tarayıcıda çalışan erişilebilir AI editörü<br><strong>Kullanım:</strong> Hızlı prototipleme, uzak çalışma<br><strong>Örnek:</strong> Browser-based AI IDE</p></div>
+<div class="card"><h3>6. Araştırma ve Analiz</h3><p><strong>Amaç:</strong> Büyük codebase analizi ve güvenlik taraması<br><strong>Kullanım:</strong> Refaktoring, teknik borç, güvenlik açıkları<br><strong>Örnek:</strong> Codebase-aware AI analizörü</p></div>
+</div>
+</section>
+
+<section id="ozet-karsilastirma">
+<h2>📋 Kendime Değerlendirme - Ben Bunları Deniyorum</h2>
+<p>Yukarıdaki proje tiplerini kendi yapım (yapay zeka asistanı) ile karşılaştırıyorum:</p>
+<table>
+<thead><tr><th>Yetenek</th><th>Opencode</th><th>Continue</th><th>Cursor</th><th>Ben (Yapay Zeka)</th></tr></thead>
+<tbody>
+<tr><td>Kod üretimi</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+<tr><td>Dosya okuma/yazma</td><td>✅ (araçlar)</td><td>✅ (IDE)</td><td>✅ (editör)</td><td>✅</td></tr>
+<tr><td>Çoklu model</td><td>❌</td><td>✅</td><td>❌</td><td>Bağımsız çalışırım</td></tr>
+<tr><td>Görsel arayüz</td><td>❌</td><td>✅</td><td>✅</td><td>Web tabanlı olabilirim</td></tr>
+<tr><td>Codebase indexleme</td><td>❌</td><td>✅</td><td>✅</td><td>Bağlam penceresi ile</td></tr>
+<tr><td>Türkçe destek</td><td>Sınırlı</td><td>Orta</td><td>İyi</td><td>✅ Doğal</td></tr>
+<tr><td>Açık kaynak</td><td>✅</td><td>✅</td><td>❌</td><td>—</td></tr>
+<tr><td>Offline çalışma</td><td>✅</td><td>Kısmen</td><td>Kısmen</td><td>❌ Bulut</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="sorular">
+<h2>❓ "Daha İyi Yapılabilir mi?" Soruları</h2>
+<div class="accordion">
+<div class="accordion-item" onclick="toggleAccordion(this)">
+<div class="question">1. Tüm bu özellikleri birleştiren tek bir açık kaynak proje mümkün mü?</div>
+<div class="answer">Evet, ancak büyük bir çabayı gerektirir. CLI + IDE + Web arayüzünü hibrit bir mimariyle (micro-frontend + plugin sistemi) birleştirmek mümkün. MCP (Model Context Protocol) gibi standartlar bu entegrasyonu kolaylaştırır.</div>
+</div>
+<div class="accordion-item" onclick="toggleAccordion(this)">
+<div class="question">2. Local LLM desteği nasıl eklenmeli?</div>
+<div class="answer">Ollama, llama.cpp veya vLLM gibi local model runner'larla entegrasyon yapılabilir. Kullanıcı modelini seçebilecek bir arayüz (GUI) ile kolayca geçiş yapabilmeli.</div>
+</div>
+<div class="accordion-item" onclick="toggleAccordion(this)">
+<div class="question">3. Türkçe dil desteği nasıl iyileştirilebilir?</div>
+<div class="answer">Türkçe özel tokenizer eğitimi, Türkçe codebase verisi ile fine-tuning, ve Türkçe dokümantasyon desteği eklenmeli. Ayrıca Türkçe yorum/talep anlayışı güçlendirilmeli.</div>
+</div>
+<div class="accordion-item" onclick="toggleAccordion(this)">
+<div class="question">4. Güvenlik ve gizlilik nasıl sağlanmalı?</div>
+<div class="answer">End-to-end şifreleme, local-only mod, veri saklama seçeneği, self-hosted model desteği ve OAuth/SSO entegrasyonu eklenmeli. Kurumsal kullanıcılar için SOC 2 uyumluluğu şart.</div>
+</div>
+<div class="accordion-item" onclick="toggleAccordion(this)">
+<div class="question">5. Multi-agent mimari ne getirir?</div>
+<div class="answer">Farklı AI'lar farklı görevlerde uzmanlaşabilir: biri kod yazar, biri test yazar, biri code review yapar. Bu "AI ekibi" yaklaşımı tek bir büyük modelden daha verimli ve özel olabilir.</div>
+</div>
+<div class="accordion-item" onclick="toggleAccordion(this)">
+<div class="question">6. Kurumsa (enterprise) kullanım için ne gerekli?</div>
+<div class="answer">SSO/SAML entegrasyonu, audit log'ları, roller ve izinler, self-hosted dağıtım seçeneği, SLA garantileri ve şirket içi LLM bağlantısı (Azure OpenAI, AWS Bedrock).</div>
+</div>
+<div class="accordion-item" onclick="toggleAccordion(this)">
+<div class="question">7. Eksik en kritik özellik ne?</div>
+<div class="answer">Görsel arayüz + CLI hibriti yok. Proje yönetimi entegrasyonu (Jira, GitHub Issues) zayıf. Eğitim ve öğrenme modu eksik. Türkçe topluluk desteği çok zayıf.</div>
+</div>
+</div>
+</section>
+
+<footer>
+<p>🤖 AI Proje Karşılaştırma Platformu | Kaynaklar | GitHub | Katkıda Bulunun</p>
+<p style="margin-top:8px">Bu analiz Opencode, Continue.dev ve Cursor üzerine hazırlanmıştır.</p>
+</footer>
+
+<script>
+function toggleAccordion(item){item.classList.toggle('active')}
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',function(e){e.preventDefault();document.querySelector(this.getAttribute('href')).scrollIntoView({behavior:'smooth'})}));
+</script>
+</body>
+</html>

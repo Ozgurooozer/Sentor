@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taslak — 10 Web Tasarımı</title>
+<style>
+/* ========== GLOBAL RESET ========== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#0a0a0a;color:#f5f5f5;min-height:100vh}
+
+/* ========== GALLERY ========== */
+#gallery{display:block}
+#gallery.hidden{display:none}
+.design-view{display:none}
+.design-view.active{display:block;animation:fadeIn .3s ease}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.gallery-header{text-align:center;padding:4rem 2rem 2rem}
+.gallery-header h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;letter-spacing:-.03em}
+.gallery-header h1 span{background:linear-gradient(135deg,#5b8def,#8b5cf6,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gallery-header p{color:#888;margin-top:.8rem;font-size:.95rem;max-width:500px;margin-left:auto;margin-right:auto}
+
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.2rem;padding:1rem 2rem 4rem;max-width:1200px;margin:0 auto}
+
+.gallery-card{
+  background:#111;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;
+  cursor:pointer;transition:all .15s ease;text-decoration:none;color:inherit;display:block;
+}
+.gallery-card:hover{border-color:#5b8def;transform:translateY(-4px)}
+
+.gallery-card .preview{
+  height:140px;display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;font-weight:700;position:relative;overflow:hidden;
+}
+.gallery-card .preview .num{opacity:.1;font-size:5rem;position:absolute;right:10px;bottom:-10px;font-weight:900}
+.gallery-card .info{padding:1rem 1.2rem 1.2rem}
+.gallery-card .info .tag{font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:#666;font-weight:600}
+.gallery-card .info h3{font-size:1rem;font-weight:700;margin:.2rem 0 .3rem}
+.gallery-card .info p{font-size:.78rem;color:#888;line-height:1.5}
+
+/* ========== BACK BAR ========== */
+.back-bar{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;gap:8px;
+  padding:.7rem 1.5rem;font-size:.82rem;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(12px);
+  border-bottom:1px solid #2a2a2a;
+  cursor:pointer;color:#888;transition:color .15s;
+  user-select:none;
+}
+.back-bar:hover{color:#f5f5f5}
+
+/* ========== DESIGN 1 — Kişisel Blog ========== */
+.d1-bg{background:#faf6f0;color:#2c1810;font-family:Georgia,'Times New Roman',serif}
+.d1-bg .back-bar{background:rgba(250,246,240,.95);border-color:#e8ddd0;color:#8b6914}
+.d1-bg .back-bar:hover{color:#2c1810}
+.d1-wrap{max-width:680px;margin:0 auto;padding:3rem 1.5rem}
+.d1-header{text-align:center;margin-bottom:3rem}
+.d1-header h1{font-size:2.8rem;font-weight:400;letter-spacing:-.02em;color:#2c1810}
+.d1-header .sub{color:#8b6914;font-size:.85rem;letter-spacing:.15em;text-transform:uppercase;margin-top:.5rem}
+.d1-header .desc{color:#666;font-size:.9rem;margin-top:.8rem;font-style:italic}
+.d1-post{border-bottom:1px solid #e8ddd0;padding:1.8rem 0}
+.d1-post:first-of-type{padding-top:0}
+.d1-post .meta{font-size:.78rem;color:#8b6914;margin-bottom:.3rem}
+.d1-post h2{font-size:1.4rem;font-weight:400;margin-bottom:.5rem}
+.d1-post h2 a{color:#2c1810;text-decoration:none}
+.d1-post h2 a:hover{color:#8b6914}
+.d1-post .excerpt{color:#555;font-size:.9rem;line-height:1.7}
+.d1-post .tags{display:flex;gap:6px;margin-top:.8rem;flex-wrap:wrap}
+.d1-post .tags span{font-size:.7rem;color:#8b6914;background:#f0e8dc;padding:2px 10px;border-radius:999px;font-family:system-ui}
+
+/* ========== DESIGN 2 — Kurumsal ========== */
+.d2-bg{background:#ffffff;color:#1e3a5f;font-family:system-ui,sans-serif}
+.d2-bg .back-bar{background:rgba(255,255,255,.95);border-color:#e0e8f0;color:#4a90d9}
+.d2-bg .back-bar:hover{color:#1e3a5f}
+.d2-hero{background:linear-gradient(135deg,#1e3a5f,#2d5f8a);color:#fff;padding:5rem 2rem;text-align:center}
+.d2-hero h1{font-size:clamp(2rem,5vw,3rem);font-weight:700;margin-bottom:.8rem}
+.d2-hero p{font-size:1.05rem;opacity:.85;max-width:550px;margin:0 auto 1.5rem}
+.d2-hero .btn{background:#fff;color:#1e3a5f;padding:.75rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;font-size:.9rem}
+.d2-features{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;max-width:1000px;margin:0 auto;padding:4rem 2rem}
+.d2-feature{text-align:center}
+.d2-feature .icon{font-size:2rem;margin-bottom:.8rem;display:block}
+.d2-feature h3{font-size:1rem;font-weight:700;margin-bottom:.3rem}
+.d2-feature p{font-size:.85rem;color:#555;line-height:1.6}
+.d2-stats{display:flex;justify-content:center;gap:3rem;padding:3rem 2rem;background:#f5f8fc;flex-wrap:wrap}
+.d2-stat{text-align:center}
+.d2-stat .num{font-size:2rem;font-weight:800;color:#2d5f8a}
+.d2-stat .label{font-size:.78rem;color:#666;margin-top:.2rem}
+
+/* ========== DESIGN 3 — Portföy ========== */
+.d3-bg{background:#0a0a0a;color:#fff;font-family:system-ui,sans-serif}
+.d3-bg .back-bar{background:rgba(10,10,10,.95);border-color:#2a2a2a;color:#ff6b35}
+.d3-bg .back-bar:hover{color:#fff}
+.d3-header{text-align:center;padding:4rem 2rem 2rem}
+.d3-header h1{font-size:3rem;font-weight:800;letter-spacing:-.03em}
+.d3-header h1 span{color:#ff6b35}
+.d3-header p{color:#666;margin-top:.5rem}
+.d3-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem;padding:0 2rem 4rem;max-width:1000px;margin:0 auto}
+.d3-project{
+  aspect-ratio:4/3;border-radius:12px;overflow:hidden;
+  display:flex;align-items:flex-end;padding:1.5rem;
+  position:relative;cursor:default;
+}
+.d3-project .overlay{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.7),transparent 50%)}
+.d3-project .content{position:relative;z-index:1}
+.d3-project h3{font-size:1.1rem;font-weight:700}
+.d3-project .tag{font-size:.7rem;color:#ff6b35;text-transform:uppercase;letter-spacing:.1em}
+
+/* ========== DESIGN 4 — Dokümantasyon ========== */
+.d4-bg{background:#f8f9fa;color:#212529;font-family:system-ui,sans-serif}
+.d4-bg .back-bar{background:rgba(248,249,250,.95);border-color:#dee2e6;color:#0366d6}
+.d4-bg .back-bar:hover{color:#212529}
+.d4-layout{display:flex;min-height:calc(100vh - 44px)}
+.d4-sidebar{width:240px;padding:2rem 1.5rem;border-right:1px solid #dee2e6;flex-shrink:0;background:#fff;position:sticky;top:44px;height:calc(100vh - 44px);overflow-y:auto}
+.d4-sidebar h3{font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;color:#6c757d;margin-bottom:1rem}
+.d4-sidebar a{display:block;padding:.4rem 0;color:#495057;text-decoration:none;font-size:.85rem}
+.d4-sidebar a:hover{color:#0366d6}
+.d4-sidebar a.active{color:#0366d6;font-weight:600}
+.d4-content{flex:1;padding:2rem 3rem;max-width:780px}
+.d4-content h1{font-size:1.8rem;font-weight:700;margin-bottom:.5rem}
+.d4-content .desc{color:#6c757d;font-size:.9rem;margin-bottom:2rem}
+.d4-content h2{font-size:1.2rem;font-weight:700;margin:1.5rem 0 .8rem}
+.d4-content p{font-size:.9rem;color:#495057;line-height:1.8;margin-bottom:1rem}
+.d4-content pre{background:#fff;border:1px solid #dee2e6;border-radius:8px;padding:1rem;font-size:.82rem;overflow-x:auto;margin-bottom:1rem;font-family:'SF Mono','Fira Code',monospace;line-height:1.6}
+
+/* ========== DESIGN 5 — Dashboard ========== */
+.d5-bg{background:#f5f6fa;color:#2d3436;font-family:system-ui,sans-serif}
+.d5-bg .back-bar{background:rgba(26,29,35,.95);border-color:#2a2d35;color:#00c9a7}
+.d5-bg .back-bar:hover{color:#fff}
+.d5-layout{display:flex;min-height:calc(100vh - 44px)}
+.d5-sidebar{width:220px;background:#1a1d23;color:#a0a4b0;padding:1.5rem;flex-shrink:0;position:sticky;top:44px;height:calc(100vh - 44px)}
+.d5-sidebar h3{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:#4a4d55;margin-bottom:1.2rem;font-weight:700}
+.d5-sidebar a{display:flex;align-items:center;gap:8px;padding:.6rem .8rem;border-radius:8px;color:#a0a4b0;text-decoration:none;font-size:.82rem;margin-bottom:2px}
+.d5-sidebar a:hover{background:#22252d;color:#f5f6fa}
+.d5-sidebar a.active{background:#22252d;color:#00c9a7}
+.d5-main{flex:1;padding:1.5rem 2rem}
+.d5-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}
+.d5-topbar h2{font-size:1.3rem;font-weight:700}
+.d5-topbar .date{font-size:.8rem;color:#888}
+.d5-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
+.d5-card{background:#fff;border-radius:10px;padding:1.2rem;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.d5-card .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#888;font-weight:600}
+.d5-card .val{font-size:1.6rem;font-weight:800;margin:.2rem 0}
+.d5-card .chg{font-size:.75rem}
+.d5-card .chg.up{color:#00c9a7}
+.d5-card .chg.down{color:#e17055}
+.d5-table{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.d5-table table{width:100%;border-collapse:collapse;font-size:.82rem}
+.d5-table th{background:#f8f9fa;padding:.8rem 1rem;text-align:left;color:#666;font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}
+.d5-table td{padding:.8rem 1rem;border-top:1px solid #eee;color:#444}
+.d5-table .badge{padding:2px 8px;border-radius:999px;font-size:.7rem;background:#e8f8f5;color:#00c9a7}
+
+/* ========== DESIGN 6 — Lansman ========== */
+.d6-bg{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;font-family:system-ui,sans-serif;min-height:100vh}
+.d6-bg .back-bar{background:rgba(15,12,41,.95);border-color:rgba(255,255,255,.1);color:#f9ca24}
+.d6-bg .back-bar:hover{color:#fff}
+.d6-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 44px);text-align:center;padding:3rem 2rem}
+.d6-badge{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;border:1px solid rgba(255,255,255,.15);padding:.35rem 1rem;border-radius:999px;margin-bottom:1.5rem;color:rgba(255,255,255,.6)}
+.d6-wrap h1{font-size:clamp(2.2rem,6vw,4rem);font-weight:800;line-height:1.1;max-width:700px}
+.d6-wrap h1 span{color:#f9ca24}
+.d6-wrap p{max-width:480px;color:rgba(255,255,255,.6);margin:1.2rem 0 2rem;font-size:.95rem;line-height:1.7}
+.d6-form{display:flex;gap:.6rem;width:100%;max-width:440px;flex-wrap:wrap;justify-content:center}
+.d6-form input{flex:1;min-width:200px;padding:.8rem 1.2rem;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;font-size:.9rem;outline:none;font-family:inherit}
+.d6-form input::placeholder{color:rgba(255,255,255,.3)}
+.d6-form input:focus{border-color:#f9ca24}
+.d6-form button{padding:.8rem 1.8rem;border-radius:8px;border:none;background:#f9ca24;color:#0f0c29;font-weight:700;font-size:.9rem;cursor:pointer}
+.d6-features{display:flex;gap:2rem;margin-top:3rem;flex-wrap:wrap;justify-content:center}
+.d6-feat{text-align:center;width:140px}
+.d6-feat .icon{font-size:1.8rem;margin-bottom:.4rem;display:block}
+.d6-feat .lbl{font-size:.78rem;color:rgba(255,255,255,.5)}
+
+/* ========== DESIGN 7 — Fiyatlandırma ========== */
+.d7-bg{background:#f0f2f5;color:#2d3436;font-family:system-ui,sans-serif}
+.d7-bg .back-bar{background:rgba(240,242,245,.95);border-color:#dde0e5;color:#6c5ce7}
+.d7-bg .back-bar:hover{color:#2d3436}
+.d7-header{text-align:center;padding:3rem 2rem 1rem}
+.d7-header h1{font-size:2rem;font-weight:800}
+.d7-header p{color:#666;margin-top:.3rem;font-size:.9rem}
+.d7-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;max-width:900px;margin:0 auto;padding:2rem 2rem 4rem}
+.d7-plan{background:#fff;border-radius:12px;padding:2rem;text-align:center;border:1px solid #e0e3e8;position:relative}
+.d7-plan.popular{border-color:#6c5ce7;box-shadow:0 4px 20px rgba(108,92,231,.12)}
+.d7-plan .pop-tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#6c5ce7;color:#fff;font-size:.68rem;padding:.2rem 1rem;border-radius:999px;font-weight:600;letter-spacing:.05em}
+.d7-plan .name{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:#888;font-weight:600}
+.d7-plan .price{font-size:2.5rem;font-weight:800;margin:.5rem 0}
+.d7-plan .price span{font-size:1rem;color:#888;font-weight:400}
+.d7-plan .desc{font-size:.82rem;color:#666;margin-bottom:1.2rem}
+.d7-plan ul{list-style:none;text-align:left;margin-bottom:1.5rem}
+.d7-plan li{padding:.4rem 0;font-size:.82rem;color:#444;display:flex;align-items:center;gap:6px}
+.d7-plan li::before{content:'\2713';color:#6c5ce7;font-weight:700}
+.d7-plan .btn{display:block;padding:.7rem;border-radius:8px;border:none;font-weight:600;font-size:.85rem;cursor:pointer;text-decoration:none;background:#f0f2f5;color:#2d3436;transition:background .15s}
+.d7-plan .btn:hover{background:#e0e3e8}
+.d7-plan.popular .btn{background:#6c5ce7;color:#fff}
+.d7-plan.popular .btn:hover{background:#5b4bd4}
+
+/* ========== DESIGN 8 — Restoran ========== */
+.d8-bg{background:#1a0f0a;color:#f5e6d3;font-family:Georgia,'Times New Roman',serif}
+.d8-bg .back-bar{background:rgba(26,15,10,.95);border-color:#3a2518;color:#c17a3a}
+.d8-bg .back-bar:hover{color:#f5e6d3}
+.d8-wrap{max-width:800px;margin:0 auto;padding:3rem 1.5rem}
+.d8-header{text-align:center;margin-bottom:2.5rem}
+.d8-header h1{font-size:2.4rem;font-weight:400;letter-spacing:.05em}
+.d8-header .sub{color:#c17a3a;font-size:.75rem;text-transform:uppercase;letter-spacing:.2em;margin-top:.3rem;font-family:system-ui}
+.d8-category{margin-bottom:2rem}
+.d8-category h2{font-size:1.1rem;color:#c17a3a;border-bottom:1px solid #3a2518;padding-bottom:.5rem;margin-bottom:1rem;letter-spacing:.1em;text-transform:uppercase;font-family:system-ui}
+.d8-item{display:flex;justify-content:space-between;align-items:baseline;padding:.5rem 0;border-bottom:1px dotted #3a2518}
+.d8-item .name{font-size:.95rem}
+.d8-item .price{color:#c17a3a;font-size:1rem;font-family:system-ui}
+.d8-item .desc{font-size:.78rem;color:#b8a090;display:block;font-family:system-ui;margin-top:.1rem}
+
+/* ========== DESIGN 9 — Seyahat ========== */
+.d9-bg{background:#eef5f1;color:#1a3c34;font-family:system-ui,sans-serif}
+.d9-bg .back-bar{background:rgba(238,245,241,.95);border-color:#c8ddd2;color:#4a9e7a}
+.d9-bg .back-bar:hover{color:#1a3c34}
+.d9-header{text-align:center;padding:3rem 2rem 1.5rem}
+.d9-header h1{font-size:2.2rem;font-weight:700}
+.d9-header h1 span{color:#4a9e7a}
+.d9-header p{color:#4a6a5e;font-size:.85rem}
+.d9-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.2rem;padding:0 2rem 3rem;max-width:960px;margin:0 auto}
+.d9-card{border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:default;transition:transform .15s}
+.d9-card:hover{transform:translateY(-3px)}
+.d9-card .img{height:160px;display:flex;align-items:center;justify-content:center;font-size:3rem}
+.d9-card .body{padding:1.2rem}
+.d9-card .body .loc{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:#4a9e7a;font-weight:600}
+.d9-card .body h3{font-size:1rem;font-weight:700;margin:.2rem 0 .3rem}
+.d9-card .body p{font-size:.8rem;color:#4a6a5e;line-height:1.5}
+.d9-card .body .meta{font-size:.7rem;color:#7a9a8e;margin-top:.5rem}
+
+/* ========== DESIGN 10 — 404 ========== */
+.d10-bg{background:#1a1a2e;color:#fff;font-family:system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+.d10-bg .back-bar{background:rgba(26,26,46,.95);border-color:rgba(255,255,255,.08);color:#e94560}
+.d10-bg .back-bar:hover{color:#fff}
+.d10-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3rem 2rem}
+.d10-code{font-size:8rem;font-weight:900;line-height:1;background:linear-gradient(135deg,#e94560,#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.d10-wrap h2{font-size:1.5rem;font-weight:700;margin:.8rem 0 .5rem}
+.d10-wrap p{color:rgba(255,255,255,.5);max-width:400px;font-size:.9rem;line-height:1.6;margin-bottom:2rem}
+.d10-wrap .btn{background:#e94560;color:#fff;padding:.75rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem;display:inline-block;transition:opacity .15s}
+.d10-wrap .btn:hover{opacity:.85}
+.d10-search{display:flex;gap:.5rem;margin-top:1.5rem;width:100%;max-width:360px}
+.d10-search input{flex:1;padding:.7rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:#fff;font-size:.85rem;outline:none;font-family:inherit}
+.d10-search input::placeholder{color:rgba(255,255,255,.3)}
+.d10-search input:focus{border-color:#e94560}
+.d10-search button{padding:.7rem 1.2rem;border-radius:8px;border:none;background:#e94560;color:#fff;font-weight:600;cursor:pointer;font-size:.85rem}
+.d10-dots{display:flex;gap:6px;margin-top:2rem}
+.d10-dots span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15);animation:d10-bounce 1.4s ease-in-out infinite}
+.d10-dots span:nth-child(2){animation-delay:.2s}
+.d10-dots span:nth-child(3){animation-delay:.4s}
+@keyframes d10-bounce{0%,80%,100%{transform:scale(1);opacity:.15}40%{transform:scale(1.3);opacity:1}}
+
+/* ========== RESPONSIVE ========== */
+@media(max-width:768px){
+  .d4-sidebar,.d5-sidebar{display:none}
+  .gallery-grid{padding:1rem}
+  .gallery-card .preview{height:100px}
+}
+
+/* ========== SCROLLBAR ========== */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#3a3a3a;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#555}
+</style>
+</head>
+<body>
+
+<!-- ========== GALLERY ========== -->
+<div id="gallery">
+  <div class="gallery-header">
+    <h1>10 <span>Web Tasarımı</span></h1>
+    <p>Her biri farklı bir amaca hizmet eden, sade ve özgün taslaklar.</p>
+  </div>
+  <div class="gallery-grid" id="galleryGrid"></div>
+</div>
+
+<!-- ========== DESIGN 1 — Blog ========== -->
+<section id="design-1" class="design-view">
+  <div class="back-bar" onclick="showGallery()">&#8592; Galeri</div>
+  <div class="d1-bg">
+    <div class="d1-wrap">
+      <div class="d1-header">
+        <div class="sub">Kişisel Blog</div>
+        <h1>Günlük</h1>
+        <div class="desc">Düşünceler, notlar ve keşifler</div>
+      </div>
+      <div class="d1-post">
+        <div class="meta">15 Mayıs 2026 &middot; 5 dk okuma</div>
+        <h2><a href="#">Yapay Zeka ile Tasarım Süreçleri</a></h2>
+        <div class="excerpt">AI araçları tasarım iş akışlarını kökten değiştiriyor. Bu yazıda kendi deneyimlerimi ve öğrendiklerimi paylaşıyorum.</div>
+        <div class="tags"><span>tasarım</span><span>AI</span><span>üretkenlik</span></div>
+      </div>
+      <div class="d1-post">
+        <div class="meta">12 Mayıs 2026 &middot; 3 dk okuma</div>
+        <h2><a href="#">Minimal Web'in Gücü</a></h2>
+        <div class="excerpt">Az kod, az yük, çok anlam. Minimalist web tasarımının ardındaki felsefeyi inceliyorum.</div>
+        <div class="tags"><span>web</span><span>minimalizm</span><span>CSS</span></div>
+      </div>
+      <div class="d1-post">
+        <div class="meta">8 Mayıs 2026 &middot; 4 dk okuma</div>
+        <h2><a href="#">CLI Araçları Neden Hala Önemli?</a></h2>
+        <div class="excerpt">Grafik arayüzler çağında terminal tabanlı araçların hala güçlü olmasının sırları.</div>
+        <div class="tags"><span>CLI</span><span>terminal</span><span>araçlar</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== DESIGN 2 — Kurumsal ========== -->
+<section id="design-2" class="design-view">
+  <div class="back-bar" onclick="showGallery()">&#8592; Galeri</div>
+  <div class="d2-bg">
+    <div class="d2-hero">
+      <h1>Geleceği Birlikte İnşa Ediyoruz</h1>
+      <p>25 yıllık tecrübe ile dijital dönüşümde iş ortağınız. Yenilikçi çözümler, güvenilir altyapı.</p>
+      <a href="#" class="btn">Hizmetlerimizi Keşfedin</a>
+    </div>
+    <div class="d2-features">
+      <div class="d2-feature">
+        <span class="icon">&#9881;</span>
+        <h3>Teknoloji Danışmanlığı</h3>
+        <p>İş süreçlerinizi dijitalleştirecek stratejik yol haritası çiziyoruz.</p>
+      </div>
+      <div class="d2-feature">
+        <span class="icon">&#128202;</span>
+        <h3>Veri Analizi</h3>
+        <p>Verinizi anlamlı içgörülere dönüştürüyor, veri odaklı kararlar almanızı sağlıyoruz.</p>
+      </div>
+      <div class="d2-feature">
+        <span class="icon">&#127760;</span>
+        <h3>Bulut Çözümleri</h3>
+        <p>Ölçeklenebilir, güvenli ve yüksek performanslı bulut altyapıları kuruyoruz.</p>
+      </div>
+    </div>
+    <div class="d2-stats">
+      <div class="d2-stat"><div class="num">250+</div><div class="label">Mutlu Müşteri</div></div>
+      <div class="d2-stat"><div class="num">500+</div><div class="label">Tamamlanan Proje</div></div>
+      <div class="d2-stat"><div class="num">35</div><div class="label">Uzman Kadro</div></div>
+      <div class="d2-stat"><div class="num">8</div><div class="label">Yıllık Deneyim</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== DESIGN 3 — Portföy ========== -->
+<section id="design-3" class="design-view">
+  <div class="back-bar" onclick="showGallery()">&#8592; Galeri</div>
+  <div class="d3-bg">
+    <div class="d3-header">
+      <h1>Yaptığım <span>İşler</span></h1>
+      <p>Seçilmiş projeler &middot; 2024–2026</p>
+    </div>
+    <div class="d3-grid">
+      <div class="d3-project" style="background:#1a1a2e">
+        <div class="overlay"></div><div class="content">
+        <div class="tag">Web Uygulaması</div><h3>Atlas OS</h3></div>
+      </div>
+      <div class="d3-project" style="background:#2d1b69">
+        <div class="overlay"></div><div class="content">
+        <div class="tag">AI Asistanı</div><h3>Orchestra Agent</h3></div>
+      </div>
+      <div class="d3-project" style="background:#1e3a5f">
+        <div class="overlay"></div><div class="content">
+        <div class="tag">Tasarım Sistemi</div><h3>UI Components</h3></div>
+      </div>
+      <div class="d3-project" style="background:#3a2518">
+        <div class="overlay"></div><div class="content">
+        <div class="tag">Mobil Uygulama</div><h3>Recipe App</h3></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== DESIGN 4 — Dokümantasyon ========== -->
+<section id="design-4" class="design-view">
+  <div class="back-bar" onclick="showGallery()">&#8592; Galeri</div>
+  <div class="d4-bg">
+    <div class="d4-layout">
+      <div class="d4-sidebar">
+        <h3>Başlarken</h3>
+        <a href="#" class="active">Kurulum</a>
+        <a href="#">Yapılandırma</a>
+        <a href="#">İlk Adımlar</a>
+        <h3 style="margin-top:1.5rem">Temel Kavramlar</h3>
+        <a href="#">Mimari</a>
+        <a href="#">Bileşenler</a>
+        <a href="#">API'ler</a>
+        <a href="#">Veri Akışı</a>
+        <h3 style="margin-top:1.5rem">Referans</h3>
+        <a href="#">CLI Komutları</a>
+        <a href="#">Yapılandırma Dosyası</a>
+        <a href="#">Sık Sorulanlar</a>
+      </div>
+      <div class="d4-content">
+        <h1>Kurulum Kılavuzu</h1>
+        <div class="desc">Atlas OS'u sisteminize kurmak için adım adım talimatlar.</div>
+        <h2>Gereksinimler</h2>
+        <p>Python 3.10 veya üzeri. Sistemde pip ve git kurulu olmalıdır. Herhangi bir sanal ortam veya bağımlılık yöneticisi gerekmez — tüm araçlar Python standart kütüphanesi ile çalışır.</p>
+        <h2>Kurulum</h2>
+        <p>Depoyu klonlayın ve doğrudan kullanmaya başlayın:</p>
+        <pre>git clone https://github.com/atlas-os/atlas
+cd atlas
+python atlas.py serve</pre>
+        <p>Bu komut REST API sunucusunu başlatır. Varsayılan port 4242'dir.</p>
+        <h2>Doğrulama</h2>
+        <p>Tarayıcınızda <code>http://localhost:4242/api/pages</code> adresine giderek kurulumu doğrulayabilirsiniz.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== DESIGN 5 — Dashboard ========== -->
+<section id="design-5" class="design-view">
+  <div class="back-bar" onclick="showGallery()">&#8592; Galeri</div>
+  <div class="d5-bg">
+    <div class="d5-layout">
+      <div class="d5-sidebar">
+        <h3>Menü</h3>
+        <a href="#" class="active">&#128200; Genel Bakış</a>
+        <a href="#">&#128202; Raporlar</a>
+        <a href="#">&#128451; Kullanıcılar</a>
+        <a href="#">&#9881; Ayarlar</a>
+        <a href="#">&#128196; Loglar</a>
+      </div>
+      <div class="d5-main">
+        <div class="d5-topbar">
+          <h2>Genel Bakış</h2>
+          <div class="date">15 Mayıs 2026</div>
+        </div>
+        <div class="d5-cards">
+          <div class="d5-card"><div class="lbl">Toplam Kullanıcı</div><div class="val">2,847</div><div class="chg up">&#9650; %12 bu hafta</div></div>
+          <div class="d5-card"><div class="lbl">Aktif Oturum</div><div class="val">143</div><div class="chg up">&#9650; %8</div></div>
+          <div class="d5-card"><div class="lbl">API İsteği</div><div class="val">12.4K</div><div class="chg up">&#9650; %23</div></div>
+          <div class="d5-card"><div class="lbl">Hata Oranı</div><div class="val">%0.3</div><div class="chg down">&#9660; %0.1</div></div>
+        </div>
+        <div class="d5-table">
+          <table>
+            <thead><tr><th>İsim</th><th>Rol</th><th>Durum</th><th>Son Giriş</th></tr></thead>
+            <tbody>
+              <tr><td>Ahmet Yılmaz</td><td>Admin</td><td><span class="badge">Aktif</span></td><td>2 dk önce</td></tr>
+              <tr><td>Elif Demir</td><td>Editör</td><td><span class="badge">Aktif</span></td><td>15 dk önce</td></tr>
+              <tr><td>Can Özkan</td><td>Kullanıcı</td><td><span class="badge">Aktif</span></td><td>1 saat önce</td></tr>
+              <tr><td>Zeynep Kaya</td><td>Kullanıcı</td><td>—</td><td>3 gün önce</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== DESIGN 6 — Lansman ========== -->
+<section id="design-6" class="design-view">
+  <div class="back-bar" onclick="showGallery()">&#8592; Galeri</div>
+  <div class="d6-bg">
+    <div class="d6-wrap">
+      <div class="d6-badge">Yakında Geliyor</div>
+      <h1>Yeni <span>Nesil</span> Platform</h1>
+      <p>Daha hızlı, daha akıllı, daha sade. Tüm araçlarınızı tek bir çatı altında toplayan yeni platformumuza hazır olun.</p>
+      <div class="d6-form">
+        <input type="email" placeholder="E-posta adresiniz" />
+        <button>Haberdar Ol</button>
+      </div>
+      <div class="d6-features">
+        <div class="d6-feat"><span class="icon">&#9889;</span><span class="lbl">Hızlı</span></div>
+        <div class="d6-feat"><span class="icon">&#128274;</span><span class="lbl">Güvenli</span></div>
+        <div class="d6-feat"><span class="icon">&#127760;</span><span class="lbl">Her Yerde</span></div>
+        <div class="d6-feat"><span class="icon">&#128200;</span><span class="lbl">Akıllı</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== DESIGN 7 — Fiyatlandırma ========== -->
+<section id="design-7" class="design-view">
+  <div class="back-bar" onclick="showGallery()">&#8592; Galeri</div>
+  <div class="d7-bg">
+    <div class="d7-header">
+      <h1>Planlar ve Fiyatlandırma</h1>
+      <p>İhtiyacına uygun planı seç, hemen başla.</p>
+    </div>
+    <div class="d7-grid">
+      <div class="d7-plan">
+        <div class="name">Başlangıç</div>
+        <div class="price">0 <span>TL/ay</span></div>
+        <div class="desc">Küçük projeler için temel özellikler</div>
+        <ul>
+          <li>3 proje alanı</li>
+          <li>1 GB depolama</li>
+          <li>Topluluk desteği</li>
+          <li>Temel API erişimi</li>
+        </ul>
+        <a href="#" class="btn">Ücretsiz Başla</a>
+      </div>
+      <div class="d7-plan popular">
+        <div class="pop-tag">Popüler</div>
+        <div class="name">Profesyonel</div>
+        <div class="price">49 <span>TL/ay</span></div>
+        <div class="desc">Büyüyen ekipler için profesyonel araçlar</div>
+        <ul>
+          <li>Sınırsız proje</li>
+          <li>10 GB depolama</li>
+          <li>Öncelikli destek</li>
+          <li>Gelişmiş API erişimi</li>
+          <li>Takım yönetimi</li>
+        </ul>
+        <a href="#" class="btn">Hemen Başla</a>
+      </div>
+      <div class="d7-plan">
+        <div class="name">Kurumsal</div>
+        <div class="price">149 <span>TL/ay</span></div>
+        <div class="desc">Büyük ölçekli operasyonlar için tam paket</div>
+        <ul>
+          <li>Özel altyapı</liider>
+          <li>Sınırsız depolama</li>
+          <li>7/24 destek</li>
+          <li>Özel API anahtarı</li>
+          <li>SSO entegrasyonu</li>
+          <li>Denetim logları</li>
+        </ul>
+        <a href="#" class="btn">İletişime Geç</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== DESIGN 8 — Restoran ========== -->
+<section id="design-8" class="design-view">
+  <div class="back-bar" onclick="showGallery()">&#8592; Galeri</div>
+  <div class="d8-bg">
+    <div class="d8-wrap">
+      <div class="d8-header">
+        <h1>Lezzet</h1>
+        <div class="sub">Mutfak &middot; Şaraphane &middot; Keyif</div>
+      </div>
+      <div class="d8-category">
+        <h2>Başlangıçlar</h2>
+        <div class="d8-item"><div><span class="name">Zeytinyağlı Enginar</span><span class="desc">Taze enginar, zeytinyağı, limon, dereotu</span></div><span class="price">85 TL</span></div>
+        <div class="d8-item"><div><span class="name">Humus</span><span class="desc">Nohut, tahin, zeytinyağı, kırmızı biber</span></div><span class="price">65 TL</span></div>
+        <div class="d8-item"><div><span class="name">Ahtapot</span><span class="desc">Izgara ahtapot, roka, limon sos</span></div><span class="price">120 TL</span></div>
+      </div>
+      <div class="d8-category">
+        <h2>Ana Yemekler</h2>
+        <div class="d8-item"><div><span class="name">Izgara Levrek</span><span class="desc">Mevsim yeşillikleri, limon sos, sebze garnitür</span></div><span class="price">195 TL</span></div>
+        <div class="d8-item"><div><span class="name">Kuzu Tandır</span><span class="desc">12 saat pişmiş tandır, pilav, yoğurt</span></div><span class="price">220 TL</span></div>
+        <div class="d8-item"><div><span class="name">Risotto</span><span class="desc">Mantar, parmesan, trüf yağı</span></div><span class="price">165 TL</span></div>
+      </div>
+      <div class="d8-category">
+        <h2>Tatlılar</h2>
+        <div class="d8-item"><div><span class="name">Fıstıklı Baklava</span><span class="desc">Antep fıstığı, kaymak, şerbet</span></div><span class="price">90 TL</span></div>
+        <div class="d8-item"><div><span class="name">Panna Cotta</span><span class="desc">Vanilya, frambuaz sos, nane</span></div><span class="price">75 TL</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== DESIGN 9 — Seyahat ========== -->
+<section id="design-9" class="design-view">
+  <div class="back-bar" onclick="showGallery()">&#8592; Galeri</div>
+  <div class="d9-bg">
+    <div class="d9-header">
+      <h1>Rota &middot; <span>Seyahat Güncesi</span></h1>
+      <p>Gidilmemiş yolların çağrısına kulak ver.</p>
+    </div>
+    <div class="d9-grid">
+      <div class="d9-card">
+        <div class="img" style="background:#c8ddd2">&#9968;</div>
+        <div class="body">
+          <div class="loc">Türkiye</div>
+          <h3>Kapadokya'nın Büyüsü</h3>
+          <p>Peri bacaları arasında sıcak hava balonuyla gün doğumu. Eşsiz bir deneyim.</p>
+          <div class="meta">Mayıs 2026 &middot; 4 gün</div>
+        </div>
+      </div>
+      <div class="d9-card">
+        <div class="img" style="background:#b8d4cb">&#127965;</div>
+        <div class="body">
+          <div class="loc">İtalya</div>
+          <h3>Floransa Sokakları</h3>
+          <p>Rönesans'ın kalbinde sınır boş gezinmek. Her köşede bir sanat eseri.</div>
+          <div class="meta">Mart 2026 &middot; 6 gün</div>
+        </div>
+      </div>
+      <div class="d9-card">
+        <div class="img" style="background:#d4e8d8">&#127959;</div>
+        <div class="body">
+          <div class="loc">Japonya</div>
+          <h3>Kiraz Çiçeği Zamanı</h3>
+          <p>Sakura mevsiminde Tokyo, Kyoto ve Osaka. Kalabalıklar içinde huzur.</p>
+          <div class="meta">Nisan 2026 &middot; 10 gün</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== DESIGN 10 — 404 ========== -->
+<section id="design-10" class="design-view">
+  <div class="back-bar" onclick="showGallery()">&#8592; Galeri</div>
+  <div class="d10-bg">
+    <div class="d10-wrap">
+      <div class="d10-code">404</div>
+      <h2>Sayfa Bulunamadı</h2>
+      <p>Aradığınız sayfa taşınmış veya silinmiş olabilir. Yeni rotanızı birlikte çizelim.</p>
+      <a href="#" class="btn">Ana Sayfaya Dön</a>
+      <div class="d10-search">
+        <input type="text" placeholder="Ne arıyordun?" />
+        <button>&#128269;</button>
+      </div>
+      <div class="d10-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// Design metadata
+const DESIGNS = [
+  { id: 1, title: 'Günlük', tag: 'Kişisel Blog', bg: '#faf6f0', color: '#2c1810', accent: '#c17817', numColor: '#e8ddd0', desc: 'Sade, okunabilir, tipografi odaklı blog tasarımı. Georgia serif font, warm tonlar.' },
+  { id: 2, title: 'Şirket', tag: 'Kurumsal Site', bg: '#ffffff', color: '#1e3a5f', accent: '#4a90d9', numColor: '#e0e8f0', desc: 'Profesyonel, güven veren kurumsal site. Hero, features grid, istatistik barı.' },
+  { id: 3, title: 'İşlerim', tag: 'Portföy', bg: '#0a0a0a', color: '#ffffff', accent: '#ff6b35', numColor: '#2a2a2a', desc: 'Koyu tema, bold accent, görsel odaklı proje sergileme. Overlay efektli kartlar.' },
+  { id: 4, title: 'Kılavuz', tag: 'Dokümantasyon', bg: '#f8f9fa', color: '#212529', accent: '#0366d6', numColor: '#dee2e6', desc: 'İki sütunlu dökümantasyon. Sidebar içindekiler + kod bloklu içerik alanı.' },
+  { id: 5, title: 'Panel', tag: 'Dashboard', bg: '#1a1d23', color: '#2d3436', accent: '#00c9a7', numColor: '#2a2d35', desc: 'Yönetici paneli: sidebar menü, stat kartları, veri tablosu. Koyu/karma tema.' },
+  { id: 6, title: 'Çıkış', tag: 'Ürün Lansmanı', bg: '#0f0c29', color: '#ffffff', accent: '#f9ca24', numColor: 'rgba(255,255,255,.05)', desc: 'Gradyan hero, sayım bekleyişi, e-posta toplama. Heyecan ve merak uyandırır.' },
+  { id: 7, title: 'Paketler', tag: 'Fiyatlandırma', bg: '#f0f2f5', color: '#2d3436', accent: '#6c5ce7', numColor: '#dde0e5', desc: '3 kolonlu fiyat tablosu. Popüler vurgusu, özellik listeleri, net CTA.' },
+  { id: 8, title: 'Lezzet', tag: 'Restoran Menüsü', bg: '#1a0f0a', color: '#f5e6d3', accent: '#c17a3a', numColor: '#3a2518', desc: 'Karanlık, sıcak restoran menüsü. Kategori başlıklı, fiyatlı liste düzeni.' },
+  { id: 9, title: 'Rota', tag: 'Seyahat Güncesi', bg: '#eef5f1', color: '#1a3c34', accent: '#4a9e7a', numColor: '#c8ddd2', desc: 'Fresh yeşil tonlar, fotoğraf kartları, gezi günlüğü akışı. Doğal ve davetkar.' },
+  { id: 10, title: 'Kayıp', tag: '404 Sayfası', bg: '#1a1a2e', color: '#ffffff', accent: '#e94560', numColor: 'rgba(255,255,255,.05)', desc: 'Eğlenceli 404 tasarımı. Gradient rakam, arama kutusu, animasyonlu noktalar.' },
+];
+
+// Build gallery
+const grid = document.getElementById('galleryGrid');
+DESIGNS.forEach(d => {
+  const card = document.createElement('a');
+  card.className = 'gallery-card';
+  card.href = `#design-${d.id}`;
+  card.innerHTML = `
+    <div class="preview" style="background:${d.bg};color:${d.color}">
+      <span class="num">${d.id}</span>
+      ${d.id}
+    </div>
+    <div class="info" style="border-left:3px solid ${d.accent}">
+      <div class="tag">${d.tag}</div>
+      <h3>${d.title}</h3>
+      <p>${d.desc}</p>
+    </div>`;
+  grid.appendChild(card);
+});
+
+// Hash routing
+function showGallery() {
+  document.getElementById('gallery').classList.remove('hidden');
+  document.querySelectorAll('.design-view').forEach(el => el.classList.remove('active'));
+  history.replaceState(null, '', '#');
+}
+
+function showDesign(id) {
+  document.getElementById('gallery').classList.add('hidden');
+  document.querySelectorAll('.design-view').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById(`design-${id}`);
+  if (el) el.classList.add('active');
+}
+
+function handleHash() {
+  const hash = location.hash.slice(1);
+  if (hash && hash.startsWith('design-')) {
+    const id = hash.replace('design-', '');
+    showDesign(id);
+  } else {
+    showGallery();
+  }
+}
+
+window.addEventListener('hashchange', handleHash);
+window.addEventListener('load', handleHash);
+
+// Card click interceptor for smooth transition
+document.querySelectorAll('.gallery-card').forEach(card => {
+  card.addEventListener('click', e => {
+    // Let the hashchange handle it
+  });
+});
+</script>
+</body>
+</html>

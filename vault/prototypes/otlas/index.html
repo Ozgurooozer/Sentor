@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Otlas — Orchestrator AI Agent Design. AI'lerin orkestra şefi konseptiyle tanışın.">
+<title>Otlas — Orchestrator AI</title>
+<style>
+/* ============================================
+   OTlas — Orchestra Agent Designer
+   Tema: Atlas OS Design System + Orkestra
+   ============================================ */
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg-base:#0a0a0a;
+  --bg-surface:#111111;
+  --bg-elevated:#1a1a1a;
+  --bg-overlay:#222222;
+  --border-subtle:#2a2a2a;
+  --border-active:#404040;
+  --text-primary:#f5f5f5;
+  --text-secondary:#888888;
+  --text-tertiary:#555555;
+  --accent:#5b8def;
+  --accent-hover:#4a7de0;
+  --accent-warm:#f59e0b;
+  --accent-purple:#8b5cf6;
+  --accent-rose:#ec4899;
+  --success:#3ecf8e;
+  --warning:#f5a623;
+  --danger:#e05c5c;
+  --radius:12px;
+  --font:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'SF Mono','Fira Code',monospace;
+  --transition:150ms ease-out;
+  --max-w:1120px;
+}
+
+body{
+  background:var(--bg-base);
+  color:var(--text-primary);
+  font-family:var(--font);
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ============ NAV ============ */
+nav{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.9rem 2rem;
+  background:rgba(10,10,10,.88);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border-subtle);
+}
+nav .logo{
+  display:flex;align-items:center;gap:10px;
+  font-size:1.2rem;font-weight:700;letter-spacing:.03em;
+}
+nav .logo-icon{
+  width:32px;height:32px;
+  border:2px solid var(--accent);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--accent);
+  position:relative;
+}
+nav .logo-icon::after{
+  content:'';position:absolute;
+  width:20px;height:2px;background:var(--accent);
+  top:50%;left:50%;transform:translate(-50%,-50%) rotate(-45deg);
+  opacity:0;
+}
+nav .logo span{color:var(--accent);}
+nav ul{list-style:none;display:flex;gap:1.8rem;}
+nav a{
+  color:var(--text-secondary);text-decoration:none;
+  font-size:.85rem;transition:color var(--transition);
+  letter-spacing:.02em;
+}
+nav a:hover{color:var(--text-primary);}
+
+/* ============ HERO ============ */
+.hero{
+  min-height:92vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:4rem 2rem 3rem;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%,rgba(91,141,239,.08) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 40% at 20% 80%,rgba(139,92,246,.05) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 80%,rgba(245,158,11,.05) 0%,transparent 60%);
+  pointer-events:none;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-bottom:1.8rem;
+  padding:.35rem 1rem;border-radius:999px;
+  border:1px solid var(--border-subtle);
+  color:var(--text-secondary);font-size:.72rem;
+  letter-spacing:.15em;text-transform:uppercase;
+  position:relative;
+}
+.hero-badge .dot{
+  width:6px;height:6px;border-radius:50%;background:var(--accent);
+  animation:pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.4;transform:scale(.7)}
+}
+.hero h1{
+  font-size:clamp(2.6rem,7vw,5.2rem);
+  font-weight:800;line-height:1.08;
+  max-width:880px;position:relative;
+  letter-spacing:-.03em;
+}
+.hero h1 .gradient{
+  background:linear-gradient(135deg,var(--accent),var(--accent-purple),var(--accent-warm));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero p{
+  margin-top:1.5rem;
+  color:var(--text-secondary);max-width:560px;
+  font-size:1.05rem;line-height:1.8;
+}
+.hero-cta{
+  margin-top:2.8rem;
+  display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;
+}
+.btn{
+  padding:.8rem 2rem;border-radius:var(--radius);
+  font-size:.92rem;font-weight:600;cursor:pointer;text-decoration:none;
+  transition:all var(--transition);
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn:hover{transform:translateY(-2px);}
+.btn-primary{
+  background:var(--accent);color:#fff;border:none;
+}
+.btn-primary:hover{background:var(--accent-hover);}
+.btn-ghost{
+  background:transparent;color:var(--text-primary);
+  border:1px solid var(--border-subtle);
+}
+.btn-ghost:hover{border-color:var(--border-active);}
+
+/* conductor baton animation */
+.conductor-line{
+  margin-top:3rem;
+  width:120px;height:3px;
+  background:linear-gradient(90deg,transparent,var(--accent),var(--accent-purple),transparent);
+  border-radius:2px;
+  animation:conductor-sweep 3s ease-in-out infinite;
+  position:relative;
+}
+@keyframes conductor-sweep{
+  0%,100%{transform:scaleX(.3);opacity:.3}
+  50%{transform:scaleX(1);opacity:1}
+}
+
+/* ============ SECTION ============ */
+section{padding:5rem 2rem;max-width:var(--max-w);margin:0 auto;}
+.section-label{
+  font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:.5rem;font-weight:600;
+}
+h2{
+  font-size:clamp(1.6rem,3vw,2.4rem);
+  font-weight:700;margin-bottom:.6rem;
+  letter-spacing:-.02em;
+}
+.section-sub{
+  color:var(--text-secondary);max-width:580px;margin-bottom:3rem;
+  font-size:.92rem;
+}
+
+/* divider */
+hr.divider{border:none;border-top:1px solid var(--border-subtle);margin:0;}
+
+/* ============ CONCEPT ============ */
+.concept-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:2rem;
+}
+@media(max-width:720px){.concept-grid{grid-template-columns:1fr;}}
+.concept-card{
+  background:var(--bg-surface);
+  border:1px solid var(--border-subtle);
+  border-radius:var(--radius);padding:1.8rem;
+  transition:border-color var(--transition);
+}
+.concept-card:hover{border-color:var(--border-active);}
+.concept-card .icon{font-size:1.8rem;margin-bottom:.8rem;}
+.concept-card h3{font-size:1rem;font-weight:700;margin-bottom:.5rem;}
+.concept-card p{font-size:.85rem;color:var(--text-secondary);line-height:1.7;}
+.concept-card ul{list-style:none;margin-top:.5rem;}
+.concept-card li{
+  font-size:.82rem;color:var(--text-secondary);
+  padding:.25rem 0;padding-left:1.2rem;
+  position:relative;
+}
+.concept-card li::before{
+  content:'\2192';position:absolute;left:0;
+  color:var(--accent);
+}
+
+/* ============ AGENT ROSTER ============ */
+.agent-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:1.2rem;
+}
+.agent-card{
+  background:var(--bg-surface);
+  border:1px solid var(--border-subtle);
+  border-radius:var(--radius);padding:1.5rem;
+  cursor:default;
+  transition:all var(--transition);
+  position:relative;overflow:hidden;
+}
+.agent-card::before{
+  content:'';position:absolute;top:0;left:0;
+  width:100%;height:3px;
+  opacity:0;transition:opacity var(--transition);
+}
+.agent-card:hover::before{opacity:1;}
+.agent-card:hover{border-color:var(--border-active);transform:translateY(-3px);}
+
+.agent-card .agent-icon{
+  width:44px;height:44px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;margin-bottom:1rem;
+}
+.agent-card h3{font-size:.95rem;font-weight:700;margin-bottom:.3rem;}
+.agent-card .role{
+  font-size:.75rem;color:var(--text-tertiary);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem;
+}
+.agent-card p{font-size:.82rem;color:var(--text-secondary);line-height:1.7;}
+.agent-card .tools{
+  display:flex;flex-wrap:wrap;gap:4px;margin-top:.8rem;
+}
+.agent-card .tools span{
+  padding:2px 8px;border-radius:999px;
+  font-size:.68rem;border:1px solid var(--border-subtle);
+  color:var(--text-tertiary);
+}
+
+/* agent accent colors */
+.agent-card.accent-search::before{background:var(--accent);}
+.agent-card.accent-search .agent-icon{background:rgba(91,141,239,.12);color:var(--accent);}
+.agent-card.accent-write::before{background:var(--success);}
+.agent-card.accent-write .agent-icon{background:rgba(62,207,142,.12);color:var(--success);}
+.agent-card.accent-index::before{background:var(--accent-purple);}
+.agent-card.accent-index .agent-icon{background:rgba(139,92,246,.12);color:var(--accent-purple);}
+.agent-card.accent-code::before{background:var(--accent-warm);}
+.agent-card.accent-code .agent-icon{background:rgba(245,158,11,.12);color:var(--accent-warm);}
+.agent-card.accent-review::before{background:var(--accent-rose);}
+.agent-card.accent-review .agent-icon{background:rgba(236,72,153,.12);color:var(--accent-rose);}
+.agent-card.accent-research::before{background:var(--warning);}
+.agent-card.accent-research .agent-icon{background:rgba(245,166,35,.12);color:var(--warning);}
+
+/* ============ FLOW ============ */
+.flow-container{
+  display:flex;flex-direction:column;gap:0;
+  position:relative;
+}
+.flow-container::before{
+  content:'';position:absolute;left:28px;top:40px;bottom:40px;
+  width:2px;background:linear-gradient(180deg,var(--accent),var(--accent-purple));
+  opacity:.3;
+}
+.flow-step{
+  display:flex;align-items:flex-start;gap:1.2rem;
+  padding:1.2rem 0;position:relative;
+}
+.flow-step .step-num{
+  width:56px;height:56px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:1rem;
+  background:var(--bg-elevated);
+  border:1px solid var(--border-subtle);
+  color:var(--text-secondary);
+  position:relative;z-index:1;
+  transition:all var(--transition);
+}
+.flow-step:hover .step-num{
+  border-color:var(--accent);color:var(--accent);
+  background:rgba(91,141,239,.08);
+}
+.flow-step .step-content{flex:1;padding-top:.5rem;}
+.flow-step h4{font-size:.95rem;font-weight:700;margin-bottom:.2rem;}
+.flow-step p{font-size:.82rem;color:var(--text-secondary);}
+.flow-step .step-detail{
+  font-size:.78rem;color:var(--text-tertiary);
+  margin-top:.3rem;font-family:var(--mono);
+}
+
+/* ============ ARCHITECTURE ============ */
+.arch-diagram{
+  background:var(--bg-surface);
+  border:1px solid var(--border-subtle);
+  border-radius:var(--radius);padding:2rem;
+  text-align:center;
+}
+.arch-layer{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin:.6rem 0;}
+.arch-node{
+  padding:.6rem 1.2rem;
+  border-radius:8px;
+  font-size:.8rem;font-weight:600;
+  border:1px solid var(--border-subtle);
+  background:var(--bg-elevated);
+  transition:all var(--transition);
+  cursor:default;
+}
+.arch-node:hover{border-color:var(--border-active);transform:translateY(-2px);}
+.arch-node.orchestrator{
+  border-color:var(--accent);
+  color:var(--accent);
+  background:rgba(91,141,239,.08);
+}
+.arch-node.agent{
+  color:var(--text-secondary);
+}
+.arch-arrow{font-size:.7rem;color:var(--text-tertiary);letter-spacing:.15em;}
+.arch-label{
+  font-size:.68rem;color:var(--text-tertiary);
+  text-transform:uppercase;letter-spacing:.15em;
+  margin:.4rem 0;
+}
+
+/* ============ USE CASES ============ */
+.cases-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;
+}
+@media(max-width:680px){.cases-grid{grid-template-columns:1fr;}}
+.case-card{
+  background:var(--bg-surface);
+  border:1px solid var(--border-subtle);
+  border-radius:var(--radius);padding:1.5rem;
+  transition:border-color var(--transition),transform var(--transition);
+}
+.case-card:hover{border-color:var(--border-active);transform:translateY(-2px);}
+.case-card .case-header{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;
+}
+.case-card .case-icon{font-size:1.4rem;}
+.case-card .case-badge{
+  font-size:.65rem;padding:2px 8px;border-radius:999px;
+  border:1px solid var(--border-subtle);color:var(--text-tertiary);
+}
+.case-card h4{font-size:.9rem;font-weight:700;margin-bottom:.3rem;}
+.case-card .case-desc{font-size:.8rem;color:var(--text-secondary);line-height:1.6;}
+.case-card .agent-chain{
+  display:flex;flex-wrap:wrap;gap:4px;margin-top:.6rem;
+  font-size:.7rem;color:var(--text-tertiary);
+}
+.case-card .agent-chain span{
+  padding:1px 6px;border-radius:4px;
+  background:var(--bg-elevated);
+}
+
+/* ============ CONDUCTOR DEMO ============ */
+.conductor-demo{
+  background:var(--bg-surface);
+  border:1px solid var(--border-subtle);
+  border-radius:var(--radius);
+  overflow:hidden;
+}
+.conductor-demo .demo-header{
+  padding:1.2rem 1.5rem;
+  border-bottom:1px solid var(--border-subtle);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.conductor-demo .demo-header h3{font-size:.9rem;font-weight:700;}
+.conductor-demo .demo-header .status{
+  font-size:.72rem;color:var(--text-tertiary);
+  display:flex;align-items:center;gap:6px;
+}
+.conductor-demo .demo-header .status .led{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--success);
+  animation:pulse-dot 2s ease-in-out infinite;
+}
+.demo-body{padding:1.5rem;}
+.demo-task-input{
+  display:flex;gap:.6rem;margin-bottom:1.2rem;
+}
+.demo-task-input input{
+  flex:1;padding:.7rem 1rem;border-radius:8px;
+  border:1px solid var(--border-subtle);
+  background:var(--bg-elevated);
+  color:var(--text-primary);font-size:.85rem;
+  outline:none;font-family:var(--font);
+  transition:border-color var(--transition);
+}
+.demo-task-input input:focus{border-color:var(--accent);}
+.demo-task-input input::placeholder{color:var(--text-tertiary);}
+.demo-task-input button{
+  padding:.7rem 1.4rem;border-radius:8px;
+  background:var(--accent);color:#fff;border:none;
+  font-weight:600;font-size:.85rem;cursor:pointer;
+  transition:background var(--transition);
+  white-space:nowrap;
+}
+.demo-task-input button:hover{background:var(--accent-hover);}
+.demo-task-input button:disabled{opacity:.4;cursor:not-allowed;}
+
+.demo-log{
+  background:var(--bg-elevated);
+  border-radius:8px;padding:1rem;
+  min-height:200px;max-height:280px;
+  overflow-y:auto;
+  font-family:var(--mono);font-size:.75rem;
+  line-height:1.8;
+}
+.demo-log::-webkit-scrollbar{width:4px;}
+.demo-log::-webkit-scrollbar-track{background:transparent;}
+.demo-log::-webkit-scrollbar-thumb{background:var(--border-subtle);border-radius:2px;}
+.demo-log .log-line{
+  display:flex;align-items:flex-start;gap:8px;
+  opacity:0;animation:log-fade .25s ease-out forwards;
+}
+.demo-log .log-time{color:var(--text-tertiary);flex-shrink:0;}
+.demo-log .log-agent{
+  padding:0 6px;border-radius:3px;font-weight:600;flex-shrink:0;
+  font-size:.7rem;
+}
+.demo-log .log-msg{color:var(--text-secondary);}
+.demo-log .log-msg.done{color:var(--success);}
+.demo-log .log-msg.wait{color:var(--warning);}
+.demo-log .log-msg.err{color:var(--danger);}
+
+@keyframes log-fade{
+  to{opacity:1;}
+}
+.log-agent.search{background:rgba(91,141,239,.15);color:var(--accent);}
+.log-agent.write{background:rgba(62,207,142,.15);color:var(--success);}
+.log-agent.code{background:rgba(245,158,11,.15);color:var(--accent-warm);}
+.log-agent.review{background:rgba(236,72,153,.15);color:var(--accent-rose);}
+.log-agent.index{background:rgba(139,92,246,.15);color:var(--accent-purple);}
+.log-agent.research{background:rgba(245,166,35,.15);color:var(--warning);}
+.log-agent.orchestra{background:rgba(91,141,239,.15);color:var(--accent);}
+
+.demo-presets{
+  display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap;
+}
+.demo-presets button{
+  font-size:.7rem;padding:.3rem .7rem;border-radius:6px;
+  border:1px solid var(--border-subtle);background:transparent;
+  color:var(--text-tertiary);cursor:pointer;
+  transition:all var(--transition);
+}
+.demo-presets button:hover{
+  border-color:var(--accent);color:var(--accent);
+}
+
+/* ============ FOOTER ============ */
+footer{
+  text-align:center;padding:2.5rem 1rem;
+  color:var(--text-tertiary);font-size:.78rem;
+  border-top:1px solid var(--border-subtle);
+  margin-top:2rem;
+}
+footer span{color:var(--accent);}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:768px){
+  nav ul{gap:1rem;}
+  nav ul li:nth-child(n+4){display:none;}
+  .hero h1{font-size:2.2rem;}
+  section{padding:3rem 1.2rem;}
+}
+
+/* ============ ANIMATIONS ============ */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.fade-up{animation:fadeUp .5s ease-out both;}
+.fade-up-1{animation-delay:.1s;}
+.fade-up-2{animation-delay:.2s;}
+.fade-up-3{animation-delay:.3s;}
+.fade-up-4{animation-delay:.4s;}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">&#9835;</div>
+    <span>O</span>tlas
+  </div>
+  <ul>
+    <li><a href="#concept">Konsept</a></li>
+    <li><a href="#agents">Ajanlar</a></li>
+    <li><a href="#flow">Akış</a></li>
+    <li><a href="#architecture">Mimari</a></li>
+    <li><a href="#demo">Demo</a></li>
+  </ul>
+</nav>
+
+<!-- ============ HERO ============ -->
+<div class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Orchestrator AI Design
+  </div>
+  <h1>
+    AI'lerin<br>
+    <span class="gradient">Orkestra Şefi</span>
+  </h1>
+  <p>
+    Otlas, uzman AI ajanlarını yöneten bir orkestratör tasarımıdır.
+    Karmaşık görevleri akıllıca böler, doğru ajana yönlendirir
+    ve tutarlı sonuçlar üretir.
+  </p>
+  <div class="hero-cta">
+    <a href="#concept" class="btn btn-primary">Konsepti Keşfet</a>
+    <a href="#demo" class="btn btn-ghost">Canlı Demo</a>
+  </div>
+  <div class="conductor-line"></div>
+</div>
+
+<hr class="divider">
+
+<!-- ============ CONCEPT ============ -->
+<section id="concept">
+  <div class="section-label">01 · Konsept</div>
+  <h2>Orkestra Agent Nedir?</h2>
+  <p class="section-sub">
+    Tıpkı bir orkestra şefinin enstrümanları yönettiği gibi, Otlas
+    uzman AI ajanlarını koordine ederek karmaşık işleri başarır.
+  </p>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="icon">&#9835;</div>
+      <h3>Şef (Conductor)</h3>
+      <p>Görevi analiz eder, plan oluşturur, her ajana doğru talimatı verir ve sonuçları birleştirir. Orkestranın beynidir.</p>
+      <ul>
+        <li>Görevi alt görevlere böler</li>
+        <li>Doğru ajanı seçer ve yönlendirir</li>
+        <li>İlerlemeyi izler ve hataları yönetir</li>
+        <li>Nihai çıktıyı sentezler</li>
+      </ul>
+    </div>
+    <div class="concept-card">
+      <div class="icon">&#127926;</div>
+      <h3>Uzman Ajanlar (Section)</h3>
+      <p>Her biri tek bir konuda uzmanlaşmış bağımsız AI ajanları. Kemancılar, üflemeliler, vurmalılar gibi…</p>
+      <ul>
+        <li>Her ajan tek bir yetenekte uzman</li>
+        <li>Bağımsız çalışır, paralel işlem yapabilir</li>
+        <li>Standartlaştırılmış girdi/çıktı formatı</li>
+        <li>Yeni ajanlar eklenebilir, çıkarılabilir</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ AGENTS ============ -->
+<section id="agents">
+  <div class="section-label">02 · Ajanlar</div>
+  <h2>Uzman Kadrosu</h2>
+  <p class="section-sub">
+    Altı uzman ajan, her biri Atlas OS ekosisteminde belirli bir
+    görevde uzmanlaşmıştır.
+  </p>
+
+  <div class="agent-grid">
+    <div class="agent-card accent-search">
+      <div class="agent-icon">&#128269;</div>
+      <h3>Search Agent</h3>
+      <div class="role">Bilgi avcısı</div>
+      <p>Vault içinde tam metin arama, semantik eşleştirme ve bağlam bulma. TF-IDF skorlaması ile en alakalı sonucu getirir.</p>
+      <div class="tools"><span>TF-IDF</span><span>Fuse.js</span><span>Semantik</span></div>
+    </div>
+
+    <div class="agent-card accent-write">
+      <div class="agent-icon">&#9998;</div>
+      <h3>Write Agent</h3>
+      <div class="role">İçerik üretici</div>
+      <p>Vault sayfaları oluşturur, düzenler ve zenginleştirir. Başlık, açıklama, backlink yapısını korur.</p>
+      <div class="tools"><span>HTML</span><span>Markdown</span><span>Meta</span></div>
+    </div>
+
+    <div class="agent-card accent-index">
+      <div class="agent-icon">&#128203;</div>
+      <h3>Index Agent</h3>
+      <div class="role">Veri ambarı</div>
+      <p>Sayfaları indeksler, backlink'leri çözümler ve arama yapısını güncel tutar. İki-pass indexing ile yüksek doğruluk.</p>
+      <div class="tools"><span>Parser</span><span>Backlink</span><span>JSON</span></div>
+    </div>
+
+    <div class="agent-card accent-code">
+      <div class="agent-icon">&lt;/&gt;</div>
+      <h3>Code Agent</h3>
+      <div class="role">Kod ustası</div>
+      <p>Python, HTML, JS ve CLI araçları için kod üretir, düzenler ve hata ayıklar. Sıfır-bağımlılık prensibiyle çalışır.</p>
+      <div class="tools"><span>Python</span><span>CLI</span><span>std-lib</span></div>
+    </div>
+
+    <div class="agent-card accent-review">
+      <div class="agent-icon">&#10003;</div>
+      <h3>Review Agent</h3>
+      <div class="role">Kalite bekçisi</div>
+      <p>İçerik ve kodu tutarlılık, stil, erişilebilirlik ve doğruluk açısından denetler. Geri bildirim sağlar.</p>
+      <div class="tools"><span>Lint</span><span>Style</span><span>Accessibility</span></div>
+    </div>
+
+    <div class="agent-card accent-research">
+      <div class="agent-icon">&#128214;</div>
+      <h3>Research Agent</h3>
+      <div class="role">Sentezleyici</div>
+      <p>Çoklu kaynaktan bilgi toplar, karşılaştırır ve kapsamlı analiz raporları oluşturur. Derin araştırma uzmanı.</p>
+      <div class="tools"><span>Multi-source</span><span>Compare</span><span>Summarize</span></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ FLOW ============ -->
+<section id="flow">
+  <div class="section-label">03 · Orchestration Akışı</div>
+  <h2>Bir Görev Nasıl Yönetilir?</h2>
+  <p class="section-sub">
+    Orchestra Agent bir görevi aldığında izlediği adımlar.
+  </p>
+
+  <div class="flow-container">
+    <div class="flow-step fade-up fade-up-1">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <h4>Görevi Analiz Et</h4>
+        <p>Kullanıcı girdisini ayrıştırır, niyeti anlar, hangi uzmanlıkların gerektiğini belirler.</p>
+        <div class="step-detail">parse &#8594; intent &#8594; requirements</div>
+      </div>
+    </div>
+
+    <div class="flow-step fade-up fade-up-2">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <h4>Plan Oluştur</h4>
+        <p>Görevi alt görevlere böler, bağımlılıkları belirler ve bir execution DAG oluşturur.</p>
+        <div class="step-detail">decompose &#8594; dependencies &#8594; schedule</div>
+      </div>
+    </div>
+
+    <div class="flow-step fade-up fade-up-3">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <h4>Uygun Ajanları Seç</h4>
+        <p>Her alt görev için en uygun uzman ajanı atar. Paralel çalışabilecek görevleri eş zamanlı başlatır.</p>
+        <div class="step-detail">match &#8594; assign &#8594; dispatch</div>
+      </div>
+    </div>
+
+    <div class="flow-step fade-up fade-up-4">
+      <div class="step-num">04</div>
+      <div class="step-content">
+        <h4>İzle ve Koordine Et</h4>
+        <p>Ajanların ilerlemesini gerçek zamanlı izler, hataları yakalar ve gerektiğinde yeniden yönlendirir.</p>
+        <div class="step-detail">monitor &#8594; handle errors &#8594; re-route</div>
+      </div>
+    </div>
+
+    <div class="flow-step fade-up fade-up-1">
+      <div class="step-num">05</div>
+      <div class="step-content">
+        <h4>Sonuçları Birleştir</h4>
+        <p>Tüm ajan çıktılarını tutarlı bir bütün halinde sentezler, çakışmaları giderir ve final çıktıyı üretir.</p>
+        <div class="step-detail">merge &#8594; resolve conflicts &#8594; synthesize</div>
+      </div>
+    </div>
+
+    <div class="flow-step fade-up fade-up-2">
+      <div class="step-num">06</div>
+      <div class="step-content">
+        <h4>Doğrula ve Teslim Et</h4>
+        <p>Nihai çıktıyı kalite kontrolünden geçirir, gerekirse revizyon döngüsü başlatır ve kullanıcıya sunar.</p>
+        <div class="step-detail">validate &#8594; revise &#8594; deliver</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ ARCHITECTURE ============ -->
+<section id="architecture">
+  <div class="section-label">04 · Mimari</div>
+  <h2>Katmanlı Tasarım</h2>
+  <p class="section-sub">
+    Otlas, modüler ve genişletilebilir bir katman mimarisi üzerine inşa edilmiştir.
+  </p>
+
+  <div class="arch-diagram">
+    <div class="arch-label">Kullanıcı Arayüzü</div>
+    <div class="arch-layer">
+      <div class="arch-node">CLI</div>
+      <div class="arch-node">API</div>
+      <div class="arch-node">Browser UI</div>
+      <div class="arch-node">IDE</div>
+    </div>
+
+    <div class="arch-arrow">&#9660; orchestrator &#9660;</div>
+
+    <div class="arch-label">Orchestration Layer</div>
+    <div class="arch-layer">
+      <div class="arch-node orchestrator">Orchestra Agent</div>
+    </div>
+
+    <div class="arch-arrow">&#9660; routes tasks &#9660;</div>
+
+    <div class="arch-label">Agent Layer</div>
+    <div class="arch-layer">
+      <div class="arch-node agent">Search</div>
+      <div class="arch-node agent">Write</div>
+      <div class="arch-node agent">Index</div>
+      <div class="arch-node agent">Code</div>
+      <div class="arch-node agent">Review</div>
+      <div class="arch-node agent">Research</div>
+    </div>
+
+    <div class="arch-arrow">&#9660; knowledge &#9660;</div>
+
+    <div class="arch-label">Knowledge Layer</div>
+    <div class="arch-layer">
+      <div class="arch-node">Vault</div>
+      <div class="arch-node">.index</div>
+      <div class="arch-node">Ollama</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ USE CASES ============ -->
+<section id="usecases">
+  <div class="section-label">05 · Kullanım Senaryoları</div>
+  <h2>Atlas OS ile Neler Yapılabilir?</h2>
+  <p class="section-sub">
+    Orchestra Agent ile karmaşık görevleri tek cümleyle başlatın.
+  </p>
+
+  <div class="cases-grid">
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-icon">&#128214;</span>
+        <span class="case-badge">Atlas OS</span>
+      </div>
+      <h4>"Kapsamlı bir doküman hazırla"</h4>
+      <div class="case-desc">
+        Research Agent bilgi toplar, Write Agent sayfayı yazar,
+        Review Agent kaliteyi denetler. Sonuç: yeni vault sayfası.
+      </div>
+      <div class="agent-chain">
+        <span>Research</span> &#8594; <span>Write</span> &#8594; <span>Review</span> &#8594; <span>Index</span>
+      </div>
+    </div>
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-icon">&#128187;</span>
+        <span class="case-badge">Geliştirme</span>
+      </div>
+      <h4>"API'e yeni endpoint ekle"</h4>
+      <div class="case-desc">
+        Code Agent server kodunu yazar, Review Agent denetler,
+        Index Agent dokümantasyonu günceller.
+      </div>
+      <div class="agent-chain">
+        <span>Code</span> &#8594; <span>Review</span> &#8594; <span>Index</span>
+      </div>
+    </div>
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-icon">&#128269;</span>
+        <span class="case-badge">Araştırma</span>
+      </div>
+      <h4>"Vault'ta bu temayı araştır"</h4>
+      <div class="case-desc">
+        Search Agent ilgili sayfaları bulur, Research Agent sentezler,
+        Write Agent özet sayfası oluşturur.
+      </div>
+      <div class="agent-chain">
+        <span>Search</span> &#8594; <span>Research</span> &#8594; <span>Write</span>
+      </div>
+    </div>
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-icon">&#128295;</span>
+        <span class="case-badge">Bakım</span>
+      </div>
+      <h4>"Backlink'leri güncelle"</h4>
+      <div class="case-desc">
+        Index Agent tüm sayfaları yeniden indeksler, Search Agent
+        kırık bağlantıları tespit eder, Write Agent düzeltir.
+      </div>
+      <div class="agent-chain">
+        <span>Index</span> &#8594; <span>Search</span> &#8594; <span>Write</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ DEMO ============ -->
+<section id="demo">
+  <div class="section-label">06 · Canlı Demo</div>
+  <h2>Orchestra Simülasyonu</h2>
+  <p class="section-sub">
+    Aşağıdaki görevlerden birini seçin veya kendi görevinizi yazın.
+    Otlas'ın ajanları nasıl yönettiğini izleyin.
+  </p>
+
+  <div class="conductor-demo">
+    <div class="demo-header">
+      <h3>&#9835; Orchestra Agent — Execution Log</h3>
+      <div class="status">
+        <span class="led"></span>
+        <span id="demo-status">Hazır</span>
+      </div>
+    </div>
+    <div class="demo-body">
+      <div class="demo-presets">
+        <button onclick="runPreset('doc')">&#128214; Doküman Hazırla</button>
+        <button onclick="runPreset('api')">&#128187; API Endpoint</button>
+        <button onclick="runPreset('search')">&#128269; Araştırma Yap</button>
+        <button onclick="runPreset('index')">&#128203; Backlink Güncelle</button>
+      </div>
+      <div class="demo-task-input">
+        <input type="text" id="taskInput" placeholder="Örn: Yeni bir API endpoint'i ekle ve dokümante et..." />
+        <button id="runBtn" onclick="runCustomTask()">&#9654; Çalıştır</button>
+      </div>
+      <div id="demoLog" class="demo-log">
+        <div class="log-line">
+          <span class="log-time">[--:--:--]</span>
+          <span class="log-agent orchestra">Otlas</span>
+          <span class="log-msg wait">Bir görev seçin veya yazın, ardından Çalıştır'a tıklayın.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <p><span>Otlas</span> — Orchestrator AI Design &middot; Atlas OS projesi için tasarlandı</p>
+</footer>
+
+<!-- ============ JS ============ -->
+<script>
+// ---- Demo Simulation ----
+const DEMO_LOG = document.getElementById('demoLog');
+const DEMO_STATUS = document.getElementById('demo-status');
+const RUN_BTN = document.getElementById('runBtn');
+const TASK_INPUT = document.getElementById('taskInput');
+
+const AGENTS = {
+  search:    { label: 'Search',   emoji: '&#128269;', color: 'search' },
+  write:     { label: 'Write',    emoji: '&#9998;',   color: 'write' },
+  index:     { label: 'Index',    emoji: '&#128203;', color: 'index' },
+  code:      { label: 'Code',     emoji: '&lt;/&gt;',    color: 'code' },
+  review:    { label: 'Review',   emoji: '&#10003;',  color: 'review' },
+  research:  { label: 'Research', emoji: '&#128214;', color: 'research' },
+  orchestra: { label: 'Otlas',    emoji: '&#9835;',   color: 'orchestra' },
+};
+
+const PRESETS = {
+  doc: {
+    title: 'Kapsamlı Doküman Hazırlama',
+    tasks: [
+      { agent: 'orchestra', msg: 'Görev alındı: "Atlas OS API dokümantasyonu hazırla"', delay: 400 },
+      { agent: 'orchestra', msg: 'Görev analiz ediliyor... gereksinimler: research, write, review, index', delay: 700 },
+      { agent: 'research', msg: 'Araştırma başladı: API mevcut durumu analiz ediliyor...', delay: 1200 },
+      { agent: 'research', msg: '3 kaynak bulundu, sentezleniyor...', delay: 800 },
+      { agent: 'research', msg: 'Araştırma tamam. 2 sayfa özet çıkarıldı.', delay: 600, done: true },
+      { agent: 'orchestra', msg: 'Research tamam. Write Agent devrede.', delay: 500 },
+      { agent: 'write', msg: 'Doküman yazılıyor: api-endpoints.html...', delay: 1000 },
+      { agent: 'write', msg: 'Meta açıklama ve başlıklar eklendi.', delay: 600 },
+      { agent: 'write', msg: 'Taslak tamam (340 kelime).', delay: 500, done: true },
+      { agent: 'orchestra', msg: 'Write tamam. Review Agent devrede.', delay: 400 },
+      { agent: 'review', msg: 'Kalite kontrol yapılıyor: tutarlılık, stil, erişilebilirlik...', delay: 900 },
+      { agent: 'review', msg: '2 iyileştirme önerisi: başlık hiyerarşisi, alt etiketler.', delay: 700 },
+      { agent: 'review', msg: 'Revizyon sonrası onaylandı.', delay: 600, done: true },
+      { agent: 'orchestra', msg: 'Review tamam. Index Agent indeksliyor.', delay: 400 },
+      { agent: 'index', msg: 'Sayfa indeksleniyor: vault/api/endpoints/index.html', delay: 800 },
+      { agent: 'index', msg: 'Backlink\'ler çözümlendi: 2 yeni bağlantı.', delay: 600, done: true },
+      { agent: 'orchestra', msg: '&#10003; Görev tamamlandı! 4 ajan, ~8sn.', delay: 500, done: true },
+    ],
+  },
+  api: {
+    title: 'API Endpoint Ekleme',
+    tasks: [
+      { agent: 'orchestra', msg: 'Görev alındı: "GET /api/health endpoint\'i ekle"', delay: 400 },
+      { agent: 'orchestra', msg: 'Plan: code -> review -> index', delay: 600 },
+      { agent: 'code', msg: 'server.py okunuyor... endpoint yapısı analiz ediliyor.', delay: 1000 },
+      { agent: 'code', msg: 'Yeni route ekleniyor: /api/health', delay: 800 },
+      { agent: 'code', msg: 'Handler yazıldı, test eklendi.', delay: 700, done: true },
+      { agent: 'orchestra', msg: 'Code tamam. Review Agent denetliyor.', delay: 400 },
+      { agent: 'review', msg: 'Kod inceleniyor: tip güvenliği, hata yönetimi, stil...', delay: 800 },
+      { agent: 'review', msg: '1 uyarı: docstring eklenmeli. Düzeltildi.', delay: 600, done: true },
+      { agent: 'orchestra', msg: 'Index Agent dokümantasyonu güncelliyor.', delay: 400 },
+      { agent: 'index', msg: 'API sayfası güncellendi: yeni endpoint eklendi.', delay: 600, done: true },
+      { agent: 'orchestra', msg: '&#10003; Görev tamamlandı! 3 ajan, ~6sn.', delay: 500, done: true },
+    ],
+  },
+  search: {
+    title: 'Tema Araştırması',
+    tasks: [
+      { agent: 'orchestra', msg: 'Görev alındı: "Vault\'ta \'ollama\' temasını araştır"', delay: 400 },
+      { agent: 'orchestra', msg: 'Plan: search -> research -> write', delay: 500 },
+      { agent: 'search', msg: 'Vault taranıyor: "ollama" için TF-IDF araması...', delay: 900 },
+      { agent: 'search', msg: '4 sayfa bulundu (skor: 2.4 - 8.7 arası)', delay: 700 },
+      { agent: 'search', msg: 'En alakalı 3 sayfa seçildi.', delay: 500, done: true },
+      { agent: 'orchestra', msg: 'Research Agent bulguları sentezliyor.', delay: 400 },
+      { agent: 'research', msg: 'Sayfalar karşılaştırılıyor, ortak temalar çıkarılıyor...', delay: 1000 },
+      { agent: 'research', msg: 'Özet rapor hazır: 3 başlık, 12 alt madde.', delay: 700, done: true },
+      { agent: 'orchestra', msg: 'Write Agent özet sayfasını oluşturuyor.', delay: 400 },
+      { agent: 'write', msg: 'Yeni sayfa: vault/ollama/ozet/index.html yazılıyor...', delay: 800 },
+      { agent: 'write', msg: 'Sayfa tamam (280 kelime, 4 backlink).', delay: 500, done: true },
+      { agent: 'orchestra', msg: '&#10003; Görev tamamlandı! 3 ajan, ~7sn.', delay: 500, done: true },
+    ],
+  },
+  index: {
+    title: 'Backlink Güncelleme',
+    tasks: [
+      { agent: 'orchestra', msg: 'Görev alındı: "Tüm backlink\'leri güncelle ve kırık bağlantıları bul"', delay: 400 },
+      { agent: 'orchestra', msg: 'Plan: index -> search -> write', delay: 500 },
+      { agent: 'index', msg: 'İki-pass indexing başlatılıyor... pass 1: extract', delay: 800 },
+      { agent: 'index', msg: 'Pass 2: 24 sayfada backlink çözümlemesi...', delay: 1000 },
+      { agent: 'index', msg: '3 kırık backlink tespit edildi.', delay: 600, done: true },
+      { agent: 'orchestra', msg: 'Search Agent doğru bağlantıları arıyor.', delay: 400 },
+      { agent: 'search', msg: 'Kırık bağlantılar için alternatif hedefler taranıyor...', delay: 900 },
+      { agent: 'search', msg: '2/3 kırık bağlantıya alternatif bulundu.', delay: 600, done: true },
+      { agent: 'orchestra', msg: 'Write Agent düzeltmeleri uyguluyor.', delay: 400 },
+      { agent: 'write', msg: '3 sayfada backlink düzeltmesi yapıldı.', delay: 700, done: true },
+      { agent: 'orchestra', msg: '&#10003; Görev tamamlandı! 3 ajan, ~6sn.', delay: 500, done: true },
+    ],
+  },
+};
+
+let running = false;
+
+function log(msg, agent = 'orchestra', type = '') {
+  const now = new Date();
+  const ts = now.toTimeString().slice(0, 8);
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `<span class="log-time">[${ts}]</span><span class="log-agent ${agent}">${AGENTS[agent].label}</span><span class="log-msg ${type}">${msg}</span>`;
+  DEMO_LOG.appendChild(line);
+  DEMO_LOG.scrollTop = DEMO_LOG.scrollHeight;
+}
+
+async function executePlan(tasks) {
+  running = true;
+  RUN_BTN.disabled = true;
+  DEMO_STATUS.textContent = 'Çalışıyor...';
+  DEMO_LOG.innerHTML = '';
+
+  for (const t of tasks) {
+    if (!running) break;
+    await new Promise(r => setTimeout(r, t.delay));
+    if (!running) break;
+    const type = t.done ? 'done' : '';
+    log(t.msg, t.agent, type);
+  }
+
+  running = false;
+  RUN_BTN.disabled = false;
+  DEMO_STATUS.textContent = t('Hazır');
+}
+
+function t(text) { return text; }
+
+function clearLog() {
+  DEMO_LOG.innerHTML = '';
+  DEMO_LOG.innerHTML = `<div class="log-line"><span class="log-time">[--:--:--]</span><span class="log-agent orchestra">Otlas</span><span class="log-msg wait">Bir görev seçin veya yazın, ardından Çalıştır'a tıklayın.</span></div>`;
+}
+
+function runPreset(name) {
+  if (running) return;
+  const p = PRESETS[name];
+  TASK_INPUT.value = p.title;
+  clearLog();
+  executePlan(p.tasks);
+}
+
+async function runCustomTask() {
+  if (running) return;
+  const input = TASK_INPUT.value.trim();
+  if (!input) { log('Lütfen bir görev yazın veya hazır bir senaryo seçin.', 'orchestra', 'wait'); return; }
+
+  clearLog();
+  const tasks = [
+    { agent: 'orchestra', msg: 'Görev alındı: "' + input + '"', delay: 400 },
+    { agent: 'orchestra', msg: 'Görev analiz ediliyor... uygun ajanlar belirleniyor.', delay: 700 },
+    { agent: 'orchestra', msg: 'Search Agent bilgi topluyor...', delay: 1000 },
+    { agent: 'search', msg: 'Vault taranıyor, alakalı bağlamlar aranıyor...', delay: 900 },
+    { agent: 'search', msg: 'İlgili içerikler bulundu.', delay: 500, done: true },
+    { agent: 'orchestra', msg: 'Code Agent gerekli kod değişikliklerini yapıyor...', delay: 800 },
+    { agent: 'code', msg: 'Kod üretiliyor ve mevcut yapıya entegre ediliyor...', delay: 1000 },
+    { agent: 'code', msg: 'Değişiklikler tamam.', delay: 500, done: true },
+    { agent: 'orchestra', msg: 'Review Agent kalite kontrol yapıyor...', delay: 700 },
+    { agent: 'review', msg: 'İçerik ve kod tutarlılığı denetleniyor...', delay: 800 },
+    { agent: 'review', msg: 'Onaylandı.', delay: 400, done: true },
+    { agent: 'orchestra', msg: '&#10003; Özel görev tamamlandı! Tüm ajanlar başarıyla çalıştı.', delay: 600, done: true },
+  ];
+  await executePlan(tasks);
+}
+
+// ---- Intersection Observer for fade-up animations ----
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.animationPlayState = 'running';
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.fade-up').forEach(el => {
+  el.style.animationPlayState = 'paused';
+  observer.observe(el);
+});
+
+// ---- Smooth scroll ----
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', function(e) {
+    e.preventDefault();
+    const el = document.querySelector(this.getAttribute('href'));
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+// ---- Enter key on input ----
+TASK_INPUT.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') runCustomTask();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Index (generated — re-run tools/indexer.py)
+.index/pages.json
+.index/pages.js
+
+# Embeddings (generated — re-run tools/embedder.py, ~50 MB)
+.index/embeddings.json
+
+# IDE / Tauri build artifacts
+ide/src-tauri/target/
+ide/node_modules/
+ide/dist/
+ide/.tauri/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/settings.json
+*.swp
+*.swo
+
+# Secrets / env
+.env
+.env.local
+*.key

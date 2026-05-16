@@ -12,15 +12,18 @@ Via CLI:         atlas serve [port]            (default port: 4242)
 
 import html as _html
 import json
+import math
+import mimetypes
 import re
 import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 ROOT         = Path(__file__).resolve().parent.parent
 VAULT_DIR    = ROOT / "vault"
 INDEX_FILE   = ROOT / ".index" / "pages.json"
+EMBED_FILE   = ROOT / ".index" / "embeddings.json"
 DEFAULT_PORT = 4242
 
 
@@ -93,6 +96,51 @@ class _Cache:
 _cache = _Cache()
 
 
+# ── Semantic search — lazy model + embedding cache ─────────────────────────────
+
+_sem_model     = None
+_sem_records:  list[dict] = []
+_sem_mtime:    float      = 0.0
+
+
+def _cosine(a: list[float], b: list[float]) -> float:
+    dot = sum(x * y for x, y in zip(a, b))
+    na  = math.sqrt(sum(x * x for x in a))
+    nb  = math.sqrt(sum(y * y for y in b))
+    return dot / (na * nb) if na and nb else 0.0
+
+
+def _get_semantic():
+    """Lazy-load model + embeddings on first call. Raises RuntimeError on failure."""
+    global _sem_model, _sem_records, _sem_mtime
+
+    # Load model once
+    if _sem_model is None:
+        try:
+            from sentence_transformers import SentenceTransformer
+        except ImportError:
+            raise RuntimeError(
+                "sentence-transformers not installed. "
+                "Run: pip install sentence-transformers && python tools/embedder.py"
+            )
+        print("  [semantic] Loading model all-MiniLM-L6-v2 …")
+        _sem_model = SentenceTransformer("all-MiniLM-L6-v2")
+        print("  [semantic] Model ready.")
+
+    # Reload embeddings when file changes
+    try:
+        mtime = EMBED_FILE.stat().st_mtime
+    except OSError:
+        raise RuntimeError(
+            "Embeddings not built yet. Run: python tools/embedder.py"
+        )
+    if mtime != _sem_mtime:
+        _sem_records = json.loads(EMBED_FILE.read_text(encoding="utf-8"))
+        _sem_mtime   = mtime
+
+    return _sem_model, _sem_records
+
+
 # ── Request handler ────────────────────────────────────────────────────────────
 
 class _Handler(BaseHTTPRequestHandler):
@@ -109,6 +157,7 @@ class _Handler(BaseHTTPRequestHandler):
                 'name': 'Atlas OS API',
                 'endpoints': [
                     '/api/search?q={query}&limit={n}&category={cat}',
+                    '/api/semantic?q={query}&limit={n}',
                     '/api/page/{category}/{slug}',
                     '/api/categories',
                     '/api/pages',
@@ -116,6 +165,8 @@ class _Handler(BaseHTTPRequestHandler):
             })
         elif path == '/api/search':
             self._search(params)
+        elif path == '/api/semantic':
+            self._semantic(params)
         elif path == '/api/categories':
             self._categories()
         elif path == '/api/pages':
@@ -127,6 +178,8 @@ class _Handler(BaseHTTPRequestHandler):
                 self._page(parts[0], parts[1])
             else:
                 self._error(400, 'Expected /api/page/{category}/{slug}')
+        elif path.startswith('/ui/') or path.startswith('/vault/'):
+            self._static(path)
         else:
             self._error(404, f'No endpoint: {path}')
 
@@ -172,6 +225,48 @@ class _Handler(BaseHTTPRequestHandler):
             }
             for p, s in scored[:limit]
         ])
+
+    def _semantic(self, params: dict) -> None:
+        q = params.get('q', [''])[0].strip()
+        try:
+            limit = max(1, min(int(params.get('limit', ['5'])[0]), 20))
+        except (ValueError, IndexError):
+            limit = 5
+
+        if not q:
+            self._json([])
+            return
+
+        try:
+            model, records = _get_semantic()
+            q_vec = model.encode([q], convert_to_numpy=True)[0].tolist()
+
+            scored = [
+                (r['id'], _cosine(q_vec, r['embedding']))
+                for r in records
+            ]
+            scored.sort(key=lambda x: x[1], reverse=True)
+            top = [(pid, s) for pid, s in scored[:limit] if s > 0.1]
+
+            pages_by_id = {p['id']: p for p in _cache.pages()}
+            result = []
+            for pid, score in top:
+                p = pages_by_id.get(pid)
+                if p:
+                    result.append({
+                        'id':          pid,
+                        'title':       p['title'],
+                        'category':    p['category'],
+                        'description': p['description'],
+                        'url':         p['url'],
+                        'score':       round(score, 4),
+                    })
+            self._json(result)
+
+        except RuntimeError as exc:
+            self._error(503, str(exc))
+        except Exception as exc:
+            self._error(500, f'Semantic search error: {exc}')
 
     def _page(self, category: str, slug: str) -> None:
         page_id = f'{category}/{slug}'
@@ -223,6 +318,25 @@ class _Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _static(self, path: str) -> None:
+        rel  = unquote(path.lstrip('/'))
+        file = ROOT / rel
+        if file.is_dir():
+            file = file / 'index.html'
+        if not file.exists() or not file.is_file():
+            self._error(404, f'Not found: {path}')
+            return
+        mime, _ = mimetypes.guess_type(str(file))
+        mime = mime or 'application/octet-stream'
+        body = file.read_bytes()
+        self.send_response(200)
+        self.send_header('Content-Type',                mime)
+        self.send_header('Content-Length',              str(len(body)))
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Cache-Control',               'no-store')
+        self.end_headers()
+        self.wfile.write(body)
+
     def _error(self, status: int, message: str) -> None:
         self._json({'error': message}, status=status)
 
@@ -238,6 +352,7 @@ def serve(port: int = DEFAULT_PORT) -> None:
     base   = f'http://localhost:{port}'
     print(f'\n  Atlas OS API  —  {base}')
     print(f'  {base}/api/search?q=...')
+    print(f'  {base}/api/semantic?q=...      (requires: pip install sentence-transformers && python tools/embedder.py)')
     print(f'  {base}/api/page/{{category}}/{{slug}}')
     print(f'  {base}/api/categories')
     print(f'  {base}/api/pages')
