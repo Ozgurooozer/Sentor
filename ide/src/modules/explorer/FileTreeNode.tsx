@@ -10,6 +10,7 @@ import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { memo, useCallback, useState } from "react";
 import { InlineInput } from "./InlineInput";
+import { localToAsset } from "@/modules/browser/assetUrl";
 import {
   copyToClipboard,
   relativePath,
@@ -33,6 +34,7 @@ type Props = {
    * omitting it means the caller decides the default (preview).
    */
   onOpenFile: (path: string, pin?: boolean) => void;
+  onOpenBrowserTab?: (url: string) => void;
   onRevealInTerminal?: (path: string) => void;
   onAttachToAgent?: (path: string) => void;
   selectedPath: string | null;
@@ -46,6 +48,7 @@ function FileTreeNodeImpl({
   depth,
   tree,
   onOpenFile,
+  onOpenBrowserTab,
   onRevealInTerminal,
   onAttachToAgent,
   selectedPath,
@@ -148,6 +151,14 @@ function FileTreeNodeImpl({
               onSelect={() => onOpenFile(path, true)}
             >
               Open
+            </ContextMenuItem>
+          )}
+          {!isDir && onOpenBrowserTab && entry.name.endsWith(".html") && (
+            <ContextMenuItem
+              className={COMPACT_ITEM}
+              onSelect={() => onOpenBrowserTab(localToAsset(path))}
+            >
+              Open in Browser
             </ContextMenuItem>
           )}
           {isDir && onRevealInTerminal && (
@@ -276,6 +287,7 @@ function FileTreeNodeImpl({
             depth={depth + 1}
             tree={tree}
             onOpenFile={onOpenFile}
+            onOpenBrowserTab={onOpenBrowserTab}
             onRevealInTerminal={onRevealInTerminal}
             onAttachToAgent={onAttachToAgent}
             selectedPath={selectedPath}

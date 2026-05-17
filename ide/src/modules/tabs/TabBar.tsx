@@ -19,6 +19,9 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useEffect, useRef } from "react";
+import {
+  BookOpenIcon,
+} from "@hugeicons/core-free-icons";
 import type { EditorTab, Tab } from "./lib/useTabs";
 
 type Props = {
@@ -28,6 +31,8 @@ type Props = {
   onNew: () => void;
   onNewPreview: () => void;
   onNewEditor: () => void;
+  onNewBrowser?: () => void;
+  onNewVaultHome?: () => void;
   onClose: (id: number) => void;
   /** Pin (promote) a preview tab to persistent on double-click. */
   onPin: (id: number) => void;
@@ -41,6 +46,8 @@ export function TabBar({
   onNew,
   onNewPreview,
   onNewEditor,
+  onNewBrowser,
+  onNewVaultHome,
   onClose,
   onPin,
   compact,
@@ -174,6 +181,18 @@ export function TabBar({
               <span className="flex-1">Preview</span>
               <span className="text-xs text-muted-foreground">{fmtShortcut(MOD_KEY, "P")}</span>
             </DropdownMenuItem>
+            {onNewBrowser && (
+              <DropdownMenuItem onSelect={() => onNewBrowser()}>
+                <HugeiconsIcon icon={Globe02Icon} size={14} strokeWidth={1.75} />
+                <span className="flex-1">Web</span>
+              </DropdownMenuItem>
+            )}
+            {onNewVaultHome && (
+              <DropdownMenuItem onSelect={() => onNewVaultHome()}>
+                <HugeiconsIcon icon={BookOpenIcon} size={14} strokeWidth={1.75} />
+                <span className="flex-1">Vault Home</span>
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -186,10 +205,20 @@ function TabIcon({ tab }: { tab: Tab }) {
     const url = fileIconUrl(tab.title);
     return url ? <img src={url} alt="" className="size-3.5 shrink-0" /> : null;
   }
-  if (tab.kind === "preview") {
+  if (tab.kind === "preview" || tab.kind === "web") {
     return (
       <HugeiconsIcon
         icon={Globe02Icon}
+        size={14}
+        strokeWidth={2}
+        className="shrink-0"
+      />
+    );
+  }
+  if (tab.kind === "vault" || tab.kind === "vault-home") {
+    return (
+      <HugeiconsIcon
+        icon={BookOpenIcon}
         size={14}
         strokeWidth={2}
         className="shrink-0"
@@ -220,6 +249,9 @@ function labelFor(t: Tab): string {
   if (t.kind === "editor") return t.title;
   if (t.kind === "preview") return t.title;
   if (t.kind === "ai-diff") return t.title;
+  if (t.kind === "vault") return t.title;
+  if (t.kind === "web") return t.title;
+  if (t.kind === "vault-home") return t.title;
   if (!t.cwd) return t.title;
   const parts = t.cwd.split(/[\\/]/).filter(Boolean);
   return parts.length ? parts[parts.length - 1] : "/";

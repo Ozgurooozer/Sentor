@@ -3,7 +3,6 @@ pub mod grep;
 pub mod mutate;
 pub mod search;
 pub mod tree;
-pub mod vault;
 
 use std::path::Path;
 

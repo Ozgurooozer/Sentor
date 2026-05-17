@@ -30,6 +30,7 @@ Auto-executes (no approval) — subagents are read-only by design.`,
       }),
       execute: async ({ type, prompt, description }) => {
         const { apiKeys, selectedModelId } = useChatStore.getState();
+        const prefs = (await import("@/modules/settings/preferences")).usePreferencesStore.getState();
         try {
           const r = await runSubagent({
             type,
@@ -37,6 +38,10 @@ Auto-executes (no approval) — subagents are read-only by design.`,
             keys: apiKeys,
             modelId: selectedModelId,
             toolContext: ctx,
+            lmstudioBaseURL: prefs.lmstudioBaseURL,
+            ollamaBaseURL: prefs.ollamaBaseURL,
+            lmstudioModelId: prefs.lmstudioChatModelId || undefined,
+            ollamaModelId: prefs.ollamaChatModelId || undefined,
           });
           return {
             type,

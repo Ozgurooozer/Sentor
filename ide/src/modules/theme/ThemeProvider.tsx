@@ -1,7 +1,6 @@
 import {
   createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -20,13 +19,13 @@ type ThemeProviderProps = {
   defaultTheme?: Theme;
 };
 
-type ThemeProviderState = {
+export type ThemeProviderState = {
   theme: Theme;
   resolvedTheme: "dark" | "light";
   setTheme: (theme: Theme) => void;
 };
 
-const ThemeProviderContext = createContext<ThemeProviderState | null>(null);
+export const ThemeProviderContext = createContext<ThemeProviderState | null>(null);
 
 // Synchronous fast-path so the initial paint isn't unstyled. The persistent
 // preference (in tauri-plugin-store) overwrites this on mount; we keep a
@@ -114,8 +113,3 @@ export function ThemeProvider({
   );
 }
 
-export function useTheme(): ThemeProviderState {
-  const ctx = useContext(ThemeProviderContext);
-  if (!ctx) throw new Error("useTheme must be used within a <ThemeProvider>");
-  return ctx;
-}

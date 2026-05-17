@@ -60,7 +60,39 @@ export type AiDiffTab = {
   isNewFile: boolean;
 };
 
-export type Tab = TerminalTab | EditorTab | PreviewTab | AiDiffTab;
+export type VaultTab = {
+  id: number;
+  kind: "vault";
+  title: string;
+  url: string;
+  history: string[];
+  historyIdx: number;
+};
+
+export type WebTab = {
+  id: number;
+  kind: "web";
+  title: string;
+  url: string;
+  history: string[];
+  historyIdx: number;
+};
+
+/** Either browser-style tab. Useful where code handles both kinds uniformly. */
+export type NavigableTab = VaultTab | WebTab;
+
+export type VaultHomeTab = {
+  id: number;
+  kind: "vault-home";
+  title: string;
+};
+
+export type Tab = TerminalTab | EditorTab | PreviewTab | AiDiffTab | VaultTab | WebTab | VaultHomeTab;
+
+/** Picks which browser-style tab kind to use for a given URL. */
+export function pickTabKindForUrl(url: string): "vault" | "web" {
+  return /^https?:\/\//i.test(url) ? "web" : "vault";
+}
 
 export type TabPatch = Partial<{
   title: string;
@@ -84,23 +116,12 @@ function titleFromUrl(url: string): string {
   }
 }
 
-export function useTabs(initial?: Partial<TerminalTab>) {
-  const [tabs, setTabs] = useState<Tab[]>(() => {
-    const tabId = 1;
-    const leafId = 2;
-    return [
-      {
-        id: tabId,
-        kind: "terminal",
-        title: initial?.title ?? "shell",
-        cwd: initial?.cwd,
-        paneTree: { kind: "leaf", id: leafId, cwd: initial?.cwd },
-        activeLeafId: leafId,
-      },
-    ];
-  });
+export function useTabs() {
+  const [tabs, setTabs] = useState<Tab[]>(() => [
+    { id: 1, kind: "vault-home", title: "Vault" } satisfies VaultHomeTab,
+  ]);
   const [activeId, setActiveId] = useState(1);
-  const nextIdRef = useRef(3);
+  const nextIdRef = useRef(2);
 
   const newTab = useCallback((cwd?: string) => {
     const tabId = nextIdRef.current++;
@@ -275,6 +296,90 @@ export function useTabs(initial?: Partial<TerminalTab>) {
     ]);
     setActiveId(id);
     return id;
+  }, []);
+
+  const openVaultTab = useCallback((url: string): number => {
+    // Route external URLs through to the web tab so callers don't have to care.
+    if (url && pickTabKindForUrl(url) === "web") {
+      return openWebTabRef.current(url);
+    }
+    const id = nextIdRef.current++;
+    let title = "Vault";
+    if (url) {
+      try { title = new URL(url).host || url; } catch { title = url; }
+    }
+    setTabs((t) => [
+      ...t,
+      { id, kind: "vault", title, url, history: url ? [url] : [], historyIdx: url ? 0 : -1 },
+    ]);
+    setActiveId(id);
+    return id;
+  }, []);
+
+  const openWebTab = useCallback((url: string): number => {
+    if (url && pickTabKindForUrl(url) === "vault") {
+      return openVaultTabRef.current(url);
+    }
+    const id = nextIdRef.current++;
+    let title = "Web";
+    if (url) {
+      try { title = new URL(url).host || url; } catch { title = url; }
+    }
+    setTabs((t) => [
+      ...t,
+      { id, kind: "web", title, url, history: url ? [url] : [], historyIdx: url ? 0 : -1 },
+    ]);
+    setActiveId(id);
+    return id;
+  }, []);
+
+  // Refs let the two openers refer to each other without circular useCallback deps.
+  const openVaultTabRef = useRef(openVaultTab);
+  const openWebTabRef = useRef(openWebTab);
+  openVaultTabRef.current = openVaultTab;
+  openWebTabRef.current = openWebTab;
+
+  const openVaultHomeTab = useCallback(() => {
+    let existingId: number | null = null;
+    setTabs((curr) => {
+      const existing = curr.find((t) => t.kind === "vault-home");
+      if (existing) {
+        existingId = existing.id;
+        return curr;
+      }
+      const id = nextIdRef.current++;
+      existingId = id;
+      return [...curr, { id, kind: "vault-home", title: "Vault" } satisfies VaultHomeTab];
+    });
+    if (existingId !== null) setActiveId(existingId);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return existingId!;
+  }, []);
+
+  const updateNavTabUrl = useCallback((tabId: number, url: string) => {
+    setTabs((curr) =>
+      curr.map((t) => {
+        if (t.id !== tabId || (t.kind !== "vault" && t.kind !== "web")) return t;
+        const history = [...t.history.slice(0, t.historyIdx + 1), url];
+        let title = url;
+        try { title = new URL(url).host || url; } catch { /* keep url */ }
+        return { ...t, url, title, history, historyIdx: history.length - 1 };
+      }),
+    );
+  }, []);
+
+  const navigateTabHistory = useCallback((tabId: number, delta: -1 | 1) => {
+    setTabs((curr) =>
+      curr.map((t) => {
+        if (t.id !== tabId || (t.kind !== "vault" && t.kind !== "web")) return t;
+        const newIdx = Math.max(0, Math.min(t.history.length - 1, t.historyIdx + delta));
+        if (newIdx === t.historyIdx) return t;
+        const url = t.history[newIdx];
+        let title = url;
+        try { title = new URL(url).host || url; } catch { /* keep url */ }
+        return { ...t, url, title, historyIdx: newIdx };
+      }),
+    );
   }, []);
 
   const closeTab = useCallback((id: number) => {
@@ -467,6 +572,11 @@ export function useTabs(initial?: Partial<TerminalTab>) {
     openFileTab,
     pinTab,
     newPreviewTab,
+    openVaultTab,
+    openWebTab,
+    openVaultHomeTab,
+    updateNavTabUrl,
+    navigateTabHistory,
     openAiDiffTab,
     setAiDiffStatus,
     closeTab,

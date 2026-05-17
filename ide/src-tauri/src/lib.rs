@@ -1,7 +1,8 @@
 mod modules;
 
-use modules::{fs, net, pty, secrets, shell};
+use modules::{fs, net, pty, secrets, shell, web, webview};
 use tauri::{Emitter, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_window_state::StateFlags;
 
 #[tauri::command]
@@ -50,6 +51,17 @@ async fn open_settings_window(app: tauri::AppHandle, tab: Option<String>) -> Res
     Ok(())
 }
 
+/// Opens the native OS folder-picker dialog and returns the chosen path,
+/// or null if the user cancelled.
+#[tauri::command]
+async fn pick_folder(app: tauri::AppHandle) -> Option<String> {
+    let (tx, rx) = tokio::sync::oneshot::channel::<Option<tauri_plugin_dialog::FilePath>>();
+    app.dialog().file().pick_folder(move |path| {
+        let _ = tx.send(path);
+    });
+    rx.await.ok().flatten().map(|p| p.to_string())
+}
+
 // Vault & AI Commands (Stubs for now to fix compilation)
 #[tauri::command]
 async fn vault_get_note_titles(query: String) -> Result<Vec<String>, String> {
@@ -57,12 +69,12 @@ async fn vault_get_note_titles(query: String) -> Result<Vec<String>, String> {
 }
 
 #[tauri::command]
-async fn vault_get_backlinks(note_id: String) -> Result<Vec<serde_json::Value>, String> {
+async fn vault_get_backlinks(_note_id: String) -> Result<Vec<serde_json::Value>, String> {
     Ok(vec![])
 }
 
 #[tauri::command]
-async fn vault_get_similar_notes(note_id: String) -> Result<Vec<serde_json::Value>, String> {
+async fn vault_get_similar_notes(_note_id: String) -> Result<Vec<serde_json::Value>, String> {
     Ok(vec![])
 }
 
@@ -110,9 +122,11 @@ pub fn run() {
                 .build(),
         )
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .manage(pty::PtyState::default())
         .manage(shell::ShellState::default())
         .manage(secrets::SecretsState::default())
+        .manage(webview::WebState::default())
         .invoke_handler(tauri::generate_handler![
             pty::pty_open,
             pty::pty_write,
@@ -144,6 +158,15 @@ pub fn run() {
             secrets::secrets_delete,
             secrets::secrets_get_all,
             net::http_ping,
+            web::web_search,
+            web::web_fetch,
+            webview::web_open,
+            webview::web_navigate,
+            webview::web_set_bounds,
+            webview::web_set_visible,
+            webview::web_close,
+            webview::web_go,
+            pick_folder,
             vault_get_note_titles,
             vault_get_backlinks,
             vault_get_similar_notes,

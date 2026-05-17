@@ -49,8 +49,11 @@ import {
   useGlobalShortcuts,
   type ShortcutHandlers,
 } from "@/modules/shortcuts";
+import { BrowserStack } from "@/modules/browser/BrowserStack";
+import { localToAsset } from "@/modules/browser/assetUrl";
+import { VaultHomePane } from "@/modules/vault-home/VaultHomePane";
 import { StatusBar } from "@/modules/statusbar";
-import { MAX_PANES_PER_TAB, useTabs, useWorkspaceCwd } from "@/modules/tabs";
+import { MAX_PANES_PER_TAB, useTabs, useWorkspaceCwd, type NavigableTab } from "@/modules/tabs";
 import {
   disposeSession,
   hasLeaf,
@@ -62,6 +65,7 @@ import {
 } from "@/modules/terminal";
 import { ThemeProvider } from "@/modules/theme";
 import { UpdaterDialog } from "@/modules/updater";
+import { listen } from "@tauri-apps/api/event";
 import { homeDir } from "@tauri-apps/api/path";
 import type { SearchAddon } from "@xterm/addon-search";
 import { AnimatePresence, motion } from "motion/react";
@@ -98,6 +102,11 @@ export default function App() {
     splitActivePane,
     closeActivePane,
     closePaneByLeaf,
+    openVaultTab,
+    openWebTab,
+    openVaultHomeTab,
+    updateNavTabUrl,
+    navigateTabHistory,
   } = useTabs();
 
   // Mirror `tabs` into a ref so callbacks scheduled with `setTimeout`
@@ -198,6 +207,8 @@ export default function App() {
   const isEditorTab = activeTab?.kind === "editor";
   const isPreviewTab = activeTab?.kind === "preview";
   const isAiDiffTab = activeTab?.kind === "ai-diff";
+  const isBrowserTab = activeTab?.kind === "vault" || activeTab?.kind === "web";
+  const isVaultHomeTab = activeTab?.kind === "vault-home";
 
   // When an AI diff is approved (write_file applied to disk), reload any
   // open editor tabs for that path so the user sees the new content. We
@@ -530,6 +541,19 @@ export default function App() {
     [newPreviewTab],
   );
 
+  // Auto-open a browser tab when Atlas-Maker writes a vault page.
+  useEffect(() => {
+    let unlisten: (() => void) | null = null;
+    listen<{ path: string; category: string; slug: string }>(
+      "atlas://vault-page-written",
+      (e) => {
+        const assetUrl = localToAsset(e.payload.path);
+        openVaultTab(assetUrl);
+      },
+    ).then((fn) => { unlisten = fn; });
+    return () => { unlisten?.(); };
+  }, [openVaultTab]);
+
   const splitActivePaneInActiveTab = useCallback(
     (dir: "row" | "col") => {
       const t = tabsRef.current.find((x) => x.id === activeId);
@@ -567,6 +591,7 @@ export default function App() {
       "shortcuts.open": () => setShortcutsOpen((v) => !v),
       "settings.open": () => void openSettingsWindow(),
       "sidebar.toggle": toggleSidebar,
+      "tab.vaultHome": () => openVaultHomeTab(),
     }),
     [
       activeId,
@@ -580,6 +605,7 @@ export default function App() {
       togglePanelAndFocus,
       askFromSelection,
       toggleSidebar,
+      openVaultHomeTab,
     ],
   );
 
@@ -726,6 +752,8 @@ export default function App() {
             onNew={openNewTab}
             onNewPreview={() => openPreviewTab("")}
             onNewEditor={() => setNewEditorOpen(true)}
+            onNewBrowser={() => openWebTab("")}
+            onNewVaultHome={() => openVaultHomeTab()}
             onClose={handleClose}
             onPin={pinTab}
             onToggleSidebar={toggleSidebar}
@@ -758,6 +786,7 @@ export default function App() {
                   <FileExplorer
                     rootPath={explorerRoot}
                     onOpenFile={handleOpenFile}
+                    onOpenBrowserTab={(url) => openVaultTab(url)}
                     onPathRenamed={handlePathRenamed}
                     onPathDeleted={handlePathDeleted}
                     onRevealInTerminal={cdInNewTab}
@@ -829,6 +858,42 @@ export default function App() {
                         activeId={activeId}
                         onAccept={(id) => respondToApproval(id, true)}
                         onReject={(id) => respondToApproval(id, false)}
+                      />
+                    </div>
+                    <div
+                      className={cn(
+                        "absolute inset-0",
+                        !isBrowserTab && "invisible pointer-events-none",
+                      )}
+                      aria-hidden={!isBrowserTab}
+                    >
+                      <BrowserStack
+                        tabs={tabs.filter(
+                          (t): t is NavigableTab => t.kind === "vault" || t.kind === "web",
+                        )}
+                        activeId={activeId}
+                        onNavigate={(tabId, url) => updateNavTabUrl(tabId, url)}
+                        onGoBack={(tabId) => navigateTabHistory(tabId, -1)}
+                        onGoForward={(tabId) => navigateTabHistory(tabId, 1)}
+                        onTitleChange={(tabId, title) => updateTab(tabId, { title })}
+                        onCrossScheme={(_src, url) => {
+                          // Address bar gave us a URL whose scheme belongs in the
+                          // other kind of tab. Open a fresh tab there.
+                          if (/^https?:\/\//i.test(url)) openWebTab(url);
+                          else openVaultTab(url);
+                        }}
+                      />
+                    </div>
+                    <div
+                      className={cn(
+                        "absolute inset-0",
+                        !isVaultHomeTab && "invisible pointer-events-none",
+                      )}
+                      aria-hidden={!isVaultHomeTab}
+                    >
+                      <VaultHomePane
+                        workspaceRoot={explorerRoot}
+                        onOpenBrowserTab={openVaultTab}
                       />
                     </div>
                   </div>

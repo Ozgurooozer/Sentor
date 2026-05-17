@@ -7,21 +7,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { fmtShortcut, MOD_KEY } from "@/lib/platform";
+import { MODELS, getModel, type ModelId } from "@/modules/ai/config";
+import { usePreferencesStore } from "@/modules/settings/preferences";
+import { setDefaultModel } from "@/modules/settings/store";
 import {
   ArrowDown01Icon,
   ArrowUp01Icon,
-  Mic01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
-
-const MODELS = [
-  { id: "claude-opus-4-7", label: "Claude Opus 4.7" },
-  { id: "claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
-  { id: "claude-haiku-4-5", label: "Claude Haiku 4.5" },
-  { id: "gpt-5", label: "GPT-5" },
-];
 
 type Props = {
   aiOpen: boolean;
@@ -43,9 +37,6 @@ export function AiTools({ aiOpen, canSubmit, onOpenAi, onSubmit }: Props) {
           className="flex items-center gap-0.5"
         >
           <ModelSelector />
-          <ToolButton title="Voice input">
-            <HugeiconsIcon icon={Mic01Icon} size={14} strokeWidth={1.75} />
-          </ToolButton>
           <Button
             size="sm"
             disabled={!canSubmit}
@@ -77,28 +68,10 @@ export function AiTools({ aiOpen, canSubmit, onOpenAi, onSubmit }: Props) {
   );
 }
 
-function ToolButton({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="icon"
-      title={title}
-      className="size-7 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
-    >
-      {children}
-    </Button>
-  );
-}
 
 function ModelSelector() {
-  const [selected, setSelected] = useState(MODELS[0]);
+  const defaultModelId = usePreferencesStore((s) => s.defaultModelId);
+  const selected = getModel(defaultModelId);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -120,7 +93,7 @@ function ModelSelector() {
         {MODELS.map((m) => (
           <DropdownMenuItem
             key={m.id}
-            onSelect={() => setSelected(m)}
+            onSelect={() => void setDefaultModel(m.id as ModelId)}
             className="text-xs"
           >
             {m.label}

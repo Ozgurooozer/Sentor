@@ -1,7 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import {
   createContext,
-  useContext,
   useEffect,
   useRef,
   useState,
@@ -34,7 +33,7 @@ export const ACCEPTED_FILES =
 
 type Voice = ReturnType<typeof useWhisperRecording>;
 
-type ComposerCtx = {
+export type ComposerCtx = {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
@@ -56,14 +55,7 @@ type ComposerCtx = {
   canSend: boolean;
 };
 
-const Ctx = createContext<ComposerCtx | null>(null);
-
-export function useComposer(): ComposerCtx {
-  const ctx = useContext(Ctx);
-  if (!ctx)
-    throw new Error("useComposer must be used inside <AiComposerProvider>");
-  return ctx;
-}
+export const ComposerContext = createContext<ComposerCtx | null>(null);
 
 type ProviderProps = {
   children: React.ReactNode;
@@ -334,7 +326,7 @@ export function AiComposerProvider({ children }: ProviderProps) {
     canSend,
   };
 
-  return <Ctx.Provider value={ctx}>{children}</Ctx.Provider>;
+  return <ComposerContext.Provider value={ctx}>{children}</ComposerContext.Provider>;
 }
 
 async function readAttachment(file: File): Promise<FileAttachment | null> {

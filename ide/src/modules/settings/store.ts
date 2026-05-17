@@ -4,6 +4,7 @@ import {
   DEFAULT_AUTOCOMPLETE_MODEL,
   DEFAULT_MODEL_ID,
   LMSTUDIO_DEFAULT_BASE_URL,
+  OLLAMA_DEFAULT_BASE_URL,
   type AutocompleteProviderId,
   type ModelId,
 } from "@/modules/ai/config";
@@ -48,8 +49,15 @@ export type Preferences = {
   autocompleteProvider: AutocompleteProviderId;
   autocompleteModelId: string;
   lmstudioBaseURL: string;
+  ollamaBaseURL: string;
+  lmstudioChatModelId: string;
+  ollamaChatModelId: string;
   vimMode: boolean;
   shortcuts: Record<ShortcutId, KeyBinding[]>;
+  /** Explicitly pinned workspace root folder; null = derive from terminal cwd. */
+  workspaceRoot: string | null;
+  /** SearXNG instance URL for web_search. */
+  searxngUrl: string;
 };
 
 const STORE_PATH = "atlas-settings.json";
@@ -63,8 +71,13 @@ const KEY_AUTOCOMPLETE_ENABLED = "autocompleteEnabled";
 const KEY_AUTOCOMPLETE_PROVIDER = "autocompleteProvider";
 const KEY_AUTOCOMPLETE_MODEL = "autocompleteModelId";
 const KEY_LMSTUDIO_BASE_URL = "lmstudioBaseURL";
+const KEY_OLLAMA_BASE_URL = "ollamaBaseURL";
+const KEY_LMSTUDIO_CHAT_MODEL = "lmstudioChatModelId";
+const KEY_OLLAMA_CHAT_MODEL = "ollamaChatModelId";
 const KEY_VIM_MODE = "vimMode";
 const KEY_SHORTCUTS = "shortcuts";
+const KEY_WORKSPACE_ROOT = "workspaceRoot";
+const KEY_SEARXNG_URL = "searxngUrl";
 
 export const DEFAULT_PREFERENCES: Preferences = {
   theme: "system",
@@ -74,11 +87,16 @@ export const DEFAULT_PREFERENCES: Preferences = {
   autostart: false,
   restoreWindowState: true,
   autocompleteEnabled: false,
-  autocompleteProvider: "cerebras",
-  autocompleteModelId: DEFAULT_AUTOCOMPLETE_MODEL.cerebras,
+  autocompleteProvider: "lmstudio",
+  autocompleteModelId: DEFAULT_AUTOCOMPLETE_MODEL.lmstudio,
   lmstudioBaseURL: LMSTUDIO_DEFAULT_BASE_URL,
+  ollamaBaseURL: OLLAMA_DEFAULT_BASE_URL,
+  lmstudioChatModelId: "",
+  ollamaChatModelId: "",
   vimMode: false,
   shortcuts: {} as Record<ShortcutId, KeyBinding[]>,
+  workspaceRoot: null,
+  searxngUrl: "https://searx.be",
 };
 
 const store = new LazyStore(STORE_PATH, { defaults: {}, autoSave: 200 });
@@ -125,10 +143,18 @@ export async function loadPreferences(): Promise<Preferences> {
       DEFAULT_PREFERENCES.autocompleteModelId,
     lmstudioBaseURL:
       get<string>(KEY_LMSTUDIO_BASE_URL) ?? DEFAULT_PREFERENCES.lmstudioBaseURL,
+    ollamaBaseURL:
+      get<string>(KEY_OLLAMA_BASE_URL) ?? DEFAULT_PREFERENCES.ollamaBaseURL,
+    lmstudioChatModelId:
+      get<string>(KEY_LMSTUDIO_CHAT_MODEL) ?? DEFAULT_PREFERENCES.lmstudioChatModelId,
+    ollamaChatModelId:
+      get<string>(KEY_OLLAMA_CHAT_MODEL) ?? DEFAULT_PREFERENCES.ollamaChatModelId,
     vimMode: get<boolean>(KEY_VIM_MODE) ?? DEFAULT_PREFERENCES.vimMode,
     shortcuts:
       get<Record<ShortcutId, KeyBinding[]>>(KEY_SHORTCUTS) ??
       DEFAULT_PREFERENCES.shortcuts,
+    workspaceRoot: get<string>(KEY_WORKSPACE_ROOT) ?? null,
+    searxngUrl: get<string>(KEY_SEARXNG_URL) ?? DEFAULT_PREFERENCES.searxngUrl,
   };
 }
 
@@ -174,8 +200,28 @@ export async function setLmstudioBaseURL(value: string): Promise<void> {
   await writePref(KEY_LMSTUDIO_BASE_URL, value);
 }
 
+export async function setOllamaBaseURL(value: string): Promise<void> {
+  await writePref(KEY_OLLAMA_BASE_URL, value);
+}
+
+export async function setLmstudioChatModelId(value: string): Promise<void> {
+  await writePref(KEY_LMSTUDIO_CHAT_MODEL, value);
+}
+
+export async function setOllamaChatModelId(value: string): Promise<void> {
+  await writePref(KEY_OLLAMA_CHAT_MODEL, value);
+}
+
 export async function setVimMode(value: boolean): Promise<void> {
   await writePref(KEY_VIM_MODE, value);
+}
+
+export async function setWorkspaceRoot(value: string | null): Promise<void> {
+  await writePref(KEY_WORKSPACE_ROOT, value);
+}
+
+export async function setSearxngUrl(value: string): Promise<void> {
+  await writePref(KEY_SEARXNG_URL, value);
 }
 
 export async function setShortcuts(
@@ -207,8 +253,13 @@ export async function onPreferencesChange(
     [KEY_AUTOCOMPLETE_PROVIDER]: "autocompleteProvider",
     [KEY_AUTOCOMPLETE_MODEL]: "autocompleteModelId",
     [KEY_LMSTUDIO_BASE_URL]: "lmstudioBaseURL",
+    [KEY_OLLAMA_BASE_URL]: "ollamaBaseURL",
+    [KEY_LMSTUDIO_CHAT_MODEL]: "lmstudioChatModelId",
+    [KEY_OLLAMA_CHAT_MODEL]: "ollamaChatModelId",
     [KEY_VIM_MODE]: "vimMode",
     [KEY_SHORTCUTS]: "shortcuts",
+    [KEY_WORKSPACE_ROOT]: "workspaceRoot",
+    [KEY_SEARXNG_URL]: "searxngUrl",
   };
   // Same-process writes still fire onChange immediately; cross-window writes
   // arrive via the Tauri event emitted by writePref().

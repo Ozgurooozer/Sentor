@@ -16,6 +16,9 @@ type Args = {
   modelId: ModelId;
   toolContext: ToolContext;
   lmstudioBaseURL?: string;
+  ollamaBaseURL?: string;
+  lmstudioModelId?: string;
+  ollamaModelId?: string;
 };
 
 type RunResult = {
@@ -31,23 +34,33 @@ export async function runSubagent({
   modelId,
   toolContext,
   lmstudioBaseURL,
+  ollamaBaseURL,
+  lmstudioModelId,
+  ollamaModelId,
 }: Args): Promise<RunResult> {
   const def = SUBAGENTS[type];
   if (!def) throw new Error(`unknown subagent type: ${type}`);
 
-  // Subagents only get read-only tools. Build directly from the read-only
-  // builders to avoid pulling in mutating/recursive tools.
+  // Subagents get read-only tools plus todo_write and vault tools.
+  const { buildTodoTools } = await import("../tools/todo");
+  const { buildVaultTools } = await import("../tools/vault");
   const readOnly: Record<string, unknown> = {
     ...buildFsTools(toolContext),
     ...buildSearchTools(toolContext),
+    ...buildTodoTools(toolContext),
+    ...buildVaultTools(toolContext),
   };
   const filtered: Record<string, unknown> = {};
   for (const t of def.tools) {
     if (t in readOnly) filtered[t] = readOnly[t];
   }
 
-  const model = await buildLanguageModel(getModel(modelId).provider, keys, getModel(modelId).id, {
+  const provider = getModel(modelId).provider;
+  const modelIdOverride = provider === "lmstudio" ? lmstudioModelId : ollamaModelId;
+  const model = await buildLanguageModel(provider, keys, getModel(modelId).id, {
     lmstudioBaseURL,
+    ollamaBaseURL,
+    modelIdOverride,
   });
 
   // The Agent constructor's tools generic infers `never` when passed a

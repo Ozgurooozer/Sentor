@@ -15,65 +15,37 @@ import {
   PROVIDERS,
   getModel,
   getProvider,
-  providerNeedsKey,
   type AutocompleteProviderId,
   type ModelId,
-  type ProviderId,
 } from "@/modules/ai/config";
-import { clearKey, getAllKeys, setKey } from "@/modules/ai/lib/keyring";
 import { usePreferencesStore } from "@/modules/settings/preferences";
 import {
-  emitKeysChanged,
   setAutocompleteEnabled,
   setAutocompleteModelId,
   setAutocompleteProvider,
   setDefaultModel,
   setLmstudioBaseURL,
+  setLmstudioChatModelId,
+  setOllamaBaseURL,
+  setOllamaChatModelId,
+  setSearxngUrl,
 } from "@/modules/settings/store";
 import { invoke } from "@tauri-apps/api/core";
 import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useEffect, useState } from "react";
 import { ProviderIcon } from "../components/ProviderIcon";
-import { ProviderKeyCard } from "../components/ProviderKeyCard";
 import { SectionHeader } from "../components/SectionHeader";
 
-type KeysMap = Record<ProviderId, string | null>;
-
 export function ModelsSection() {
-  const [keys, setKeys] = useState<KeysMap | null>(null);
   const defaultModel = usePreferencesStore((s) => s.defaultModelId);
-
-  useEffect(() => {
-    void getAllKeys().then(setKeys);
-  }, []);
-
-  const onSave = async (provider: ProviderId, value: string) => {
-    await setKey(provider, value);
-    setKeys((prev) => (prev ? { ...prev, [provider]: value } : prev));
-    await emitKeysChanged();
-  };
-
-  const onClear = async (provider: ProviderId) => {
-    await clearKey(provider);
-    setKeys((prev) => (prev ? { ...prev, [provider]: null } : prev));
-    await emitKeysChanged();
-  };
-
-  if (!keys) {
-    return <div className="text-[12px] text-muted-foreground">Loading…</div>;
-  }
-
   const defaultModelInfo = getModel(defaultModel);
-  const configuredCount = PROVIDERS.filter(
-    (p) => providerNeedsKey(p.id) && !!keys[p.id],
-  ).length;
 
   return (
     <div className="flex flex-col gap-7">
       <SectionHeader
         title="Models"
-        description="Bring your own keys. They live in your OS keychain and are used only by Atlas."
+        description="Local models only — no API keys required. Configure LM Studio or Ollama below."
       />
 
       <div className="flex flex-col gap-2">
@@ -99,28 +71,19 @@ export function ModelsSection() {
               />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[260px]">
-            {PROVIDERS.filter((p) => providerNeedsKey(p.id)).map((p) => {
+          <DropdownMenuContent align="start" className="min-w-[220px]">
+            {PROVIDERS.map((p) => {
               const models = MODELS.filter((m) => m.provider === p.id);
-              const hasKey = !!keys[p.id];
               return (
                 <div key={p.id} className="px-1 pt-1.5">
                   <div className="mb-1 flex items-center gap-1.5 px-2 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
                     <ProviderIcon provider={p.id} size={11} />
                     <span>{p.label}</span>
-                    {!hasKey && (
-                      <span className="ml-auto text-[9.5px] normal-case tracking-normal text-muted-foreground/70">
-                        no key
-                      </span>
-                    )}
                   </div>
                   {models.map((m) => (
                     <DropdownMenuItem
                       key={m.id}
-                      disabled={!hasKey}
-                      onSelect={() =>
-                        hasKey && void setDefaultModel(m.id as ModelId)
-                      }
+                      onSelect={() => void setDefaultModel(m.id as ModelId)}
                       className={cn(
                         "flex items-center justify-between gap-2 text-[12px]",
                         m.id === defaultModel && "bg-accent/50",
@@ -141,45 +104,70 @@ export function ModelsSection() {
         </DropdownMenu>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <div className="flex items-baseline justify-between">
-          <Label>API keys</Label>
-          <span className="text-[10.5px] text-muted-foreground">
-            {configuredCount} of {PROVIDERS.filter((p) => providerNeedsKey(p.id)).length} configured
-          </span>
-        </div>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {PROVIDERS.filter((p) => providerNeedsKey(p.id)).map((p) => (
-            <ProviderKeyCard
-              key={p.id}
-              provider={p}
-              currentKey={keys[p.id]}
-              onSave={(v: string) => onSave(p.id, v)}
-              onClear={() => onClear(p.id)}
-            />
-          ))}
-        </div>
-      </div>
-
-      <AutocompleteBlock keys={keys} />
+      <ChatModelBlock />
+      <AutocompleteBlock />
+      <SearxngBlock />
     </div>
   );
 }
 
-function AutocompleteBlock({ keys }: { keys: KeysMap }) {
+function ChatModelBlock() {
+  const lmstudioChatModelId = usePreferencesStore((s) => s.lmstudioChatModelId);
+  const ollamaChatModelId = usePreferencesStore((s) => s.ollamaChatModelId);
+  const defaultModel = usePreferencesStore((s) => s.defaultModelId);
+  const isOllama = getModel(defaultModel).provider === "ollama";
+
+  const [draft, setDraft] = useState(isOllama ? ollamaChatModelId : lmstudioChatModelId);
+
+  useEffect(() => {
+    setDraft(isOllama ? ollamaChatModelId : lmstudioChatModelId);
+  }, [isOllama, lmstudioChatModelId, ollamaChatModelId]);
+
+  const save = () => {
+    const v = draft.trim();
+    if (isOllama) {
+      if (v !== ollamaChatModelId) void setOllamaChatModelId(v);
+    } else {
+      if (v !== lmstudioChatModelId) void setLmstudioChatModelId(v);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Label>Chat model identifier</Label>
+      <span className="text-[10.5px] leading-relaxed text-muted-foreground">
+        Exact model ID sent to {isOllama ? "Ollama" : "LM Studio"} (e.g.{" "}
+        {isOllama ? "qwen2.5-coder:7b" : "google/gemma-4-e4b"}). Leave blank to use the provider default.
+      </span>
+      <Input
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={save}
+        placeholder={isOllama ? "ollama-local" : "lmstudio-local"}
+        spellCheck={false}
+        className="h-8 font-mono text-[11.5px]"
+      />
+    </div>
+  );
+}
+
+function AutocompleteBlock() {
   const enabled = usePreferencesStore((s) => s.autocompleteEnabled);
   const provider = usePreferencesStore((s) => s.autocompleteProvider);
   const modelId = usePreferencesStore((s) => s.autocompleteModelId);
   const lmstudioBaseURL = usePreferencesStore((s) => s.lmstudioBaseURL);
+  const ollamaBaseURL = usePreferencesStore((s) => s.ollamaBaseURL);
 
   const [modelDraft, setModelDraft] = useState(modelId);
-  const [urlDraft, setUrlDraft] = useState(lmstudioBaseURL);
+  const [lmUrlDraft, setLmUrlDraft] = useState(lmstudioBaseURL);
+  const [ollamaUrlDraft, setOllamaUrlDraft] = useState(ollamaBaseURL);
   const [testStatus, setTestStatus] = useState<
     "idle" | "testing" | "ok" | "fail"
   >("idle");
 
   useEffect(() => setModelDraft(modelId), [modelId]);
-  useEffect(() => setUrlDraft(lmstudioBaseURL), [lmstudioBaseURL]);
+  useEffect(() => setLmUrlDraft(lmstudioBaseURL), [lmstudioBaseURL]);
+  useEffect(() => setOllamaUrlDraft(ollamaBaseURL), [ollamaBaseURL]);
 
   const onProviderChange = (next: AutocompleteProviderId) => {
     void setAutocompleteProvider(next);
@@ -189,14 +177,16 @@ function AutocompleteBlock({ keys }: { keys: KeysMap }) {
     }
   };
 
-  const providerInfo = getProvider(provider);
-  const hasKey = providerNeedsKey(provider) ? !!keys[provider] : true;
+  const activeURL = provider === "lmstudio" ? lmUrlDraft : ollamaUrlDraft;
 
-  const testLmStudio = async () => {
+  const testConnection = async () => {
     setTestStatus("testing");
     try {
-      const url = urlDraft.replace(/\/$/, "") + "/models";
-      const status = await invoke<number>("http_ping", { url });
+      const url = activeURL.replace(/\/$/, "").replace(/\/v1$/, "") + "/api/tags";
+      const urlToTest = provider === "lmstudio"
+        ? activeURL.replace(/\/$/, "") + "/models"
+        : url;
+      const status = await invoke<number>("http_ping", { url: urlToTest });
       setTestStatus(status >= 200 && status < 400 ? "ok" : "fail");
     } catch {
       setTestStatus("fail");
@@ -209,8 +199,7 @@ function AutocompleteBlock({ keys }: { keys: KeysMap }) {
         <div className="flex flex-col gap-0.5">
           <Label>Editor autocomplete</Label>
           <span className="text-[10.5px] leading-relaxed text-muted-foreground">
-            Inline ghost-text suggestions in the code editor. Powered by
-            ultra-fast inference (Cerebras / Groq) or a local LM Studio server.
+            Inline ghost-text suggestions powered by a local LM Studio or Ollama server.
           </span>
         </div>
         <Switch
@@ -230,7 +219,7 @@ function AutocompleteBlock({ keys }: { keys: KeysMap }) {
                 <button
                   key={id}
                   type="button"
-                  onClick={() => onProviderChange(id)}
+                  onClick={() => { onProviderChange(id); setTestStatus("idle"); }}
                   className={cn(
                     "flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[11.5px] transition-colors",
                     active
@@ -244,11 +233,6 @@ function AutocompleteBlock({ keys }: { keys: KeysMap }) {
               );
             })}
           </div>
-          {!hasKey ? (
-            <span className="text-[10.5px] text-amber-500">
-              No API key configured for {providerInfo.label}. Add one above.
-            </span>
-          ) : null}
         </div>
 
         <div className="flex flex-col gap-1.5">
@@ -266,46 +250,86 @@ function AutocompleteBlock({ keys }: { keys: KeysMap }) {
           />
         </div>
 
-        {provider === "lmstudio" ? (
-          <div className="flex flex-col gap-1.5">
-            <Label>LM Studio base URL</Label>
-            <div className="flex gap-1.5">
-              <Input
-                value={urlDraft}
-                onChange={(e) => setUrlDraft(e.target.value)}
-                onBlur={() => {
-                  const v = urlDraft.trim();
+        <div className="flex flex-col gap-1.5">
+          <Label>{provider === "lmstudio" ? "LM Studio" : "Ollama"} base URL</Label>
+          <div className="flex gap-1.5">
+            <Input
+              value={provider === "lmstudio" ? lmUrlDraft : ollamaUrlDraft}
+              onChange={(e) =>
+                provider === "lmstudio"
+                  ? setLmUrlDraft(e.target.value)
+                  : setOllamaUrlDraft(e.target.value)
+              }
+              onBlur={() => {
+                if (provider === "lmstudio") {
+                  const v = lmUrlDraft.trim();
                   if (v && v !== lmstudioBaseURL) void setLmstudioBaseURL(v);
-                }}
-                placeholder="http://localhost:1234/v1"
-                spellCheck={false}
-                className="h-8 flex-1 font-mono text-[11.5px]"
-              />
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => void testLmStudio()}
-                className="h-8 px-2.5 text-[11px]"
-              >
-                Test
-              </Button>
-            </div>
-            {testStatus === "ok" ? (
-              <span className="text-[10.5px] text-emerald-500">
-                Connected — server responded.
-              </span>
-            ) : testStatus === "fail" ? (
-              <span className="text-[10.5px] text-destructive">
-                Could not reach the server. Is LM Studio running?
-              </span>
-            ) : testStatus === "testing" ? (
-              <span className="text-[10.5px] text-muted-foreground">
-                Testing…
-              </span>
-            ) : null}
+                } else {
+                  const v = ollamaUrlDraft.trim();
+                  if (v && v !== ollamaBaseURL) void setOllamaBaseURL(v);
+                }
+              }}
+              placeholder={
+                provider === "lmstudio"
+                  ? "http://localhost:1234/v1"
+                  : "http://localhost:11434/v1"
+              }
+              spellCheck={false}
+              className="h-8 flex-1 font-mono text-[11.5px]"
+            />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => void testConnection()}
+              className="h-8 px-2.5 text-[11px]"
+            >
+              Test
+            </Button>
           </div>
-        ) : null}
+          {testStatus === "ok" ? (
+            <span className="text-[10.5px] text-emerald-500">
+              Connected — server responded.
+            </span>
+          ) : testStatus === "fail" ? (
+            <span className="text-[10.5px] text-destructive">
+              Could not reach the server. Is {provider === "lmstudio" ? "LM Studio" : "Ollama"} running?
+            </span>
+          ) : testStatus === "testing" ? (
+            <span className="text-[10.5px] text-muted-foreground">
+              Testing…
+            </span>
+          ) : null}
+        </div>
       </div>
+    </div>
+  );
+}
+
+function SearxngBlock() {
+  const searxngUrl = usePreferencesStore((s) => s.searxngUrl);
+  const [draft, setDraft] = useState(searxngUrl);
+
+  useEffect(() => setDraft(searxngUrl), [searxngUrl]);
+
+  const save = () => {
+    const v = draft.trim();
+    if (v && v !== searxngUrl) void setSearxngUrl(v);
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Label>SearXNG URL</Label>
+      <span className="text-[10.5px] leading-relaxed text-muted-foreground">
+        Self-hosted SearXNG instance used by agents for web search. Must return JSON (enable <code className="font-mono">json</code> output format in SearXNG settings).
+      </span>
+      <Input
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={save}
+        placeholder="https://searx.be"
+        spellCheck={false}
+        className="h-8 font-mono text-[11.5px]"
+      />
     </div>
   );
 }

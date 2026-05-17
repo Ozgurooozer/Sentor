@@ -36,7 +36,7 @@ goto :eof
 start "Atlas API" /min python api\server.py
 timeout /t 1 /nobreak >nul
 cd ide
-npm run tauri dev
+npx tauri dev
 goto :eof
 
 :index

@@ -37,3 +37,15 @@ desktop.ini
 .env
 .env.local
 *.key
+
+# AI session data (Claude Code memory, plans, session logs)
+.claude/
+
+# Old UI prototypes (to be migrated to vault/)
+.last/
+
+# Personal vault content
+vault/Interaction Log/
+
+# Local settings
+ide/src-tauri/gen/schemas/windows-schema.json

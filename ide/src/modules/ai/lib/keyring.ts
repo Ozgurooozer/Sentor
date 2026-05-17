@@ -10,14 +10,8 @@ import {
 export type ProviderKeys = Record<ProviderId, string | null>;
 
 export const EMPTY_PROVIDER_KEYS: ProviderKeys = {
-  openai: null,
-  anthropic: null,
-  google: null,
-  xai: null,
-  cerebras: null,
-  groq: null,
-  deepseek: null,
   lmstudio: null,
+  ollama: null,
 };
 
 export async function getKey(provider: ProviderId): Promise<string | null> {
@@ -80,6 +74,7 @@ export async function getAllKeys(): Promise<ProviderKeys> {
   }
 }
 
-export function hasAnyKey(keys: ProviderKeys): boolean {
-  return PROVIDERS.some((p) => providerNeedsKey(p.id) && !!keys[p.id]);
+export function hasAnyKey(_keys: ProviderKeys): boolean {
+  // All providers are local/keyless — always ready.
+  return PROVIDERS.some((p) => !providerNeedsKey(p.id));
 }

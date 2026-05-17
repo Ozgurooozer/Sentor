@@ -9,19 +9,12 @@ import { Kbd } from "@/components/ui/kbd";
 import { Spinner } from "@/components/ui/spinner";
 import { fmtShortcut, MOD_KEY } from "@/lib/platform";
 import { cn } from "@/lib/utils";
-import { openSettingsWindow } from "@/modules/settings/openSettingsWindow";
 import {
   Add01Icon,
   ArrowDown01Icon,
   ArrowUpIcon,
-  ChatGptIcon,
-  ClaudeIcon,
   ComputerIcon,
   CpuIcon,
-  DeepseekIcon,
-  FlashIcon,
-  GoogleGeminiIcon,
-  Grok02Icon,
   Message01Icon,
   Mic01Icon,
   StopCircleIcon,
@@ -37,19 +30,14 @@ import {
   type ModelId,
   type ProviderId,
 } from "../config";
-import { ACCEPTED_FILES, useComposer } from "../lib/composer";
+import { ACCEPTED_FILES } from "../lib/composer";
+import { useComposer } from "../lib/useComposer";
 import { useChatStore } from "../store/chatStore";
 
 const PROVIDER_ICON = {
-  openai: ChatGptIcon,
-  anthropic: ClaudeIcon,
-  google: GoogleGeminiIcon,
-  xai: Grok02Icon,
-  cerebras: CpuIcon,
-  groq: FlashIcon,
-  deepseek: DeepseekIcon,
   lmstudio: ComputerIcon,
-} as const satisfies Record<ProviderId, typeof ChatGptIcon>;
+  ollama: CpuIcon,
+} as const satisfies Record<ProviderId, typeof ComputerIcon>;
 
 export function AiOpenButton({ onOpen }: { onOpen: () => void }) {
   return (
@@ -200,13 +188,10 @@ function ModelDropdown() {
   const apiKeys = useChatStore((s) => s.apiKeys);
   const setSelected = useChatStore((s) => s.setSelectedModelId);
   const current = getModel(selected);
-  const currentProviderHasKey = !!apiKeys[current.provider];
+  const currentProviderHasKey =
+    providerNeedsKey(current.provider) ? !!apiKeys[current.provider] : true;
 
-  const onPick = (id: ModelId, providerId: ProviderId) => {
-    if (!apiKeys[providerId]) {
-      void openSettingsWindow("models");
-      return;
-    }
+  const onPick = (id: ModelId, _providerId: ProviderId) => {
     setSelected(id);
   };
 
@@ -256,20 +241,7 @@ function ModelDropdown() {
                   strokeWidth={1.25}
                 />
                 <span>{p.label}</span>
-                {!hasKey ? (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      void openSettingsWindow("models");
-                    }}
-                    className="ml-auto rounded-sm px-1 text-[9px] normal-case tracking-normal text-amber-600 underline-offset-2 hover:underline dark:text-amber-400"
-                  >
-                    Set key…
-                  </button>
-                ) : null}
-              </div>
+                </div>
               {models.map((m) => (
                 <DropdownMenuItem
                   key={m.id}

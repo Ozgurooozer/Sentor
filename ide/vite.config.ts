@@ -91,5 +91,17 @@ export default defineConfig(async ({ mode }) => ({
     watch: {
       ignored: ["**/src-tauri/**"],
     },
+    proxy: {
+      "/lmstudio-proxy": {
+        target: "http://localhost:1234",
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/lmstudio-proxy/, ""),
+      },
+      "/ollama-proxy": {
+        target: "http://localhost:11434",
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/ollama-proxy/, ""),
+      },
+    },
   },
 }));

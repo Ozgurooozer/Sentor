@@ -11,10 +11,12 @@ import {
   FileAddIcon,
   Folder01Icon,
   FolderAddIcon,
+  FolderOpenIcon,
   Refresh01Icon,
   Search01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ExplorerSearch, type ExplorerSearchHandle } from "./ExplorerSearch";
 import { FileTreeNode } from "./FileTreeNode";
@@ -24,10 +26,12 @@ import { fileIconUrl, folderIconUrl } from "./lib/iconResolver";
 import { COMPACT_CONTENT, COMPACT_ITEM } from "./lib/menuItemClass";
 import { useFileTree } from "./lib/useFileTree";
 import { useGlobalShortcuts } from "@/modules/shortcuts";
+import { setWorkspaceRoot } from "@/modules/settings/store";
 
 type Props = {
   rootPath: string | null;
   onOpenFile: (path: string, pin?: boolean) => void;
+  onOpenBrowserTab?: (url: string) => void;
   onPathRenamed?: (from: string, to: string) => void;
   onPathDeleted?: (path: string) => void;
   onRevealInTerminal?: (path: string) => void;
@@ -39,9 +43,15 @@ function basename(path: string): string {
   return parts.length ? parts[parts.length - 1] : path;
 }
 
+async function openFolderPicker(): Promise<void> {
+  const picked = await invoke<string | null>("pick_folder");
+  if (picked) await setWorkspaceRoot(picked);
+}
+
 export function FileExplorer({
   rootPath,
   onOpenFile,
+  onOpenBrowserTab,
   onPathRenamed,
   onPathDeleted,
   onRevealInTerminal,
@@ -91,16 +101,23 @@ export function FileExplorer({
 
   if (!rootPath) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
+      <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
         <HugeiconsIcon
           icon={Folder01Icon}
-          size={24}
+          size={28}
           strokeWidth={1.5}
           className="text-muted-foreground"
         />
-        <div className="text-xs text-muted-foreground">
-          No current directory
-        </div>
+        <div className="text-xs text-muted-foreground">No folder open</div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-7 gap-1.5 px-3 text-xs"
+          onClick={openFolderPicker}
+        >
+          <HugeiconsIcon icon={FolderOpenIcon} size={13} strokeWidth={2} />
+          Open Folder
+        </Button>
       </div>
     );
   }
@@ -204,6 +221,17 @@ export function FileExplorer({
           variant="ghost"
           size="icon"
           className="size-6 text-muted-foreground hover:text-foreground"
+          onClick={openFolderPicker}
+          title="Open folder…"
+          aria-label="Open folder"
+        >
+          <HugeiconsIcon icon={FolderOpenIcon} size={13} strokeWidth={2} />
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-6 text-muted-foreground hover:text-foreground"
           onClick={() => setIsSearchOpen((v) => !v)}
           title="Search files"
           aria-label="Search files"
@@ -299,6 +327,7 @@ export function FileExplorer({
                       depth={0}
                       tree={tree}
                       onOpenFile={onOpenFile}
+                      onOpenBrowserTab={onOpenBrowserTab}
                       onRevealInTerminal={onRevealInTerminal}
                       onAttachToAgent={onAttachToAgent}
                       selectedPath={selectedPath}
@@ -308,12 +337,25 @@ export function FileExplorer({
               </div>
             </ScrollArea>
           </ContextMenuTrigger>
-          <ContextMenuContent 
+          <ContextMenuContent
             className={COMPACT_CONTENT}
             onCloseAutoFocus={(e) => {
               if (tree.renaming || tree.pendingCreate) e.preventDefault();
             }}
           >
+            <ContextMenuItem
+              className={COMPACT_ITEM}
+              onSelect={() => void openFolderPicker()}
+            >
+              Open Folder…
+            </ContextMenuItem>
+            <ContextMenuItem
+              className={COMPACT_ITEM}
+              onSelect={() => void setWorkspaceRoot(null)}
+            >
+              Close Folder
+            </ContextMenuItem>
+            <ContextMenuSeparator />
             {onRevealInTerminal && (
               <ContextMenuItem
                 className={COMPACT_ITEM}

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { usePreferencesStore } from "@/modules/settings/preferences";
 import type { Tab } from "./useTabs";
 
 type Result = {
@@ -12,6 +13,7 @@ export function useWorkspaceCwd(
   home: string | null,
 ): Result {
   const lastTerminalCwd = useRef<string | null>(null);
+  const pinnedRoot = usePreferencesStore((s) => s.workspaceRoot);
 
   useEffect(() => {
     if (activeTab?.kind === "terminal" && activeTab.cwd) {
@@ -20,12 +22,14 @@ export function useWorkspaceCwd(
   }, [activeTab]);
 
   const explorerRoot = useMemo<string | null>(() => {
+    // Explicitly pinned folder takes priority over terminal cwd.
+    if (pinnedRoot) return pinnedRoot;
     if (activeTab?.kind === "terminal" && activeTab.cwd) return activeTab.cwd;
     if (lastTerminalCwd.current) return lastTerminalCwd.current;
     const anyTerm = tabs.find((t) => t.kind === "terminal" && t.cwd);
     if (anyTerm?.kind === "terminal" && anyTerm.cwd) return anyTerm.cwd;
     return home;
-  }, [activeTab, tabs, home]);
+  }, [pinnedRoot, activeTab, tabs, home]);
 
   const inheritedCwdForNewTab = useCallback((): string | undefined => {
     if (activeTab?.kind === "terminal" && activeTab.cwd) return activeTab.cwd;

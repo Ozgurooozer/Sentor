@@ -1,12 +1,16 @@
 # Atlas OS — Proje Durum Raporu
 
-*15 Mayıs 2026*
+*17 Mayıs 2026 — Güncel*
 
 ---
 
 ## Genel Bakış
 
-Atlas OS; vault (kişisel offline web), CLI, API ve tam donanımlı bir AI IDE'den oluşan sıfır-bağımlılıklı bir kişisel işletim sistemi / bilgi tabanıdır. Phase 1–2 tamamlandı, Phase 2.5 (AI IDE) aktif geliştirmede, Phase 3 CLI kısmı tamamlandı.
+Atlas OS; vault (kişisel offline web), CLI, API ve tam donanımlı bir AI IDE'den oluşan
+sıfır-bağımlılıklı kişisel işletim sistemi / bilgi tabanıdır.
+
+**Plan durumu:** ATLAS_PLAN.md v2 içindeki **Phase 0, A, B, C, D tamamlandı.**
+Şu an Phase E (Vault Home) bekliyor.
 
 ---
 
@@ -15,184 +19,276 @@ Atlas OS; vault (kişisel offline web), CLI, API ve tam donanımlı bir AI IDE'd
 ```
 vault/{category}/{slug}/index.html   ← kaynak gerçek; HTML sayfalar
          │
-tools/indexer.py                     ← HTML parse → index yazar
+tools/indexer.py                     ← HTML parse → index yazar (vault_write sonrası otomatik)
+tools/embedder.py                    ← 384-dim vektörler (all-MiniLM-L6-v2)
          │
-.index/pages.json                    ← makine-okunabilir (API + CLI)
+.index/pages.json                    ← makine-okunabilir (API + CLI + VaultHome)
 .index/pages.js                      ← tarayıcı-yüklenebilir (window.ATLAS_INDEX)
 .index/embeddings.json               ← semantik vektörler (384-dim)
          │
-         ├── ui/index.html           ← istemci-taraflı fuzzy arama (Fuse.js)
-         ├── api/server.py           ← REST API (port 4242)
+         ├── ui/index.html           ← istemci-taraflı fuzzy arama (Fuse.js) — standalone
+         ├── api/server.py           ← REST API (port 4242) — opsiyonel
          ├── cli/atlas.py            ← terminal CLI
-         └── ide/                    ← Tauri + React AI IDE
+         └── ide/                    ← Tauri v2 + React AI IDE (AKTİF)
+               ├── Browser tab       ← gerçek tarayıcı (asset:// + https://)  ✅ YENİ
+               ├── AI Agents         ← Vault, Atlas-Maker, Coder              ✅ YENİ
+               └── web_search/fetch  ← SearXNG üzerinden web araması          ✅ YENİ
 ```
 
 ---
 
-## Modül Durumları
+## Phase Durumları
 
-### Phase 1 — Vault + UI (TAMAMLANDI)
+### Phase 0 — Fast Refresh Düzeltmeleri ✅ TAMAMLANDI
+
+| Sorun | Dosya | Çözüm |
+|-------|-------|-------|
+| `useComposer` hook bileşen ile aynı dosyada | `composer.tsx` | `useComposer.ts`'e taşındı |
+| `useTheme` hook bileşen ile aynı dosyada | `ThemeProvider.tsx` | `useTheme.ts`'e taşındı |
+
+**Etki:** Her kaydet'te tam sayfa yeniden yükleme durdu. Vite HMR artık `hmr update` (invalidate değil) gösteriyor.
+
+---
+
+### Phase A — Web Araçları ✅ TAMAMLANDI
 
 | Bileşen | Dosya | Durum |
 |---------|-------|-------|
-| Vault sayfa formatı | `vault/{cat}/{slug}/index.html` | Aktif |
-| İndeksleyici | `tools/indexer.py` | Aktif (264 satır) |
-| Tarayıcı arama UI | `ui/index.html + app.js + style.css` | Aktif |
-| Sayfa indeksi (JSON) | `.index/pages.json` | 2 sayfa |
-| Sayfa indeksi (JS) | `.index/pages.js` | Aktif |
+| Rust HTTP istemcisi | `ide/src-tauri/src/modules/web.rs` | reqwest + scraper + urlencoding |
+| `web_search` komutu | `web.rs` | SearXNG JSON API, 8 sonuç limiti |
+| `web_fetch` komutu | `web.rs` | HTML → metin (50 KB limit, script/nav/footer temizlendi) |
+| TypeScript araçları | `ide/src/modules/ai/tools/web.ts` | `buildWebTools()` → tools.ts'e eklendi |
+| SearXNG URL ayarı | `ide/src/modules/settings/store.ts` | Settings → Models'da yapılandırılabilir |
+| Mermaid (offline) | `ide/public/vendor/mermaid.min.js` | Yerel bundle (CDN yok) |
 
-### Phase 2 — API + CLI (TAMAMLANDI)
+**Nasıl çalışır:** Agent `web_search` aracını çağırır → Rust SearXNG'ye istek atar → JSON sonuçlar döner → Agent `web_fetch` ile URL içeriğini okur. Her iki araç da otomatik çalışır (kullanıcı onayı gerekmez — read-only).
+
+---
+
+### Phase B — Agent Sistemi Yeniden Yapılandırma ✅ TAMAMLANDI
+
+**Önceki durum:** Planner + Builder (2 generic agent, 5 subagent tipi)
+**Şimdiki durum:** Vault + Atlas-Maker + Coder (3 odaklı agent, 2 subagent tipi)
+
+| Agent | ID | Görevi |
+|-------|----|--------|
+| Vault | `builtin:vault` | Vault önce arar, yoksa web'e bakar. Varsayılan. |
+| Atlas-Maker | `builtin:atlas-maker` | Her yanıt bir vault HTML sayfası yazar. Mermaid destekli. |
+| Coder | `builtin:coder` | Workspace'deki kaynak kod dosyalarını düzenler. |
+
+**Subagent tipleri:** `explore` + `general` (planner, code-review, security silindi)
+
+**Atlas-Maker'ın HTML kuralları:**
+- `/vendor/mermaid.min.js` (CDN yok)
+- CSS değişkenleri: `--bg:#0a0a0a`, `--accent:#5b8def` vb.
+- `box-shadow` yasak — sadece `border` derinlik
+- `system-ui` font — Google Fonts yok
+
+---
+
+### Phase C — Otomatik Re-index ✅ TAMAMLANDI
 
 | Bileşen | Dosya | Durum |
 |---------|-------|-------|
-| REST API server | `api/server.py` | Aktif (374 satır) |
-| Keyword search | `GET /api/search?q=` | Aktif |
-| Semantic search | `GET /api/semantic?q=` | Aktif |
-| Sayfa okuma | `GET /api/page/{cat}/{slug}` | Aktif |
-| CLI | `cli/atlas.py` | Aktif (416 satır) |
-| Semantic embedder | `tools/embedder.py` | Aktif (136 satır) |
-| Embedding modeli | all-MiniLM-L6-v2 (22 MB) | Kurulu |
+| `findPython()` yardımcısı | `ide/src/modules/ai/tools/vault.ts` | `py` → `python3` → `python` sıralaması |
+| Re-index tetikleyicisi | `vault_write.execute` sonrası | `shell_bg_spawn` ile arka planda |
+| Re-embed tetikleyicisi | `vault_write.execute` sonrası | embeddings.json varsa çalışır, yoksa atlar |
+| Vault-page-written event | `vault.ts` → `App.tsx` | Tauri event: `atlas://vault-page-written` |
 
-### Phase 2.5 — AI IDE (AKTİF GELİŞTİRME)
+**Nasıl çalışır:** Atlas-Maker bir sayfa yazdıktan sonra `indexer.py` arka planda sessizce çalışır. Kullanıcı beklemez. `embeddings.json` zaten kuruluysa `embedder.py` de çalışır. Bir sonraki Vault agent araması yeni sayfayı bulur.
+
+---
+
+### Phase D — Browser Tab ✅ TAMAMLANDI
 
 | Bileşen | Dosya | Durum |
 |---------|-------|-------|
-| Tauri + React çerçeve | `ide/` | Aktif |
-| Agent sistemi | `ide/src/modules/ai/lib/agents.ts` | 10 built-in agent |
-| Agent çalıştırıcı | `ide/src/modules/ai/lib/agent.ts` | Aktif |
-| Provider/Model config | `ide/src/modules/ai/config.ts` | 2 provider (LM Studio, Ollama) |
-| Vault araçları | `ide/src/modules/ai/tools/vault.ts` | vault_search (hibrit) / vault_read / vault_write |
-| Tam araç seti | `ide/src/modules/ai/tools/tools.ts` | buildTools (17 araç) |
-| Local-lite araç seti | `ide/src/modules/ai/tools/tools.ts` | buildLiteTools (8 araç) |
-| Hibrit semantik arama | `ide/src/modules/ai/tools/vault.ts` | keyword + /api/semantic fallback, mode param |
+| asset:// protokolü | `tauri.conf.json` → `assetProtocol` | Yerel HTML'yi iframe'de açar |
+| URL dönüştürücü | `ide/src/modules/browser/assetUrl.ts` | `localToAsset()`, `vaultPageAssetUrl()` |
+| Yer imi deposu | `ide/src/modules/browser/bookmarks.ts` | `appDataDir()`'a JSON dosyası |
+| Adres çubuğu | `ide/src/modules/browser/AddressBar.tsx` | Geri/ileri/yenile/yer imi/dış açma |
+| Ana panel | `ide/src/modules/browser/BrowserPane.tsx` | URL → iframe, metin → arama kartları |
+| Tab yığını | `ide/src/modules/browser/BrowserStack.tsx` | Tüm browser tab'ları DOM'da (iframe reload önlenir) |
+| Tab tipleri | `ide/src/modules/tabs/lib/useTabs.ts` | `BrowserTab`, `VaultHomeTab` eklendi |
+| Tab yönetimi | `useTabs` | `openBrowserTab`, `openVaultHomeTab`, `updateBrowserUrl`, `navigateBrowserHistory` |
+| Tab bar | `ide/src/modules/tabs/TabBar.tsx` | "Browser" ve "Vault Home" menü seçenekleri |
+| Dosya explorer | `FileTreeNode.tsx` | `.html` dosyaları için "Open in Browser" context menüsü |
+| Otomatik açma | `App.tsx` | `vault-page-written` event → yeni browser tab |
+
+**Adres çubuğu akıllı yönlendirme:**
+
+| Girilen | Sonuç |
+|---------|-------|
+| `https://github.com` | Doğrudan iframe'de açar |
+| `github.com` | `https://` ekler, iframe'de açar |
+| `C:\vault\...index.html` | `asset://` URL'e çevirir, iframe'de açar |
+| `mermaid diagram types` | SearXNG araması yapar, kart listesi gösterir |
+
+**Yer imleri:** Yıldız ikonuna tıkla → `appDataDir/bookmarks.json`'a kaydedilir.
+**Harici açma:** `https://` URL'ler için Share ikonu → sistem tarayıcısında açar.
+**Birden fazla browser tab:** Hepsi DOM'da mount'lu tutulur → tab değişiminde iframe yeniden yüklenmez.
 
 ---
 
-## AI Provider & Model Listesi
+## Şu An Çalışan Her Şey
 
-IDE şu an **yerel modeller** ile çalışır (API key gerektirmez):
-
-| Provider | Model | Özellik |
-|----------|-------|---------|
-| LM Studio | lmstudio-local | Kullanıcı tarafından yapılandırılan yerel model |
-| Ollama | ollama-local | Kullanıcı tarafından yapılandırılan yerel model |
-
-- Varsayılan model: `lmstudio-local`
-- Autocomplete: LM Studio (`qwen2.5-coder-7b-instruct` varsayılan)
-- Her iki provider lite modda çalışır: sistem prompt ~120 token, 8 araç, max 8 adım
-
----
-
-## Built-in Agent Listesi
-
-| ID | Ad | Açıklama |
-|----|-----|---------|
-| builtin:coder | Coder | Genel kodlama asistanı |
-| builtin:architect | Architect | Tasarım ve trade-off analizi |
-| builtin:reviewer | Code Reviewer | Diff inceleme; mantık, perf, güvenlik |
-| builtin:security | Security | Tehdit modelleme ve açık tespiti |
-| builtin:designer | Designer | UI/UX eleştiri ve iyileştirme |
-| builtin:debug | Debugger | Hızlı hata tespiti, kök neden analizi |
-| builtin:explain | Explain | Kod açıklama, sadece okur |
-| builtin:tests | Test Writer | Unit ve entegrasyon testi yazımı |
-| builtin:web | Web | Her cevap vault'a HTML sayfa olarak kaydedilir |
-| builtin:vault | Vault | Hafıza döngüsü: vault_search → cevap → vault_write |
+| Özellik | Nasıl test edilir |
+|---------|------------------|
+| Terminal tab | Varsayılan açılır, PowerShell çalışır |
+| Editor tab | Dosyaya çift tıkla → CodeMirror açılır |
+| Preview tab | Tab menüsü → Preview → URL gir |
+| Browser tab | Tab menüsü → Browser → adres çubuğuna yaz |
+| AI Chat paneli | Alt kısımda, model seçiliyken çalışır |
+| Vault arama | Vault agent: vault_search çalışır (keyword + semantic) |
+| Vault yazma | Atlas-Maker: vault_write → onay kartı → dosya yazılır → re-index |
+| Web arama | Vault/Atlas-Maker: web_search via SearXNG |
+| Web okuma | web_fetch → metin çıkarma (50 KB) |
+| Re-index | vault_write sonrası otomatik arka planda |
+| Dosya explorer | Klasör aç/kapat, sağ tık menüsü, "Open in Browser" (.html) |
+| Mermaid offline | `/vendor/mermaid.min.js` sunuluyor |
+| Shortcuts | Ctrl+T (terminal), Ctrl+E (editor), Ctrl+P (preview) vb. |
+| Settings | Models ekranında SearXNG URL, model ID ayarlanabilir |
 
 ---
 
-## Local Model Optimizasyonu
+## Tamamlanmamış / Bekleyen
 
-Yerel modeller (LM Studio, Ollama) otomatik algılanır ve lite moda geçilir:
+### Phase E — Vault Home ❌ YAPILMADI
 
-- **Sistem promptu**: 800 token → ~120 token (LOCAL_SYSTEM_PROMPT)
-- **Araç sayısı**: 17 → 8 (buildLiteTools)
-- **Max adım**: 24 → 8 (LOCAL_MAX_AGENT_STEPS)
-- **Vault memory loop**: Context limiti sorununu çözer — her cevap HTML olarak kaydedilir, sonraki soruda vault_search ile geri çekilir
+Şu an: Vault Home tab seçilince `"Vault Home — coming in Phase E"` yazısı görünür.
+
+Yapılacaklar:
+- `ide/src/modules/vault-home/VaultHomePane.tsx` yeni dosya
+- `searchVault()` fonksiyonunu `vault.ts`'den ayrı export et
+- Debounced arama kutusu (150ms)
+- Son sayfalar (modified'a göre top 6)
+- Kategori filtre chip'leri
+- Sonuç kartı → tıkla → browser tab'da açılır
+- Boş durum: "Run indexer" butonu
+- Uygulama açılışında Vault Home varsayılan tab olarak başlasın (şu an terminal)
+
+### Phase F — Polish (isteğe bağlı)
+
+| Özellik | Dosya | Efor |
+|---------|-------|------|
+| Backlink paneli gerçek veri | `ide/src/modules/backlinks/` | Orta |
+| Mermaid önizleme editörde | `EditorPane.tsx` | Orta |
+| Graf görünümü (vault backlinks) | `ide/src/modules/graph/` | Büyük |
+| Browser geçmişi kalıcı | `browser/historyStore.ts` | Küçük |
+| Yer imi paneli | `browser/BookmarksPanel.tsx` | Küçük |
+| Adres çubuğu otomatik tamamlama | `BrowserPane.tsx` | Orta |
+| Sesli not → Atlas-Maker | `useWhisperRecording.ts` | Küçük |
+| BacklinkPanel: stub Tauri komutlarını `.index/pages.json`'a bağla | `backlinks/` | Orta |
 
 ---
 
-## Vault Memory Döngüsü
+## Olası Sorunlar ve Sınırlamalar
+
+| Sorun | Durum | Çözüm |
+|-------|-------|-------|
+| SearXNG public instance yavaş/kapalı | Normal | Settings'den kendi instance'ını yaz (`http://localhost:8080`) |
+| Bazı siteler iframe'de açılmaz (X-Frame-Options) | Tasarım gereği | "Open in system browser" butonu her https:// URL'de görünür |
+| Vault relative link'leri (`../`) asset:// üzerinde bozulabilir | Test edilmedi | Eğer bozulursa: lokal HTTP server (rastgele port) alternatif |
+| Mermaid CDN yerine `/vendor/` kullan | Atlas-Maker prompt'unda kuralı var | Model kural dinlemezse post-write validator eklenebilir |
+
+---
+
+## Updater Hatası Açıklaması
 
 ```
-Kullanıcı sorar
-    │
-vault_search (geçmiş bağlam)
-    │
-vault_read (ilgili sayfalar)
-    │
-Agent cevap üretir
-    │
-vault_write → tools/indexer.py çalışır → aranabilir HTML
-    │
-Sonraki konuşmada vault_search geri çeker
-    └── Context window sınırı artık sorun değil
+[tauri_plugin_updater::updater][ERROR] update endpoint did not respond with a successful status code
 ```
+
+**Ne anlama gelir:** Atlas OS'un `tauri.conf.json`'unda `updater` plugin'i aktif ama
+gerçek bir güncelleme sunucusu kurulmamış. Uygulama başladığında Tauri otomatik güncelleme
+kontrol eder, sunucu bulamayınca bu hata loglanır.
+
+**Bu bir sorun mu?** **Hayır.** Uygulama tamamen normal çalışır — bu hata sadece konsola
+yazılır, kullanıcıya hiçbir şey gösterilmez.
+
+**Düzeltmek için 2 seçenek:**
+
+1. **Kolay (şimdi için):** `tauri.conf.json`'dan updater endpoint'ini kaldır veya plugin'i devre dışı bırak:
+   ```json
+   "plugins": {
+     "updater": {
+       "active": false
+     }
+   }
+   ```
+
+2. **Gerçek çözüm (ileride):** GitHub Releases + `tauri-action` ile otomatik güncelleme
+   altyapısı kur. Atlas OS dağıtıma hazır olduğunda anlamlı.
 
 ---
 
-## API Endpoint'leri (port 4242)
+## API Endpoint'leri (port 4242, opsiyonel)
 
 | Method | Endpoint | Açıklama |
 |--------|----------|---------|
-| GET | `/api/search?q=&limit=&category=` | Keyword arama (TF-IDF benzeri skor) |
-| GET | `/api/semantic?q=&limit=` | Semantik arama (cosine similarity) |
+| GET | `/api/search?q=&limit=&category=` | Keyword arama |
+| GET | `/api/semantic?q=&limit=` | Semantik arama |
 | GET | `/api/page/{category}/{slug}` | Tam sayfa metni |
 | GET | `/api/categories` | Kategori listesi |
 | GET | `/api/pages` | Tüm index |
+
+IDE bu API'ye bağlı değil — vault araması doğrudan `.index/pages.json` okur.
+
+---
+
+## Geliştirme Komutları
+
+```bash
+# IDE başlat (API opsiyonel)
+atlas-ide.bat
+
+# IDE manuel
+cd ide && npm run tauri dev
+
+# TypeScript kontrol
+cd ide && npx tsc --noEmit
+
+# Rust derleme
+cd ide/src-tauri && cargo build
+
+# Re-index (vault sayfaları değiştikten sonra)
+python tools/indexer.py
+
+# Semantic embedding (indexer sonrası)
+python tools/embedder.py
+
+# Offline semantic arama için Ollama model
+ollama pull all-minilm
+```
 
 ---
 
 ## Tasarım Sistemi Renk Tokenleri
 
-| Token | Değer |
-|-------|-------|
-| bg-base | #0a0a0a |
-| bg-surface | #111111 |
-| bg-elevated | #1a1a1a |
-| bg-overlay | #222222 |
-| border-subtle | #2a2a2a |
-| border-active | #404040 |
-| text-primary | #f5f5f5 |
-| text-secondary | #888888 |
-| accent | #5b8def |
-| accent-hover | #4a7de0 |
+| Token | Değer | Kullanım |
+|-------|-------|---------|
+| bg-base | #0a0a0a | Ana arka plan |
+| bg-surface | #111111 | Panel yüzeyleri |
+| bg-elevated | #1a1a1a | Kart, dropdown |
+| bg-overlay | #222222 | Tooltip, popover |
+| border-subtle | #2a2a2a | Normal kenarlar |
+| border-active | #404040 | Hover/focus kenarlar |
+| text-primary | #f5f5f5 | Ana metin |
+| text-secondary | #888888 | İkincil metin |
+| accent | #5b8def | Vurgu rengi |
+| accent-hover | #4a7de0 | Hover vurgu |
 
-**Kurallar:** Border-only derinlik (box-shadow yasak), 150ms ease-out, system-ui font, rounded-lg maksimum.
-
----
-
-## Dosya Satır Sayıları
-
-| Dosya | Satır |
-|-------|-------|
-| api/server.py | 374 |
-| cli/atlas.py | 416 |
-| tools/indexer.py | 264 |
-| tools/embedder.py | 136 |
-| ide/.../config.ts | 193 |
-| ide/.../agent.ts | 232 |
-| ide/.../agents.ts | 244 |
-| ide/.../vault.ts | 417 |
-| ide/.../tools.ts | 60 |
+**Kurallar:** Border-only derinlik (box-shadow yasak), 150ms ease-out, system-ui font, rounded-lg maksimum, gradient yasak.
 
 ---
 
-## Phase 3 — Ollama Tool-Calling (TAMAMLANDI)
+## Sonraki Adım
 
-| Bileşen | Dosya | Durum |
-|---------|-------|-------|
-| CLI Ollama tool-calling | `cli/atlas.py:216–339` + `tools/ollama-tools.json` | Tamamlandı |
-| `search_knowledge` aracı | `ollama-tools.json` → `/api/search` | Tamamlandı |
-| `get_page` aracı | `ollama-tools.json` → `/api/page/{cat}/{slug}` | Tamamlandı |
-| CLI agentic loop | `cmd_chat()` — tool_calls döngüsü | Tamamlandı |
-| Test paketi | `tests/test_ollama.py`, `tests/test_multiturn.py` | Tamamlandı |
-| IDE hibrit vault_search | `ide/.../vault.ts` — keyword + semantic fallback | Tamamlandı |
+**Phase E — Vault Home** başlatılmaya hazır.
 
----
-
-## Sonraki Adımlar (Phase 4)
-
-- [ ] Vault sayfa sayısını artır
-- [ ] Semantic search otomatik embed tetikleme (indexer'a ekle)
-- [ ] IDE: AtlasPanel ve Graf görünümü tamamlama
-- [ ] Auto-embed on index: `tools/indexer.py` → `tools/embedder.py` bağlantısı
+Yapılacak iş listesi:
+1. `ide/src/modules/ai/tools/vault.ts`'ten `searchVault()` fonksiyonunu ayrı export et
+2. `ide/src/modules/vault-home/VaultHomePane.tsx` yeni dosya oluştur
+3. `useTabs.ts`'te başlangıç tab'ını terminal yerine vault-home yap
+4. `App.tsx`'te VaultHomePane'i gerçek bileşenle değiştir
+5. Opsiyonel: `Ctrl+Shift+H` kısayolu ekle

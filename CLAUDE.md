@@ -31,7 +31,7 @@ python cli/atlas.py <cmd>   # index | search "query" | list [category] | open ca
 python tools/test_api.py
 ```
 
-**Start IDE** (requires API server running on 4242):
+**Start IDE** (API server optional — IDE works offline for keyword search):
 ```bash
 # Windows launcher — starts API then IDE
 atlas-ide.bat
@@ -40,9 +40,24 @@ atlas-ide.bat
 npm run tauri dev
 ```
 
+**Offline semantic search in IDE** — pull the embedding model for Ollama:
+```bash
+ollama pull all-minilm
+```
+
 **Build IDE (release):**
 ```bash
 cd ide && npm run tauri build
+```
+
+**Verify Rust compiles (zero warnings expected):**
+```bash
+cd ide/src-tauri && cargo build
+```
+
+**Verify TypeScript (zero errors expected):**
+```bash
+cd ide && npx tsc --noEmit
 ```
 
 **Open browser search UI** — open `ui/index.html` directly. No server needed; `pages.js` loads as `window.ATLAS_INDEX` via `<script src>`, bypassing CORS.
@@ -102,13 +117,13 @@ ide/src-tauri/src/
   lib.rs              ← command registry (invoke_handler)
   modules/
     fs/               ← file ops: file.rs, tree.rs, mutate.rs, search.rs, grep.rs
-    net.rs            ← http_ping, http_fetch (streaming proxy via Tauri event channel)
+    net.rs            ← http_ping (5s timeout GET, returns status code)
     pty/              ← portable-pty terminal emulator
     shell/            ← shell_run_command, session management, bg process management
     secrets.rs        ← OS keyring (keyring crate, platform-native)
+    web.rs            ← web_search (SearXNG JSON API) + web_fetch (reqwest + scraper)
+    webview.rs        ← native child WebView: web_open/navigate/set_bounds/set_visible/close/go
 ```
-
-**`net.rs` streaming:** `http_fetch` proxies HTTP through Rust to avoid WebView CORS restrictions. It returns headers/status immediately and streams the body back as `{data, done, error}` events on a caller-supplied Tauri event channel — required for LLM streaming responses.
 
 **`lib.rs` vault stubs:** `vault_get_note_titles`, `vault_get_backlinks`, `vault_get_similar_notes` are currently stub implementations; real vault intelligence lives in the frontend AI tools.
 
@@ -119,20 +134,24 @@ ide/src-tauri/src/
 ```
 ide/src/modules/
   ai/
-    config.ts           ← 9 providers, 18 models (OpenAI, Anthropic, Google, xAI, Cerebras, Groq, DeepSeek, LM Studio, Ollama)
+    config.ts           ← 2 local providers (LM Studio, Ollama), 2 models; compact SYSTEM_PROMPT (~120 tokens)
     lib/
-      agent.ts          ← agent runner loop (full & lite mode)
-      agents.ts         ← 10 built-in agents
-      transport.ts      ← AI HTTP transport (uses http_fetch command for streaming)
-      localFetch.ts     ← direct fetch for local models
-      security.ts       ← prompt/output sanitization
+      agent.ts          ← agent runner loop; buildLanguageModel (+ toDevProxyURL CORS fix) + createAtlasAgent
+      agents.ts         ← 3 built-in agents: Vault (default), Atlas-Maker, Coder
+      transport.ts      ← AI HTTP transport (DirectChatTransport + live context injection)
+      composer.tsx      ← React context for shared input state (text, files, voice, snippets)
+      useComposer.ts    ← useComposer hook (split out for Fast Refresh compliance)
+      native.ts         ← low-level file I/O wrappers
+      security.ts       ← prompt/output sanitization, sensitive-path deny-list
       sessions.ts       ← conversation session management
       slashCommands.ts  ← /command parsing
       snippets.ts       ← reusable prompt snippets
       todos.ts          ← AI-driven todo extraction
+      placeholders.ts   ← placeholder text generation
+      keyring.ts        ← OS keychain access via Tauri
     agents/
-      registry.ts       ← agent registration & lookup
-      runSubagent.ts    ← sub-agent invocation (agents calling agents)
+      registry.ts       ← subagent types: explore, general (only two)
+      runSubagent.ts    ← sub-agent invocation; pool includes fs + search + todo + vault + web tools
     store/
       chatStore.ts      ← conversation state (Zustand)
       agentsStore.ts    ← agent list & selection
@@ -140,15 +159,16 @@ ide/src/modules/
       snippetsStore.ts  ← snippet CRUD
       todoStore.ts      ← todo list state
     tools/
-      vault.ts          ← vault_search (hybrid: keyword + /api/semantic fallback) / vault_read / vault_write
-      tools.ts          ← buildTools (17 tools, full) / buildLiteTools (8 tools, local models)
-      fs.ts, edit.ts, search.ts, shell.ts, terminal.ts, todo.ts, subagent.ts, context.ts
+      tools.ts          ← buildTools (aggregates all tool modules)
+      fs.ts, edit.ts, search.ts, shell.ts, terminal.ts, todo.ts, subagent.ts, vault.ts, web.ts, context.ts
     hooks/
       useWhisperRecording.ts  ← voice input via Whisper
+  browser/              ← Vault + Web browser panes, AddressBar, BrowserStack, bookmarks, assetUrl
+  vault-home/           ← VaultHomePane — startup search tab over vault pages
   editor/               ← CodeMirror 6 editor with syntax highlighting, vim mode, inline AI autocomplete, wiki-link autocomplete
   explorer/             ← file tree with context menu, file/folder icons
   terminal/             ← xterm.js + PTY bridge, OSC handler support, multi-pane
-  tabs/                 ← tab management, workspace CWD tracking
+  tabs/                 ← tab management (TerminalTab, EditorTab, PreviewTab, VaultTab, WebTab, VaultHomeTab, AiDiffTab)
   settings/             ← settings window bridge, preferences store, keyring access
   shortcuts/            ← global keybinding registry
   header/               ← top bar
@@ -156,13 +176,23 @@ ide/src/modules/
   statusbar/            ← status bar with path utils
   theme/                ← theme tokens and switching
   updater/              ← Tauri updater integration
+  backlinks/            ← backlink/graph navigation
+  graph/                ← graph visualization
 ```
 
-**Local model optimization:** LM Studio/Ollama auto-detected → lite mode: system prompt 800→120 tokens, tools 17→8, max steps 24→8.
+**Agents (current):** Three built-in agents — **Vault** (default, research + memory), **Atlas-Maker** (writes vault HTML pages), **Coder** (edits source files). Subagent types: `explore` + `general` only. Do not add new agents without checking `ATLAS_PLAN.md`.
 
-**Vault memory loop** (builtin:vault agent): vault_search → agent answers → vault_write (saves as HTML) → tools/indexer.py → next query searches history. Solves context window limits for local models.
+**Fast Refresh:** Fixed — `useComposer` lives in `useComposer.ts`, `useTheme` lives in `useTheme.ts`. Do not re-merge hooks back into component files.
 
-**Hybrid vault_search:** First runs keyword search locally against the index; if no strong results, falls back to `GET /api/semantic` for cosine similarity. Accepts a `mode` param to force either path.
+**Local file iframes use `asset://` not `file://`:** Tauri's WebView blocks `file://` in iframes. Use `convertFileSrc()` from `@tauri-apps/api/core` to get `asset://localhost/...` URLs. Helper: `ide/src/modules/browser/assetUrl.ts` (created in Phase D). There is no custom `vault:` URL scheme — use `vaultPageAssetUrl(root, cat, slug)` from that helper instead.
+
+**Local-only providers:** LM Studio (`http://localhost:1234/v1`) and Ollama (`http://localhost:11434/v1`). Both use `@ai-sdk/openai-compatible`. Base URLs and **chat model ID** (e.g. `google/gemma-4-e4b`) are configurable in Settings → Models. No API keys required.
+
+**CORS in dev mode:** `vite.config.ts` proxies `/lmstudio-proxy` → `:1234` and `/ollama-proxy` → `:11434` at the Node level, bypassing browser CORS. `agent.ts:toDevProxyURL()` rewrites localhost provider URLs to these proxy paths when `import.meta.env.DEV` is true. In production Tauri builds, providers must have CORS enabled in their own settings.
+
+**Model ID override:** `lmstudioChatModelId` / `ollamaChatModelId` preferences hold the exact model string sent to the provider (e.g. `google/gemma-4-e4b`). Empty = provider default. Set via Settings → Models → "Chat model identifier". Threaded through: `chatStore` → `transport` → `createAtlasAgent` → `buildLanguageModel(modelIdOverride)`.
+
+**Tool approval policy:** Read-only tools (read_file, list_directory, grep, glob) auto-execute after security check. Mutating tools (write_file, edit, multi_edit, create_directory, bash_*) require user approval. `edit`/`multi_edit` additionally enforce read-before-edit via `readCache`.
 
 ---
 
@@ -206,10 +236,34 @@ Read `interface-setup/.interface-design/system.md` before touching any UI. Key r
 
 ## Roadmap
 
-- **Phase 1** (done): Browser UI + indexer
-- **Phase 2** (done): CLI + REST API + semantic embeddings
-- **Phase 2.5** (active): Tauri AI IDE — agent system, vault tools, terminal emulator
-- **Phase 3** (done): Ollama tool-calling — `cli/atlas.py` agentic chat loop, `tools/ollama-tools.json` defines `search_knowledge` + `get_page` tools, requires `atlas serve` running
-- **Phase 4** (planned): `atlas new`, backlinks watcher, category landing pages, prev/next nav; auto-embed on index; IDE AtlasPanel + graph view
+The full build plan is in **`ATLAS_PLAN.md`**.
 
-The `.last/` directory contains old UI examples to be migrated to `vault/` in Phase 4.
+### Completed phases
+
+| Phase | Description |
+|---|---|
+| 0 | Fast Refresh fixes — `useComposer.ts`, `useTheme.ts` split |
+| A | `web_search` + `web_fetch` via SearXNG + reqwest (`modules/web.rs`, `tools/web.ts`) |
+| B | Agent consolidation — Vault / Atlas-Maker / Coder; subagents trimmed to `explore` + `general`; Mermaid bundled offline |
+| C | Auto re-index after `vault_write` via `findPython()` helper |
+| D | **Browser tabs** — Vault tab (asset:// iframe) + Web tab (native child WebView using Tauri `unstable` feature); address bar, back/forward, bookmarks, SearXNG search |
+| E | Vault Home tab — startup search front door over the user's own knowledge base |
+
+### Browser tab architecture (Phase D)
+
+Two discriminated tab kinds replace the old single `browser` tab:
+
+- **`vault` tab** — renders `asset://` vault pages in an `<iframe>`. Same-origin, fast. `VaultBrowserPane.tsx`.
+- **`web` tab** — creates a native Tauri child WebView (`webview.rs: web_open`) positioned over the pane rect. Handles any `https://` URL without X-Frame-Options limits. `WebBrowserPane.tsx`.
+
+Cross-scheme routing: typing `https://` in a Vault tab address bar opens a Web tab (and vice versa). `pickTabKindForUrl()` in `modules/tabs/index.ts`.
+
+Native WebView notes:
+- Requires `features = ["unstable"]` in `ide/src-tauri/Cargo.toml` (Tauri 2 multi-webview API).
+- Sits above the DOM compositor — CSS `visibility` alone cannot hide it. Call `web_set_visible(false)` when the tab is inactive.
+- Bounds pushed via `ResizeObserver` + `requestAnimationFrame` debounce → `web_set_bounds`.
+- `web://nav-changed` event emitted by Rust when page navigates itself (link clicks, redirects) — syncs address bar.
+
+### Next (Phase F)
+
+Polish — backlinks panel, mermaid editor preview, graph view, voice-to-vault.

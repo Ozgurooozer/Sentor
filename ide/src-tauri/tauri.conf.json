@@ -4,7 +4,7 @@
   "version": "0.6.1",
   "identifier": "app.atlas.ide",
   "build": {
-    "beforeDevCommand": "pnpm dev",
+    "beforeDevCommand": "npx vite",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "pnpm build",
     "frontendDist": "../dist",
@@ -24,7 +24,11 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["**"]
+      }
     }
   },
   "bundle": {

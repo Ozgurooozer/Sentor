@@ -12,7 +12,8 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
-import { useComposer, type FileAttachment } from "../lib/composer";
+import { type FileAttachment } from "../lib/composer";
+import { useComposer } from "../lib/useComposer";
 import { SLASH_COMMANDS } from "../lib/slashCommands";
 import type { Snippet } from "../lib/snippets";
 import { useSnippetsStore } from "../store/snippetsStore";

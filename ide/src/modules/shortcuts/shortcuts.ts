@@ -22,7 +22,8 @@ export type ShortcutId =
   | "ai.askSelection"
   | "shortcuts.open"
   | "settings.open"
-  | "sidebar.toggle";
+  | "sidebar.toggle"
+  | "tab.vaultHome";
 
 export type ShortcutGroup =
   | "General"
@@ -155,6 +156,12 @@ export const SHORTCUTS: Shortcut[] = [
     label: "Toggle file explorer",
     group: "View",
     defaultBindings: [{ [MOD_PROP]: true, key: "b" }],
+  },
+  {
+    id: "tab.vaultHome",
+    label: "Open Vault Home",
+    group: "Tabs",
+    defaultBindings: [{ [MOD_PROP]: true, shift: true, key: "h" }],
   },
 ];
 

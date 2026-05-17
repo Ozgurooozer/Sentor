@@ -542,7 +542,7 @@ function CustomInstructionsBlock({ value }: { value: string }) {
         {/* {savedTick > 0 ? (
           <span className="text-[10px] text-muted-foreground">Saved</span>
         ) : null} */}
-        {draft && (
+        {draft !== value && (
           <Button size="xs" onClick={() => void setCustomInstructions(draft)}>
             Save
           </Button>

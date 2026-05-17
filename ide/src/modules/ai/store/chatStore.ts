@@ -212,6 +212,10 @@ function makeChat(sessionId: string): Chat<UIMessage> {
         activeFile: live.getActiveFile(),
       };
     },
+    getLmstudioBaseURL: () => usePreferencesStore.getState().lmstudioBaseURL,
+    getOllamaBaseURL: () => usePreferencesStore.getState().ollamaBaseURL,
+    getLmstudioModelId: () => usePreferencesStore.getState().lmstudioChatModelId || undefined,
+    getOllamaModelId: () => usePreferencesStore.getState().ollamaChatModelId || undefined,
     getPlanMode: () => usePlanStore.getState().active,
     onStep: (step) => {
       useChatStore.getState().patchAgentMeta({ step });
