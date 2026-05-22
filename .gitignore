@@ -49,3 +49,11 @@ vault/Interaction Log/
 
 # Local settings
 ide/src-tauri/gen/schemas/windows-schema.json
+
+# Atlas runtime artefacts
+.ide-state.json
+.mcp-queue.json
+.vault-trash/
+
+# Third-party module bundles (Flowise, codegraph)
+modules/
