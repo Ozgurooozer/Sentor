@@ -14,7 +14,10 @@ export type PanelType =
   | "header"
   | "checklist"
   | "gallery"
-  | "filebrowser";
+  | "filebrowser"
+  | "sketch"
+  | "note"
+  | "tool";
 
 export interface CanvasPanelNode {
   id: string;

@@ -88,15 +88,19 @@ export function CanvasContextMenu({ pos, onClose, onAddPanel, onImportBlueprint,
       {item("→  Input node", () => onAddPanel("input", at))}
       {sep()}
       {sectionLabel("Nodes")}
-      {nodes.length === 0
-        ? item("atlas node new <id> ile ekle", () => {}, false, true)
-        : nodes.map((n) =>
-            item(
-              `${n.icon}  ${n.name}`,
-              () => onSpawnNode?.(n.id, at),
-              n.kind === "pipeline",
-            ),
-          )}
+      {nodes.length === 0 ? (
+        <>
+          {item("↯  Pipeline node", () => onAddPanel("pipeline", at))}
+          {item("⌬  Code Graph", () => onAddPanel("codegraph", at))}
+          {item("⊞  Sub Canvas", () => onAddPanel("canvas", at))}
+        </>
+      ) : nodes.map((n) =>
+          item(
+            `${n.icon}  ${n.name}`,
+            () => onSpawnNode?.(n.id, at),
+            n.kind === "pipeline",
+          ),
+        )}
       {sep()}
       {sectionLabel("Sentor")}
       {item("▶  Run task / pipeline…", onRunSentorTask, true)}

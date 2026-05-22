@@ -34,12 +34,28 @@ function schedulePersist(snapshot: PersistedCanvas): void {
   }, 200);
 }
 
+export type CanvasKind = "workspace" | "image" | "audio" | "data";
+
+export interface CanvasRecord {
+  id: string;
+  title: string;
+  kind: CanvasKind;
+  /** If set, this canvas is hidden (used as a Tool node sub-canvas). */
+  hidden?: boolean;
+  parentCanvasId?: string;
+}
+
 interface CanvasState {
   panels: CanvasPanelNode[];
   connections: Connection[];
   viewport: Viewport;
   nextZ: number;
   hydrated: boolean;
+  /** Named canvas list. The active canvas's data lives in panels/connections/viewport. */
+  canvases: CanvasRecord[];
+  activeCanvasId: string;
+  /** Navigation stack for breadcrumb (array of canvas ids). */
+  canvasHistory: string[];
 }
 
 interface CanvasActions {
@@ -47,6 +63,16 @@ interface CanvasActions {
   ensureSystemCanvas(workspaceRoot: string): void;
   /** Switch the active vault — saves current canvas, loads the vault`s own canvas. */
   switchVault(root: string): Promise<void>;
+  /** Multi-canvas: add a new named canvas and switch to it. */
+  addCanvas(title?: string, kind?: CanvasKind): string;
+  /** Multi-canvas: remove a canvas (not the last one). */
+  removeCanvas(id: string): void;
+  /** Multi-canvas: switch to a canvas by id. */
+  switchCanvas(id: string): Promise<void>;
+  /** Multi-canvas: enter a sub-canvas (push to history). */
+  enterCanvas(id: string): Promise<void>;
+  /** Multi-canvas: navigate back in history. */
+  exitCanvas(): Promise<void>;
   removePanel(id: string): void;
   updatePanel(id: string, patch: Partial<CanvasPanelNode>): void;
   bringToFront(id: string): void;
@@ -87,7 +113,12 @@ const PANEL_DEFAULTS: Record<PanelType, { width: number; height: number; title: 
   checklist:   { width: 260, height: 280, title: "Checklist" },
   gallery:     { width: 360, height: 300, title: "Gallery" },
   filebrowser: { width: 480, height: 520, title: "Files" },
+  sketch:      { width: 480, height: 360, title: "Sketch" },
+  note:        { width: 260, height: 200, title: "Note" },
+  tool:        { width: 200, height: 160, title: "Tool" },
 };
+
+const DEFAULT_CANVAS_ID = "main";
 
 export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => ({
   panels: [],
@@ -95,6 +126,9 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
   viewport: { x: 0, y: 0, scale: 1 },
   nextZ: 1,
   hydrated: false,
+  canvases: [{ id: DEFAULT_CANVAS_ID, title: "Main", kind: "workspace" }],
+  activeCanvasId: DEFAULT_CANVAS_ID,
+  canvasHistory: [DEFAULT_CANVAS_ID],
 
   addPanel(type, at) {
     const id = uid();
@@ -367,6 +401,66 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
       ],
     };
     set((s) => ({ panels: [systemCanvas, ...s.panels], nextZ: s.nextZ + 1 }));
+  },
+
+  addCanvas(title = "Canvas", kind = "workspace") {
+    const id = uid();
+    set((s) => ({
+      canvases: [...s.canvases, { id, title, kind }],
+    }));
+    return id;
+  },
+
+  removeCanvas(id) {
+    const { canvases, activeCanvasId } = get();
+    if (canvases.length <= 1) return;
+    const remaining = canvases.filter((c) => c.id !== id);
+    if (activeCanvasId === id) {
+      void get().switchCanvas(remaining[0].id);
+    } else {
+      set({ canvases: remaining });
+    }
+  },
+
+  async switchCanvas(id) {
+    const { activeCanvasId, canvases } = get();
+    if (id === activeCanvasId) return;
+    if (!canvases.find((c) => c.id === id)) return;
+
+    // Persist current canvas state
+    const cur = get();
+    const curKey = `atlas-canvas-multi-${activeCanvasId}`;
+    const curStore = new LazyStore(`${curKey}.json`, { defaults: {}, autoSave: 0 });
+    await curStore.set(PERSIST_KEY, {
+      panels: cur.panels, connections: cur.connections,
+      viewport: cur.viewport, nextZ: cur.nextZ,
+    }).catch(() => undefined);
+
+    // Load target canvas state
+    const targetKey = `atlas-canvas-multi-${id}`;
+    const targetStore = new LazyStore(`${targetKey}.json`, { defaults: {}, autoSave: 0 });
+    const snap = await targetStore.get<PersistedCanvas>(PERSIST_KEY).catch(() => null);
+    set({
+      activeCanvasId: id,
+      canvasHistory: [...get().canvasHistory.filter((h) => h !== id), id],
+      panels: Array.isArray(snap?.panels) ? snap!.panels : [],
+      connections: Array.isArray(snap?.connections) ? snap!.connections : [],
+      viewport: snap?.viewport ?? { x: 0, y: 0, scale: 1 },
+      nextZ: typeof snap?.nextZ === "number" ? snap!.nextZ : 1,
+    });
+  },
+
+  async enterCanvas(id) {
+    await get().switchCanvas(id);
+    set((s) => ({ canvasHistory: [...s.canvasHistory, id] }));
+  },
+
+  async exitCanvas() {
+    const { canvasHistory } = get();
+    if (canvasHistory.length <= 1) return;
+    const prev = canvasHistory[canvasHistory.length - 2];
+    await get().switchCanvas(prev);
+    set((s) => ({ canvasHistory: s.canvasHistory.slice(0, -1) }));
   },
 }));
 

@@ -47,15 +47,9 @@ const APPEARANCE: {
 
 const LAYOUTS: { id: LayoutMode; label: string; description: string }[] = [
   {
-    id: "classic",
-    label: "Classic",
-    description: "Tabbed IDE with file explorer and chat panel.",
-  },
-  {
-    id: "focused",
-    label: "Focused",
-    description:
-      "Terminal strip + dedicated chat center. Click-through is Windows-only — other platforms show the overlay without desktop pass-through.",
+    id: "canvas",
+    label: "Canvas",
+    description: "Infinite canvas workspace — nodes, wires, multi-agent flows.",
   },
 ];
 
@@ -130,7 +124,7 @@ export function GeneralSection() {
 
       <div className="flex flex-col gap-2">
         <Label>Layout</Label>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {LAYOUTS.map((o) => (
             <button
               key={o.id}

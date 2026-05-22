@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Tek Ajan Loop Mimarisi</title>
+  <meta name="description" content="Tek ajan loop mimarisi: nasıl çalışır, araç kullanımı, yansıma döngüsü, ne zaman kullanılmalı ve örnek taktikler.">
+  <style>
+    :root {
+      --bg: #0a0a0a; --surface: #111; --elevated: #1a1a1a;
+      --border: #2a2a2a; --text: #f5f5f5; --dim: #888; --dim2: #555;
+      --accent: #5b8def;
+    }
+    * { box-sizing: border-box; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0; padding: 2rem; max-width: 820px; margin-inline: auto; line-height: 1.6;
+    }
+    header { border-bottom: 1px solid var(--border); padding-bottom: 1.2rem; margin-bottom: 2rem; }
+    header h1 { margin: 0 0 0.25rem; font-size: 1.5rem; }
+    .meta { color: var(--dim2); font-size: 0.8rem; }
+    h2 { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); margin: 2rem 0 0.75rem; }
+    p { margin: 0 0 1rem; font-size: 0.9rem; color: #ccc; }
+    .svg-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+    .steps { display: flex; flex-direction: column; gap: 0.5rem; margin: 1rem 0; }
+    .step {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 0.75rem 1rem;
+    }
+    .step-num {
+      min-width: 22px; height: 22px; border-radius: 50%;
+      background: color-mix(in srgb, var(--accent) 15%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+      color: var(--accent); font-size: 0.75rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-body { flex: 1; }
+    .step-title { font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.2rem; }
+    .step-desc { font-size: 0.8rem; color: var(--dim); }
+    .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+    .box h3 { margin: 0 0 0.6rem; font-size: 0.8rem; font-weight: 600; }
+    .box ul { margin: 0; padding-left: 1.2rem; }
+    .box li { font-size: 0.8rem; color: var(--dim); margin-bottom: 0.35rem; }
+    .green { color: #4db89a; }
+    .red { color: #e05454; }
+    code { font-family: monospace; font-size: 0.85em; background: var(--elevated); border-radius: 3px; padding: 0.1em 0.4em; color: var(--accent); }
+    a { color: var(--text); border-bottom: 1px solid var(--border); text-decoration: none; }
+    a:hover { border-bottom-color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Tek Ajan Loop Mimarisi</h1>
+  <span class="meta">ai-design · single-agent-loop · 2026-05-22</span>
+</header>
+
+<h2>Nasıl Çalışır?</h2>
+<p>Tek bir AI modeli, kullanıcının isteğini alır ve bir <strong>döngü</strong> içinde yanıt üretir. Her döngü adımında araçları çağırabilir, sonuçları gözlemleyebilir ve bir sonraki adıma geçebilir. Yeterli bilgi toplandığında döngüden çıkarak son yanıtı üretir.</p>
+
+<div class="svg-wrap">
+  <svg viewBox="0 0 660 260" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+    <defs>
+      <marker id="a" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M0 0L8 4L0 8Z" fill="#5b8def"/>
+      </marker>
+      <marker id="ag" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M0 0L8 4L0 8Z" fill="#4db89a"/>
+      </marker>
+      <marker id="ao" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M0 0L8 4L0 8Z" fill="#e07b54"/>
+      </marker>
+    </defs>
+
+    <!-- User -->
+    <rect x="20" y="110" width="80" height="36" rx="6" fill="#0d0d0d" stroke="#2a2a2a"/>
+    <text x="60" y="132" text-anchor="middle" fill="#888" font-size="12">Kullanıcı</text>
+    <path d="M100 128 L140 128" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+
+    <!-- Think box -->
+    <rect x="140" y="95" width="120" height="64" rx="8" fill="#0d0d0d" stroke="#5b8def" stroke-width="1.5"/>
+    <text x="200" y="122" text-anchor="middle" fill="#5b8def" font-size="13" font-weight="600">Ajan</text>
+    <text x="200" y="138" text-anchor="middle" fill="#555" font-size="10">Düşün · Plan · Act</text>
+
+    <!-- Tools -->
+    <rect x="330" y="60" width="100" height="34" rx="6" fill="#0d0d0d" stroke="#4db89a" stroke-width="1"/>
+    <text x="380" y="81" text-anchor="middle" fill="#4db89a" font-size="11">Web Araması</text>
+    <rect x="330" y="113" width="100" height="34" rx="6" fill="#0d0d0d" stroke="#4db89a" stroke-width="1"/>
+    <text x="380" y="134" text-anchor="middle" fill="#4db89a" font-size="11">Dosya / Kod</text>
+    <rect x="330" y="166" width="100" height="34" rx="6" fill="#0d0d0d" stroke="#4db89a" stroke-width="1"/>
+    <text x="380" y="187" text-anchor="middle" fill="#4db89a" font-size="11">Bellek</text>
+
+    <!-- Ajan → Araçlar -->
+    <path d="M260 110 L330 77" stroke="#4db89a" stroke-width="1.2" fill="none" stroke-dasharray="4,3" marker-end="url(#ag)"/>
+    <path d="M260 128 L330 130" stroke="#4db89a" stroke-width="1.2" fill="none" stroke-dasharray="4,3" marker-end="url(#ag)"/>
+    <path d="M260 145 L330 183" stroke="#4db89a" stroke-width="1.2" fill="none" stroke-dasharray="4,3" marker-end="url(#ag)"/>
+
+    <!-- Araçlar → Gözlem -->
+    <rect x="470" y="95" width="100" height="64" rx="8" fill="#0d0d0d" stroke="#e07b54" stroke-width="1"/>
+    <text x="520" y="122" text-anchor="middle" fill="#e07b54" font-size="12" font-weight="600">Gözlem</text>
+    <text x="520" y="137" text-anchor="middle" fill="#555" font-size="10">Sonuçları değerlendir</text>
+    <path d="M430 128 L470 128" stroke="#e07b54" stroke-width="1.2" fill="none" marker-end="url(#ao)"/>
+
+    <!-- Loop back arrow -->
+    <path d="M520 159 Q520 220 330 220 Q140 220 200 159" stroke="#5b8def" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#a)"/>
+    <text x="330" y="215" text-anchor="middle" fill="#555" font-size="9">Yeterli değilse → tekrar döngü</text>
+
+    <!-- Final output -->
+    <path d="M570 128 L610 128" stroke="#5b8def" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+    <rect x="610" y="108" width="45" height="38" rx="6" fill="#0d0d0d" stroke="#5b8def"/>
+    <text x="632" y="131" text-anchor="middle" fill="#5b8def" font-size="10">Yanıt</text>
+  </svg>
+</div>
+
+<h2>Döngü Adımları</h2>
+<div class="steps">
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <div class="step-title">Algıla (Perceive)</div>
+      <div class="step-desc">Kullanıcının isteğini ve mevcut context'i parse eder. Hangi araçların gerekli olduğuna karar verir.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <div class="step-title">Planla (Plan)</div>
+      <div class="step-desc"><code>function_call</code> ya da <code>tool_use</code> ile bir sonraki adımı seçer. Birden fazla araç zincirleme çağrılabilir.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <div class="step-title">Çalıştır (Execute)</div>
+      <div class="step-desc">Araç çalışır: web araması, kod yürütme, dosya okuma, API çağrısı vb. Sonuç modele geri beslenir.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <div class="step-title">Yansı (Reflect)</div>
+      <div class="step-desc">Toplanan bilgi yeterli mi? Değilse → döngü tekrarlanır. Yeterliyse → son yanıt üretilir.</div>
+    </div>
+  </div>
+</div>
+
+<h2>Avantaj & Dezavantaj</h2>
+<div class="pros-cons">
+  <div class="box">
+    <h3 class="green">+ Avantajlar</h3>
+    <ul>
+      <li>Tek model, düşük gecikme</li>
+      <li>Basit prompt yönetimi</li>
+      <li>Context tek yerde — tutarlı</li>
+      <li>Hata ayıklama kolay</li>
+      <li>Düşük maliyet</li>
+    </ul>
+  </div>
+  <div class="box">
+    <h3 class="red">− Dezavantajlar</h3>
+    <ul>
+      <li>Context pencere sınırı</li>
+      <li>Uzmanlaşma zor</li>
+      <li>Paralel çalışma yok</li>
+      <li>Uzun görevlerde drift riski</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Ne Zaman Kullan?</h2>
+<p>Görev <strong>tek bir uzmanlık alanı</strong> içeriyor ve context 128K token sınırı içinde kalıyorsa ideal seçimdir. Hızlı prototipleme, sohbet asistanları, basit araştırma akışları için en verimli yaklaşımdır.</p>
+
+<h2>İlgili</h2>
+<p><a href="../overview/">← Genel Bakış</a> · <a href="../sequential-multi-agent/">Sıralı Çok Ajan →</a></p>
+
+</body>
+</html>

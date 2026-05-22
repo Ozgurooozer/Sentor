@@ -1,0 +1,78 @@
+<svg viewBox="0 0 480 300" width="480" height="300" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif" style="background:#0a0a0a">
+  <!-- Title -->
+  <text x="240" y="26" text-anchor="middle" fill="#f5f5f5" font-size="13" font-weight="700">MİMARİ KARŞILAŞTIRMA</text>
+
+  <!-- Divider -->
+  <line x1="240" y1="38" x2="240" y2="280" stroke="#2a2a2a" stroke-width="1" stroke-dasharray="4,4"/>
+
+  <!-- Left: Single Agent -->
+  <text x="120" y="54" text-anchor="middle" fill="#5b8def" font-size="11" font-weight="700" letter-spacing="0.5">TEK AJAN LOOP</text>
+
+  <!-- Metrics left -->
+  <text x="30" y="82" fill="#888" font-size="10">Gecikme</text>
+  <rect x="100" y="70" width="120" height="8" rx="4" fill="#1a1a1a"/>
+  <rect x="100" y="70" width="50" height="8" rx="4" fill="#5b8def" opacity="0.7"/>
+  <text x="225" y="80" fill="#5b8def" font-size="9" text-anchor="end">Düşük</text>
+
+  <text x="30" y="102" fill="#888" font-size="10">Maliyet</text>
+  <rect x="100" y="90" width="120" height="8" rx="4" fill="#1a1a1a"/>
+  <rect x="100" y="90" width="45" height="8" rx="4" fill="#5b8def" opacity="0.7"/>
+  <text x="225" y="100" fill="#5b8def" font-size="9" text-anchor="end">Düşük</text>
+
+  <text x="30" y="122" fill="#888" font-size="10">Kalite</text>
+  <rect x="100" y="110" width="120" height="8" rx="4" fill="#1a1a1a"/>
+  <rect x="100" y="110" width="75" height="8" rx="4" fill="#5b8def" opacity="0.7"/>
+  <text x="225" y="120" fill="#5b8def" font-size="9" text-anchor="end">Orta</text>
+
+  <text x="30" y="142" fill="#888" font-size="10">Ölçeklenebilirlik</text>
+  <rect x="100" y="130" width="120" height="8" rx="4" fill="#1a1a1a"/>
+  <rect x="100" y="130" width="55" height="8" rx="4" fill="#5b8def" opacity="0.7"/>
+  <text x="225" y="140" fill="#5b8def" font-size="9" text-anchor="end">Orta</text>
+
+  <text x="30" y="162" fill="#888" font-size="10">Karmaşıklık</text>
+  <rect x="100" y="150" width="120" height="8" rx="4" fill="#1a1a1a"/>
+  <rect x="100" y="150" width="35" height="8" rx="4" fill="#5b8def" opacity="0.7"/>
+  <text x="225" y="160" fill="#5b8def" font-size="9" text-anchor="end">Basit</text>
+
+  <!-- Ne zaman -->
+  <rect x="20" y="178" width="205" height="50" rx="6" fill="#111" stroke="#2a2a2a"/>
+  <text x="122" y="197" text-anchor="middle" fill="#888" font-size="10" font-weight="600">Ne Zaman?</text>
+  <text x="122" y="213" text-anchor="middle" fill="#555" font-size="9">Hız önemliyse · Tek uzmanlık</text>
+  <text x="122" y="225" text-anchor="middle" fill="#555" font-size="9">Context &lt; 128K · Prototip</text>
+
+  <!-- Right: Sequential -->
+  <text x="360" y="54" text-anchor="middle" fill="#4db89a" font-size="11" font-weight="700" letter-spacing="0.5">SIRALI ÇOK AJAN</text>
+
+  <text x="252" y="82" fill="#888" font-size="10">Gecikme</text>
+  <rect x="320" y="70" width="120" height="8" rx="4" fill="#1a1a1a"/>
+  <rect x="320" y="70" width="100" height="8" rx="4" fill="#4db89a" opacity="0.7"/>
+  <text x="445" y="80" fill="#4db89a" font-size="9" text-anchor="end">Yüksek</text>
+
+  <text x="252" y="102" fill="#888" font-size="10">Maliyet</text>
+  <rect x="320" y="90" width="120" height="8" rx="4" fill="#1a1a1a"/>
+  <rect x="320" y="90" width="95" height="8" rx="4" fill="#4db89a" opacity="0.7"/>
+  <text x="445" y="100" fill="#4db89a" font-size="9" text-anchor="end">Yüksek</text>
+
+  <text x="252" y="122" fill="#888" font-size="10">Kalite</text>
+  <rect x="320" y="110" width="120" height="8" rx="4" fill="#1a1a1a"/>
+  <rect x="320" y="110" width="110" height="8" rx="4" fill="#4db89a" opacity="0.7"/>
+  <text x="445" y="120" fill="#4db89a" font-size="9" text-anchor="end">Yüksek</text>
+
+  <text x="252" y="142" fill="#888" font-size="10">Ölçeklenebilirlik</text>
+  <rect x="320" y="130" width="120" height="8" rx="4" fill="#1a1a1a"/>
+  <rect x="320" y="130" width="105" height="8" rx="4" fill="#4db89a" opacity="0.7"/>
+  <text x="445" y="140" fill="#4db89a" font-size="9" text-anchor="end">Yüksek</text>
+
+  <text x="252" y="162" fill="#888" font-size="10">Karmaşıklık</text>
+  <rect x="320" y="150" width="120" height="8" rx="4" fill="#1a1a1a"/>
+  <rect x="320" y="150" width="90" height="8" rx="4" fill="#4db89a" opacity="0.7"/>
+  <text x="445" y="160" fill="#4db89a" font-size="9" text-anchor="end">Yüksek</text>
+
+  <rect x="250" y="178" width="210" height="50" rx="6" fill="#111" stroke="#2a2a2a"/>
+  <text x="355" y="197" text-anchor="middle" fill="#888" font-size="10" font-weight="600">Ne Zaman?</text>
+  <text x="355" y="213" text-anchor="middle" fill="#555" font-size="9">Kalite öncelikli · Çok uzmanlık</text>
+  <text x="355" y="225" text-anchor="middle" fill="#555" font-size="9">Uzun görevler · Prod sistemler</text>
+
+  <!-- Bottom note -->
+  <text x="240" y="264" text-anchor="middle" fill="#333" font-size="9">Her iki mimari de doğru kullanım senaryosunda idealdir.</text>
+</svg>

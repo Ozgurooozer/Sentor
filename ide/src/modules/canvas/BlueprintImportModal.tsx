@@ -34,16 +34,16 @@ type BlueprintFile = {
 };
 
 async function listBlueprints(workspaceRoot: string): Promise<BlueprintMeta[]> {
-  const sep = workspaceRoot.includes("\\") ? "\\" : "/";
-  const blueprintsDir = `${workspaceRoot}${sep}vault${sep}blueprints`;
+  const root = workspaceRoot.replace(/[\\/]+$/, "").replace(/\\/g, "/");
+  const blueprintsDir = `${root}/vault/blueprints`;
   try {
-    type FsEntry = { name: string; path: string; is_dir: boolean };
-    const entries = await invoke<FsEntry[]>("fs_list_directory", { path: blueprintsDir });
-    const dirs = entries.filter((e) => e.is_dir);
+    type FsEntry = { name: string; kind: string };
+    const entries = await invoke<FsEntry[]>("fs_read_dir", { path: blueprintsDir });
+    const dirs = entries.filter((e) => e.kind === "dir");
     const metas: BlueprintMeta[] = [];
     for (const dir of dirs) {
       try {
-        const jsonPath = `${dir.path}${sep}blueprint.json`;
+        const jsonPath = `${blueprintsDir}/${dir.name}/blueprint.json`;
         const result = await invoke<{ kind: string; content?: string }>("fs_read_file", { path: jsonPath });
         if (result.kind !== "text" || !result.content) continue;
         const bp = JSON.parse(result.content) as BlueprintFile;
@@ -55,7 +55,7 @@ async function listBlueprints(workspaceRoot: string): Promise<BlueprintMeta[]> {
           panelCount: bp.panels?.length ?? 0,
           connectionCount: bp.connections?.length ?? 0,
           created: bp.created?.slice(0, 10) ?? "",
-          path: `${dir.path}${sep}blueprint.json`,
+          path: jsonPath,
         });
       } catch {
         // Malformed or missing blueprint.json — skip.

@@ -150,6 +150,8 @@ function PortDots({
 
 // ── Main component ────────────────────────────────────────────────────────────
 
+import type { WireAnim } from "./canvasTweaksStore";
+
 interface Props {
   panels: CanvasPanelNode[];
   connections: Connection[];
@@ -157,10 +159,11 @@ interface Props {
   /** Bounding rect of the canvas container, used to convert clientXY → canvas space. */
   canvasRect: DOMRect | null;
   pending: PendingConn | null;
+  wireAnim?: WireAnim;
   onPendingChange: (p: PendingConn | null) => void;
 }
 
-export function ConnectionLayer({ panels, connections, viewport, canvasRect, pending, onPendingChange }: Props) {
+export function ConnectionLayer({ panels, connections, viewport, canvasRect, pending, onPendingChange, wireAnim = "off" }: Props) {
   const addConnection = useCanvasStore((s) => s.addConnection);
   const removeConnection = useCanvasStore((s) => s.removeConnection);
   const updateConnectionKind = useCanvasStore((s) => s.updateConnectionKind);
@@ -302,7 +305,80 @@ export function ConnectionLayer({ panels, connections, viewport, canvasRect, pen
                 strokeWidth={1.5}
                 strokeOpacity={0.6}
                 strokeDasharray="4 3"
+                className={
+                  wireAnim === "flow"
+                    ? "atlas-wire-flow"
+                    : wireAnim === "pulse"
+                      ? "atlas-wire-pulse"
+                      : undefined
+                }
               />
+              {/* Data preview label — text (first 52 chars) or image thumbnail */}
+              {(() => {
+                const srcData = fp.meta?.outputData as { kind: string; value: unknown } | undefined;
+                if (!srcData || !srcData.value) return null;
+
+                if (srcData.kind === "image" && typeof srcData.value === "string") {
+                  return (
+                    <foreignObject
+                      x={mid.x - 22}
+                      y={mid.y - 28}
+                      width={44}
+                      height={24}
+                      style={{ pointerEvents: "none", overflow: "visible" }}
+                    >
+                      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <img
+                          src={srcData.value}
+                          alt="wire"
+                          style={{
+                            maxWidth: 40, maxHeight: 20,
+                            borderRadius: 2,
+                            border: "1px solid #2a2a2a",
+                            objectFit: "cover",
+                            display: "block",
+                          }}
+                        />
+                      </div>
+                    </foreignObject>
+                  );
+                }
+
+                if (srcData.kind !== "text") return null;
+                const preview = String(srcData.value).replace(/\s+/g, " ").trim().slice(0, 52);
+                if (!preview) return null;
+                return (
+                  <foreignObject
+                    x={mid.x - 80}
+                    y={mid.y - 30}
+                    width={160}
+                    height={20}
+                    style={{ pointerEvents: "none", overflow: "visible" }}
+                  >
+                    <div
+                      className="flex items-center justify-center"
+                      style={{ width: "100%", height: "100%" }}
+                    >
+                      <span
+                        className="rounded px-1.5 py-0.5 font-mono text-[8.5px] text-[#4a4845]"
+                        style={{
+                          background: "#111111",
+                          border: "1px solid #252525",
+                          maxWidth: 160,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          display: "block",
+                          textAlign: "center",
+                        }}
+                        title={String(srcData.value)}
+                      >
+                        {preview}{String(srcData.value).length > 52 ? "…" : ""}
+                      </span>
+                    </div>
+                  </foreignObject>
+                );
+              })()}
               {/* Delete button at midpoint */}
               <g
                 transform={`translate(${mid.x},${mid.y})`}

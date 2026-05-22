@@ -4,25 +4,56 @@ import { useCanvasStore } from "./canvasStore";
 import { CanvasPanel } from "./CanvasPanel";
 import { CanvasContextMenu, type ContextMenuPos, type NodeMenuItem } from "./CanvasContextMenu";
 import { ConnectionLayer, type PendingConn } from "./ConnectionLayer";
-import { PanelMenu } from "./PanelMenu";
 import { CanvasDock } from "./CanvasDock";
+import { Orkestra } from "./Orkestra";
 import { BlueprintImportModal } from "./BlueprintImportModal";
 import { SentorRunModal } from "./SentorRunModal";
+import { AddPanel } from "./AddPanel";
+import { MiniMap } from "./MiniMap";
+import { ZoomBar } from "./ZoomBar";
+import { CanvasFab } from "./CanvasFab";
+import { TweaksPanel } from "./TweaksPanel";
+import { useTweaksStore } from "./canvasTweaksStore";
 import { usePreferencesStore } from "@/modules/settings/preferences";
+import type { BgStyle } from "./canvasTweaksStore";
 
-const DOT_GRID_STYLE: React.CSSProperties = {
-  backgroundImage:
-    "radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)",
-  backgroundSize: "24px 24px",
-};
+function getBgStyle(style: BgStyle): React.CSSProperties {
+  switch (style) {
+    case "dot":
+      return {
+        backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)",
+        backgroundSize: "24px 24px",
+      };
+    case "grid":
+      return {
+        backgroundImage:
+          "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+        backgroundSize: "32px 32px",
+      };
+    case "radial":
+      return {
+        background: "radial-gradient(ellipse at center, #111111 0%, #0a0a0a 70%)",
+      };
+    case "noise":
+      return {
+        backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeBlend in='SourceGraphic' result='blend'/%3E%3CfeComposite in='blend' in2='SourceGraphic' operator='in'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E\")",
+      };
+    default: // solid
+      return { background: "#0a0a0a" };
+  }
+}
 
 export function InfiniteCanvas() {
   const panels = useCanvasStore((s) => s.panels);
   const connections = useCanvasStore((s) => s.connections);
   const viewport = useCanvasStore((s) => s.viewport);
   const setViewport = useCanvasStore((s) => s.setViewport);
-
   const addPanel = useCanvasStore((s) => s.addPanel);
+
+  const bgStyle = useTweaksStore((s) => s.bgStyle);
+  const showMinimap = useTweaksStore((s) => s.showMinimap);
+  const showGuides = useTweaksStore((s) => s.showGuides);
+  const wireAnim = useTweaksStore((s) => s.wireAnim);
 
   const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot);
   const [panelDragging, setPanelDragging] = useState(false);
@@ -30,7 +61,11 @@ export function InfiniteCanvas() {
   const [ctxMenu, setCtxMenu] = useState<ContextMenuPos | null>(null);
   const [showBlueprintImport, setShowBlueprintImport] = useState(false);
   const [showSentorRun, setShowSentorRun] = useState(false);
+  const [showAddPanel, setShowAddPanel] = useState(false);
+  const [showTweaks, setShowTweaks] = useState(false);
   const [nodes, setNodes] = useState<NodeMenuItem[]>([]);
+  // Alignment guides: { axis: "v"|"h", pos: number }[] in canvas space
+  const [guides, setGuides] = useState<{ axis: "v" | "h"; pos: number }[]>([]);
 
   // Fetch available nodes from API for the context menu
   useEffect(() => {
@@ -39,6 +74,19 @@ export function InfiniteCanvas() {
       .then((d) => setNodes(d.nodes ?? []))
       .catch(() => undefined);
   }, []);
+
+  // Ctrl+K → open AddPanel
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setShowAddPanel(true);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   const panState = useRef<{
@@ -78,10 +126,6 @@ export function InfiniteCanvas() {
     [],
   );
 
-  // Modern Chrome/Edge mark wheel listeners as passive by default; React's
-  // onWheel prop inherits this and silently ignores preventDefault. Attaching
-  // a native listener with passive: false is the only way to suppress page
-  // scroll while we zoom the canvas.
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -103,14 +147,12 @@ export function InfiniteCanvas() {
 
   const onContextMenu = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      // Only trigger on the canvas background, not on panels.
       if ((e.target as HTMLElement).closest("[data-canvas-panel]")) return;
       e.preventDefault();
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
       const screenX = e.clientX - rect.left;
       const screenY = e.clientY - rect.top;
-      // Convert screen coords → canvas coords (undo pan+zoom).
       const canvasX = (screenX - viewport.x) / viewport.scale;
       const canvasY = (screenY - viewport.y) / viewport.scale;
       setCtxMenu({ x: screenX, y: screenY, canvasX, canvasY });
@@ -118,23 +160,53 @@ export function InfiniteCanvas() {
     [viewport],
   );
 
-  // Pinned panels are managed by PinnedPanelsPortal (App.tsx) — always visible, both modes
+  // Alignment guides: only computed while actively dragging a panel.
+  // Deps exclude `panels` intentionally — we read the store directly so a new
+  // array reference from `useCanvasStore(s => s.panels)` never re-triggers this.
+  useEffect(() => {
+    if (!showGuides || !panelDragging) {
+      // Use functional form so we only schedule a re-render when the guides
+      // array is non-empty — avoids the infinite-loop that [] !== [] would cause.
+      setGuides((prev) => (prev.length === 0 ? prev : []));
+      return;
+    }
+    const allPanels = useCanvasStore.getState().panels.filter((p) => !p.pinned);
+    const newGuides: { axis: "v" | "h"; pos: number }[] = [];
+    const tol = 6 / viewport.scale;
+    for (let i = 0; i < allPanels.length; i++) {
+      for (let j = i + 1; j < allPanels.length; j++) {
+        const a = allPanels[i];
+        const b = allPanels[j];
+        if (Math.abs(a.x - b.x) < tol) newGuides.push({ axis: "v", pos: (a.x + b.x) / 2 });
+        if (Math.abs(a.x + a.width - (b.x + b.width)) < tol) newGuides.push({ axis: "v", pos: (a.x + a.width + b.x + b.width) / 2 });
+        if (Math.abs(a.x + a.width / 2 - (b.x + b.width / 2)) < tol) newGuides.push({ axis: "v", pos: (a.x + a.width / 2 + b.x + b.width / 2) / 2 });
+        if (Math.abs(a.y - b.y) < tol) newGuides.push({ axis: "h", pos: (a.y + b.y) / 2 });
+        if (Math.abs(a.y + a.height - (b.y + b.height)) < tol) newGuides.push({ axis: "h", pos: (a.y + a.height + b.y + b.height) / 2 });
+        if (Math.abs(a.y + a.height / 2 - (b.y + b.height / 2)) < tol) newGuides.push({ axis: "h", pos: (a.y + a.height / 2 + b.y + b.height / 2) / 2 });
+      }
+    }
+    setGuides(newGuides.slice(0, 8));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [panelDragging, showGuides, viewport.scale]);
+
   const canvasPanels = panels.filter((p) => !p.pinned);
   const hasNoPanels = panels.length === 0;
-
   const canvasRect = containerRef.current?.getBoundingClientRect() ?? null;
 
   return (
     <div
       ref={containerRef}
       className="relative h-full w-full select-none"
-      style={DOT_GRID_STYLE}
+      style={getBgStyle(bgStyle)}
       onPointerDown={onCanvasPointerDown}
       onPointerMove={onCanvasPointerMove}
       onPointerUp={onCanvasPointerUp}
       onContextMenu={onContextMenu}
     >
-      {/* Canvas-space layer — pan/zoom applied here */}
+      {/* Film grain + vignette — quality atmosphere */}
+      <div className="canvas-grain" />
+      <div className="canvas-vignette" />
+      {/* Canvas-space layer */}
       <div
         style={{
           position: "absolute",
@@ -160,12 +232,13 @@ export function InfiniteCanvas() {
           canvasRect={canvasRect}
           pending={pendingConn}
           onPendingChange={setPendingConn}
+          wireAnim={wireAnim}
         />
       </div>
 
       {hasNoPanels && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <span className="text-[12px] text-[#333333]">Press [+] or right-click to add</span>
+          <span className="text-[12px] text-[#333333]">Ctrl+K to add a node, or right-click</span>
         </div>
       )}
 
@@ -205,20 +278,66 @@ export function InfiniteCanvas() {
         <SentorRunModal onClose={() => setShowSentorRun(false)} />
       )}
 
-      {/* Minimized panels dock — sits above the AI bar */}
+      {showAddPanel && (
+        <AddPanel
+          onClose={() => setShowAddPanel(false)}
+          onImportBlueprint={() => { setShowAddPanel(false); setShowBlueprintImport(true); }}
+        />
+      )}
+
+      {/* Alignment guides — rendered in canvas space */}
+      {guides.length > 0 && (
+        <div
+          className="pointer-events-none absolute inset-0 overflow-visible"
+          style={{ transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.scale})`, transformOrigin: "0 0", position: "absolute" }}
+        >
+          {guides.map((g, i) =>
+            g.axis === "v" ? (
+              <div
+                key={i}
+                className="absolute bg-red-500/60"
+                style={{ left: g.pos, top: -9999, width: 1, height: 99999 }}
+              />
+            ) : (
+              <div
+                key={i}
+                className="absolute bg-red-500/60"
+                style={{ top: g.pos, left: -9999, height: 1, width: 99999 }}
+              />
+            ),
+          )}
+        </div>
+      )}
+
+      {/* Overlays */}
+      {showMinimap && <MiniMap />}
+      <ZoomBar />
+
+      {/* Tweaks button — below topbar, above FAB */}
+      <button
+        type="button"
+        onClick={() => setShowTweaks((v) => !v)}
+        onPointerDown={(e) => e.stopPropagation()}
+        className="absolute right-3 top-16 z-30 flex h-6 w-6 items-center justify-center rounded border border-[#2a2a2a] bg-[#111111]/90 text-[11px] text-[#555555] transition-colors duration-150 ease-out hover:border-[#404040] hover:text-[#888888]"
+        title="Canvas tweaks"
+      >
+        ⚙
+      </button>
+
+      {/* Tweaks panel */}
+      {showTweaks && <TweaksPanel onClose={() => setShowTweaks(false)} />}
+
+      {/* Canvas dock — sits above Orkestra */}
       <CanvasDock />
 
-      {/* Floating + button — canvas bottom-left, visible in both layout modes.
-          stopPropagation on the wrapper prevents the canvas pan handler from
-          claiming pointerdown via setPointerCapture, which would otherwise
-          steal subsequent events from the Radix dropdown portal. */}
-      <div className="pointer-events-none absolute inset-0 z-20">
-        <div
-          className="pointer-events-auto absolute bottom-4 left-4"
-          onPointerDown={(e) => e.stopPropagation()}
-        >
-          <PanelMenu />
-        </div>
+      {/* Orkestra — bottom command bar */}
+      <div onPointerDown={(e) => e.stopPropagation()}>
+        <Orkestra onAdd={(type) => addPanel(type)} />
+      </div>
+
+      {/* Right-side FAB */}
+      <div onPointerDown={(e) => e.stopPropagation()}>
+        <CanvasFab onOpenAddPanel={() => setShowAddPanel(true)} />
       </div>
     </div>
   );

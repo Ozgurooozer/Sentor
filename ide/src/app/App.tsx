@@ -4,6 +4,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { CanvasAppShell } from "./CanvasAppShell";
 import { OnboardingWizard } from "@/modules/onboarding/OnboardingWizard";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
@@ -1509,6 +1510,17 @@ export default function App() {
       </TooltipProvider>
     </ThemeProvider>
   );
+
+  if (layoutMode === "canvas") {
+    return (
+      <ErrorBoundary name="app">
+        <CanvasAppShell />
+        {showOnboarding && (
+          <OnboardingWizard onComplete={() => setShowOnboarding(false)} />
+        )}
+      </ErrorBoundary>
+    );
+  }
 
   return (
     <ErrorBoundary name="app">

@@ -282,6 +282,7 @@ Read `interface-setup/.interface-design/system.md` before touching any UI. Key r
 | D | **Browser tabs** — Vault tab (asset:// iframe) + Web tab (native child WebView using Tauri `unstable` feature); address bar, back/forward, bookmarks, SearXNG search |
 | E | Vault Home tab — startup search front door over the user's own knowledge base |
 | F | **Release-quality cleanup** — see "Phase F notes" below |
+| G | **Canvas UI full transition** — see "Phase G notes" below |
 
 ### Phase F notes (v0.6 cleanup)
 
@@ -331,6 +332,46 @@ Key implementation details:
 - Shortcuts: `Ctrl+Alt+F` (`"layout.toggleFocused"`), `Ctrl+Alt+P` (`"layout.toggleClickThrough"`). (`Ctrl+Shift+F` is taken by `explorer.search` on Windows.)
 - Chat balloon auto-opens when `agentMeta.status === "thinking"` in focused mode (G6 in `OVERLAY_PLAN.md`).
 
-### Next (Phase G — feature polish)
+### Phase G notes (v0.7 — Canvas UI transition)
 
-Now that the v0.6 cleanup is in: backlinks panel UX, mermaid editor preview, richer graph view interactions, voice-to-vault flow, plus the three deferred items listed above (layout JSX split, vault undo snackbar, cross-platform click-through).
+**`layoutMode: "canvas"` is now the default.** Eski `classic` ve `focused` modları silinmedi — `preferences.ts`'te default'u değiştirerek geri dönülür.
+
+New files and what they do:
+
+- **`app/CanvasAppShell.tsx`** — Canvas mode root layout (replaces `App.tsx` shell when `layoutMode === "canvas"`). Has its own ThemeProvider + AiComposerProvider so it's independent.
+- **`modules/canvas/CanvasTopBar.tsx`** — Top bar: Atlas logo, `CanvasBreadcrumb`, provider pill, settings button.
+- **`modules/canvas/CanvasBreadcrumb.tsx`** — Multi-canvas navigation breadcrumb from `canvasHistory`.
+- **`modules/canvas/AddPanel.tsx`** — Cmd+K node palette. Categories: AI / Tools / Inputs / Display / Canvas. Fuzzy search.
+- **`modules/canvas/MiniMap.tsx`** — 160×100px SVG minimap (bottom-left). Click to navigate.
+- **`modules/canvas/ZoomBar.tsx`** — `[−] [%] [+] [⊞]` zoom control (bottom-right). Fit-all button.
+- **`modules/canvas/Orkestra.tsx`** — Node/wire counter + quick-add bar (above dock).
+- **`modules/canvas/TweaksPanel.tsx`** — Slide-in panel (⚙ button, top-right): bg style, wire anim, guides, density, quality, node radius/header.
+- **`modules/canvas/canvasTweaksStore.ts`** — Zustand store for tweak settings (`BgStyle`, `WireAnim`, `WireStyle`, etc.).
+- **`modules/canvas/SketchPanel.tsx`** — HTML5 Canvas 2D drawing panel (pen/eraser/select/clear).
+- **`modules/canvas/NotePanel.tsx`** — Sticky-note panel (yellow gradient, textarea, wire output).
+- **`modules/canvas/ToolPanel.tsx`** — ComfyUI-style tool wrapper node (icon + label + hidden canvas badge).
+
+**`canvasStore.ts` multi-canvas additions:**
+- `CanvasRecord` type: `{ id, title, kind, hidden?, parentCanvasId? }`
+- `canvases: CanvasRecord[]`, `activeCanvasId: string`, `canvasHistory: string[]`
+- Actions: `addCanvas()`, `removeCanvas()`, `switchCanvas(id)`, `enterCanvas(id)`, `exitCanvas()`
+- Canvas switching persists to per-canvas `atlas-canvas-multi-{id}.json` files.
+
+**`types.ts`:** `"sketch"`, `"note"`, `"tool"` added to `PanelType`.
+
+**Wire animations:** `atlas-wire-flow` / `atlas-wire-pulse` keyframes in `globals.css`. Controlled by `canvasTweaksStore.wireAnim` → `ConnectionLayer.wireAnim` prop.
+
+**Background styles:** `InfiniteCanvas.getBgStyle(bgStyle)` — dot / grid / solid / radial / noise.
+
+**Alignment guides:** computed during panel drag when `canvasTweaksStore.showGuides` is true — red lines at x/y/center alignment positions.
+
+**Settings → General:** Layout option "Canvas" added (grid is now 3-column).
+
+What is deferred:
+- `CanvasPanel` drill-in for canvas nodes (double-click → `switchCanvas`) — ToolPanel stub is in place.
+- Vault undo snackbar (backend is already there).
+- Layout JSX split in App.tsx.
+
+### Next (Phase H)
+
+Backlinks panel UX, mermaid editor preview, richer graph view interactions, voice-to-vault flow, plus the three deferred items from Phase G above.

@@ -5,6 +5,7 @@
  * any connected wire to downstream panels (e.g. a chat panel).
  */
 import { useRef, useState, useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { useCanvasStore } from "./canvasStore";
 import type { CanvasPanelNode } from "./types";
 
@@ -58,9 +59,19 @@ export function InputPanel({ panel }: { panel: CanvasPanelNode }) {
   const onFilePicked = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // In Tauri the File object's name isn't a full path, but it's the best we have.
     commitText(file.name);
   };
+
+  // When file kind and a path is set, read content and push to wire.
+  useEffect(() => {
+    if (kind !== "file" || !text.trim()) return;
+    invoke<string>("fs_read_file", { path: text.trim() })
+      .then((content) => {
+        setOutputData(panel.id, { kind: "text", value: content.slice(0, 8000) });
+      })
+      .catch(() => undefined);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kind, text]);
 
   const tabCls = (k: InputKind) =>
     `px-2 py-0.5 text-[9px] rounded transition-colors cursor-pointer ${

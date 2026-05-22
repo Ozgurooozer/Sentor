@@ -15,9 +15,9 @@ const PANEL_ICONS: Record<string, string> = {
   preview: "◻",
   "vault-home": "⌂",
   web: "⊕",
-  chat: "💬",
+  chat: "□",
   canvas: "⊞",
-  agent: "A",
+  agent: "◎",
   instance: "◈",
   header: "◆",
   checklist: "✓",
@@ -25,6 +25,32 @@ const PANEL_ICONS: Record<string, string> = {
   input: "□",
   pipeline: "↯",
   codegraph: "⌬",
+  sketch: "✏",
+  note: "◧",
+  tool: "⚡",
+  filebrowser: "◫",
+};
+
+const PANEL_LABELS: Record<string, string> = {
+  terminal: "terminal",
+  editor: "editor",
+  preview: "preview",
+  "vault-home": "vault",
+  web: "web",
+  chat: "atlas chat",
+  canvas: "canvas",
+  agent: "agent",
+  instance: "instance",
+  header: "header",
+  checklist: "checklist",
+  gallery: "gallery",
+  input: "input",
+  pipeline: "pipeline",
+  codegraph: "codegraph",
+  sketch: "sketch",
+  note: "note",
+  tool: "tool",
+  filebrowser: "files",
 };
 
 
@@ -43,6 +69,10 @@ export function CanvasPanel({ panel, viewport, onDragStart, onDragEnd, children 
   const bringToFront = useCanvasStore((s) => s.bringToFront);
   const togglePin = useCanvasStore((s) => s.togglePin);
   const toggleMinimized = useCanvasStore((s) => s.toggleMinimized);
+  const connections = useCanvasStore((s) => s.connections);
+
+  const inWires  = connections.filter((c) => c.toPanel   === panel.id).length;
+  const outWires = connections.filter((c) => c.fromPanel === panel.id).length;
 
   const ref = useRef<HTMLDivElement>(null);
   const [fullscreen, setFullscreen] = useState(false);
@@ -206,7 +236,9 @@ export function CanvasPanel({ panel, viewport, onDragStart, onDragEnd, children 
 
   const baseStyle: React.CSSProperties = {
     borderColor: accent,
-    boxShadow: `0 0 12px ${accent}${GLOW_ALPHA}`,
+    boxShadow: `0 10px 32px -8px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.35), 0 0 14px ${accent}${GLOW_ALPHA}`,
+    // expose accent for CSS rules that need it
+    ["--cv-accent" as string]: accent,
   };
 
   const panelStyle: React.CSSProperties = fullscreen
@@ -237,22 +269,27 @@ export function CanvasPanel({ panel, viewport, onDragStart, onDragEnd, children 
       data-canvas-panel
       style={panelStyle}
       className={cn(
-        "flex flex-col overflow-hidden rounded-lg",
-        "border bg-[#0a0a0a]/90 backdrop-blur-md",
-        "transition-[border-color,box-shadow] duration-150",
+        "canvas-node-card flex flex-col overflow-hidden rounded-[10px]",
+        "border bg-[#111111] backdrop-blur-sm",
+        "transition-[border-color,box-shadow,transform] duration-150",
         panel.pinned && "ring-1 ring-[#5b8def]/30",
       )}
       onPointerDownCapture={() => bringToFront(panel.id)}
     >
       {/* Title bar — drag handle; double-click anywhere on the bar toggles fullscreen */}
       <div
-        className="flex h-8 shrink-0 cursor-move select-none items-center gap-2 border-b border-[#2a2a2a] bg-[#222222] px-2"
+        className="relative flex h-8 shrink-0 cursor-move select-none items-center gap-2 border-b border-[#2a2a2a] bg-[#111111] pl-4 pr-2"
         onPointerDown={onTitlePointerDown}
         onPointerMove={onTitlePointerMove}
         onPointerUp={onTitlePointerUp}
-        onDoubleClick={() => setFullscreen((v) => !v)}
+        onDoubleClick={() => panel.type === "canvas" ? setFullscreen(true) : setFullscreen((v) => !v)}
       >
-        <span className="text-[10px] text-[#555555]">{PANEL_ICONS[panel.type] ?? "□"}</span>
+        {/* Left accent stripe */}
+        <div
+          className="absolute left-0 top-0 bottom-0 w-[3px] rounded-tl-lg"
+          style={{ background: accent }}
+        />
+        <span className="text-[10px]" style={{ color: accent }}>{PANEL_ICONS[panel.type] ?? "□"}</span>
         {editingTitle ? (
           <input
             autoFocus
@@ -276,10 +313,24 @@ export function CanvasPanel({ panel, viewport, onDragStart, onDragEnd, children 
           />
         ) : (
           <span
-            className="min-w-0 flex-1 truncate text-[11px] font-medium text-[#888888]"
+            className="min-w-0 flex-1 truncate text-[11px] font-medium text-[#f5f5f5]"
             onDoubleClick={(e) => { e.stopPropagation(); setTitleDraft(panel.title); setEditingTitle(true); }}
           >
             {panel.title}
+          </span>
+        )}
+        {/* Sub-label: shell, model, or other meta */}
+        {(panel.meta?.shell != null || panel.meta?.model != null) && (
+          <span className="shrink-0 font-mono text-[10px] text-[#555555]">
+            {String(panel.meta.shell ?? panel.meta.model ?? "")}
+          </span>
+        )}
+        {/* Wire count badge — only shown when at least one wire exists */}
+        {(inWires > 0 || outWires > 0) && (
+          <span className="shrink-0 font-mono text-[9.5px] text-[#4a4845] tabular-nums">
+            {inWires > 0 && <span title={`${inWires} input wire${inWires > 1 ? "s" : ""}`}>{inWires}↓</span>}
+            {inWires > 0 && outWires > 0 && <span className="mx-0.5 opacity-40">·</span>}
+            {outWires > 0 && <span title={`${outWires} output wire${outWires > 1 ? "s" : ""}`}>{outWires}↑</span>}
           </span>
         )}
         {/* Snapshot toggle — freezes the panel's current outputData so
@@ -316,6 +367,24 @@ export function CanvasPanel({ panel, viewport, onDragStart, onDragEnd, children 
             )}
           >
             ❄
+          </button>
+        )}
+        {/* Enter sub-canvas button — only for canvas-type panels */}
+        {panel.type === "canvas" && (
+          <button
+            type="button"
+            title="Enter sub-canvas (double-click to enter, Esc to exit)"
+            onPointerDown={(e) => e.stopPropagation()}
+            onDoubleClick={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); setFullscreen(true); }}
+            className={cn(
+              "flex size-5 items-center justify-center rounded transition-colors",
+              fullscreen
+                ? "bg-[#5b8def]/20 text-[#5b8def]"
+                : "text-[#555555] hover:bg-[#2a2a2a] hover:text-[#5b8def]",
+            )}
+          >
+            <span className="text-[10px] leading-none">⤵</span>
           </button>
         )}
         {/* Controls */}
@@ -366,9 +435,21 @@ export function CanvasPanel({ panel, viewport, onDragStart, onDragEnd, children 
         </button>
       </div>
 
-      {/* Content */}
-      <div className="relative min-h-0 flex-1 overflow-hidden">
+      {/* Content — stop propagation so drawing/typing doesn't pan the canvas */}
+      <div
+        className="relative min-h-0 flex-1 overflow-hidden"
+        onPointerDown={(e) => e.stopPropagation()}
+      >
         {children ?? <CanvasPanelContent panel={panel} />}
+      </div>
+
+      {/* Footer — type dot + label + short ID */}
+      <div className="canvas-node-foot shrink-0" onPointerDown={(e) => e.stopPropagation()}>
+        <div className="cv-dot" style={{ ["--cv-accent" as string]: accent }} />
+        <span>{PANEL_LABELS[panel.type] ?? panel.type}</span>
+        <span className="ml-auto font-mono text-[9px]" style={{ color: "#3a3a3a" }}>
+          {panel.id.slice(-4).toUpperCase()}
+        </span>
       </div>
 
       {/* Resize handles */}

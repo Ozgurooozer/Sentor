@@ -1,0 +1,240 @@
+{
+  "$schema": "atlas-blueprint-v1",
+  "slug": "ai-design-tactics",
+  "name": "Yapay Zeka ile Tasarım Taktikleri",
+  "description": "Tek ajan loop vs sıralı çok ajan mimarisi — vault notları, chat, gallery, checklist, sketch ve terminal bağlı canvas.",
+  "created": "2026-05-22T00:00:00Z",
+  "panels": [
+    {
+      "id": "hdr-1",
+      "type": "header",
+      "x": 40,
+      "y": 20,
+      "width": 1060,
+      "height": 52,
+      "zIndex": 1,
+      "title": "Yapay Zeka ile Tasarım Taktikleri",
+      "meta": {}
+    },
+    {
+      "id": "prev-ov",
+      "type": "preview",
+      "x": 40,
+      "y": 100,
+      "width": 360,
+      "height": 290,
+      "zIndex": 2,
+      "title": "Genel Bakış",
+      "meta": {
+        "path": "C:\\Atlas OS\\vault\\ai-design\\overview\\index.html"
+      }
+    },
+    {
+      "id": "prev-sa",
+      "type": "preview",
+      "x": 40,
+      "y": 420,
+      "width": 360,
+      "height": 290,
+      "zIndex": 3,
+      "title": "Tek Ajan Loop",
+      "meta": {
+        "path": "C:\\Atlas OS\\vault\\ai-design\\single-agent-loop\\index.html"
+      }
+    },
+    {
+      "id": "prev-sq",
+      "type": "preview",
+      "x": 40,
+      "y": 740,
+      "width": 360,
+      "height": 290,
+      "zIndex": 4,
+      "title": "Sıralı Çok Ajan",
+      "meta": {
+        "path": "C:\\Atlas OS\\vault\\ai-design\\sequential-multi-agent\\index.html"
+      }
+    },
+    {
+      "id": "note-1",
+      "type": "note",
+      "x": 440,
+      "y": 100,
+      "width": 260,
+      "height": 190,
+      "zIndex": 5,
+      "title": "Temel Prensip",
+      "meta": {
+        "text": "🧠 Temel Kural\n\nİlk önce Tek Ajan dene.\n\nEğer:\n• Context yetmiyorsa\n• Farklı uzmanlar gerekiyorsa\n• Kalite kritikse\n→ Sıralı Çok Ajan'a geç.\n\nKarmaşıklığı son çare olarak ekle."
+      }
+    },
+    {
+      "id": "chk-1",
+      "type": "checklist",
+      "x": 440,
+      "y": 320,
+      "width": 260,
+      "height": 300,
+      "zIndex": 6,
+      "title": "Tasarım Kontrol Listesi",
+      "meta": {
+        "items": [
+          { "id": "c1", "text": "Görev tek bir uzmanlık mı?", "done": false },
+          { "id": "c2", "text": "Context 128K token içinde kalıyor mu?", "done": false },
+          { "id": "c3", "text": "Latency kritik mi?", "done": false },
+          { "id": "c4", "text": "Farklı model rolleri gerekiyor mu?", "done": false },
+          { "id": "c5", "text": "Hata izolasyonu önemli mi?", "done": false },
+          { "id": "c6", "text": "Paralel çalışma faydalı mı?", "done": false },
+          { "id": "c7", "text": "Handoff formatı tanımlandı mı?", "done": false },
+          { "id": "c8", "text": "Test pipeline'ı kuruldu mu?", "done": false }
+        ]
+      }
+    },
+    {
+      "id": "inp-1",
+      "type": "input",
+      "x": 440,
+      "y": 650,
+      "width": 260,
+      "height": 150,
+      "zIndex": 7,
+      "title": "Sorgu Şablonu",
+      "meta": {
+        "text": "Bu görev için hangi AI mimarisini önerirsin?\n\nGörev: [görev açıklaması]\nContext boyutu: [tahmini token]\nLatency gereksinimleri: [düşük/orta/yüksek]\nKalite önceliği: [düşük/orta/yüksek]"
+      }
+    },
+    {
+      "id": "gal-1",
+      "type": "gallery",
+      "x": 440,
+      "y": 830,
+      "width": 260,
+      "height": 200,
+      "zIndex": 8,
+      "title": "Diyagramlar",
+      "meta": {
+        "dir": "C:\\Atlas OS\\vault\\ai-design\\assets"
+      }
+    },
+    {
+      "id": "chat-1",
+      "type": "chat",
+      "x": 740,
+      "y": 100,
+      "width": 420,
+      "height": 700,
+      "zIndex": 9,
+      "title": "Atlas AI — Tasarım Danışmanı",
+      "meta": {}
+    },
+    {
+      "id": "sk-1",
+      "type": "sketch",
+      "x": 1200,
+      "y": 100,
+      "width": 380,
+      "height": 360,
+      "zIndex": 10,
+      "title": "Whiteboard",
+      "meta": {}
+    },
+    {
+      "id": "term-1",
+      "type": "terminal",
+      "x": 1200,
+      "y": 490,
+      "width": 380,
+      "height": 280,
+      "zIndex": 11,
+      "title": "Terminal",
+      "meta": {
+        "initCmd": "echo 'Atlas AI Design Tactics — Vault hazır'"
+      }
+    },
+    {
+      "id": "fb-1",
+      "type": "filebrowser",
+      "x": 1200,
+      "y": 800,
+      "width": 380,
+      "height": 240,
+      "zIndex": 12,
+      "title": "Vault / ai-design",
+      "meta": {}
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn-ov-chat",
+      "fromPanel": "prev-ov",
+      "fromSide": "right",
+      "toPanel": "chat-1",
+      "toSide": "left",
+      "kind": "context",
+      "charLimit": 6000
+    },
+    {
+      "id": "conn-sa-chat",
+      "fromPanel": "prev-sa",
+      "fromSide": "right",
+      "toPanel": "chat-1",
+      "toSide": "left",
+      "kind": "context",
+      "charLimit": 6000
+    },
+    {
+      "id": "conn-sq-chat",
+      "fromPanel": "prev-sq",
+      "fromSide": "right",
+      "toPanel": "chat-1",
+      "toSide": "left",
+      "kind": "context",
+      "charLimit": 6000
+    },
+    {
+      "id": "conn-note-chat",
+      "fromPanel": "note-1",
+      "fromSide": "right",
+      "toPanel": "chat-1",
+      "toSide": "left",
+      "kind": "context",
+      "charLimit": 2000
+    },
+    {
+      "id": "conn-chk-chat",
+      "fromPanel": "chk-1",
+      "fromSide": "right",
+      "toPanel": "chat-1",
+      "toSide": "left",
+      "kind": "context",
+      "charLimit": 1000
+    },
+    {
+      "id": "conn-inp-chat",
+      "fromPanel": "inp-1",
+      "fromSide": "right",
+      "toPanel": "chat-1",
+      "toSide": "left",
+      "kind": "data",
+      "charLimit": 2000
+    },
+    {
+      "id": "conn-gal-chat",
+      "fromPanel": "gal-1",
+      "fromSide": "right",
+      "toPanel": "chat-1",
+      "toSide": "left",
+      "kind": "data",
+      "charLimit": 1000
+    },
+    {
+      "id": "conn-chat-term",
+      "fromPanel": "chat-1",
+      "fromSide": "right",
+      "toPanel": "term-1",
+      "toSide": "left",
+      "kind": "trigger",
+      "charLimit": 2000
+    }
+  ]
+}

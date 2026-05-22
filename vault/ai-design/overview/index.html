@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Yapay Zeka ile Tasarım Taktikleri — Genel Bakış</title>
+  <meta name="description" content="AI tasarım taktikleri: tek ajan loop ve sıralı çok ajan mimarilerinin karşılaştırması, ne zaman hangisini kullanmalı.">
+  <style>
+    :root {
+      --bg: #0a0a0a; --surface: #111; --elevated: #1a1a1a;
+      --border: #2a2a2a; --text: #f5f5f5; --dim: #888; --dim2: #555;
+      --accent: #5b8def; --green: #4db89a; --orange: #e07b54; --purple: #9b72ef;
+    }
+    * { box-sizing: border-box; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0; padding: 2rem; max-width: 820px; margin-inline: auto; line-height: 1.6;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.2rem; margin-bottom: 2rem;
+    }
+    header h1 { margin: 0 0 0.25rem; font-size: 1.5rem; }
+    .meta { color: var(--dim2); font-size: 0.8rem; }
+    h2 {
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--dim); margin: 2rem 0 0.75rem;
+    }
+    p { margin: 0 0 1rem; font-size: 0.9rem; color: #ccc; }
+    .svg-wrap {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+      overflow: hidden;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
+    .chip {
+      font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 100px;
+      border: 1px solid; font-family: monospace;
+    }
+    .chip-blue { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 30%, transparent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+    .chip-green { color: var(--green); border-color: color-mix(in srgb, var(--green) 30%, transparent); background: color-mix(in srgb, var(--green) 8%, transparent); }
+    .chip-purple { color: var(--purple); border-color: color-mix(in srgb, var(--purple) 30%, transparent); background: color-mix(in srgb, var(--purple) 8%, transparent); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem;
+    }
+    .card h3 { margin: 0 0 0.5rem; font-size: 0.85rem; }
+    .card p { margin: 0; font-size: 0.8rem; color: var(--dim); }
+    a { color: var(--text); border-bottom: 1px solid var(--border); text-decoration: none; }
+    a:hover { border-bottom-color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Yapay Zeka ile Tasarım Taktikleri</h1>
+  <span class="meta">ai-design · overview · 2026-05-22</span>
+</header>
+
+<h2>Neden Önemli</h2>
+<p>Bir AI sistemini tasarlarken mimarinin seçimi, yanıt kalitesini, maliyeti ve hata toleransını doğrudan etkiler. İki temel yaklaşım öne çıkar: <strong>Tek Ajan Loop</strong> ve <strong>Sıralı Çok Ajan</strong> zinciri.</p>
+
+<div class="chips">
+  <span class="chip chip-blue">tek ajan loop</span>
+  <span class="chip chip-green">sıralı çok ajan</span>
+  <span class="chip chip-purple">araç kullanımı</span>
+  <span class="chip chip-blue">yansıma / reflection</span>
+</div>
+
+<h2>Mimariye Genel Bakış</h2>
+<div class="svg-wrap">
+  <svg viewBox="0 0 700 220" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+    <!-- Background grid -->
+    <defs>
+      <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M20 0L0 0 0 20" fill="none" stroke="#1e1e1e" stroke-width="0.5"/>
+      </pattern>
+    </defs>
+    <rect width="700" height="220" fill="url(#grid)"/>
+
+    <!-- Left: Single Agent Loop -->
+    <text x="175" y="22" text-anchor="middle" fill="#5b8def" font-size="11" font-weight="600" letter-spacing="1">TEK AJAN LOOP</text>
+    <!-- Agent box -->
+    <rect x="120" y="35" width="110" height="40" rx="6" fill="#111" stroke="#5b8def" stroke-width="1.5"/>
+    <text x="175" y="58" text-anchor="middle" fill="#5b8def" font-size="12" font-weight="600">Ajan</text>
+    <!-- Tools box -->
+    <rect x="120" y="130" width="110" height="36" rx="6" fill="#111" stroke="#2a2a2a" stroke-width="1"/>
+    <text x="175" y="152" text-anchor="middle" fill="#888" font-size="11">Araçlar / Bellek</text>
+    <!-- Loop arrows -->
+    <path d="M175 75 L175 130" stroke="#5b8def" stroke-width="1.5" fill="none" marker-end="url(#arr-blue)"/>
+    <path d="M120 148 Q60 148 60 88 Q60 55 120 55" stroke="#5b8def" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arr-blue)"/>
+    <!-- Output -->
+    <path d="M230 55 L270 55" stroke="#5b8def" stroke-width="1.5" fill="none" marker-end="url(#arr-blue)"/>
+    <rect x="268" y="42" width="80" height="28" rx="5" fill="#111" stroke="#2a2a2a"/>
+    <text x="308" y="59" text-anchor="middle" fill="#888" font-size="11">Yanıt</text>
+    <!-- User input -->
+    <path d="M60 170 L175 170 L175 166" stroke="#333" stroke-width="1" fill="none" marker-end="url(#arr-dim)"/>
+    <text x="60" y="185" fill="#555" font-size="10">Kullanıcı</text>
+
+    <!-- Divider -->
+    <line x1="360" y1="20" x2="360" y2="200" stroke="#2a2a2a" stroke-width="1" stroke-dasharray="4,4"/>
+
+    <!-- Right: Sequential Multi-Agent -->
+    <text x="530" y="22" text-anchor="middle" fill="#4db89a" font-size="11" font-weight="600" letter-spacing="1">SIRALI ÇOK AJAN</text>
+    <!-- Agent boxes -->
+    <rect x="375" y="80" width="80" height="36" rx="6" fill="#111" stroke="#4db89a" stroke-width="1.5"/>
+    <text x="415" y="102" text-anchor="middle" fill="#4db89a" font-size="11" font-weight="600">Ajan 1</text>
+    <rect x="490" y="80" width="80" height="36" rx="6" fill="#111" stroke="#4db89a" stroke-width="1.5"/>
+    <text x="530" y="102" text-anchor="middle" fill="#4db89a" font-size="11" font-weight="600">Ajan 2</text>
+    <rect x="605" y="80" width="80" height="36" rx="6" fill="#111" stroke="#4db89a" stroke-width="1.5"/>
+    <text x="645" y="102" text-anchor="middle" fill="#4db89a" font-size="11" font-weight="600">Ajan 3</text>
+    <!-- Arrows between agents -->
+    <path d="M455 98 L490 98" stroke="#4db89a" stroke-width="1.5" fill="none" marker-end="url(#arr-green)"/>
+    <path d="M570 98 L605 98" stroke="#4db89a" stroke-width="1.5" fill="none" marker-end="url(#arr-green)"/>
+    <!-- Input -->
+    <path d="M375 150 L415 150 L415 116" stroke="#333" stroke-width="1" fill="none" marker-end="url(#arr-dim)"/>
+    <text x="365" y="165" fill="#555" font-size="10">Girdi</text>
+    <!-- Output -->
+    <path d="M645 116 L645 150" stroke="#4db89a" stroke-width="1.5" fill="none" marker-end="url(#arr-green)"/>
+    <rect x="600" y="148" width="90" height="28" rx="5" fill="#111" stroke="#2a2a2a"/>
+    <text x="645" y="165" text-anchor="middle" fill="#888" font-size="11">Çıktı</text>
+
+    <!-- Arrow markers -->
+    <defs>
+      <marker id="arr-blue" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M0 0L8 4L0 8Z" fill="#5b8def"/>
+      </marker>
+      <marker id="arr-green" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M0 0L8 4L0 8Z" fill="#4db89a"/>
+      </marker>
+      <marker id="arr-dim" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M0 0L8 4L0 8Z" fill="#555"/>
+      </marker>
+    </defs>
+  </svg>
+</div>
+
+<h2>Karşılaştırma</h2>
+<div class="grid-2">
+  <div class="card" style="border-color: color-mix(in srgb, #5b8def 30%, #2a2a2a)">
+    <h3 style="color:#5b8def">Tek Ajan Loop</h3>
+    <p>Tek model, araçlarıyla döngüsel çalışır. Basit, hızlı, düşük gecikme. Kompleks görevlerde context sınırına takılabilir.</p>
+  </div>
+  <div class="card" style="border-color: color-mix(in srgb, #4db89a 30%, #2a2a2a)">
+    <h3 style="color:#4db89a">Sıralı Çok Ajan</h3>
+    <p>Her ajan uzmanlaşmış bir rol üstlenir. Yüksek kalite, ölçeklenebilir. Daha yüksek gecikme ve koordinasyon maliyeti.</p>
+  </div>
+</div>
+
+<h2>Hangi Mimarıyi Seç?</h2>
+<p>Görev <strong>tek bir uzmanlık</strong> gerektiriyorsa → Tek Ajan Loop.<br>
+Görev <strong>farklı uzmanlık alanları</strong> içeriyorsa (araştırma + kod + QA) → Sıralı Çok Ajan.<br>
+<strong>Latency kritikse</strong> → Tek Ajan daha hızlıdır.<br>
+<strong>Kalite kritikse</strong> → Sıralı ajan zinciri daha tutarlı sonuç verir.</p>
+
+<h2>İlgili Notlar</h2>
+<p>
+  <a href="../single-agent-loop/">Tek Ajan Loop Detayı →</a><br>
+  <a href="../sequential-multi-agent/">Sıralı Çok Ajan Detayı →</a>
+</p>
+
+</body>
+</html>

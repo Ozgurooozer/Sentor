@@ -1,0 +1,44 @@
+<svg viewBox="0 0 480 320" width="480" height="320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif" style="background:#0a0a0a">
+  <defs>
+    <marker id="a" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#5b8def"/>
+    </marker>
+    <marker id="ag" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#4db89a"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="240" y="28" text-anchor="middle" fill="#5b8def" font-size="13" font-weight="700" letter-spacing="1">TEK AJAN LOOP</text>
+
+  <!-- User -->
+  <rect x="20" y="120" width="80" height="36" rx="6" fill="#111" stroke="#2a2a2a" stroke-width="1.5"/>
+  <text x="60" y="142" text-anchor="middle" fill="#888" font-size="12">👤 User</text>
+  <path d="M100 138 L145 138" stroke="#5b8def" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+
+  <!-- Agent -->
+  <rect x="145" y="102" width="120" height="72" rx="10" fill="#0d0d0d" stroke="#5b8def" stroke-width="2"/>
+  <text x="205" y="133" text-anchor="middle" fill="#5b8def" font-size="14" font-weight="700">🤖 Ajan</text>
+  <text x="205" y="152" text-anchor="middle" fill="#555" font-size="10">Düşün · Planla · Çalıştır</text>
+
+  <!-- Tools -->
+  <rect x="320" y="60" width="110" height="30" rx="5" fill="#111" stroke="#4db89a" stroke-width="1"/>
+  <text x="375" y="79" text-anchor="middle" fill="#4db89a" font-size="11">🔍 Web Arama</text>
+  <rect x="320" y="122" width="110" height="30" rx="5" fill="#111" stroke="#4db89a" stroke-width="1"/>
+  <text x="375" y="141" text-anchor="middle" fill="#4db89a" font-size="11">📁 Dosya / Kod</text>
+  <rect x="320" y="184" width="110" height="30" rx="5" fill="#111" stroke="#4db89a" stroke-width="1"/>
+  <text x="375" y="203" text-anchor="middle" fill="#4db89a" font-size="11">🧠 Bellek</text>
+
+  <!-- Agent → Tools -->
+  <path d="M265 120 Q295 75 320 75" stroke="#4db89a" stroke-width="1.2" stroke-dasharray="4,3" fill="none" marker-end="url(#ag)"/>
+  <path d="M265 138 L320 138" stroke="#4db89a" stroke-width="1.2" stroke-dasharray="4,3" fill="none" marker-end="url(#ag)"/>
+  <path d="M265 158 Q295 199 320 199" stroke="#4db89a" stroke-width="1.2" stroke-dasharray="4,3" fill="none" marker-end="url(#ag)"/>
+
+  <!-- Loop back -->
+  <path d="M375 245 Q375 280 205 280 Q145 280 205 174" stroke="#5b8def" stroke-width="1.5" fill="none" stroke-dasharray="5,4" marker-end="url(#a)"/>
+  <text x="290" y="276" fill="#444" font-size="9" text-anchor="middle">tekrar → yeterli bilgi toplanana kadar</text>
+
+  <!-- Response -->
+  <path d="M430 138 L460 138" stroke="#5b8def" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+  <text x="375" y="248" text-anchor="middle" fill="#333" font-size="9">Gözlem</text>
+</svg>

@@ -40,7 +40,7 @@ export const EDITOR_THEME_LABELS: Record<EditorThemeId, string> = {
 
 export type EmbeddingBackend = "sentence-transformers" | "ollama";
 
-export type LayoutMode = "classic" | "focused";
+export type LayoutMode = "classic" | "focused" | "canvas";
 
 export type Preferences = {
   theme: ThemePref;
@@ -142,7 +142,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   searxngUrl: "https://searx.be",
   embeddingBackend: "sentence-transformers",
   embeddingOllamaModel: "all-minilm",
-  layoutMode: "focused",
+  layoutMode: "canvas",
   sentorPath: "",
   barCollapsed: false,
   focusedTopOpen: true,
@@ -215,8 +215,7 @@ export async function loadPreferences(): Promise<Preferences> {
       get<EmbeddingBackend>(KEY_EMBEDDING_BACKEND) ?? DEFAULT_PREFERENCES.embeddingBackend,
     embeddingOllamaModel:
       get<string>(KEY_EMBEDDING_OLLAMA_MODEL) ?? DEFAULT_PREFERENCES.embeddingOllamaModel,
-    layoutMode:
-      get<LayoutMode>(KEY_LAYOUT_MODE) ?? DEFAULT_PREFERENCES.layoutMode,
+    layoutMode: "canvas" as LayoutMode,
     sentorPath:
       get<string>(KEY_SENTOR_PATH) ?? DEFAULT_PREFERENCES.sentorPath,
     barCollapsed:

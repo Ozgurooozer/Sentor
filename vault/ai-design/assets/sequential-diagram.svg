@@ -1,0 +1,55 @@
+<svg viewBox="0 0 480 280" width="480" height="280" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif" style="background:#0a0a0a">
+  <defs>
+    <marker id="ag" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#4db89a"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="240" y="28" text-anchor="middle" fill="#4db89a" font-size="13" font-weight="700" letter-spacing="1">SIRALI ÇOK AJAN</text>
+
+  <!-- Input -->
+  <rect x="10" y="105" width="60" height="36" rx="6" fill="#111" stroke="#2a2a2a"/>
+  <text x="40" y="127" text-anchor="middle" fill="#888" font-size="11">Girdi</text>
+  <path d="M70 123 L90 123" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#ag)"/>
+
+  <!-- Agent 1 -->
+  <rect x="90" y="90" width="90" height="66" rx="8" fill="#0d0d0d" stroke="#5b8def" stroke-width="1.5"/>
+  <text x="135" y="118" text-anchor="middle" fill="#5b8def" font-size="12" font-weight="700">🔍</text>
+  <text x="135" y="134" text-anchor="middle" fill="#5b8def" font-size="11" font-weight="600">Araştırmacı</text>
+  <text x="135" y="148" text-anchor="middle" fill="#555" font-size="9">Bilgi topla</text>
+  <path d="M180 123 L200 123" stroke="#4db89a" stroke-width="1.5" fill="none" marker-end="url(#ag)"/>
+
+  <!-- Agent 2 -->
+  <rect x="200" y="90" width="90" height="66" rx="8" fill="#0d0d0d" stroke="#9b72ef" stroke-width="1.5"/>
+  <text x="245" y="118" text-anchor="middle" fill="#9b72ef" font-size="12" font-weight="700">🗂</text>
+  <text x="245" y="134" text-anchor="middle" fill="#9b72ef" font-size="11" font-weight="600">Planlayıcı</text>
+  <text x="245" y="148" text-anchor="middle" fill="#555" font-size="9">Adımları planla</text>
+  <path d="M290 123 L310 123" stroke="#4db89a" stroke-width="1.5" fill="none" marker-end="url(#ag)"/>
+
+  <!-- Agent 3 -->
+  <rect x="310" y="90" width="90" height="66" rx="8" fill="#0d0d0d" stroke="#e07b54" stroke-width="1.5"/>
+  <text x="355" y="118" text-anchor="middle" fill="#e07b54" font-size="12" font-weight="700">✍️</text>
+  <text x="355" y="134" text-anchor="middle" fill="#e07b54" font-size="11" font-weight="600">Üretici</text>
+  <text x="355" y="148" text-anchor="middle" fill="#555" font-size="9">Çıktı üret</text>
+  <path d="M400 123 L420 123" stroke="#4db89a" stroke-width="1.5" fill="none" marker-end="url(#ag)"/>
+
+  <!-- Output -->
+  <rect x="420" y="105" width="50" height="36" rx="6" fill="#0d0d0d" stroke="#4db89a" stroke-width="1.5"/>
+  <text x="445" y="127" text-anchor="middle" fill="#4db89a" font-size="11">✅</text>
+
+  <!-- Labels under arrows -->
+  <text x="190" y="108" text-anchor="middle" fill="#333" font-size="9">özet</text>
+  <text x="300" y="108" text-anchor="middle" fill="#333" font-size="9">plan</text>
+  <text x="410" y="108" text-anchor="middle" fill="#333" font-size="9">sonuç</text>
+
+  <!-- Shared context bar -->
+  <rect x="90" y="175" width="380" height="28" rx="5" fill="#111" stroke="#2a2a2a"/>
+  <text x="280" y="193" text-anchor="middle" fill="#444" font-size="10">🧠 Paylaşılan Context / Bellek</text>
+  <line x1="135" y1="156" x2="135" y2="175" stroke="#2a2a2a" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="245" y1="156" x2="245" y2="175" stroke="#2a2a2a" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="355" y1="156" x2="355" y2="175" stroke="#2a2a2a" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- Comparison note -->
+  <text x="240" y="230" text-anchor="middle" fill="#333" font-size="10">Her ajan önceki çıktıyı alır · Uzmanlaşmış roller · Yüksek kalite</text>
+</svg>

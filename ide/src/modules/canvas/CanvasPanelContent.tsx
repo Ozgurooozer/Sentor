@@ -30,6 +30,9 @@ import { HeaderPanel } from "./HeaderPanel";
 import { InputPanel } from "./InputPanel";
 import { PipelinePanel } from "./PipelinePanel";
 import { SubCanvasContent } from "./SubCanvasContent";
+import { SketchPanel } from "./SketchPanel";
+import { NotePanel } from "./NotePanel";
+import { ToolPanel } from "./ToolPanel";
 import { webLayerManager } from "./webLayer/WebLayerManager";
 import { useAgentsStore } from "@/modules/ai/store/agentsStore";
 import type { Agent } from "@/modules/ai/lib/agents";
@@ -116,6 +119,23 @@ export function CanvasPanelContent({ panel }: { panel: CanvasPanelNode }) {
       return <GalleryPanel panel={panel} />;
     case "filebrowser":
       return <FileBrowserPanel panel={panel} />;
+    case "sketch":
+      return <SketchPanel />;
+    case "note":
+      return (
+        <NotePanel
+          panelId={panel.id}
+          initialText={(panel.meta?.text as string | undefined) ?? ""}
+        />
+      );
+    case "tool":
+      return (
+        <ToolPanel
+          toolName={(panel.meta?.toolName as string | undefined) ?? panel.title}
+          toolIcon={(panel.meta?.toolIcon as string | undefined) ?? "⚙"}
+          canvasId={(panel.meta?.canvasId as string | undefined)}
+        />
+      );
   }
 }
 
@@ -223,6 +243,7 @@ function CanvasEditor({ panel }: { panel: CanvasPanelNode }) {
 
 function CanvasPreview({ panel }: { panel: CanvasPanelNode }) {
   const updatePanel = useCanvasStore((s) => s.updatePanel);
+  const setOutputData = useCanvasStore((s) => s.setOutputData);
   const path = panel.meta?.path as string | undefined;
   const [input, setInput] = useState("");
   if (!path) {
@@ -249,6 +270,12 @@ function CanvasPreview({ panel }: { panel: CanvasPanelNode }) {
       className="h-full w-full border-0 bg-white"
       sandbox="allow-scripts allow-same-origin"
       title="Preview"
+      onLoad={(e) => {
+        try {
+          const text = e.currentTarget.contentDocument?.body?.innerText?.slice(0, 8000) ?? "";
+          if (text.trim()) setOutputData(panel.id, { kind: "text", value: text.trim() });
+        } catch { /* cross-origin */ }
+      }}
     />
   );
 }
@@ -292,6 +319,7 @@ function CanvasVaultHome({ panel }: { panel: CanvasPanelNode }) {
  */
 function CanvasInstance({ panel }: { panel: CanvasPanelNode }) {
   const updatePanel = useCanvasStore((s) => s.updatePanel);
+  const setOutputData = useCanvasStore((s) => s.setOutputData);
   const vaultRoot = ((panel.meta?.vaultRoot as string) || "").trim();
   const [inputRoot, setInputRoot] = useState(vaultRoot);
   const [inputName, setInputName] = useState("");
@@ -397,6 +425,12 @@ function CanvasInstance({ panel }: { panel: CanvasPanelNode }) {
         title={panel.title}
         className="min-h-0 flex-1 border-0"
         sandbox="allow-scripts allow-same-origin"
+        onLoad={(e) => {
+          try {
+            const text = e.currentTarget.contentDocument?.body?.innerText?.slice(0, 8000) ?? "";
+            if (text.trim()) setOutputData(panel.id, { kind: "text", value: text.trim() });
+          } catch { /* cross-origin */ }
+        }}
       />
     </div>
   );
