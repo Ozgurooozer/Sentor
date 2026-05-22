@@ -12,6 +12,10 @@ export type ProviderKeys = Record<ProviderId, string | null>;
 export const EMPTY_PROVIDER_KEYS: ProviderKeys = {
   lmstudio: null,
   ollama: null,
+  openai: null,
+  anthropic: null,
+  groq: null,
+  custom: null,
 };
 
 export async function getKey(provider: ProviderId): Promise<string | null> {

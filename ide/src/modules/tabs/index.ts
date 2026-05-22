@@ -14,5 +14,7 @@ export {
   type WebTab,
   type NavigableTab,
   type VaultHomeTab,
+  type AgentsOfficeTab,
+  type GraphTab,
 } from "./lib/useTabs";
 export { useWorkspaceCwd } from "./lib/useWorkspaceCwd";

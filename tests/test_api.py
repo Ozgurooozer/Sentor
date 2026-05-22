@@ -23,9 +23,10 @@ if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
         pass
 
 sys.path.insert(0, str(ROOT / 'api'))
+sys.path.insert(0, str(ROOT / 'tools'))
 
 try:
-    from server import _Handler
+    from server import _Handler, _API_TOKEN
 except ImportError as exc:
     print(f'\n  Cannot import server: {exc}')
     print('  Build api/server.py first.\n')
@@ -49,6 +50,7 @@ def _wait_ready(timeout: float = 5.0) -> bool:
     deadline = time.time() + timeout
     while time.time() < deadline:
         try:
+            # /api/categories is a public (no-auth) endpoint
             urllib.request.urlopen(f'{BASE}/api/categories', timeout=1)
             return True
         except Exception:
@@ -80,12 +82,25 @@ def test(name: str, fn) -> None:
 
 # ── HTTP helpers ───────────────────────────────────────────────────────────────
 
-def _get(path: str):
-    resp = urllib.request.urlopen(f'{BASE}{path}', timeout=5)
+def _get(path: str, auth: bool = True):
+    req = urllib.request.Request(f'{BASE}{path}')
+    if auth:
+        req.add_header('Authorization', f'Bearer {_API_TOKEN}')
+    resp = urllib.request.urlopen(req, timeout=5)
     assert resp.status == 200, f'HTTP {resp.status}'
-    assert resp.getheader('Access-Control-Allow-Origin') == '*', \
-        f'Missing CORS header on {path}'
+    cors = resp.getheader('Access-Control-Allow-Origin') or ''
+    assert cors != '', f'Missing CORS header on {path}'
     return json.loads(resp.read().decode('utf-8'))
+
+
+def _get_unauth(path: str) -> int:
+    """Expect a 401 for an unauthenticated request."""
+    req = urllib.request.Request(f'{BASE}{path}')
+    try:
+        urllib.request.urlopen(req, timeout=5)
+        return 200  # should not happen
+    except urllib.error.HTTPError as e:
+        return e.code
 
 
 def _get_error(path: str) -> tuple[int, dict]:
@@ -224,11 +239,26 @@ def test_cors_preflight():
 
 def test_cors_on_error():
     """CORS header must be present even on error responses."""
+    req = urllib.request.Request(f'{BASE}/api/page/x/y')
+    req.add_header('Authorization', f'Bearer {_API_TOKEN}')
     try:
-        urllib.request.urlopen(f'{BASE}/api/page/x/y', timeout=5)
+        urllib.request.urlopen(req, timeout=5)
     except urllib.error.HTTPError as exc:
         header = exc.headers.get('Access-Control-Allow-Origin')
-        assert header == '*', f'CORS header missing on 404 response (got {header!r})'
+        assert header, f'CORS header missing on error response (got {header!r})'
+
+
+def test_auth_required():
+    """Unauthenticated requests to protected endpoints must return 401."""
+    status = _get_unauth('/api/pages')
+    assert status == 401, f'Expected 401 for unauth request, got {status}'
+
+
+def test_public_path_no_auth():
+    """Public endpoints (categories) should work without a token."""
+    req = urllib.request.Request(f'{BASE}/api/categories')
+    resp = urllib.request.urlopen(req, timeout=5)
+    assert resp.status == 200, f'Expected 200 for public /api/categories without auth'
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
@@ -255,6 +285,8 @@ def main() -> None:
     test('GET /api/does-not-exist        404 + error body',              test_unknown_endpoint)
     test('OPTIONS /api/categories         204 CORS preflight',           test_cors_preflight)
     test('GET /api/page/x/y (error)      CORS header on error response', test_cors_on_error)
+    test('GET /api/pages (no auth)       401 Unauthorised',              test_auth_required)
+    test('GET /api/categories (no auth)  200 public endpoint',           test_public_path_no_auth)
 
     httpd.shutdown()
 

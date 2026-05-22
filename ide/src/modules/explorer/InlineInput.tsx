@@ -62,6 +62,7 @@ export function InlineInput({
 
   return (
     <input
+      name="explorer-rename"
       ref={ref}
       value={value}
       placeholder={placeholder}

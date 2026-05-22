@@ -14,6 +14,7 @@ import {
   useImperativeHandle,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import { Prec } from "@codemirror/state";
 import { vim } from "@replit/codemirror-vim";
@@ -23,6 +24,7 @@ import {
   vimCompartment,
 } from "./lib/extensions";
 import { initVimGlobals, vimHandlersExtension } from "./lib/vim";
+import { MermaidPreview } from "./MermaidPreview";
 
 initVimGlobals();
 import { resolveLanguage } from "./lib/languageResolver";
@@ -54,6 +56,14 @@ function formatBytes(n: number): string {
   return `${(n / 1024 / 1024).toFixed(1)} MB`;
 }
 
+const MERMAID_EXTS = new Set(["md", "mmd", "mermaid"]);
+const MERMAID_RE_CHECK = /```mermaid/;
+
+function isMermaidFile(path: string): boolean {
+  const ext = path.split(".").pop()?.toLowerCase() ?? "";
+  return MERMAID_EXTS.has(ext);
+}
+
 export const EditorPane = forwardRef<EditorPaneHandle, Props>(
   function EditorPane({ path, onDirtyChange, onSaved, onClose }, ref) {
     const { doc, onChange, save, reload } = useDocument({ path, onDirtyChange });
@@ -64,6 +74,12 @@ export const EditorPane = forwardRef<EditorPaneHandle, Props>(
     const vimMode = usePreferencesStore((s) => s.vimMode);
     const languageRef = useRef<string | null>(null);
     const themeExt = EDITOR_THEME_EXT[editorThemeId] ?? EDITOR_THEME_EXT.atomone;
+
+    const ext = path.split(".").pop()?.toLowerCase() ?? "";
+    const isMmd = ext === "mmd" || ext === "mermaid";
+    const canPreview = isMermaidFile(path);
+    const hasBlocks = isMmd || (doc.status === "ready" && MERMAID_RE_CHECK.test(doc.content));
+    const [previewOpen, setPreviewOpen] = useState(isMmd);
 
     // Stabilize save + onSaved via refs so the extensions array never changes
     // identity — a new identity makes @uiw/react-codemirror reconfigure the
@@ -233,28 +249,59 @@ export const EditorPane = forwardRef<EditorPaneHandle, Props>(
       );
     }
 
+    const showPreview = previewOpen && canPreview;
+
     return (
       <div className="flex h-full min-h-0 flex-col">
-        <CodeMirror
-          ref={cmRef}
-          value={doc.content}
-          onChange={onChange}
-          theme={themeExt}
-          extensions={extensions}
-          height="100%"
-          className="flex-1 min-h-0 overflow-hidden"
-          basicSetup={{
-            lineNumbers: true,
-            highlightActiveLineGutter: true,
-            foldGutter: true,
-            bracketMatching: true,
-            closeBrackets: true,
-            autocompletion: true,
-            highlightActiveLine: true,
-            highlightSelectionMatches: true,
-            searchKeymap: true,
-          }}
-        />
+        {/* Mermaid toggle — only for .md/.mmd files */}
+        {canPreview && (
+          <div className="flex shrink-0 items-center justify-end border-b border-[#1a1a1a] px-2 py-0.5">
+            <button
+              type="button"
+              onClick={() => setPreviewOpen((v) => !v)}
+              title={previewOpen ? "Hide diagram preview" : "Show diagram preview"}
+              className={`rounded px-2 py-0.5 text-[10px] transition-colors ${
+                previewOpen
+                  ? "bg-[#1a1a1a] text-[#5b8def]"
+                  : hasBlocks
+                    ? "text-[#555] hover:bg-[#1a1a1a] hover:text-[#888]"
+                    : "text-[#333] cursor-default"
+              }`}
+              disabled={!hasBlocks}
+            >
+              {isMmd ? "Diagram" : "Mermaid"} {previewOpen ? "▸" : "◂"}
+            </button>
+          </div>
+        )}
+
+        <div className={`flex min-h-0 flex-1 ${showPreview ? "flex-row" : ""}`}>
+          <CodeMirror
+            ref={cmRef}
+            value={doc.content}
+            onChange={onChange}
+            theme={themeExt}
+            extensions={extensions}
+            height="100%"
+            className={`min-h-0 overflow-hidden ${showPreview ? "w-1/2 border-r border-[#2a2a2a]" : "flex-1"}`}
+            basicSetup={{
+              lineNumbers: true,
+              highlightActiveLineGutter: true,
+              foldGutter: true,
+              bracketMatching: true,
+              closeBrackets: true,
+              autocompletion: true,
+              highlightActiveLine: true,
+              highlightSelectionMatches: true,
+              searchKeymap: true,
+            }}
+          />
+
+          {showPreview && (
+            <div className="min-h-0 w-1/2 overflow-hidden">
+              <MermaidPreview content={doc.content} isMmd={isMmd} />
+            </div>
+          )}
+        </div>
       </div>
     );
   },

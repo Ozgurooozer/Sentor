@@ -20,10 +20,14 @@ export type ShortcutId =
   | "explorer.search"
   | "ai.toggle"
   | "ai.askSelection"
+  | "ai.switchAgent"
   | "shortcuts.open"
   | "settings.open"
   | "sidebar.toggle"
-  | "tab.vaultHome";
+  | "tab.vaultHome"
+  | "layout.toggleFocused"
+  | "layout.toggleClickThrough"
+  | "graph.open";
 
 export type ShortcutGroup =
   | "General"
@@ -152,6 +156,12 @@ export const SHORTCUTS: Shortcut[] = [
     defaultBindings: [{ [MOD_PROP]: true, key: "l" }],
   },
   {
+    id: "ai.switchAgent",
+    label: "Switch agent",
+    group: "AI",
+    defaultBindings: [{ ctrl: true, shift: true, key: "a" }],
+  },
+  {
     id: "sidebar.toggle",
     label: "Toggle file explorer",
     group: "View",
@@ -162,6 +172,24 @@ export const SHORTCUTS: Shortcut[] = [
     label: "Open Vault Home",
     group: "Tabs",
     defaultBindings: [{ [MOD_PROP]: true, shift: true, key: "h" }],
+  },
+  {
+    id: "layout.toggleFocused",
+    label: "Toggle focused overlay mode",
+    group: "View",
+    defaultBindings: [{ ctrl: true, alt: true, key: "f" }],
+  },
+  {
+    id: "layout.toggleClickThrough",
+    label: "Toggle desktop click-through",
+    group: "View",
+    defaultBindings: [{ ctrl: true, alt: true, key: "p" }],
+  },
+  {
+    id: "graph.open",
+    label: "Open knowledge graph",
+    group: "View",
+    defaultBindings: [{ ctrl: true, shift: true, key: "g" }],
   },
 ];
 

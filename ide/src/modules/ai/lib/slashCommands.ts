@@ -43,6 +43,30 @@ export const SLASH_COMMANDS: Record<string, SlashCommandMeta> = {
     label: "Plan mode",
     icon: CheckListIcon,
   },
+  decision: {
+    name: "decision",
+    invocation: "/decision",
+    label: "Log a decision",
+    icon: CheckListIcon,
+  },
+  meeting: {
+    name: "meeting",
+    invocation: "/meeting",
+    label: "Log meeting notes",
+    icon: SparklesIcon,
+  },
+  search: {
+    name: "search",
+    invocation: "/search",
+    label: "Search vault",
+    icon: SparklesIcon,
+  },
+  voice: {
+    name: "voice",
+    invocation: "/voice",
+    label: "Voice note to vault",
+    icon: SparklesIcon,
+  },
 };
 
 export const ATLAS_CMD_RE =
@@ -52,7 +76,7 @@ export function wrapWithCommandMarker(prompt: string, name: string): string {
   return `<atlas-command name="${name}" />\n\n${prompt}`;
 }
 
-export function tryRunSlashCommand(input: string): SlashOutcome {
+export async function tryRunSlashCommand(input: string): Promise<SlashOutcome> {
   const trimmed = input.trim();
   const lead = trimmed[0];
   if (lead !== "/" && lead !== "#") return { kind: "none" };
@@ -79,6 +103,64 @@ export function tryRunSlashCommand(input: string): SlashOutcome {
         kind: "send-prompt",
         prompt: INIT_PROMPT,
         commandName: "init",
+      };
+    }
+    case "decision": {
+      if (!tail) return { kind: "none" };
+      const { useAgentsStore } = await import("@/modules/ai/store/agentsStore");
+      const { invoke } = await import("@tauri-apps/api/core");
+      const activeId = useAgentsStore.getState().activeId;
+      const slug = activeId.startsWith("builtin:")
+        ? activeId.slice("builtin:".length)
+        : activeId;
+      try {
+        await invoke("vault_agent_log", { slug, event: "decision", msg: tail });
+        return { kind: "handled", toast: `Decision logged to ${slug} office` };
+      } catch {
+        // Agent office not set up — fall back to AI prompt
+        return {
+          kind: "send-prompt",
+          prompt: `Log this decision to my vault agent office by calling vault_agent_log(event="decision", msg="${tail.replace(/"/g, '\\"')}"). Confirm when done with a single line.`,
+          commandName: "decision",
+        };
+      }
+    }
+    case "meeting": {
+      const topic = tail || "Untitled meeting";
+      const today = new Date().toISOString().split("T")[0];
+      return {
+        kind: "send-prompt",
+        prompt: `MEETING — ${topic} (${today})
+
+1. Call vault_agent_log(event="meeting", msg="Meeting: ${topic}") to record this session.
+2. Create a vault page at meetings/{slug} capturing: date, attendees (ask if unknown), agenda items, key decisions, and action items.
+3. Reply with "Meeting saved to vault/meetings/{slug}."`,
+        commandName: "meeting",
+      };
+    }
+    case "search": {
+      if (!tail) return { kind: "none" };
+      return {
+        kind: "send-prompt",
+        prompt: `vault_search("${tail.replace(/"/g, '\\"')}") — call vault_search with this query, then list the top results as a concise markdown table: | Title | Category | Score | Snippet |. No preamble, no commentary. Just the table.`,
+        commandName: "search",
+      };
+    }
+    case "voice": {
+      if (!tail) return { kind: "none" };
+      const { useAgentsStore } = await import("@/modules/ai/store/agentsStore");
+      useAgentsStore.getState().setActiveId("builtin:atlas-maker");
+      return {
+        kind: "send-prompt",
+        prompt: `Create a vault page from this voice note:
+
+"${tail.replace(/"/g, '\\"')}"
+
+1. Call vault_search to check if a related page already exists.
+2. Infer a suitable title and category from the content.
+3. Write a complete vault HTML page with vault_write.
+4. Reply with "Saved to vault/{category}/{slug}".`,
+        commandName: "voice",
       };
     }
     default:

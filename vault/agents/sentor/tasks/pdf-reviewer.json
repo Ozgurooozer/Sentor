@@ -1,0 +1,17 @@
+{
+  "id": "pdf-reviewer",
+  "name": "PDF Reviewer",
+  "description": "Bir PDF / belge metnini özetler, anahtar noktaları çıkarır.",
+  "type": "single",
+  "provider": "local-ollama",
+  "model": "",
+  "context_tokens": 8192,
+  "vault_scope": "vault/projects/",
+  "permissions": ["vault:read", "file:read", "notify:send"],
+  "tools": ["vault_read", "file_read", "notify"],
+  "prompt": "Sana verilen belgeyi oku. Şu çıktıyı üret:\n1. Bir cümlelik özet\n2. 3-5 anahtar nokta (bullet)\n3. Eksik / belirsiz görünen noktalar\nKısa ve net yaz.",
+  "on_done": "notify",
+  "on_error": "notify",
+  "retry_count": 3,
+  "created_at": "2026-05-20T11:00:00Z"
+}

@@ -1,51 +1,103 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Link01Icon, AiViewIcon } from "@hugeicons/core-free-icons";
+import { AiViewIcon, Link01Icon } from "@hugeicons/core-free-icons";
 
-export function BacklinkPanel({ noteId }: { noteId: string }) {
-  const [backlinks, setBacklinks] = useState<{ title: string; path: string }[]>([]);
-  const [similarNotes, setSimilarNotes] = useState<{ title: string; score: number }[]>([]);
+type BacklinkItem = { id: string; title: string; type?: string; url?: string };
+type SimilarItem = { id: string; title: string; score: number };
+
+export function BacklinkPanel({
+  noteId,
+  onNavigate,
+}: {
+  noteId: string;
+  onNavigate?: (id: string) => void;
+}) {
+  const [backlinks, setBacklinks] = useState<BacklinkItem[]>([]);
+  const [similar, setSimilar] = useState<SimilarItem[]>([]);
+
+  const load = () => {
+    if (!noteId) return;
+    void invoke<BacklinkItem[]>("vault_get_backlinks", { noteId }).then(setBacklinks);
+    void invoke<SimilarItem[]>("vault_get_similar_notes", { noteId }).then(setSimilar);
+  };
 
   useEffect(() => {
-    if (!noteId) return;
-    // Backlinkleri getir
-    void invoke("vault_get_backlinks", { noteId }).then((res: any) => setBacklinks(res));
-    // Benzer notları getir (Semantik Arama)
-    void invoke("vault_get_similar_notes", { noteId }).then((res: any) => setSimilarNotes(res));
+    setBacklinks([]);
+    setSimilar([]);
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [noteId]);
+
+  useEffect(() => {
+    const unsub = listen("vault:reindexed", load);
+    return () => { void unsub.then((fn) => fn()); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [noteId]);
 
   return (
-    <div className="flex flex-col h-full border-l border-border bg-card/50 overflow-y-auto p-4 gap-6">
+    <div className="flex h-full flex-col overflow-y-auto border-l border-[#2a2a2a] bg-[#0a0a0a] px-3 py-3 gap-5">
       <section>
-        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
-          <HugeiconsIcon icon={Link01Icon} size={12} />
+        <div className="mb-2 flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-[#555]">
+          <HugeiconsIcon icon={Link01Icon} size={11} strokeWidth={1.75} />
           Backlinks
-        </h3>
-        <div className="flex flex-col gap-1">
-          {backlinks.length > 0 ? backlinks.map(link => (
-            <button key={link.path} className="text-[12px] text-left hover:underline truncate">
-              {link.title}
-            </button>
-          )) : <span className="text-[11px] text-muted-foreground italic">No backlinks found</span>}
+          {backlinks.length > 0 && (
+            <span className="ml-auto text-[#444]">{backlinks.length}</span>
+          )}
         </div>
+        {backlinks.length === 0 ? (
+          <span className="text-[11px] italic text-[#444]">No backlinks</span>
+        ) : (
+          <div className="flex flex-col gap-0.5">
+            {backlinks.map((link) => (
+              <button
+                key={link.id}
+                type="button"
+                onClick={() => onNavigate?.(link.id)}
+                className="truncate rounded px-1 py-0.5 text-left text-[11px] text-[#888] hover:bg-[#1a1a1a] hover:text-[#f5f5f5]"
+                title={link.id}
+              >
+                {link.title || link.id}
+              </button>
+            ))}
+          </div>
+        )}
       </section>
 
       <section>
-        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
-          <HugeiconsIcon icon={AiViewIcon} size={12} />
-          Similar Notes (AI)
-        </h3>
-        <div className="flex flex-col gap-2">
-          {similarNotes.map(note => (
-            <div key={note.title} className="flex flex-col gap-1">
-              <span className="text-[12px] truncate">{note.title}</span>
-              <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-primary" style={{ width: `${note.score * 100}%` }} />
-              </div>
-            </div>
-          ))}
+        <div className="mb-2 flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-[#555]">
+          <HugeiconsIcon icon={AiViewIcon} size={11} strokeWidth={1.75} />
+          Similar
+          {similar.length > 0 && (
+            <span className="ml-auto text-[#444]">{similar.length}</span>
+          )}
         </div>
+        {similar.length === 0 ? (
+          <span className="text-[11px] italic text-[#444]">No embeddings yet</span>
+        ) : (
+          <div className="flex flex-col gap-1.5">
+            {similar.map((note) => (
+              <button
+                key={note.id}
+                type="button"
+                onClick={() => onNavigate?.(note.id)}
+                className="flex flex-col gap-0.5 rounded px-1 py-0.5 text-left hover:bg-[#1a1a1a]"
+                title={`${note.id} (${(note.score * 100).toFixed(0)}%)`}
+              >
+                <span className="truncate text-[11px] text-[#888] hover:text-[#f5f5f5]">
+                  {note.title || note.id}
+                </span>
+                <div className="h-0.5 w-full overflow-hidden rounded-full bg-[#1a1a1a]">
+                  <div
+                    className="h-full rounded-full bg-[#5b8def]"
+                    style={{ width: `${Math.min(note.score * 100, 100)}%` }}
+                  />
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

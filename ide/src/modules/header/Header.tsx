@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { WindowControls } from "@/components/WindowControls";
 import { IS_MAC, KEY_SEP, USE_CUSTOM_WINDOW_CONTROLS } from "@/lib/platform";
+import { useAgentsStore } from "@/modules/ai/store/agentsStore";
+import { AGENT_ICONS } from "@/modules/ai/components/AgentSwitcher";
 import { usePreferencesStore } from "@/modules/settings/preferences";
 import {
   getBindingTokens,
@@ -20,8 +22,11 @@ import {
   KeyboardIcon,
   LayoutTwoColumnIcon,
   LayoutTwoRowIcon,
+  Maximize01Icon,
+  NodeEditIcon,
   Settings01Icon,
   SidebarLeftIcon,
+  SparklesIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
@@ -40,6 +45,7 @@ type Props = {
   onNewEditor: () => void;
   onNewBrowser?: () => void;
   onNewVaultHome?: () => void;
+  onNewSentor?: () => void;
   onClose: (id: number) => void;
   /** Promote a preview (transient) tab to persistent. */
   onPin: (id: number) => void;
@@ -49,6 +55,10 @@ type Props = {
   canSplit: boolean;
   onOpenShortcuts: () => void;
   onOpenSettings: () => void;
+  onEnterFocusedMode: () => void;
+  onOpenAgentSwitcher?: () => void;
+  onOpenGraph?: () => void;
+  onOpenLauncher?: () => void;
   searchTarget: SearchTarget;
   searchRef: RefObject<SearchInlineHandle | null>;
 };
@@ -64,6 +74,7 @@ export function Header({
   onNewEditor,
   onNewBrowser,
   onNewVaultHome,
+  onNewSentor,
   onClose,
   onPin,
   onToggleSidebar,
@@ -71,12 +82,20 @@ export function Header({
   canSplit,
   onOpenShortcuts,
   onOpenSettings,
+  onEnterFocusedMode,
+  onOpenAgentSwitcher,
+  onOpenGraph,
+  onOpenLauncher,
   searchTarget,
   searchRef,
 }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [compact, setCompact] = useState(false);
   const userShortcuts = usePreferencesStore((s) => s.shortcuts);
+  const activeAgentId = useAgentsStore((s) => s.activeId);
+  const allAgents = useAgentsStore.getState().all();
+  const activeAgent = allAgents.find((a) => a.id === activeAgentId) ?? allAgents[0];
+  const AgentIcon = activeAgent ? (AGENT_ICONS[activeAgent.icon] ?? SparklesIcon) : SparklesIcon;
 
   const tokensFor = (id: ShortcutId): string => {
     const s = SHORTCUTS.find((s) => s.id === id);
@@ -127,6 +146,54 @@ export function Header({
       title="Settings"
     >
       <HugeiconsIcon icon={Settings01Icon} size={15} strokeWidth={1.75} />
+    </Button>
+  );
+
+  const agentButton = onOpenAgentSwitcher ? (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="size-7 shrink-0 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+      onClick={onOpenAgentSwitcher}
+      title={`Agent: ${activeAgent?.name ?? "Switch agent"} (Ctrl+Shift+A)`}
+    >
+      <HugeiconsIcon icon={AgentIcon} size={15} strokeWidth={1.75} />
+    </Button>
+  ) : null;
+
+  const graphButton = onOpenGraph ? (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="size-7 shrink-0 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+      onClick={onOpenGraph}
+      title={`Knowledge graph (${tokensFor("graph.open") || "Ctrl+Shift+G"})`}
+    >
+      <HugeiconsIcon icon={NodeEditIcon} size={15} strokeWidth={1.75} />
+    </Button>
+  ) : null;
+
+  const launcherButton = onOpenLauncher ? (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="size-7 shrink-0 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+      onClick={onOpenLauncher}
+      title="Workspace seç / Başlangıç ekranı"
+    >
+      <span className="text-[13px] leading-none">⊞</span>
+    </Button>
+  ) : null;
+
+  const focusedModeButton = (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="size-7 shrink-0 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+      onClick={onEnterFocusedMode}
+      title={`Enter focused overlay mode (${tokensFor("layout.toggleFocused") || "Ctrl+Alt+F"})`}
+    >
+      <HugeiconsIcon icon={Maximize01Icon} size={15} strokeWidth={1.75} />
     </Button>
   );
 
@@ -211,6 +278,7 @@ export function Header({
           onNewEditor={onNewEditor}
           onNewBrowser={onNewBrowser}
           onNewVaultHome={onNewVaultHome}
+          onNewSentor={onNewSentor}
           onClose={onClose}
           onPin={onPin}
           compact={compact}
@@ -222,12 +290,24 @@ export function Header({
 
       {IS_MAC && (
         <>
+          {graphButton}
+          {agentButton}
+          {launcherButton}
+          {focusedModeButton}
           {shortcutsButton}
           {settingsButton}
         </>
       )}
 
-      {!IS_MAC && settingsButton}
+      {!IS_MAC && (
+        <>
+          {graphButton}
+          {agentButton}
+          {launcherButton}
+          {focusedModeButton}
+          {settingsButton}
+        </>
+      )}
 
       {USE_CUSTOM_WINDOW_CONTROLS && (
         <>

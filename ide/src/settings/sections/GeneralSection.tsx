@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,9 +15,12 @@ import {
   EDITOR_THEMES,
   setAutostart,
   setEditorTheme,
+  setLayoutMode,
   setRestoreWindowState,
+  setSentorPath,
   setVimMode,
   type EditorThemeId,
+  type LayoutMode,
 } from "@/modules/settings/store";
 import { useTheme } from "@/modules/theme";
 import {
@@ -27,7 +31,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SectionHeader } from "../components/SectionHeader";
 import { SettingRow } from "../components/SettingRow";
 
@@ -41,12 +45,30 @@ const APPEARANCE: {
   { id: "dark", label: "Dark", icon: Moon02Icon },
 ];
 
+const LAYOUTS: { id: LayoutMode; label: string; description: string }[] = [
+  {
+    id: "classic",
+    label: "Classic",
+    description: "Tabbed IDE with file explorer and chat panel.",
+  },
+  {
+    id: "focused",
+    label: "Focused",
+    description:
+      "Terminal strip + dedicated chat center. Click-through is Windows-only — other platforms show the overlay without desktop pass-through.",
+  },
+];
+
 export function GeneralSection() {
   const { theme, setTheme } = useTheme();
   const editorTheme = usePreferencesStore((s) => s.editorTheme);
   const autostart = usePreferencesStore((s) => s.autostart);
   const restoreWindowState = usePreferencesStore((s) => s.restoreWindowState);
   const vimMode = usePreferencesStore((s) => s.vimMode);
+  const layoutMode = usePreferencesStore((s) => s.layoutMode);
+  const sentorPathPref = usePreferencesStore((s) => s.sentorPath);
+  const [sentorPathDraft, setSentorPathDraft] = useState(sentorPathPref);
+  useEffect(() => { setSentorPathDraft(sentorPathPref); }, [sentorPathPref]);
 
   // Reconcile autostart pref with the actual OS state on mount — the user may
   // have toggled it from System Settings.
@@ -107,6 +129,28 @@ export function GeneralSection() {
       </div>
 
       <div className="flex flex-col gap-2">
+        <Label>Layout</Label>
+        <div className="grid grid-cols-2 gap-2">
+          {LAYOUTS.map((o) => (
+            <button
+              key={o.id}
+              type="button"
+              onClick={() => void setLayoutMode(o.id)}
+              className={cn(
+                "flex flex-col items-start gap-1 rounded-lg border bg-card px-3 py-2.5 text-left transition-all",
+                layoutMode === o.id
+                  ? "border-foreground/60 ring-1 ring-foreground/20"
+                  : "border-border/60 hover:border-border",
+              )}
+            >
+              <span className="text-[12px] font-medium">{o.label}</span>
+              <span className="text-[10.5px] text-muted-foreground leading-relaxed">{o.description}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
         <Label>Editor theme</Label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -145,6 +189,22 @@ export function GeneralSection() {
           <Switch
             checked={vimMode}
             onCheckedChange={(v) => void setVimMode(v)}
+          />
+        </SettingRow>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label>Sentor</Label>
+        <SettingRow
+          title="Sentor path"
+          description="Absolute path to modules/Flowise-flowise-3.1.2. Required to auto-start Sentor from the IDE."
+        >
+          <Input
+            value={sentorPathDraft}
+            onChange={(e) => setSentorPathDraft(e.target.value)}
+            onBlur={() => void setSentorPath(sentorPathDraft.trim())}
+            placeholder="C:\Atlas OS\modules\Flowise-flowise-3.1.2"
+            className="h-7 w-72 font-mono text-[11px]"
           />
         </SettingRow>
       </div>

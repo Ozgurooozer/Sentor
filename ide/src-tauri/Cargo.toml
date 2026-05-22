@@ -18,7 +18,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = ["protocol-asset", "unstable"] }
+tauri = { version = "2", features = ["protocol-asset", "unstable", "tray-icon"] }
 tauri-plugin-opener = "2"
 tauri-plugin-dialog = "2"
 tokio = { version = "1", features = ["sync"] }
@@ -46,9 +46,10 @@ urlencoding = "2"
 rusqlite = { version = "0.31", features = ["bundled"] }
 chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1.8", features = ["v4", "serde"] }
-ort = "2.0.0-rc.9" # ONNX Runtime for local embeddings
+ort = { version = "2.0.0-rc.9", features = ["tls-rustls"] } # ort-sys's download-binaries needs an explicit TLS provider since rc.10+ (ureq 3 split tls behind a feature)
 ndarray = "0.15"
 tokenizers = "0.19"
+notify = { version = "6", default-features = false, features = ["macos_kqueue"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 keyring = { version = "3.6", default-features = false, features = [
@@ -64,7 +65,10 @@ windows-sys = { version = "0.59", features = [
 	"Win32_Security",
 	"Win32_System_JobObjects",
 	"Win32_System_Threading",
+	"Win32_UI_WindowsAndMessaging",
+	"Win32_Graphics_Gdi",
 ] }
+raw-window-handle = "0.6"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-autostart = "2"
@@ -78,5 +82,5 @@ incremental = true
 codegen-units = 1
 lto = "fat"
 opt-level = "s"
-panic = "abort"
+panic = "unwind"
 strip = true

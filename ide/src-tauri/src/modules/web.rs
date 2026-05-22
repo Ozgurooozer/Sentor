@@ -16,6 +16,8 @@ pub struct FetchResult {
     pub title: Option<String>,
     pub text: String,
     pub html_len: usize,
+    /// True when the extracted text exceeded 50 KB and was cut off.
+    pub truncated: bool,
 }
 
 fn make_client() -> Result<Client, String> {
@@ -121,10 +123,11 @@ pub async fn web_fetch(url: String) -> Result<FetchResult, String> {
     }
     let text: String = text.split_whitespace().collect::<Vec<_>>().join(" ");
     const MAX: usize = 50_000;
-    let text = if text.len() > MAX {
+    let truncated = text.len() > MAX;
+    let text = if truncated {
         format!("{}…", &text[..MAX])
     } else {
         text
     };
-    Ok(FetchResult { url: final_url, title, text, html_len })
+    Ok(FetchResult { url: final_url, title, text, html_len, truncated })
 }

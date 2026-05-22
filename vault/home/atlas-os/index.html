@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas OS — Complete Reference</title>
+  <meta name="description" content="Atlas OS: local-first knowledge base, AI IDE, web browser, canvas workspace. Complete feature reference.">
+  <meta name="created" content="2026-05-18">
+  <meta name="updated" content="2026-05-20">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0a0a;
+      --surface:  #111111;
+      --elevated: #1a1a1a;
+      --overlay:  #222222;
+      --subtle:   #2a2a2a;
+      --mid:      #404040;
+      --ink:      #f5f5f5;
+      --dim:      #888888;
+      --muted:    #555555;
+      --accent:   #5b8def;
+      --accent-h: #4a7de0;
+      --green:    #4caf7d;
+      --amber:    #d4a853;
+      --purple:   #8b7ed8;
+      --pink:     #c27098;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code {
+      font-family: ui-monospace, monospace;
+      font-size: .82em;
+      color: var(--accent);
+      background: var(--elevated);
+      padding: .1rem .35rem;
+      border-radius: 3px;
+      border: 1px solid var(--subtle);
+    }
+    kbd {
+      font-family: ui-monospace, monospace;
+      font-size: .78em;
+      color: var(--ink);
+      background: var(--elevated);
+      border: 1px solid var(--mid);
+      border-radius: 4px;
+      padding: .15rem .45rem;
+      white-space: nowrap;
+    }
+
+    /* ── topbar ──────────────────────────────────────────────── */
+
+    .topbar {
+      border-bottom: 1px solid var(--subtle);
+      padding: .75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 100;
+      gap: 1rem;
+    }
+    .logo { font-size: .88rem; font-weight: 700; letter-spacing: .1em; color: var(--accent); flex-shrink: 0; }
+    .nav {
+      display: flex;
+      gap: .25rem;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+    .nav a {
+      font-size: .78rem;
+      color: var(--dim);
+      text-decoration: none;
+      padding: .3rem .7rem;
+      border-radius: 5px;
+      transition: color 150ms ease-out, background 150ms ease-out;
+    }
+    .nav a:hover, .nav a.active { color: var(--ink); background: var(--elevated); }
+    .nav-cta {
+      font-size: .78rem;
+      font-weight: 500;
+      padding: .3rem .8rem;
+      background: var(--accent);
+      color: #fff !important;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background 150ms ease-out;
+      flex-shrink: 0;
+    }
+    .nav-cta:hover { background: var(--accent-h) !important; text-decoration: none; }
+
+    /* ── layout ──────────────────────────────────────────────── */
+
+    .wrap { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
+    section { padding: 4rem 0; border-bottom: 1px solid var(--subtle); }
+    section:last-of-type { border-bottom: none; }
+
+    .eyebrow {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: .6rem;
+    }
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: .5rem;
+    }
+    .section-sub {
+      color: var(--dim);
+      font-size: .9rem;
+      max-width: 600px;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    /* ── hero ────────────────────────────────────────────────── */
+
+    .hero { padding: 5rem 0 4.5rem; border-bottom: 1px solid var(--subtle); }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid rgba(91,141,239,.3);
+      background: rgba(91,141,239,.07);
+      border-radius: 4px;
+      padding: .2rem .7rem;
+      margin-bottom: 1.4rem;
+    }
+    .hero h1 {
+      font-size: clamp(1.9rem, 5vw, 3.1rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      margin-bottom: 1rem;
+    }
+    .hero h1 em { font-style: normal; color: var(--dim); }
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--dim);
+      max-width: 560px;
+      line-height: 1.75;
+      margin-bottom: 2rem;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      margin-bottom: 2rem;
+    }
+    .pill {
+      font-size: .75rem;
+      padding: .25rem .65rem;
+      border-radius: 99px;
+      border: 1px solid var(--subtle);
+      color: var(--dim);
+    }
+    .pill-accent { border-color: rgba(91,141,239,.35); color: var(--accent); background: rgba(91,141,239,.07); }
+    .pill-green  { border-color: rgba(76,175,125,.35); color: var(--green);  background: rgba(76,175,125,.07); }
+    .pill-amber  { border-color: rgba(212,168,83,.35);  color: var(--amber);  background: rgba(212,168,83,.07); }
+    .btn-row { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+    .btn {
+      display: inline-block;
+      padding: .55rem 1.2rem;
+      border-radius: 6px;
+      font-size: .85rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out;
+      border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-h); text-decoration: none; }
+    .btn-ghost { background: transparent; color: var(--dim); border-color: var(--subtle); }
+    .btn-ghost:hover { border-color: var(--mid); color: var(--ink); text-decoration: none; }
+
+    /* ── pillar cards ────────────────────────────────────────── */
+
+    .pillars {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 1px;
+      background: var(--subtle);
+      border: 1px solid var(--subtle);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .pillar { background: var(--surface); padding: 1.6rem 1.4rem; }
+    .pillar-icon { font-size: 1.3rem; margin-bottom: .85rem; display: block; }
+    .pillar h3 { font-size: .92rem; font-weight: 600; margin-bottom: .35rem; }
+    .pillar p { font-size: .8rem; color: var(--dim); line-height: 1.6; }
+
+    /* ── tab switcher ────────────────────────────────────────── */
+
+    .tabs {
+      display: flex;
+      gap: 2px;
+      border-bottom: 1px solid var(--subtle);
+      margin-bottom: 2rem;
+      overflow-x: auto;
+      padding-bottom: 1px;
+    }
+    .tab-btn {
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--dim);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: .55rem 1rem;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: color 150ms ease-out, border-color 150ms ease-out;
+    }
+    .tab-btn:hover { color: var(--ink); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── feature grid ────────────────────────────────────────── */
+
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: .5rem;
+    }
+    .feat {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: 6px;
+      padding: 1rem 1.1rem;
+      transition: border-color 150ms ease-out;
+    }
+    .feat:hover { border-color: var(--mid); }
+    .feat-head {
+      font-size: .85rem;
+      font-weight: 600;
+      margin-bottom: .3rem;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .feat p { font-size: .78rem; color: var(--dim); line-height: 1.55; }
+    .feat-icon { font-size: .9rem; }
+
+    /* ── category header ─────────────────────────────────────── */
+
+    .cat-header {
+      display: flex;
+      align-items: baseline;
+      gap: .75rem;
+      margin-bottom: 1.25rem;
+    }
+    .cat-title { font-size: 1.05rem; font-weight: 700; }
+    .cat-desc { font-size: .82rem; color: var(--dim); }
+
+    /* ── agent cards ─────────────────────────────────────────── */
+
+    .agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .5rem; }
+    .agent { background: var(--surface); border: 1px solid var(--subtle); border-radius: 6px; padding: 1rem 1.1rem; transition: border-color 150ms ease-out; }
+    .agent:hover { border-color: var(--mid); }
+    .agent-name { font-size: .9rem; font-weight: 600; margin-bottom: .2rem; }
+    .agent-id {
+      font-size: .68rem;
+      color: var(--accent);
+      background: rgba(91,141,239,.1);
+      border: 1px solid rgba(91,141,239,.2);
+      border-radius: 3px;
+      padding: .1rem .4rem;
+      margin-bottom: .55rem;
+      font-family: ui-monospace, monospace;
+      display: inline-block;
+    }
+    .agent p { font-size: .78rem; color: var(--dim); line-height: 1.5; }
+    .agent-tools { margin-top: .6rem; display: flex; flex-wrap: wrap; gap: .25rem; }
+    .agent-tool {
+      font-size: .65rem;
+      padding: .1rem .4rem;
+      border-radius: 3px;
+      background: var(--elevated);
+      border: 1px solid var(--subtle);
+      color: var(--muted);
+      font-family: ui-monospace, monospace;
+    }
+
+    /* ── slash command table ─────────────────────────────────── */
+
+    .cmd-list { display: flex; flex-direction: column; gap: .4rem; }
+    .cmd-row {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: 6px;
+      padding: .9rem 1.2rem;
+      display: grid;
+      grid-template-columns: 12rem 1fr;
+      gap: 1rem;
+      align-items: start;
+      transition: border-color 150ms ease-out;
+    }
+    .cmd-row:hover { border-color: var(--mid); }
+    .cmd-name {
+      font-family: ui-monospace, monospace;
+      font-size: .82rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .cmd-desc { font-size: .82rem; color: var(--dim); line-height: 1.5; }
+    .cmd-ex { font-size: .75rem; color: var(--muted); margin-top: .25rem; font-family: ui-monospace, monospace; }
+
+    /* ── keyboard shortcut table ─────────────────────────────── */
+
+    .shortcut-filter {
+      width: 100%;
+      max-width: 320px;
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: 6px;
+      padding: .5rem .85rem;
+      color: var(--ink);
+      font-size: .85rem;
+      margin-bottom: 1rem;
+      outline: none;
+      transition: border-color 150ms ease-out;
+    }
+    .shortcut-filter:focus { border-color: var(--accent); }
+    .shortcut-filter::placeholder { color: var(--muted); }
+    .shortcut-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+    .shortcut-table thead tr { border-bottom: 1px solid var(--mid); }
+    .shortcut-table th { text-align: left; padding: .5rem .75rem; color: var(--muted); font-weight: 500; font-size: .75rem; }
+    .shortcut-table td { padding: .55rem .75rem; border-bottom: 1px solid var(--subtle); color: var(--dim); }
+    .shortcut-table tr:last-child td { border-bottom: none; }
+    .shortcut-table td:first-child { color: var(--ink); font-weight: 500; }
+    .shortcut-table .sc-cat {
+      font-size: .65rem;
+      padding: .1rem .4rem;
+      border-radius: 3px;
+      background: var(--elevated);
+      border: 1px solid var(--subtle);
+      color: var(--muted);
+    }
+    .shortcut-row.hidden { display: none; }
+
+    /* ── canvas panel grid ───────────────────────────────────── */
+
+    .panel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: .4rem; }
+    .panel-card {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: 6px;
+      padding: .85rem 1rem;
+      transition: border-color 150ms ease-out;
+    }
+    .panel-card:hover { border-color: var(--mid); }
+    .panel-type { font-size: .7rem; font-family: ui-monospace, monospace; color: var(--accent); margin-bottom: .3rem; }
+    .panel-card h4 { font-size: .85rem; font-weight: 600; margin-bottom: .2rem; }
+    .panel-card p { font-size: .75rem; color: var(--dim); line-height: 1.5; }
+
+    /* ── stack table ─────────────────────────────────────────── */
+
+    .stack-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+    .stack-table th { text-align: left; padding: .45rem .75rem; color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--mid); }
+    .stack-table td { padding: .5rem .75rem; border-bottom: 1px solid var(--subtle); vertical-align: top; }
+    .stack-table tr:last-child td { border-bottom: none; }
+    .stack-table .layer { font-size: .75rem; font-weight: 600; color: var(--dim); }
+
+    /* ── quick start ─────────────────────────────────────────── */
+
+    .steps { display: flex; flex-direction: column; gap: .4rem; counter-reset: step; }
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: 6px;
+      padding: .9rem 1.2rem;
+      display: grid;
+      grid-template-columns: 1.8rem 1fr auto;
+      gap: .9rem;
+      align-items: center;
+    }
+    .step-n { font-size: .75rem; font-weight: 700; color: var(--muted); font-family: ui-monospace, monospace; }
+    .step p { font-size: .83rem; color: var(--dim); }
+    .step p strong { color: var(--ink); font-weight: 500; }
+    .step-cmd {
+      font-family: ui-monospace, monospace;
+      font-size: .76rem;
+      color: var(--accent);
+      background: var(--elevated);
+      border: 1px solid var(--subtle);
+      border-radius: 4px;
+      padding: .25rem .65rem;
+      white-space: nowrap;
+    }
+
+    /* ── flow diagram ────────────────────────────────────────── */
+
+    .flow {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: 8px;
+      padding: 1.5rem 1.75rem;
+      font-family: ui-monospace, monospace;
+      font-size: .78rem;
+      color: var(--dim);
+      line-height: 1.9;
+      overflow-x: auto;
+    }
+    .flow .hi { color: var(--accent); }
+    .flow .lo { color: var(--muted); }
+    .flow .gr { color: var(--green); }
+
+    /* ── principle grid ──────────────────────────────────────── */
+
+    .principles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .5rem; }
+    .principle { padding: 1rem 1.1rem; border: 1px solid var(--subtle); border-radius: 6px; }
+    .principle h4 { font-size: .85rem; font-weight: 600; margin-bottom: .3rem; }
+    .principle p { font-size: .78rem; color: var(--dim); line-height: 1.5; }
+
+    /* ── info row ────────────────────────────────────────────── */
+
+    .info-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    @media (max-width: 600px) { .info-row { grid-template-columns: 1fr; } }
+    .info-box {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: 6px;
+      padding: 1.1rem 1.25rem;
+    }
+    .info-box h4 { font-size: .85rem; font-weight: 600; margin-bottom: .5rem; }
+    .info-box ul { list-style: none; }
+    .info-box li { font-size: .8rem; color: var(--dim); line-height: 1.7; }
+    .info-box li::before { content: "→ "; color: var(--accent); }
+
+    /* ── badge ───────────────────────────────────────────────── */
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: .66rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: .15rem .5rem;
+      border-radius: 3px;
+      vertical-align: middle;
+    }
+    .badge-new  { background: rgba(76,175,125,.15); color: var(--green);  border: 1px solid rgba(76,175,125,.3); }
+    .badge-beta { background: rgba(212,168,83,.12); color: var(--amber); border: 1px solid rgba(212,168,83,.25); }
+
+    /* ── divider ─────────────────────────────────────────────── */
+
+    .divider { border: none; border-top: 1px solid var(--subtle); margin: 2rem 0; }
+
+    /* ── footer ──────────────────────────────────────────────── */
+
+    .footer {
+      border-top: 1px solid var(--subtle);
+      padding: 1.75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-logo { font-size: .85rem; font-weight: 700; letter-spacing: .08em; color: var(--accent); }
+    .footer-copy { font-size: .75rem; color: var(--muted); }
+    .footer-links { display: flex; gap: 1.1rem; }
+    .footer-links a { font-size: .75rem; color: var(--dim); text-decoration: none; transition: color 150ms ease-out; }
+    .footer-links a:hover { color: var(--ink); }
+
+    [id] { scroll-margin-top: 5rem; }
+  </style>
+</head>
+<body>
+
+<!-- ── Top bar ───────────────────────────────────────────────── -->
+<nav class="topbar">
+  <span class="logo">ATLAS OS</span>
+  <ul class="nav">
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#vault">Vault</a></li>
+    <li><a href="#agents">Agents</a></li>
+    <li><a href="#canvas">Canvas</a></li>
+    <li><a href="#browser">Browser</a></li>
+    <li><a href="#commands">Commands</a></li>
+    <li><a href="#shortcuts">Shortcuts</a></li>
+    <li><a href="#quickstart">Quick start</a></li>
+  </ul>
+  <a href="https://github.com/Ozgurooozer/ATLAS_OS" class="nav-cta">GitHub</a>
+</nav>
+
+<!-- ── Hero ─────────────────────────────────────────────────── -->
+<div class="wrap">
+  <div class="hero">
+    <span class="hero-badge">v2026.05 · Phase F Complete · All features shipped</span>
+    <h1>Your offline second brain.<br><em>AI IDE. Canvas. Real browser.</em></h1>
+    <p class="hero-sub">
+      Atlas OS is a local-first desktop app combining a knowledge vault, AI coding IDE,
+      infinite canvas workspace, and a real web browser. Everything stored as plain HTML
+      on your file system. No cloud, no API keys required for core features.
+    </p>
+    <div class="pill-row">
+      <span class="pill pill-accent">Tauri v2 + React</span>
+      <span class="pill pill-accent">Local AI (LM Studio / Ollama)</span>
+      <span class="pill pill-green">5 Built-in Agents</span>
+      <span class="pill pill-green">Infinite Canvas</span>
+      <span class="pill pill-amber">Knowledge Graph</span>
+      <span class="pill pill-amber">Voice → Vault</span>
+      <span class="pill">CodeMirror 6</span>
+      <span class="pill">PTY Terminal</span>
+      <span class="pill">Mermaid Preview</span>
+      <span class="pill">SearXNG Search</span>
+    </div>
+    <div class="btn-row">
+      <a href="#quickstart" class="btn btn-primary">Get started</a>
+      <a href="#overview" class="btn btn-ghost">See all features</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── Overview ─────────────────────────────────────────────── -->
+<section id="overview">
+  <div class="wrap">
+    <div class="eyebrow">What it is</div>
+    <h2 class="section-title">Four systems. One desktop app.</h2>
+    <p class="section-sub">
+      Most tools do one thing. Atlas OS integrates a knowledge base, an AI development
+      environment, an infinite canvas workspace, and a native web browser — all backed by
+      local models with no cloud dependency.
+    </p>
+    <div class="pillars">
+      <div class="pillar">
+        <span class="pillar-icon">🗄</span>
+        <h3>Knowledge Vault</h3>
+        <p>Pages live at <code>vault/{category}/{slug}/index.html</code>. AI agents write and index them automatically. Keyword TF-IDF + 384-dim semantic search — fully offline.</p>
+      </div>
+      <div class="pillar">
+        <span class="pillar-icon">🤖</span>
+        <h3>AI IDE</h3>
+        <p>Five specialized agents, CodeMirror 6 editor, PTY terminal, Mermaid preview, voice input, sub-agents, and every tool an AI coder needs — all running on your local models.</p>
+      </div>
+      <div class="pillar">
+        <span class="pillar-icon">⬡</span>
+        <h3>Infinite Canvas</h3>
+        <p>Pan/zoom workspace with draggable panels (terminal, editor, chat, browser, sub-canvas). Connect panels with edges. Build agent workflows. Save as blueprints.</p>
+      </div>
+      <div class="pillar">
+        <span class="pillar-icon">🌐</span>
+        <h3>Real Browser</h3>
+        <p>Two tab kinds: <strong>Vault</strong> iframe for local pages and <strong>Web</strong> native child WebView. Browse Google, GitHub, YouTube. No X-Frame-Options limits.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Vault ─────────────────────────────────────────────────── -->
+<section id="vault">
+  <div class="wrap">
+    <div class="eyebrow">Knowledge Vault</div>
+    <h2 class="section-title">A file system that thinks.</h2>
+    <p class="section-sub">
+      The vault is a folder of plain HTML files. The indexer understands them; the AI agents extend them;
+      the backlink panel connects them. Every page is readable in any browser even without Atlas OS installed.
+    </p>
+
+    <div class="flow">
+<span class="hi">vault/{category}/{slug}/index.html</span>   ← source of truth<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+<span class="lo">tools/indexer.py</span>          ← two-pass: extract → resolve backlinks<br>
+<span class="lo">tools/embedder.py</span>         ← 384-dim vectors (Ollama or sentence-transformers)<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+<span class="hi">.index/pages.json</span>         ← machine-readable (API + CLI + IDE)<br>
+<span class="hi">.index/pages.js</span>           ← browser-loadable (window.ATLAS_INDEX)<br>
+<span class="hi">.index/embeddings.json</span>    ← cosine similarity vectors<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+<span class="gr">api/server.py</span>  port 4242   ← REST: /api/search · /api/semantic · /api/pages<br>
+<span class="gr">cli/atlas.py</span>              ← terminal: search · list · open · chat<br>
+<span class="gr">ide/</span>                      ← Tauri IDE reads .index directly (offline keyword)<br>
+<span class="gr">ui/index.html</span>             ← standalone browser search (Fuse.js, no server needed)
+    </div>
+
+    <div class="info-row">
+      <div class="info-box">
+        <h4>Search modes</h4>
+        <ul>
+          <li><strong>Keyword</strong> — TF-IDF; title(3) &gt; headings/desc(2) &gt; body(1)</li>
+          <li><strong>Semantic</strong> — 384-dim cosine similarity (requires embedder.py)</li>
+          <li><strong>Hybrid</strong> — IDE combines both results live</li>
+          <li>Scope filter: per-category or cross-vault</li>
+          <li>Archive exclusion: <code>include_archive</code> param</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>Auto re-index triggers</h4>
+        <ul>
+          <li>After any <code>vault_write</code> tool call by an agent</li>
+          <li>File watcher (5s debounce, Rust <code>notify</code> crate)</li>
+          <li>Emits <code>vault:reindexed</code> event — UI auto-refreshes</li>
+          <li>BacklinkPanel, VaultHome, Graph View all respond to this event</li>
+          <li>Manual: <code>python tools/indexer.py</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="cat-header"><span class="cat-title">Backlinks &amp; Similar Notes</span> <span class="badge badge-new">New</span></div>
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">🔗</span> Backlink panel</div>
+        <p>In any Vault tab, click the ⟳ (Link) button in the address bar to open a right-side panel showing every page that links to the current one.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">≈</span> Similar notes</div>
+        <p>The same panel shows semantically similar pages via cosine similarity on embeddings. Requires <code>embedder.py</code> to have been run at least once.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">⚡</span> Live refresh</div>
+        <p>Listens for <code>vault:reindexed</code> and updates backlinks and similar notes automatically whenever the vault changes.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">🗺</span> Knowledge graph</div>
+        <p>Press <kbd>Ctrl+Shift+G</kbd> or click the graph icon in the header. D3 force-directed graph of all vault pages and their links. Click a node to open the page.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Agents ─────────────────────────────────────────────────── -->
+<section id="agents">
+  <div class="wrap">
+    <div class="eyebrow">AI Agents</div>
+    <h2 class="section-title">Five specialists, not one giant prompt.</h2>
+    <p class="section-sub">
+      Each agent has a focused system prompt, the right subset of tools, and its own vault office
+      (a folder of notes it reads at startup). Switch agents mid-conversation from the AgentSwitcher.
+      Sub-agents (<code>explore</code> + <code>general</code>) run in parallel for research-heavy tasks.
+    </p>
+
+    <div class="agents">
+      <div class="agent">
+        <div class="agent-name">Vault</div>
+        <div class="agent-id">builtin:vault</div>
+        <p>Default. Searches your vault before answering. Cites local pages. Saves new knowledge. Best for research and Q&amp;A grounded in your own notes.</p>
+        <div class="agent-tools">
+          <span class="agent-tool">vault_search</span>
+          <span class="agent-tool">vault_write</span>
+          <span class="agent-tool">read_file</span>
+          <span class="agent-tool">web_search</span>
+          <span class="agent-tool">web_fetch</span>
+        </div>
+      </div>
+      <div class="agent">
+        <div class="agent-name">Atlas-Maker</div>
+        <div class="agent-id">builtin:atlas-maker</div>
+        <p>Writes new vault HTML pages from any conversation, voice note, or research result. Shows a confirmation card before saving. Re-indexes on write.</p>
+        <div class="agent-tools">
+          <span class="agent-tool">vault_write</span>
+          <span class="agent-tool">vault_search</span>
+          <span class="agent-tool">web_fetch</span>
+          <span class="agent-tool">subagent</span>
+        </div>
+      </div>
+      <div class="agent">
+        <div class="agent-name">Coder</div>
+        <div class="agent-id">builtin:coder</div>
+        <p>Reads, edits, and creates source files. Runs shell commands. Multi-file edits, grep, glob, terminal output. Read-before-edit enforced.</p>
+        <div class="agent-tools">
+          <span class="agent-tool">read_file</span>
+          <span class="agent-tool">edit_file</span>
+          <span class="agent-tool">multi_edit</span>
+          <span class="agent-tool">bash_run</span>
+          <span class="agent-tool">grep</span>
+          <span class="agent-tool">glob</span>
+        </div>
+      </div>
+      <div class="agent">
+        <div class="agent-name">Sentor</div>
+        <div class="agent-id">builtin:sentor</div>
+        <p>Interfaces with a local Flowise instance (port 3000). Lists and runs visual agent flows. Requires Flowise running in your Sentor path.</p>
+        <div class="agent-tools">
+          <span class="agent-tool">sentor_list_flows</span>
+          <span class="agent-tool">sentor_run_flow</span>
+          <span class="agent-tool">vault_search</span>
+        </div>
+      </div>
+      <div class="agent">
+        <div class="agent-name">Orkestra</div>
+        <div class="agent-id">builtin:orkestra</div>
+        <p>Coordinates other agents. Uses <code>agent_invoke</code> to delegate tasks to Vault, Coder, or Atlas-Maker as sub-steps of a larger goal.</p>
+        <div class="agent-tools">
+          <span class="agent-tool">agent_invoke</span>
+          <span class="agent-tool">canvas_read_state</span>
+          <span class="agent-tool">blueprint_save</span>
+          <span class="agent-tool">subagent</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="cat-header"><span class="cat-title">Agent Offices</span> <span class="badge badge-new">New</span></div>
+    <p style="font-size:.82rem;color:var(--dim);margin-bottom:1rem;max-width:560px">
+      Each agent has a personal office at <code>vault/agents/{slug}/</code> — a collection of vault pages it reads at startup (Self-RAG). The office holds the agent's memory, meeting notes, and decisions. Open with <kbd>Ctrl+Shift+A</kbd>.
+    </p>
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">🏢</span> Agent offices</div>
+        <p>4 built-in offices: vault, atlas-maker, coder, sentor. Each agent reads its own office pages via <code>vault_self_context</code> before responding.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">📋</span> /decision command</div>
+        <p>Use <code>/decision {text}</code> to log a decision to the active agent's office log. Persists across sessions.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">📝</span> /meeting command</div>
+        <p>Use <code>/meeting {topic}</code> to create a timestamped meeting note in the active agent's office.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">🔄</span> Self-RAG</div>
+        <p>Agents inject their own office context into every prompt via <code>vault_self_context</code>. They remember what they decided and wrote in past sessions.</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="cat-header"><span class="cat-title">Local AI Providers</span></div>
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="feat-head">LM Studio</div>
+        <p>Point at <code>localhost:1234</code>. Any loaded model works. Set the exact model ID in Settings → Models (e.g. <code>google/gemma-4-e4b</code>).</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head">Ollama</div>
+        <p>Point at <code>localhost:11434</code>. Pull any model: <code>ollama pull &lt;name&gt;</code>. Semantic embeddings: <code>ollama pull all-minilm</code>.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head">Cloud providers</div>
+        <p>OpenAI, Anthropic, Google, xAI, Cerebras, Groq, DeepSeek — add API key to OS keyring. No key stored on disk.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Canvas ─────────────────────────────────────────────────── -->
+<section id="canvas">
+  <div class="wrap">
+    <div class="eyebrow">Infinite Canvas</div>
+    <h2 class="section-title">A spatial workspace for your tools.</h2>
+    <p class="section-sub">
+      The canvas is a pannable, zoomable infinite plane where you can place any IDE panel —
+      terminal, editor, chat, browser, or a sub-canvas. Connect panels with wires. Arrange, save,
+      and recall layouts as blueprints.
+    </p>
+
+    <div class="cat-header"><span class="cat-title">Panel types</span></div>
+    <div class="panel-grid">
+      <div class="panel-card">
+        <div class="panel-type">type: terminal</div>
+        <h4>Terminal</h4>
+        <p>Full PTY terminal inside a canvas panel. Set <code>cwd</code> and <code>initCmd</code> in meta to auto-run a command on spawn.</p>
+      </div>
+      <div class="panel-card">
+        <div class="panel-type">type: editor</div>
+        <h4>Editor</h4>
+        <p>CodeMirror 6 editor panel. Opens any file from the vault or workspace.</p>
+      </div>
+      <div class="panel-card">
+        <div class="panel-type">type: chat</div>
+        <h4>Chat</h4>
+        <p>AI chat panel with its own isolated session ID. Multiple chat panels don't share history.</p>
+      </div>
+      <div class="panel-card">
+        <div class="panel-type">type: web</div>
+        <h4>Web</h4>
+        <p>Native WebView inside the canvas. Browse any URL. Zooms and pans with the canvas.</p>
+      </div>
+      <div class="panel-card">
+        <div class="panel-type">type: vault-home</div>
+        <h4>Vault Home</h4>
+        <p>Inline vault search panel. Search your entire vault without leaving the canvas.</p>
+      </div>
+      <div class="panel-card">
+        <div class="panel-type">type: canvas</div>
+        <h4>Sub-Canvas</h4>
+        <p>A nested canvas inside the main canvas. Has its own viewport and children. Export contents to vault as a blueprint page.</p>
+      </div>
+      <div class="panel-card">
+        <div class="panel-type">type: agent</div>
+        <h4>Agent</h4>
+        <p>Created via right-click → Agent. Configure name, tools, system prompt. Save as custom agent.</p>
+      </div>
+      <div class="panel-card">
+        <div class="panel-type">type: preview</div>
+        <h4>Preview</h4>
+        <p>File preview panel. Renders HTML, images, Markdown with Mermaid support.</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="cat-header"><span class="cat-title">Canvas UX</span> <span class="badge badge-new">New</span></div>
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">⬛</span> Fullscreen panel</div>
+        <p>Double-click any panel's title bar → the panel goes fullscreen (fixed inset-0). Press <kbd>Esc</kbd> to exit. Double-clicking the title <em>text</em> still opens rename.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">−</span> Minimize to dock</div>
+        <p>Click the <strong>−</strong> button on a panel → it disappears from the canvas and appears as a chip in the dock strip at the bottom. Click the chip to restore. × to close.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">📌</span> Pin to screen</div>
+        <p>Click the pin icon → panel attaches to screen coordinates (not canvas). Stays in place when you pan or zoom. Useful for always-visible terminals.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">↑</span> Z-index capture</div>
+        <p>Click any panel — including pinned ones — and it comes to front. Uses <code>onPointerDownCapture</code> so title-bar button clicks don't block the bring-to-front.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">🔗</span> Connection edges</div>
+        <p>Drag from a panel port to another panel to draw a connection edge. Edges represent data flow in agent workflows.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">💾</span> Persistent state</div>
+        <p>All panels, positions, connections, minimize state, and viewport are saved to <code>atlas-canvas.json</code> (Tauri LazyStore) and restored on next launch.</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="cat-header"><span class="cat-title">Agent Builder &amp; Blueprint</span></div>
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">🛠</span> Agent Builder</div>
+        <p>Right-click on canvas → Add Agent panel. Configure name, tool subset, and system prompt. Save → a real agent is registered and a Chat panel opens automatically.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">🗺</span> Blueprint</div>
+        <p>AI can call <code>blueprint_save</code> to snapshot the current canvas layout. Right-click → Import Blueprint to load any saved layout.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">📤</span> Export to vault</div>
+        <p>Export a sub-canvas as a vault HTML page via the sub-canvas context menu. Indexed and searchable immediately.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-head"><span class="feat-icon">🧠</span> Ephemeral memory</div>
+        <p>Each canvas-built agent can have its memory toggled to ephemeral mode — no vault writes, no cross-session persistence. Good for scratch agents.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Browser ────────────────────────────────────────────────── -->
+<section id="browser">
+  <div class="wrap">
+    <div class="eyebrow">Browser &amp; Navigation</div>
+    <h2 class="section-title">Your vault and the web, in one place.</h2>
+    <p class="section-sub">
+      Two tab kinds coexist in the same tab bar. Vault tabs load local HTML via <code>asset://</code> URL.
+      Web tabs open a native child WebView on top of the app — real OS browser engine, no iframe limits.
+    </p>
+
+    <div class="tabs" id="browser-tabs">
+      <button class="tab-btn active" data-tab="vault-tab">Vault tab</button>
+      <button class="tab-btn" data-tab="web-tab">Web tab</button>
+      <button class="tab-btn" data-tab="graph-tab">Graph view</button>
+    </div>
+
+    <div class="tab-panel active" id="vault-tab">
+      <div class="feat-grid">
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">📄</span> asset:// URLs</div>
+          <p>Vault pages load via Tauri's <code>asset://localhost/…</code> protocol. Same-origin, instant, works offline. Converted by <code>vaultPageAssetUrl()</code>.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🔗</span> BacklinkPanel</div>
+          <p>Click the ⟳ icon in the address bar → right panel shows every page that links here + semantically similar pages.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🏠</span> Vault Home</div>
+          <p>The default tab on launch. Full-text search over the entire vault. Keyword + semantic. Category filter sidebar. Click a result to open in a vault tab.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">⏱</span> Browser history</div>
+          <p>All visited vault URLs stored in localStorage. Click the address bar → previous URLs appear as autocomplete suggestions (<code>&lt;datalist&gt;</code>).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="web-tab">
+      <div class="feat-grid">
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🌐</span> Native WebView</div>
+          <p>Tauri <code>WebviewBuilder</code> creates a real OS-level browser pane positioned over the app. Bypasses X-Frame-Options, CSP, all iframe restrictions.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🔄</span> URL sync</div>
+          <p>The address bar tracks the WebView's current URL via <code>web://nav-changed</code> events from Rust. Works for link clicks, redirects, form submissions.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🔍</span> SearXNG search</div>
+          <p>Type a plain query (no protocol) in any address bar → opens search results via your configured SearXNG instance. Privacy-preserving.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🔖</span> Bookmarks</div>
+          <p>Save any URL with the bookmark button. Bookmarks are accessible from any address bar. Stored in Tauri plugin-store.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="graph-tab">
+      <div class="feat-grid">
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🗺</span> Force-directed graph</div>
+          <p>D3 force simulation renders all vault pages as nodes and their links as edges. Color-coded by category. Drag nodes to reposition.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🖱</span> Click to navigate</div>
+          <p>Click any node → opens that vault page in a vault tab. Hover shows the page title and category.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🔎</span> Zoom &amp; pan</div>
+          <p>Scroll to zoom, drag to pan on the graph SVG. Nodes show 20-character truncated title labels.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">⚡</span> Auto-refresh</div>
+          <p>Listens to <code>vault:reindexed</code> — whenever you add a page or run the indexer, the graph updates automatically.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── IDE Tools ──────────────────────────────────────────────── -->
+<section id="ide">
+  <div class="wrap">
+    <div class="eyebrow">IDE Tools</div>
+    <h2 class="section-title">Every tool a developer needs, locally.</h2>
+    <p class="section-sub">No plugins. No marketplace. Shipped together and tested together.</p>
+
+    <div class="tabs" id="ide-tabs">
+      <button class="tab-btn active" data-tab="editor-tab">Editor</button>
+      <button class="tab-btn" data-tab="terminal-tab">Terminal</button>
+      <button class="tab-btn" data-tab="voice-tab">Voice</button>
+      <button class="tab-btn" data-tab="focused-tab">Focused Mode</button>
+    </div>
+
+    <div class="tab-panel active" id="editor-tab">
+      <div class="feat-grid">
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">✏️</span> CodeMirror 6</div>
+          <p>Syntax highlighting for 50+ languages, configurable theme, line numbers, bracket matching, auto-close.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">⌨️</span> Vim mode</div>
+          <p>Full Vim key bindings via <code>@codemirror/vim</code>. Toggle in Settings.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🤖</span> Inline AI autocomplete</div>
+          <p>Ghost-text completions powered by the active local model. Tab to accept, Esc to dismiss.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">[[</span> Wiki-link complete</div>
+          <p>Type <code>[[</code> to get autocomplete suggestions from all vault page titles. Inserts the correct <code>[[slug]]</code> link.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🧜</span> Mermaid preview</div>
+          <p>Open any <code>.md</code> or <code>.mmd</code> file → click "Mermaid ◂" button → split-view live preview. Diagram renders offline (bundled Mermaid).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="terminal-tab">
+      <div class="feat-grid">
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">💻</span> Real PTY</div>
+          <p>xterm.js frontend backed by <code>portable-pty</code> Rust crate. Not a simulated shell — interactive programs (vim, htop, ssh) work correctly.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">⬡</span> System Canvas</div>
+          <p>On first launch, a "Çalışan Terminaller" sub-canvas spawns with an API Server terminal (<code>python api/server.py</code>) and an Atlas CLI terminal pre-configured.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">📁</span> Custom cwd</div>
+          <p>Each terminal panel can have its own working directory (<code>meta.cwd</code>) and an init command (<code>meta.initCmd</code>) that runs on spawn.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🔌</span> OSC handlers</div>
+          <p>Terminal supports OSC escape sequences. Used for hyperlinks and custom protocol integrations.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="voice-tab">
+      <div class="feat-grid">
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🎙️</span> Web Speech API</div>
+          <p>Uses the browser's built-in <code>SpeechRecognition</code> / <code>webkitSpeechRecognition</code> — available in Tauri's Chromium WebView. No API key, no server.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">⚡</span> Auto-submit</div>
+          <p>After recording stops, the transcript fills the chat input as <code>/voice [transcript]</code> and submits automatically. No click required.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">📝</span> Vault page creation</div>
+          <p>The <code>/voice</code> slash command switches to Atlas-Maker and prompts it to search for related pages, then write a new vault HTML page from your transcript.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🔴</span> Recording state</div>
+          <p>Microphone button turns red while recording. Interim results are available. Stop recording → <code>transcribing</code> → final transcript captured.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="focused-tab">
+      <div class="feat-grid">
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🔮</span> Overlay mode</div>
+          <p>Toggle with <kbd>Ctrl+Alt+F</kbd>. Window becomes transparent and always-on-top. Only the 148px bottom bar is opaque. Desktop is visible through the app.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">🖱</span> Click-through</div>
+          <p>Toggle with <kbd>Ctrl+Alt+P</kbd>. The transparent area passes mouse clicks to the desktop (Win32 <code>SetWindowRgn</code>). Bar + chat balloon remain clickable.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">💬</span> Auto chat balloon</div>
+          <p>When an agent starts "thinking" in focused mode, the chat balloon opens automatically so you see the response without switching windows.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-head"><span class="feat-icon">📐</span> Auto-resize</div>
+          <p>Entering focused mode auto-resizes the window to full-width × 180px at the bottom of the screen. Exiting restores previous size.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Slash Commands ─────────────────────────────────────────── -->
+<section id="commands">
+  <div class="wrap">
+    <div class="eyebrow">Slash Commands</div>
+    <h2 class="section-title">Type <code>/</code> to skip the round-trip.</h2>
+    <p class="section-sub">Slash commands intercept the chat input before sending to the AI. They run immediately — no LLM turn needed for the common operations.</p>
+
+    <div class="cmd-list">
+      <div class="cmd-row">
+        <div>
+          <div class="cmd-name">/search {query}</div>
+        </div>
+        <div class="cmd-desc">
+          Runs <code>vault_search</code> immediately and returns results as a formatted table — no AI turn. Shows title, category, score.
+          <div class="cmd-ex">Example: /search tauri webview → instant list of matching vault pages</div>
+        </div>
+      </div>
+      <div class="cmd-row">
+        <div>
+          <div class="cmd-name">/voice {transcript}</div>
+        </div>
+        <div class="cmd-desc">
+          Auto-filled by the voice recorder. Switches to Atlas-Maker agent, then sends a prompt to check for related pages and write a new vault HTML page from the transcript.
+          <div class="cmd-ex">Example: speak "meeting notes about the canvas refactor" → vault page created</div>
+        </div>
+      </div>
+      <div class="cmd-row">
+        <div>
+          <div class="cmd-name">/decision {text}</div>
+        </div>
+        <div class="cmd-desc">
+          Appends the decision text to the active agent's office <code>log.md</code>. Persists across sessions for recall.
+          <div class="cmd-ex">Example: /decision use onPointerDownCapture for z-index fix</div>
+        </div>
+      </div>
+      <div class="cmd-row">
+        <div>
+          <div class="cmd-name">/meeting {topic}</div>
+        </div>
+        <div class="cmd-desc">
+          Creates a timestamped meeting note in the active agent's office folder. The agent writes the note to <code>vault/agents/{slug}/meetings/</code>.
+          <div class="cmd-ex">Example: /meeting canvas ux review → structured meeting note saved</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Shortcuts ──────────────────────────────────────────────── -->
+<section id="shortcuts">
+  <div class="wrap">
+    <div class="eyebrow">Keyboard Shortcuts</div>
+    <h2 class="section-title">Everything from the keyboard.</h2>
+    <p class="section-sub">All shortcuts are registered globally via the shortcut registry. Filter by name or key below.</p>
+
+    <input type="text" class="shortcut-filter" id="sc-filter" placeholder="Filter shortcuts…" autocomplete="off">
+
+    <table class="shortcut-table" id="sc-table">
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Keys</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="shortcut-row"><td>Open Knowledge Graph</td><td><kbd>Ctrl+Shift+G</kbd></td><td><span class="sc-cat">Browser</span></td></tr>
+        <tr class="shortcut-row"><td>Open Agent Office</td><td><kbd>Ctrl+Shift+A</kbd></td><td><span class="sc-cat">Agents</span></td></tr>
+        <tr class="shortcut-row"><td>Toggle Focused Mode</td><td><kbd>Ctrl+Alt+F</kbd></td><td><span class="sc-cat">Layout</span></td></tr>
+        <tr class="shortcut-row"><td>Toggle Click-through</td><td><kbd>Ctrl+Alt+P</kbd></td><td><span class="sc-cat">Layout</span></td></tr>
+        <tr class="shortcut-row"><td>Explorer search</td><td><kbd>Ctrl+Shift+F</kbd></td><td><span class="sc-cat">Explorer</span></td></tr>
+        <tr class="shortcut-row"><td>New terminal tab</td><td><kbd>Ctrl+Shift+T</kbd></td><td><span class="sc-cat">Terminal</span></td></tr>
+        <tr class="shortcut-row"><td>Close current tab</td><td><kbd>Ctrl+W</kbd></td><td><span class="sc-cat">Tabs</span></td></tr>
+        <tr class="shortcut-row"><td>Next tab</td><td><kbd>Ctrl+Tab</kbd></td><td><span class="sc-cat">Tabs</span></td></tr>
+        <tr class="shortcut-row"><td>Previous tab</td><td><kbd>Ctrl+Shift+Tab</kbd></td><td><span class="sc-cat">Tabs</span></td></tr>
+        <tr class="shortcut-row"><td>Save file (editor)</td><td><kbd>Ctrl+S</kbd></td><td><span class="sc-cat">Editor</span></td></tr>
+        <tr class="shortcut-row"><td>Find in file</td><td><kbd>Ctrl+F</kbd></td><td><span class="sc-cat">Editor</span></td></tr>
+        <tr class="shortcut-row"><td>Toggle Vim mode</td><td><kbd>Ctrl+Alt+V</kbd></td><td><span class="sc-cat">Editor</span></td></tr>
+        <tr class="shortcut-row"><td>Focus address bar</td><td><kbd>Ctrl+L</kbd></td><td><span class="sc-cat">Browser</span></td></tr>
+        <tr class="shortcut-row"><td>Browser back</td><td><kbd>Alt+Left</kbd></td><td><span class="sc-cat">Browser</span></td></tr>
+        <tr class="shortcut-row"><td>Browser forward</td><td><kbd>Alt+Right</kbd></td><td><span class="sc-cat">Browser</span></td></tr>
+        <tr class="shortcut-row"><td>Canvas fullscreen panel</td><td>Double-click title bar</td><td><span class="sc-cat">Canvas</span></td></tr>
+        <tr class="shortcut-row"><td>Exit fullscreen</td><td><kbd>Esc</kbd></td><td><span class="sc-cat">Canvas</span></td></tr>
+        <tr class="shortcut-row"><td>Minimize panel to dock</td><td>Click − button</td><td><span class="sc-cat">Canvas</span></td></tr>
+        <tr class="shortcut-row"><td>Rename canvas panel</td><td>Double-click title text</td><td><span class="sc-cat">Canvas</span></td></tr>
+        <tr class="shortcut-row"><td>Open settings</td><td><kbd>Ctrl+,</kbd></td><td><span class="sc-cat">App</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── Architecture ───────────────────────────────────────────── -->
+<section id="stack">
+  <div class="wrap">
+    <div class="eyebrow">Stack</div>
+    <h2 class="section-title">Boring, reliable technology.</h2>
+    <p class="section-sub">No exotic runtimes. Every layer is a well-understood, actively maintained tool.</p>
+    <table class="stack-table">
+      <thead>
+        <tr><th>Layer</th><th>Technology</th><th>Why</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="layer">Desktop shell</td><td><code>Tauri v2</code></td><td>Rust backend, native WebView2 (Windows) / WKWebView (macOS), tiny bundle</td></tr>
+        <tr><td class="layer">Frontend</td><td><code>React 18 + Vite + Tailwind v4</code></td><td>Fast DX, hot-reload, TypeScript throughout</td></tr>
+        <tr><td class="layer">Editor</td><td><code>CodeMirror 6</code></td><td>Extensible, Vim mode, 50+ language grammars, inline completions</td></tr>
+        <tr><td class="layer">Terminal</td><td><code>xterm.js + portable-pty</code></td><td>Real PTY, not a shell emulator — interactive programs work</td></tr>
+        <tr><td class="layer">Canvas</td><td>Custom React + Zustand</td><td>Infinite pan/zoom, persistent layout, sub-canvas, blueprints</td></tr>
+        <tr><td class="layer">AI layer</td><td><code>Vercel AI SDK</code></td><td>Provider-agnostic streaming, tool-calling, structured output</td></tr>
+        <tr><td class="layer">Graph</td><td><code>D3 v7</code></td><td>Force-directed simulation, drag, zoom, SVG rendering</td></tr>
+        <tr><td class="layer">State</td><td><code>Zustand</code></td><td>Minimal boilerplate, persist middleware, subscriptions</td></tr>
+        <tr><td class="layer">Native browser</td><td>Tauri <code>WebviewBuilder</code></td><td>Multi-webview unstable API — real OS browser pane, no iframe limits</td></tr>
+        <tr><td class="layer">Web search</td><td><code>SearXNG JSON API</code></td><td>Self-hosted or public, privacy-preserving, no key needed</td></tr>
+        <tr><td class="layer">Vault search</td><td><code>Python stdlib</code></td><td>TF-IDF + 384-dim cosine similarity, zero pip dependencies</td></tr>
+        <tr><td class="layer">Embeddings</td><td><code>Ollama</code> / <code>sentence-transformers</code></td><td>Choosable in Settings — any running Ollama model or offline pip model</td></tr>
+        <tr><td class="layer">Storage</td><td>Tauri <code>plugin-store</code> (JSON)</td><td>Persistent settings, canvas layout, bookmarks — no database</td></tr>
+        <tr><td class="layer">Secrets</td><td>OS keyring (<code>keyring</code> crate)</td><td>Keychain / Windows Credential Manager — API keys never on disk</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── Quick Start ────────────────────────────────────────────── -->
+<section id="quickstart">
+  <div class="wrap">
+    <div class="eyebrow">Quick start</div>
+    <h2 class="section-title">Running in four commands.</h2>
+    <p class="section-sub">Prerequisites: Node.js ≥ 18, Rust toolchain (<code>rustup</code>), Python 3. An LM Studio or Ollama instance is optional but recommended for AI features.</p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-n">01</span>
+        <p><strong>Clone &amp; install</strong> — install frontend dependencies</p>
+        <span class="step-cmd">git clone … &amp;&amp; cd ide &amp;&amp; npm install</span>
+      </div>
+      <div class="step">
+        <span class="step-n">02</span>
+        <p><strong>Index the vault</strong> — creates <code>.index/pages.json</code> and <code>pages.js</code></p>
+        <span class="step-cmd">python tools/indexer.py</span>
+      </div>
+      <div class="step">
+        <span class="step-n">03</span>
+        <p><strong>Generate embeddings</strong> — optional; enables semantic search and similar notes</p>
+        <span class="step-cmd">python tools/embedder.py</span>
+      </div>
+      <div class="step">
+        <span class="step-n">04</span>
+        <p><strong>Launch the IDE</strong> — opens Vault Home on startup</p>
+        <span class="step-cmd">atlas-ide.bat</span>
+      </div>
+    </div>
+
+    <div class="info-row" style="margin-top:1.25rem">
+      <div class="info-box">
+        <h4>Development commands</h4>
+        <ul>
+          <li><code>cd ide &amp;&amp; npm run tauri dev</code> — start dev server</li>
+          <li><code>cd ide &amp;&amp; npx tsc --noEmit</code> — TypeScript check (0 errors expected)</li>
+          <li><code>cd ide/src-tauri &amp;&amp; cargo build</code> — verify Rust compiles</li>
+          <li><code>python tools/indexer.py</code> — re-index after vault changes</li>
+          <li><code>python tools/embedder.py --check</code> — verify Ollama connection</li>
+          <li><code>python api/server.py</code> — start REST API on port 4242</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>Connect a local AI model</h4>
+        <ul>
+          <li>Start LM Studio → load a model → enable local server</li>
+          <li>Or: <code>ollama run &lt;model-name&gt;</code></li>
+          <li>In Atlas OS → Settings → Models → set provider URL</li>
+          <li>Set "Chat model identifier" to the exact model name</li>
+          <li>For semantic search: <code>ollama pull all-minilm</code></li>
+          <li>Test: click New Chat → ask anything</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Philosophy ─────────────────────────────────────────────── -->
+<section id="philosophy">
+  <div class="wrap">
+    <div class="eyebrow">Philosophy</div>
+    <h2 class="section-title">Four rules we don't break.</h2>
+    <p class="section-sub">These aren't aspirations — they're constraints built into every layer.</p>
+    <div class="principles">
+      <div class="principle">
+        <h4>Local first</h4>
+        <p>No telemetry. No cloud sync. No account required. Vault pages live on your file system and nowhere else. The app works fully offline.</p>
+      </div>
+      <div class="principle">
+        <h4>Zero lock-in</h4>
+        <p>Vault pages are plain HTML readable in any browser. If Atlas OS disappears tomorrow, your data is fine. No proprietary format.</p>
+      </div>
+      <div class="principle">
+        <h4>Fewer lines</h4>
+        <p>No abstraction until a third use case exists. The Python side uses stdlib only — zero pip installs. Readable over clever.</p>
+      </div>
+      <div class="principle">
+        <h4>Working &gt; perfect</h4>
+        <p>Ship the smallest change that delivers value. Refactor when the need is concrete. No speculative generality.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ────────────────────────────────────────────────── -->
+<footer class="footer">
+  <div style="display:flex;align-items:center;gap:.75rem">
+    <span class="footer-logo">ATLAS OS</span>
+    <span class="footer-copy">MIT License · 2026 · Phase 0–F complete</span>
+  </div>
+  <div class="footer-links">
+    <a href="https://github.com/Ozgurooozer/ATLAS_OS">GitHub</a>
+    <a href="../../../ui/index.html">Vault Search UI</a>
+    <a href="../../home/vault-rehberi/index.html">Vault Guide</a>
+  </div>
+</footer>
+
+<script>
+  // ── Tab switcher ────────────────────────────────────────────
+  document.querySelectorAll('.tabs').forEach(function(tabBar) {
+    tabBar.addEventListener('click', function(e) {
+      var btn = e.target.closest('.tab-btn');
+      if (!btn) return;
+      var id = btn.dataset.tab;
+      tabBar.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      // find sibling tab panels (next siblings until next .tabs or section end)
+      var parent = tabBar.parentElement;
+      parent.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+      var target = parent.querySelector('#' + id);
+      if (target) target.classList.add('active');
+    });
+  });
+
+  // ── Shortcut filter ─────────────────────────────────────────
+  var scFilter = document.getElementById('sc-filter');
+  if (scFilter) {
+    scFilter.addEventListener('input', function() {
+      var q = this.value.toLowerCase();
+      document.querySelectorAll('.shortcut-row').forEach(function(row) {
+        var text = row.textContent.toLowerCase();
+        row.classList.toggle('hidden', q.length > 0 && !text.includes(q));
+      });
+    });
+  }
+
+  // ── Active nav highlight on scroll ─────────────────────────
+  var sections = document.querySelectorAll('section[id], div[id].hero, div.wrap > div.hero');
+  var navLinks = document.querySelectorAll('.nav a');
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        navLinks.forEach(function(a) {
+          a.classList.toggle('active', a.getAttribute('href') === '#' + entry.target.id);
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -75% 0px' });
+
+  document.querySelectorAll('section[id]').forEach(function(s) { observer.observe(s); });
+</script>
+
+</body>
+</html>

@@ -4,6 +4,7 @@ import {
   ArrowRight01Icon,
   BookmarkAdd01Icon,
   BookmarkCheck01Icon,
+  Link01Icon,
   Refresh01Icon,
   Share04Icon,
 } from "@hugeicons/core-free-icons";
@@ -22,6 +23,10 @@ type Props = {
   onReload: () => void;
   onToggleBookmark: () => void;
   onOpenExternal: () => void;
+  history?: string[];
+  showBacklinksToggle?: boolean;
+  backlinksOpen?: boolean;
+  onToggleBacklinks?: () => void;
 };
 
 export function AddressBar({
@@ -36,6 +41,10 @@ export function AddressBar({
   onReload,
   onToggleBookmark,
   onOpenExternal,
+  history,
+  showBacklinksToggle,
+  backlinksOpen,
+  onToggleBacklinks,
 }: Props) {
   const [inputValue, setInputValue] = useState(url);
   const [focused, setFocused] = useState(false);
@@ -98,8 +107,10 @@ export function AddressBar({
 
       <div className="flex flex-1 items-center overflow-hidden rounded-md border border-border/60 bg-background px-2 focus-within:border-border focus-within:ring-1 focus-within:ring-accent/40">
         <input
+          name="address-bar"
           ref={inputRef}
           type="text"
+          list="atlas-url-history"
           value={focused ? inputValue : url}
           onChange={(e) => setInputValue(e.target.value)}
           onFocus={() => {
@@ -114,6 +125,11 @@ export function AddressBar({
           spellCheck={false}
           autoComplete="off"
         />
+        {history && history.length > 0 && (
+          <datalist id="atlas-url-history">
+            {history.map((h) => <option key={h} value={h} />)}
+          </datalist>
+        )}
       </div>
 
       {url && (
@@ -142,6 +158,18 @@ export function AddressBar({
           title="Open in system browser"
         >
           <HugeiconsIcon icon={Share04Icon} size={13} strokeWidth={2} />
+        </Button>
+      )}
+
+      {showBacklinksToggle && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className={`size-6 shrink-0 hover:text-foreground ${backlinksOpen ? "text-accent" : "text-muted-foreground"}`}
+          onClick={onToggleBacklinks}
+          title={backlinksOpen ? "Hide backlinks" : "Show backlinks & similar"}
+        >
+          <HugeiconsIcon icon={Link01Icon} size={13} strokeWidth={2} />
         </Button>
       )}
     </div>

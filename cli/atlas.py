@@ -72,18 +72,8 @@ def _load_pages() -> list[dict]:
 
 # ── Search helpers ────────────────────────────────────────────────────────────
 
-def _score(page: dict, terms: list[str]) -> int:
-    title    = page['title'].lower()
-    headings = ' '.join(page['headings']).lower()
-    desc     = page['description'].lower()
-    text     = page['text'].lower()
-    score    = 0
-    for t in terms:
-        if t in title:    score += 3
-        if t in headings: score += 2
-        if t in desc:     score += 2
-        if t in text:     score += 1
-    return score
+sys.path.insert(0, str(ROOT / "tools"))
+from scoring import score as _score  # noqa: E402  — shared with api/server.py
 
 
 def _snippet(text: str, terms: list[str], length: int = 100) -> str:
@@ -378,6 +368,13 @@ def main() -> None:
             '  atlas serve 8080\n'
             '  atlas chat\n'
             '  atlas chat --model qwen2.5-coder:7b\n'
+            '\n'
+            '  atlas new-task                       # interactive wizard\n'
+            '  atlas task list\n'
+            '  atlas task show pdf-reviewer\n'
+            '  atlas run pdf-reviewer --wait\n'
+            '  atlas provider status\n'
+            '  atlas notify "build done"\n'
         ),
     )
     sub = ap.add_subparsers(dest='cmd')
@@ -401,6 +398,96 @@ def main() -> None:
     pc.add_argument('--model', default=None, metavar='MODEL',
                     help='Ollama model to use (default: auto-detect qwen2.5-coder)')
 
+    # ── Sentor Worker komutları ─────────────────────────────────────────────
+    sub.add_parser('new-task', help='create a new Sentor task (interactive wizard)')
+
+    pr = sub.add_parser('run', help='run a saved Sentor task')
+    pr.add_argument('task_id', help='task id')
+    pr.add_argument('--wait', action='store_true',
+                    help='wait for provider to become idle')
+    pr.add_argument('--input', default=None,
+                    help='extra input appended to the task prompt')
+
+    pt = sub.add_parser('task', help='manage Sentor tasks')
+    pt_sub = pt.add_subparsers(dest='task_cmd')
+    pt_sub.add_parser('list', help='list all tasks')
+    pts = pt_sub.add_parser('show', help='show task JSON')
+    pts.add_argument('task_id')
+    ptd = pt_sub.add_parser('delete', help='delete a task')
+    ptd.add_argument('task_id')
+
+    pp = sub.add_parser('provider', help='inspect LLM providers')
+    pp_sub = pp.add_subparsers(dest='provider_cmd')
+    pp_sub.add_parser('status', help='probe all providers')
+    ppw = pp_sub.add_parser('wait', help='wait until a provider is idle')
+    ppw.add_argument('name', nargs='?', default='local-ollama')
+
+    pn = sub.add_parser('notify', help='send a notification (terminal + log)')
+    pn.add_argument('message', nargs='+', help='notification text')
+
+    # ── Pipeline komutları ──────────────────────────────────────────────────
+    ppl = sub.add_parser('pipeline', help='manage and run pipelines')
+    ppl_sub = ppl.add_subparsers(dest='pipeline_cmd')
+    ppl_sub.add_parser('list', help='list all pipelines')
+    ppls = ppl_sub.add_parser('show', help='show pipeline JSON')
+    ppls.add_argument('pipeline_id')
+    pplr = ppl_sub.add_parser('run', help='run a pipeline')
+    pplr.add_argument('pipeline_id')
+    pplr.add_argument('ctx', nargs='*', metavar='key=value',
+                      help='context variables, e.g. file=foo.pdf')
+    ppln = ppl_sub.add_parser('new', help='create a template pipeline')
+    ppln.add_argument('pipeline_id', nargs='?', default=None)
+
+    # ── Node (unified pipeline + task) ─────────────────────────────────────
+    pnd = sub.add_parser('node', help='manage reusable nodes (pipelines + tasks)')
+    pnd_sub = pnd.add_subparsers(dest='node_cmd')
+    pnd_sub.add_parser('list', help='list all nodes')
+    pndr = pnd_sub.add_parser('run', help='run a node; stdin → ctx[input]')
+    pndr.add_argument('node_id', help='node id')
+    pndr.add_argument('ctx', nargs='*', metavar='key=value',
+                      help='context variables, e.g. input="hello"')
+    pndp = pnd_sub.add_parser('pipe', help='chain nodes: output → next input')
+    pndp.add_argument('node_ids', nargs='+', metavar='node-id',
+                      help='ordered node ids to chain')
+    pndp.add_argument('--ctx', nargs='*', metavar='key=value', default=[],
+                      help='initial context variables')
+    pnds = pnd_sub.add_parser('show', help='show node JSON')
+    pnds.add_argument('node_id')
+    pndl = pnd_sub.add_parser('log', help='show run history for a node')
+    pndl.add_argument('node_id')
+    pnde = pnd_sub.add_parser('edit', help='open node JSON in $EDITOR')
+    pnde.add_argument('node_id')
+    pndn = pnd_sub.add_parser('new', help='create a new node template')
+    pndn.add_argument('node_id', nargs='?', default=None)
+    pndd = pnd_sub.add_parser('delete', help='delete a node')
+    pndd.add_argument('node_id')
+
+    # ── Flow (named multi-node pipelines) ───────────────────────────────────
+    pfl = sub.add_parser('flow', help='manage named multi-node flows')
+    pfl_sub = pfl.add_subparsers(dest='flow_cmd')
+    pfl_sub.add_parser('list', help='list all flows')
+    pfln = pfl_sub.add_parser('new', help='create a new flow')
+    pfln.add_argument('flow_id', nargs='?', default=None)
+    pfln.add_argument('--name', default=None, help='display name')
+    pflsh = pfl_sub.add_parser('show', help='print flow JSON')
+    pflsh.add_argument('flow_id')
+    pflas = pfl_sub.add_parser('add-step', help='append a node step to a flow')
+    pflas.add_argument('flow_id')
+    pflas.add_argument('node_id')
+    pflas.add_argument('ctx', nargs='*', metavar='key=value',
+                       help='default context for this step')
+    pflr = pfl_sub.add_parser('run', help='run all steps in a flow')
+    pflr.add_argument('flow_id')
+    pflr.add_argument('ctx', nargs='*', metavar='key=value',
+                      help='initial context variables')
+    pfld = pfl_sub.add_parser('delete', help='delete a flow')
+    pfld.add_argument('flow_id')
+
+    # ── Daemon ──────────────────────────────────────────────────────────────
+    psd = sub.add_parser('serve-daemon', help='start watcher + cron daemon')
+    psd.add_argument('--poll', type=int, default=5, metavar='SECS',
+                     help='poll interval in seconds (default: 5)')
+
     args = ap.parse_args()
 
     if   args.cmd == 'index':  cmd_index()
@@ -409,6 +496,21 @@ def main() -> None:
     elif args.cmd == 'open':   cmd_open(args.id)
     elif args.cmd == 'serve':  cmd_serve(args.port)
     elif args.cmd == 'chat':   cmd_chat(args.model)
+    elif args.cmd in ('new-task', 'run', 'task', 'provider', 'notify'):
+        from sentor import dispatch  # noqa: PLC0415
+        dispatch(args)
+    elif args.cmd == 'pipeline':
+        from pipeline import dispatch as pl_dispatch  # noqa: PLC0415
+        pl_dispatch(args)
+    elif args.cmd == 'node':
+        from node import dispatch as nd_dispatch  # noqa: PLC0415
+        nd_dispatch(args)
+    elif args.cmd == 'flow':
+        from flow import dispatch as fl_dispatch  # noqa: PLC0415
+        fl_dispatch(args)
+    elif args.cmd == 'serve-daemon':
+        from serve_daemon import dispatch as sd_dispatch  # noqa: PLC0415
+        sd_dispatch(args)
     else:                      ap.print_help()
 
 

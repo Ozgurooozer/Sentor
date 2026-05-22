@@ -1,6 +1,6 @@
 import { Experimental_Agent as Agent, stepCountIs } from "ai";
 import { DEFAULT_MODEL_ID, getModel, type ModelId } from "../config";
-import { buildLanguageModel } from "../lib/agent";
+import { buildLanguageModel, type ProviderConfigs } from "../lib/agent";
 import type { ProviderKeys } from "../lib/keyring";
 import type { ToolContext } from "../tools/context";
 import { buildFsTools } from "../tools/fs";
@@ -15,10 +15,7 @@ type Args = {
   keys: ProviderKeys;
   modelId: ModelId;
   toolContext: ToolContext;
-  lmstudioBaseURL?: string;
-  ollamaBaseURL?: string;
-  lmstudioModelId?: string;
-  ollamaModelId?: string;
+  providers?: ProviderConfigs;
 };
 
 type RunResult = {
@@ -33,10 +30,7 @@ export async function runSubagent({
   keys,
   modelId,
   toolContext,
-  lmstudioBaseURL,
-  ollamaBaseURL,
-  lmstudioModelId,
-  ollamaModelId,
+  providers = {},
 }: Args): Promise<RunResult> {
   const def = SUBAGENTS[type];
   if (!def) throw new Error(`unknown subagent type: ${type}`);
@@ -56,11 +50,8 @@ export async function runSubagent({
   }
 
   const provider = getModel(modelId).provider;
-  const modelIdOverride = provider === "lmstudio" ? lmstudioModelId : ollamaModelId;
   const model = await buildLanguageModel(provider, keys, getModel(modelId).id, {
-    lmstudioBaseURL,
-    ollamaBaseURL,
-    modelIdOverride,
+    providers,
   });
 
   // The Agent constructor's tools generic infers `never` when passed a

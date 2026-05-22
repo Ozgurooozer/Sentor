@@ -1,11 +1,34 @@
 import type { VaultTab } from "@/modules/tabs";
+import { BacklinkPanel } from "@/modules/backlinks/BacklinkPanel";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { useEffect, useRef, useState } from "react";
 import { AddressBar } from "./AddressBar";
 import { localToAsset } from "./assetUrl";
+import { addUrl, getHistory } from "./browserHistory";
 import { loadBookmarks, toggleBookmark } from "./bookmarks";
 
 const isAssetUrl = (url: string) => /^asset:\/\//i.test(url);
+
+/** Extract vault page ID from an asset:// URL, e.g. "home/atlas-os" */
+function pageIdFromAssetUrl(url: string): string | null {
+  const marker = "/vault/";
+  const idx = url.indexOf(marker);
+  if (idx === -1) return null;
+  let rest = decodeURIComponent(url.slice(idx + marker.length));
+  const qi = rest.indexOf("?");
+  if (qi !== -1) rest = rest.slice(0, qi);
+  if (rest.endsWith("/index.html")) rest = rest.slice(0, -"/index.html".length);
+  if (rest.endsWith("/")) rest = rest.slice(0, -1);
+  return rest || null;
+}
+
+/** Build asset URL for a page ID using the current tab URL as a base. */
+function assetUrlForId(tabUrl: string, id: string): string {
+  const marker = "/vault/";
+  const idx = tabUrl.indexOf(marker);
+  if (idx === -1) return tabUrl;
+  return `${tabUrl.slice(0, idx + marker.length)}${id}/index.html`;
+}
 
 type Props = {
   tab: VaultTab;
@@ -23,7 +46,6 @@ function resolveInput(input: string): { kind: "asset" | "external"; value: strin
   if (/^asset:\/\//i.test(s)) return { kind: "asset", value: s };
   if (/^[a-zA-Z]:\\/.test(s) || s.startsWith("/")) return { kind: "asset", value: localToAsset(s) };
   if (/^[a-z0-9-]+\.[a-z]{2,}(\/.*)?$/i.test(s)) return { kind: "external", value: `https://${s}` };
-  // Treat free text as an external search; route to the Web tab.
   return { kind: "external", value: s };
 }
 
@@ -31,11 +53,17 @@ export function VaultBrowserPane({ tab, onNavigate, onNavigateExternal, onGoBack
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [showBacklinks, setShowBacklinks] = useState(false);
+  const [urlHistory, setUrlHistory] = useState(() => getHistory());
+
+  const noteId = pageIdFromAssetUrl(tab.url);
 
   useEffect(() => {
     loadBookmarks().then((bm) => {
       setIsBookmarked(bm.some((b) => b.url === tab.url));
     });
+    addUrl(tab.url);
+    setUrlHistory(getHistory());
   }, [tab.url]);
 
   useEffect(() => {
@@ -57,6 +85,10 @@ export function VaultBrowserPane({ tab, onNavigate, onNavigateExternal, onGoBack
     try {
       const doc = iframeRef.current?.contentDocument;
       if (doc?.title) onTitleChange(doc.title);
+      const href = iframeRef.current?.contentWindow?.location?.href;
+      if (href && href !== "about:blank" && href !== tab.url) {
+        onNavigate(href);
+      }
     } catch {
       // asset:// pages are same-origin so this should always succeed.
     }
@@ -70,6 +102,10 @@ export function VaultBrowserPane({ tab, onNavigate, onNavigateExternal, onGoBack
 
   const handleOpenExternal = () => {
     openUrl(tab.url);
+  };
+
+  const handleBacklinkNavigate = (id: string) => {
+    onNavigate(assetUrlForId(tab.url, id));
   };
 
   const showIframe = tab.url && isAssetUrl(tab.url);
@@ -98,24 +134,36 @@ export function VaultBrowserPane({ tab, onNavigate, onNavigateExternal, onGoBack
         }}
         onToggleBookmark={handleToggleBookmark}
         onOpenExternal={handleOpenExternal}
+        history={urlHistory}
+        showBacklinksToggle={!!noteId}
+        backlinksOpen={showBacklinks}
+        onToggleBacklinks={() => setShowBacklinks((v) => !v)}
       />
 
-      {showIframe && (
-        <iframe
-          ref={iframeRef}
-          src={tab.url}
-          onLoad={handleIframeLoad}
-          className="h-full w-full flex-1 border-0"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
-          title="vault"
-        />
-      )}
+      <div className="flex min-h-0 flex-1">
+        {showIframe && (
+          <iframe
+            ref={iframeRef}
+            src={tab.url}
+            onLoad={handleIframeLoad}
+            className="h-full min-w-0 flex-1 border-0"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+            title="vault"
+          />
+        )}
 
-      {!showIframe && (
-        <div className="flex flex-1 items-center justify-center">
-          <p className="text-sm text-muted-foreground">Type a path or vault URL above.</p>
-        </div>
-      )}
+        {!showIframe && (
+          <div className="flex flex-1 items-center justify-center">
+            <p className="text-sm text-muted-foreground">Type a path or vault URL above.</p>
+          </div>
+        )}
+
+        {showBacklinks && noteId && (
+          <div className="w-52 shrink-0">
+            <BacklinkPanel noteId={noteId} onNavigate={handleBacklinkNavigate} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

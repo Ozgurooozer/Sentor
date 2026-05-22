@@ -38,6 +38,10 @@ export const EDITOR_THEME_LABELS: Record<EditorThemeId, string> = {
   "xcode-light": "Xcode Light",
 };
 
+export type EmbeddingBackend = "sentence-transformers" | "ollama";
+
+export type LayoutMode = "classic" | "focused";
+
 export type Preferences = {
   theme: ThemePref;
   defaultModelId: ModelId;
@@ -58,6 +62,32 @@ export type Preferences = {
   workspaceRoot: string | null;
   /** SearXNG instance URL for web_search. */
   searxngUrl: string;
+  /** Which embedding backend to use for semantic vault search. */
+  embeddingBackend: EmbeddingBackend;
+  /** Ollama model name for embeddings (used when embeddingBackend = "ollama"). */
+  embeddingOllamaModel: string;
+  /** UI layout mode: classic tabbed IDE or focused chat-centric layout. */
+  layoutMode: LayoutMode;
+  /** Absolute path to the Sentor (Flowise) directory. */
+  sentorPath: string;
+  /** Set to true after the user completes (or skips) the first-run wizard. */
+  onboarded: boolean;
+  /** Focused-mode bottom bar collapsed (canvas-only view) — persists across reloads. */
+  barCollapsed: boolean;
+  /** Focused-mode collapsible top header (tab bar) open state. */
+  focusedTopOpen: boolean;
+  /** Focused-mode collapsible left panel (file explorer) open state. */
+  focusedLeftOpen: boolean;
+  /** OpenAI chat model identifier (e.g. "gpt-4o"). Empty = use default. */
+  openaiChatModelId: string;
+  /** Anthropic chat model identifier (e.g. "claude-sonnet-4-6"). Empty = use default. */
+  anthropicChatModelId: string;
+  /** Groq chat model identifier (e.g. "llama-3.3-70b-versatile"). Empty = use default. */
+  groqChatModelId: string;
+  /** Base URL for the custom OpenAI-compatible provider. */
+  customProviderBaseURL: string;
+  /** Model identifier for the custom provider. */
+  customProviderModelId: string;
 };
 
 const STORE_PATH = "atlas-settings.json";
@@ -78,6 +108,19 @@ const KEY_VIM_MODE = "vimMode";
 const KEY_SHORTCUTS = "shortcuts";
 const KEY_WORKSPACE_ROOT = "workspaceRoot";
 const KEY_SEARXNG_URL = "searxngUrl";
+const KEY_EMBEDDING_BACKEND = "embeddingBackend";
+const KEY_EMBEDDING_OLLAMA_MODEL = "embeddingOllamaModel";
+const KEY_LAYOUT_MODE = "layoutMode";
+const KEY_SENTOR_PATH = "sentorPath";
+const KEY_BAR_COLLAPSED = "barCollapsed";
+const KEY_FOCUSED_TOP_OPEN = "focusedTopOpen";
+const KEY_FOCUSED_LEFT_OPEN = "focusedLeftOpen";
+const KEY_OPENAI_CHAT_MODEL = "openaiChatModelId";
+const KEY_ANTHROPIC_CHAT_MODEL = "anthropicChatModelId";
+const KEY_GROQ_CHAT_MODEL = "groqChatModelId";
+const KEY_CUSTOM_PROVIDER_BASE_URL = "customProviderBaseURL";
+const KEY_CUSTOM_PROVIDER_MODEL = "customProviderModelId";
+const KEY_ONBOARDED = "onboarded";
 
 export const DEFAULT_PREFERENCES: Preferences = {
   theme: "system",
@@ -97,6 +140,19 @@ export const DEFAULT_PREFERENCES: Preferences = {
   shortcuts: {} as Record<ShortcutId, KeyBinding[]>,
   workspaceRoot: null,
   searxngUrl: "https://searx.be",
+  embeddingBackend: "sentence-transformers",
+  embeddingOllamaModel: "all-minilm",
+  layoutMode: "focused",
+  sentorPath: "",
+  barCollapsed: false,
+  focusedTopOpen: true,
+  focusedLeftOpen: false,
+  openaiChatModelId: "",
+  anthropicChatModelId: "",
+  groqChatModelId: "",
+  customProviderBaseURL: "",
+  customProviderModelId: "",
+  onboarded: false,
 };
 
 const store = new LazyStore(STORE_PATH, { defaults: {}, autoSave: 200 });
@@ -155,6 +211,29 @@ export async function loadPreferences(): Promise<Preferences> {
       DEFAULT_PREFERENCES.shortcuts,
     workspaceRoot: get<string>(KEY_WORKSPACE_ROOT) ?? null,
     searxngUrl: get<string>(KEY_SEARXNG_URL) ?? DEFAULT_PREFERENCES.searxngUrl,
+    embeddingBackend:
+      get<EmbeddingBackend>(KEY_EMBEDDING_BACKEND) ?? DEFAULT_PREFERENCES.embeddingBackend,
+    embeddingOllamaModel:
+      get<string>(KEY_EMBEDDING_OLLAMA_MODEL) ?? DEFAULT_PREFERENCES.embeddingOllamaModel,
+    layoutMode:
+      get<LayoutMode>(KEY_LAYOUT_MODE) ?? DEFAULT_PREFERENCES.layoutMode,
+    sentorPath:
+      get<string>(KEY_SENTOR_PATH) ?? DEFAULT_PREFERENCES.sentorPath,
+    barCollapsed:
+      get<boolean>(KEY_BAR_COLLAPSED) ?? DEFAULT_PREFERENCES.barCollapsed,
+    openaiChatModelId:
+      get<string>(KEY_OPENAI_CHAT_MODEL) ?? DEFAULT_PREFERENCES.openaiChatModelId,
+    anthropicChatModelId:
+      get<string>(KEY_ANTHROPIC_CHAT_MODEL) ?? DEFAULT_PREFERENCES.anthropicChatModelId,
+    groqChatModelId:
+      get<string>(KEY_GROQ_CHAT_MODEL) ?? DEFAULT_PREFERENCES.groqChatModelId,
+    customProviderBaseURL:
+      get<string>(KEY_CUSTOM_PROVIDER_BASE_URL) ?? DEFAULT_PREFERENCES.customProviderBaseURL,
+    customProviderModelId:
+      get<string>(KEY_CUSTOM_PROVIDER_MODEL) ?? DEFAULT_PREFERENCES.customProviderModelId,
+    onboarded: get<boolean>(KEY_ONBOARDED) ?? DEFAULT_PREFERENCES.onboarded,
+    focusedTopOpen: get<boolean>(KEY_FOCUSED_TOP_OPEN) ?? DEFAULT_PREFERENCES.focusedTopOpen,
+    focusedLeftOpen: get<boolean>(KEY_FOCUSED_LEFT_OPEN) ?? DEFAULT_PREFERENCES.focusedLeftOpen,
   };
 }
 
@@ -224,6 +303,58 @@ export async function setSearxngUrl(value: string): Promise<void> {
   await writePref(KEY_SEARXNG_URL, value);
 }
 
+export async function setEmbeddingBackend(value: EmbeddingBackend): Promise<void> {
+  await writePref(KEY_EMBEDDING_BACKEND, value);
+}
+
+export async function setEmbeddingOllamaModel(value: string): Promise<void> {
+  await writePref(KEY_EMBEDDING_OLLAMA_MODEL, value);
+}
+
+export async function setLayoutMode(value: LayoutMode): Promise<void> {
+  await writePref(KEY_LAYOUT_MODE, value);
+}
+
+export async function setSentorPath(value: string): Promise<void> {
+  await writePref(KEY_SENTOR_PATH, value);
+}
+
+export async function setBarCollapsed(value: boolean): Promise<void> {
+  await writePref(KEY_BAR_COLLAPSED, value);
+}
+
+export async function setOpenaiChatModelId(value: string): Promise<void> {
+  await writePref(KEY_OPENAI_CHAT_MODEL, value);
+}
+
+export async function setAnthropicChatModelId(value: string): Promise<void> {
+  await writePref(KEY_ANTHROPIC_CHAT_MODEL, value);
+}
+
+export async function setGroqChatModelId(value: string): Promise<void> {
+  await writePref(KEY_GROQ_CHAT_MODEL, value);
+}
+
+export async function setCustomProviderBaseURL(value: string): Promise<void> {
+  await writePref(KEY_CUSTOM_PROVIDER_BASE_URL, value);
+}
+
+export async function setCustomProviderModelId(value: string): Promise<void> {
+  await writePref(KEY_CUSTOM_PROVIDER_MODEL, value);
+}
+
+export async function setFocusedTopOpen(value: boolean): Promise<void> {
+  await writePref(KEY_FOCUSED_TOP_OPEN, value);
+}
+
+export async function setFocusedLeftOpen(value: boolean): Promise<void> {
+  await writePref(KEY_FOCUSED_LEFT_OPEN, value);
+}
+
+export async function setOnboarded(value: boolean): Promise<void> {
+  await writePref(KEY_ONBOARDED, value);
+}
+
 export async function setShortcuts(
   value: Record<ShortcutId, KeyBinding[]> | {}
 ): Promise<void> {
@@ -260,6 +391,16 @@ export async function onPreferencesChange(
     [KEY_SHORTCUTS]: "shortcuts",
     [KEY_WORKSPACE_ROOT]: "workspaceRoot",
     [KEY_SEARXNG_URL]: "searxngUrl",
+    [KEY_EMBEDDING_BACKEND]: "embeddingBackend",
+    [KEY_EMBEDDING_OLLAMA_MODEL]: "embeddingOllamaModel",
+    [KEY_LAYOUT_MODE]: "layoutMode",
+    [KEY_SENTOR_PATH]: "sentorPath",
+    [KEY_BAR_COLLAPSED]: "barCollapsed",
+    [KEY_OPENAI_CHAT_MODEL]: "openaiChatModelId",
+    [KEY_ANTHROPIC_CHAT_MODEL]: "anthropicChatModelId",
+    [KEY_GROQ_CHAT_MODEL]: "groqChatModelId",
+    [KEY_CUSTOM_PROVIDER_BASE_URL]: "customProviderBaseURL",
+    [KEY_CUSTOM_PROVIDER_MODEL]: "customProviderModelId",
   };
   // Same-process writes still fire onChange immediately; cross-window writes
   // arrive via the Tauri event emitted by writePref().

@@ -87,7 +87,21 @@ export type VaultHomeTab = {
   title: string;
 };
 
-export type Tab = TerminalTab | EditorTab | PreviewTab | AiDiffTab | VaultTab | WebTab | VaultHomeTab;
+export type AgentsOfficeTab = {
+  id: number;
+  kind: "agents-office";
+  title: string;
+  /** vault/agents/{slug} — empty string for the index view */
+  agentSlug: string;
+};
+
+export type GraphTab = {
+  id: number;
+  kind: "graph";
+  title: string;
+};
+
+export type Tab = TerminalTab | EditorTab | PreviewTab | AiDiffTab | VaultTab | WebTab | VaultHomeTab | AgentsOfficeTab | GraphTab;
 
 /** Picks which browser-style tab kind to use for a given URL. */
 export function pickTabKindForUrl(url: string): "vault" | "web" {
@@ -117,10 +131,8 @@ function titleFromUrl(url: string): string {
 }
 
 export function useTabs() {
-  const [tabs, setTabs] = useState<Tab[]>(() => [
-    { id: 1, kind: "vault-home", title: "Vault" } satisfies VaultHomeTab,
-  ]);
-  const [activeId, setActiveId] = useState(1);
+  const [tabs, setTabs] = useState<Tab[]>([]);
+  const [activeId, setActiveId] = useState(0);
   const nextIdRef = useRef(2);
 
   const newTab = useCallback((cwd?: string) => {
@@ -356,6 +368,46 @@ export function useTabs() {
     return existingId!;
   }, []);
 
+  const openGraphTab = useCallback(() => {
+    let existingId: number | null = null;
+    setTabs((curr) => {
+      const existing = curr.find((t) => t.kind === "graph");
+      if (existing) {
+        existingId = existing.id;
+        return curr;
+      }
+      const id = nextIdRef.current++;
+      existingId = id;
+      return [...curr, { id, kind: "graph", title: "Graph" } satisfies GraphTab];
+    });
+    if (existingId !== null) setActiveId(existingId);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return existingId!;
+  }, []);
+
+  const openAgentsOfficeTab = useCallback((agentSlug = "") => {
+    let existingId: number | null = null;
+    setTabs((curr) => {
+      const existing = curr.find(
+        (t) => t.kind === "agents-office" && t.agentSlug === agentSlug,
+      );
+      if (existing) {
+        existingId = existing.id;
+        return curr;
+      }
+      const id = nextIdRef.current++;
+      existingId = id;
+      const title = agentSlug ? `Office: ${agentSlug}` : "Agents";
+      return [
+        ...curr,
+        { id, kind: "agents-office", title, agentSlug } satisfies AgentsOfficeTab,
+      ];
+    });
+    if (existingId !== null) setActiveId(existingId);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return existingId!;
+  }, []);
+
   const updateNavTabUrl = useCallback((tabId: number, url: string) => {
     setTabs((curr) =>
       curr.map((t) => {
@@ -575,6 +627,8 @@ export function useTabs() {
     openVaultTab,
     openWebTab,
     openVaultHomeTab,
+    openGraphTab,
+    openAgentsOfficeTab,
     updateNavTabUrl,
     navigateTabHistory,
     openAiDiffTab,

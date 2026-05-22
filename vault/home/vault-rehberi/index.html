@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vault Rehberi — Atlas OS</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --elevated: #1a1a1a;
+    --overlay: #222222;
+    --border: #2a2a2a;
+    --border-active: #404040;
+    --text: #f5f5f5;
+    --dim: #888888;
+    --dim2: #555555;
+    --accent: #5b8def;
+    --accent-dim: #3a6abf;
+    --green: #4caf82;
+    --yellow: #d4a84b;
+    --red: #c0504d;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-mark {
+    width: 28px;
+    height: 28px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .logo-sub {
+    font-size: 12px;
+    color: var(--dim);
+  }
+
+  header time {
+    font-size: 12px;
+    color: var(--dim);
+  }
+
+  /* ── Layout ── */
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    max-width: 1100px;
+    margin: 0 auto;
+    min-height: calc(100vh - 68px);
+  }
+
+  /* ── TOC ── */
+  nav.toc {
+    padding: 28px 16px 28px 32px;
+    position: sticky;
+    top: 68px;
+    height: calc(100vh - 68px);
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+  }
+
+  nav.toc p {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--dim2);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  nav.toc a {
+    display: block;
+    font-size: 13px;
+    color: var(--dim);
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: color 150ms ease-out, background 150ms ease-out;
+  }
+
+  nav.toc a:hover {
+    color: var(--text);
+    background: var(--elevated);
+  }
+
+  nav.toc a.sub {
+    font-size: 12px;
+    padding-left: 20px;
+    color: var(--dim2);
+  }
+
+  nav.toc a.sub:hover {
+    color: var(--dim);
+    background: var(--elevated);
+  }
+
+  /* ── Main content ── */
+  main {
+    padding: 32px 40px 80px;
+    max-width: 800px;
+  }
+
+  .hero {
+    margin-bottom: 44px;
+  }
+
+  .hero h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .hero p {
+    font-size: 14px;
+    color: var(--dim);
+    max-width: 560px;
+  }
+
+  .badge-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    color: var(--dim);
+    background: var(--surface);
+  }
+
+  .badge.accent { border-color: var(--accent-dim); color: var(--accent); background: transparent; }
+  .badge.green  { border-color: #2d6b4e; color: var(--green); background: transparent; }
+
+  /* ── Sections ── */
+  section { margin-bottom: 52px; }
+
+  section h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  section h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 24px 0 8px;
+  }
+
+  section p {
+    color: var(--dim);
+    margin-bottom: 12px;
+  }
+
+  section ul, section ol {
+    color: var(--dim);
+    padding-left: 20px;
+    margin-bottom: 12px;
+  }
+
+  section li { margin-bottom: 4px; }
+
+  strong { color: var(--text); font-weight: 600; }
+
+  code {
+    font-family: "Cascadia Code", "Fira Code", ui-monospace, monospace;
+    font-size: 12.5px;
+    background: var(--elevated);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--accent);
+  }
+
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    overflow-x: auto;
+    margin: 12px 0;
+    font-family: "Cascadia Code", "Fira Code", ui-monospace, monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  pre .c  { color: var(--dim2); }
+  pre .k  { color: var(--accent); }
+  pre .s  { color: var(--green); }
+  pre .n  { color: var(--yellow); }
+
+  /* ── Tables ── */
+  .table-wrap { overflow-x: auto; margin: 12px 0; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
+  }
+
+  th {
+    text-align: left;
+    padding: 8px 12px;
+    color: var(--dim);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 9px 12px;
+    color: var(--dim);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  td strong { color: var(--text); }
+  td code { font-size: 11.5px; }
+
+  tr:last-child td { border-bottom: none; }
+
+  /* ── Cards ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 12px 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .card-icon {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .card h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .card p {
+    font-size: 12px;
+    color: var(--dim);
+    margin: 0;
+  }
+
+  /* ── Call-out boxes ── */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: 13px;
+    color: var(--dim);
+  }
+
+  .callout.warn { border-color: var(--yellow); }
+  .callout.ok   { border-color: var(--green); }
+
+  .callout strong { color: var(--text); }
+
+  /* ── Flow steps ── */
+  .steps {
+    counter-reset: step;
+    list-style: none;
+    padding: 0;
+    margin: 12px 0;
+  }
+
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .steps li:last-child { border-bottom: none; }
+
+  .steps li::before {
+    content: counter(step);
+    min-width: 24px;
+    height: 24px;
+    background: var(--elevated);
+    border: 1px solid var(--border-active);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .steps li .step-body { flex: 1; }
+  .steps li .step-title { font-weight: 600; color: var(--text); font-size: 13px; }
+  .steps li .step-desc  { color: var(--dim); font-size: 12.5px; margin-top: 2px; }
+
+  /* ── Mermaid ── */
+  .mermaid {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 14px 0;
+    overflow-x: auto;
+  }
+
+  /* ── Agent pill tags ── */
+  .agent-tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    color: var(--dim);
+    margin-right: 4px;
+  }
+
+  .agent-tag.vault  { border-color: #2a4a7f; color: #5b8def; }
+  .agent-tag.maker  { border-color: #4a2a5a; color: #a06dbf; }
+  .agent-tag.coder  { border-color: #2a5a3a; color: #4caf82; }
+
+  /* ── Slash cmd highlight ── */
+  .slash {
+    font-family: "Cascadia Code", ui-monospace, monospace;
+    font-size: 13px;
+    color: var(--yellow);
+    background: var(--elevated);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 7px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">A</div>
+    <div>
+      <div class="logo-text">Atlas OS</div>
+      <div class="logo-sub">Vault Sistemi Rehberi</div>
+    </div>
+  </div>
+  <time datetime="2026-05-19">2026-05-19</time>
+</header>
+
+<div class="layout">
+
+  <nav class="toc">
+    <p>İçindekiler</p>
+    <a href="#vault-nedir">Vault Nedir?</a>
+    <a href="#dizin">Dizin Yapısı</a>
+    <a href="#ajanlar">Ajanlar</a>
+    <a href="#a-vault" class="sub">Vault Ajanı</a>
+    <a href="#a-maker" class="sub">Atlas-Maker</a>
+    <a href="#a-coder" class="sub">Coder</a>
+    <a href="#ofisler">Ajan Ofisleri</a>
+    <a href="#araclar">AI Araçları</a>
+    <a href="#arac-search" class="sub">vault_search</a>
+    <a href="#arac-read" class="sub">vault_read</a>
+    <a href="#arac-write" class="sub">vault_write</a>
+    <a href="#arac-log" class="sub">vault_agent_log</a>
+    <a href="#arac-state" class="sub">vault_agent_state_*</a>
+    <a href="#arac-self" class="sub">vault_self_context</a>
+    <a href="#slash">Slash Komutları</a>
+    <a href="#akis">Tipik Akışlar</a>
+    <a href="#indeks">İndeks & Arama</a>
+    <a href="#guard">Güvenlik Kuralları</a>
+  </nav>
+
+  <main>
+
+    <div class="hero">
+      <h1>Vault Rehberi</h1>
+      <p>Atlas OS'taki vault sisteminin nasıl çalıştığını, ajanların bu sistemi nasıl kullandığını
+         ve günlük iş akışlarında nasıl yararlanabileceğinizi anlatan tam referans.</p>
+      <div class="badge-row">
+        <span class="badge accent">Faz 0–7 Tamamlandı</span>
+        <span class="badge green">Üretimde</span>
+        <span class="badge">3 Built-in Ajan</span>
+        <span class="badge">6 AI Aracı</span>
+        <span class="badge">4 Slash Komutu</span>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────── -->
+    <section id="vault-nedir">
+      <h2>Vault Nedir?</h2>
+      <p>Vault, Atlas OS'un kalıcı bilgi tabanıdır. Her "sayfa" <code>vault/{kategori}/{slug}/index.html</code>
+         yolundaki tam HTML dosyasıdır. Markdown değil, tarayıcıda doğrudan açılabilen bağımsız HTML.</p>
+
+      <div class="callout ok">
+        <strong>Temel ilke:</strong> Vault, hem insanın okuduğu hem de AI'ın aradığı tek kaynak.
+        İki kanalı var: <strong>keyword (TF-IDF)</strong> arama ve <strong>semantik (embedding)</strong> arama.
+      </div>
+
+      <h3>Ne saklarsınız?</h3>
+      <ul>
+        <li>Araştırma notları, teknik referanslar, proje belgeleri</li>
+        <li>Toplantı tutanakları (<code>meetings/</code>)</li>
+        <li>Ajan durumları, kararlar, loglar (<code>agents/</code>)</li>
+        <li>Şablonlar (<code>templates/</code>) — arama dışı, yalnızca araç şablonu</li>
+      </ul>
+    </section>
+
+    <!-- ─────────────────────────────────── -->
+    <section id="dizin">
+      <h2>Dizin Yapısı</h2>
+
+      <pre><span class="n">vault/</span>
+├─ <span class="n">home/</span>          <span class="c"># genel bilgi sayfaları (bu rehber burada)</span>
+├─ <span class="n">projects/</span>      <span class="c"># proje belgeleri</span>
+├─ <span class="n">html/</span>          <span class="c"># teknik HTML referans</span>
+├─ <span class="n">meetings/</span>      <span class="c"># toplantı notları  → YYYY-MM-DD-{slug}/</span>
+├─ <span class="n">archive/</span>       <span class="c"># salt-okunur arşiv (ajan yazamaz)</span>
+├─ <span class="n">templates/</span>     <span class="c"># şablonlar (arama ve embed dışı)</span>
+│
+└─ <span class="n">agents/</span>        <span class="c"># AJAN OFİSLERİ</span>
+   └─ <span class="n">{slug}/</span>      <span class="c"># vault / coder / atlas-maker</span>
+      ├─ index.html  <span class="c"># ofis kartı (hibrit: generated + user blok)</span>
+      ├─ profile.md  <span class="c"># sync_profiles.py üretir — salt-okunur</span>
+      ├─ state.md    <span class="c"># ajan durumu (frontmatter + agent:start/end blok)</span>
+      ├─ log.md      <span class="c"># kronolojik event log — sadece append</span>
+      ├─ decisions.md <span class="c"># karar arşivi (K16: otomatik dolduruluyor)</span>
+      └─ projects/   <span class="c"># proje sayfaları</span></pre>
+
+      <div class="table-wrap">
+        <table>
+          <tr><th>Yol</th><th>Tip</th><th>Aramaya Dahil</th><th>Embed</th></tr>
+          <tr><td><code>home/**</code></td><td>note</td><td>✅</td><td>✅</td></tr>
+          <tr><td><code>projects/**</code></td><td>project</td><td>✅</td><td>✅</td></tr>
+          <tr><td><code>agents/{a}/index.html</code></td><td>agent-profile</td><td>✅</td><td>✅</td></tr>
+          <tr><td><code>agents/{a}/state.md</code></td><td>agent-state</td><td>✅</td><td>✅</td></tr>
+          <tr><td><code>agents/{a}/log.md</code></td><td>agent-log</td><td>❌ tam metin arama</td><td>❌</td></tr>
+          <tr><td><code>agents/{a}/decisions.md</code></td><td>agent-decisions</td><td>✅</td><td>✅</td></tr>
+          <tr><td><code>meetings/**</code></td><td>meeting</td><td>✅</td><td>✅</td></tr>
+          <tr><td><code>archive/**</code></td><td>archive</td><td>❌ (opt-in)</td><td>✅</td></tr>
+          <tr><td><code>templates/**</code></td><td>template</td><td>❌</td><td>❌</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────── -->
+    <section id="ajanlar">
+      <h2>Ajanlar</h2>
+      <p>Atlas OS'ta üç built-in ajan var. Her biri farklı bir görev setine ve sistem promptuna sahip.</p>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">✦</div>
+          <h4>Vault <span class="agent-tag vault">default</span></h4>
+          <p>Her sorudan önce vault'u arar. Vault'ta yoksa web'e bakar. Cevap üretir, sayfa yazmaz.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">◈</div>
+          <h4>Atlas-Maker <span class="agent-tag maker">writer</span></h4>
+          <p>Her cevabı vault HTML sayfasına dönüştürür. İkinci beynini inşa eder.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">⌨</div>
+          <h4>Coder <span class="agent-tag coder">dev</span></h4>
+          <p>Açık workspace'teki kod dosyalarını düzenler. vault_write çağırmaz.</p>
+        </div>
+      </div>
+
+      <h3 id="a-vault">Vault Ajanı — Nasıl Çalışır?</h3>
+      <p>Vault ajanı her mesajınızda şu sırayı izler:</p>
+      <ol class="steps">
+        <li><div class="step-body"><div class="step-title">Sistem bağlamı otomatik yüklenir</div><div class="step-desc">Mesajınız gönderilmeden önce, <code>readAgentSelfContext()</code> arka planda aktif ajanın ofis durumunu okur ve sistem promptuna sessizce ekler (15 sn cache).</div></div></li>
+        <li><div class="step-body"><div class="step-title">vault_search çağrılır</div><div class="step-desc">Konu ile ilgili vault sayfaları aranır. Skor ≥ 6 ise <code>vault_read</code> ile tam içerik okunur.</div></div></li>
+        <li><div class="step-body"><div class="step-title">Web araması (fallback)</div><div class="step-desc">Vault'ta iyi eşleşme yoksa <code>web_search</code> → <code>web_fetch</code> ile güncel bilgi alınır.</div></div></li>
+        <li><div class="step-body"><div class="step-title">Cevap üretilir</div><div class="step-desc">Kaynak belirtilerek cevap verilir. Önemli araştırma ise "Atlas-Maker'a vault sayfası yazmasını isteyin" önerisi eklenir.</div></div></li>
+      </ol>
+
+      <h3 id="a-maker">Atlas-Maker — Sayfa Yazma Akışı</h3>
+      <ol class="steps">
+        <li><div class="step-body"><div class="step-title">Mevcut sayfa kontrolü</div><div class="step-desc"><code>vault_search</code> ile skor ≥ 6 varsa kullanıcıya sorar: güncelle mi, yeni mi?</div></div></li>
+        <li><div class="step-body"><div class="step-title">Web araştırması</div><div class="step-desc">Gerekiyorsa <code>web_search</code> (max 5) → <code>web_fetch</code> (top 3 URL).</div></div></li>
+        <li><div class="step-body"><div class="step-title">HTML oluşturulur</div><div class="step-desc">Atlas tasarım kurallarına uygun tam HTML belgesi hazırlanır (inline style, dark theme, Mermaid).</div></div></li>
+        <li><div class="step-body"><div class="step-title">vault_write onaya sunulur</div><div class="step-desc">Araç kullanıcıya önizleme gösterir. Onay sonrası yazar, indexer otomatik tetiklenir.</div></div></li>
+        <li><div class="step-body"><div class="step-title">Özet verilir</div><div class="step-desc">"vault/kategori/slug'a kaydedildi" + 2 cümle özet.</div></div></li>
+      </ol>
+    </section>
+
+    <!-- ─────────────────────────────────── -->
+    <section id="ofisler">
+      <h2>Ajan Ofisleri</h2>
+      <p>Her built-in ajanın <code>vault/agents/{slug}/</code> altında bir "ofisi" vardır. Bu ofis ajanın belleğidir.</p>
+
+      <h3>state.md — Ajan Durumu</h3>
+      <p>YAML frontmatter + serbest metin bloğu içerir. Frontmatter ajanın mevcut durumunu tanımlar:</p>
+      <pre><span class="c">---</span>
+<span class="k">status</span>: <span class="s">active</span>
+<span class="k">focus</span>: <span class="s">vault rehberi yazılıyor</span>
+<span class="k">phase</span>: <span class="s">production</span>
+<span class="k">updated</span>: <span class="s">2026-05-19</span>
+<span class="c">---</span>
+<span class="c">&lt;!-- agent:start --&gt;</span>
+Ajanın kendi notları burada. Indexer'ın görmediği serbest alan.
+<span class="c">&lt;!-- agent:end --&gt;</span></pre>
+
+      <h3>log.md — Olay Günlüğü</h3>
+      <p>Kronolojik, sadece append. Her satır: <code>ISO8601 [event_type] mesaj</code></p>
+      <pre><span class="s">2026-05-19T14:30 [start] ofis oluşturuldu</span>
+<span class="s">2026-05-19T15:10 [progress] vault rehberi taslağı hazırlandı</span>
+<span class="s">2026-05-19T15:45 [decision] HTML formatı seçildi, markdown değil</span></pre>
+
+      <h3>decisions.md — Karar Arşivi</h3>
+      <p><strong>K16 kuralı:</strong> <code>vault_agent_log(event="decision", msg=...)</code> çağrısı otomatik olarak hem <code>log.md</code>'ye satır hem de <code>decisions.md</code>'ye yapılandırılmış blok ekler.</p>
+      <pre><span class="c">## D3 — HTML formatı seçildi</span>
+<span class="k">Tarih:</span> <span class="s">2026-05-19T15:45</span>
+<span class="k">Mesaj:</span> <span class="s">HTML formatı seçildi, markdown değil</span>
+<span class="k">Sebep:</span>
+<span class="k">Alternatifler:</span>
+<span class="k">Etki:</span></pre>
+
+      <div class="callout warn">
+        <strong>Yazım kısıtlaması:</strong> <code>archive/**</code>, <code>templates/**</code> ve <code>agents/*/profile.md</code>
+        yollarına ajan yazamaz. Bu yollar write-guard ile korunur.
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────── -->
+    <section id="araclar">
+      <h2>AI Araçları</h2>
+      <p>Ajanlar vault ile aşağıdaki araçlar üzerinden konuşur. Tüm araçlar <code>ide/src/modules/ai/tools/vault.ts</code> dosyasında tanımlıdır.</p>
+
+      <h3 id="arac-search">vault_search</h3>
+      <p>Vault'taki sayfalarda hibrit arama yapar. İlk olarak yerel keyword index (TF-IDF) kullanır, sonuçlar zayıfsa semantik aramaya (embedding) geçer.</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Parametre</th><th>Tip</th><th>Açıklama</th></tr>
+          <tr><td><code>query</code></td><td>string</td><td>Arama sorgusu</td></tr>
+          <tr><td><code>category</code></td><td>string?</td><td>Kategori filtresi (<code>home</code>, <code>projects</code>…)</td></tr>
+          <tr><td><code>limit</code></td><td>1–20</td><td>Maksimum sonuç sayısı (varsayılan 8)</td></tr>
+          <tr><td><code>mode</code></td><td>auto/keyword/semantic</td><td>Arama modu (varsayılan auto)</td></tr>
+        </table>
+      </div>
+      <p>Dönen her kayıt: <code>id, title, category, slug, description, snippet, score, source</code></p>
+
+      <h3 id="arac-read">vault_read</h3>
+      <p>Bir sayfanın tam içeriğini okur. Üç adım dener: API → yerel HTML → index özeti.</p>
+      <div class="callout">
+        <strong>Ne zaman kullanılır:</strong> <code>vault_search</code> ile bulunan bir sayfanın tam metnine ihtiyaç duyulduğunda. Score ≥ 6 olan ilk sonuç için çağırın.
+      </div>
+
+      <h3 id="arac-write">vault_write</h3>
+      <p><code>vault/{category}/{slug}/index.html</code> dosyası oluşturur veya günceller. Yazdıktan sonra Python indexer ve embedder otomatik tetiklenir.</p>
+      <div class="callout warn">
+        <strong>Onay gerektirir:</strong> Bu araç yazma işlemi öncesinde kullanıcıya önizleme gösterir.
+        Yalnızca Atlas-Maker kullanmalıdır; Coder bu aracı çağırmaz.
+      </div>
+
+      <h3 id="arac-log">vault_agent_log</h3>
+      <p>Aktif ajanın <code>log.md</code>'sine olay satırı ekler. <code>event="decision"</code> verilirse aynı zamanda <code>decisions.md</code>'ye yapılandırılmış blok da eklenir (K16).</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Parametre</th><th>Açıklama</th></tr>
+          <tr><td><code>slug</code></td><td>Ajan klasörü (<code>vault</code>, <code>coder</code>, <code>atlas-maker</code>)</td></tr>
+          <tr><td><code>event</code></td><td><code>note</code>, <code>progress</code>, <code>decision</code>, <code>error</code>, <code>meeting</code></td></tr>
+          <tr><td><code>msg</code></td><td>Log mesajı (secret içermemeli)</td></tr>
+        </table>
+      </div>
+
+      <h3 id="arac-state">vault_agent_state_read / vault_agent_state_update</h3>
+      <p><strong>Read:</strong> <code>state.md</code>'yi frontmatter + body olarak döner.<br>
+         <strong>Update:</strong> Frontmatter anahtarlarını merge eder ve/veya <code>agent:start/end</code> bloğunu günceller. Dışındaki kullanıcı içeriğine dokunmaz.</p>
+
+      <h3 id="arac-self">vault_self_context</h3>
+      <p>Ajanın kendi ofis bağlamını okur. Transport katmanı bunu her mesajda otomatik sistem promptuna inject eder (15 sn cache).</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>depth</th><th>İçerik</th><th>~Token</th></tr>
+          <tr><td><code>0</code></td><td>state frontmatter + proje listesi (log yok)</td><td>~100</td></tr>
+          <tr><td><code>1</code> (varsayılan)</td><td>frontmatter + son 10 log satırı + projeler</td><td>~300</td></tr>
+        </table>
+      </div>
+      <div class="callout ok">
+        <strong>Otomatik:</strong> Her mesajda arka planda çağrılır. Karmaşık görevler için araç olarak da manuel çağırabilirsiniz.
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────── -->
+    <section id="slash">
+      <h2>Slash Komutları</h2>
+      <p>Composer'a <code>/</code> ile başlayarak yazın. AI'ya gitmeden doğrudan çalışır veya özel prompt üretir.</p>
+
+      <div class="table-wrap">
+        <table>
+          <tr><th>Komut</th><th>Davranış</th></tr>
+          <tr>
+            <td><span class="slash">/plan</span></td>
+            <td>Plan modunu açar/kapar. Aktifken mutasyon araçları (write, edit) değişiklikleri kuyruğa alır. <code>/plan off</code> ile kapatılır.</td>
+          </tr>
+          <tr>
+            <td><span class="slash">/init</span></td>
+            <td>Workspace'i tarar, <code>ATLAS.md</code> oluşturur: proje açıklaması, komutlar, mimari, giriş noktaları.</td>
+          </tr>
+          <tr>
+            <td><span class="slash">/decision {mesaj}</span></td>
+            <td><strong>Anında çalışır, AI yok.</strong> Aktif ajan ofisine <code>vault_agent_log(event="decision")</code> yazar, K16 ile <code>decisions.md</code>'ye de eklenir. Toast ile onaylar.</td>
+          </tr>
+          <tr>
+            <td><span class="slash">/meeting {konu}</span></td>
+            <td>AI'ya şu komutu gönderir: log'a meeting kaydı yaz + <code>vault/meetings/{slug}</code> sayfası oluştur.</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="callout">
+        <strong>İpucu:</strong> <code>/decision</code> ajan ofisi oluşturulmamışsa otomatik olarak AI prompt moduna geçer ve ajan aracı üzerinden kaydeder.
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────── -->
+    <section id="akis">
+      <h2>Tipik Akışlar</h2>
+
+      <h3>Araştırma → Kaydetme</h3>
+      <div class="mermaid">
+flowchart LR
+    U([Kullanıcı sorusu]) --> V[Vault ajanı]
+    V --> VS[vault_search]
+    VS -->|score ≥ 6| VR[vault_read]
+    VS -->|score < 6| WS[web_search + web_fetch]
+    VR --> ANS([Cevap])
+    WS --> ANS
+    ANS -->|önemli bilgi| AM[Atlas-Maker'a yönlendir]
+    AM --> VW[vault_write → yeni sayfa]
+      </div>
+
+      <h3>Karar Loglama</h3>
+      <div class="mermaid">
+flowchart LR
+    D(["/decision Rust seçildi"]) --> SC[slashCommands.ts]
+    SC -->|Tauri invoke| LOG[vault_agent_log\nevent=decision]
+    LOG --> LMD[log.md'ye satır]
+    LOG --> DMD[decisions.md'ye D-numaralı blok]
+    LMD & DMD --> T([Toast: Decision logged])
+      </div>
+
+      <h3>Toplantı Akışı</h3>
+      <div class="mermaid">
+flowchart LR
+    M(["/meeting canvas review"]) --> PR[Yapılandırılmış prompt]
+    PR --> AG[Vault + Atlas-Maker]
+    AG --> AL[vault_agent_log\nevent=meeting]
+    AG --> VW[vault_write\nmeetings/2026-05-19-canvas-review]
+    VW --> IDX[Indexer + Embedder\notomatik tetiklenir]
+    IDX --> SR([Aramada bulunur])
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────── -->
+    <section id="indeks">
+      <h2>İndeks ve Arama</h2>
+
+      <h3>İndeksleme</h3>
+      <p><code>tools/indexer.py</code> tüm vault'u tarayarak <code>.index/pages.json</code> ve <code>.index/pages.js</code> üretir.
+         <code>vault_write</code> sonrası otomatik tetiklenir. Manuel çalıştırmak için:</p>
+      <pre>python tools/indexer.py
+<span class="c"># Sadece değişen dosyalar (artımlı):</span>
+python tools/indexer.py --changed-files vault/home/vault-rehberi/index.html</pre>
+
+      <h3>Semantik Arama</h3>
+      <p><code>tools/embedder.py</code> ile 384 boyutlu vektörler üretilir (<code>.index/embeddings.json</code>).
+         Ollama <code>all-minilm</code> modeli kullanır. Ollama yoksa keyword-only modda çalışır.</p>
+      <pre>python tools/embedder.py
+<span class="c"># Ollama modelini çek (bir kez):</span>
+ollama pull all-minilm</pre>
+
+      <h3>Arama Skoru</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Alan</th><th>Ağırlık</th></tr>
+          <tr><td>Başlık (<code>title</code>)</td><td>× 3</td></tr>
+          <tr><td>Başlıklar + Açıklama</td><td>× 2</td></tr>
+          <tr><td>Gövde metni</td><td>× 1</td></tr>
+        </table>
+      </div>
+      <p>Hibrit aramada: <code>0.6 × keyword_norm + 0.4 × semantic + 0.1 bonus</code> (her iki kaynakta da varsa).</p>
+    </section>
+
+    <!-- ─────────────────────────────────── -->
+    <section id="guard">
+      <h2>Güvenlik Kuralları</h2>
+      <p>Rust write-guard (<code>vault::guard</code>) tüm vault yazma işlemlerinde devreye girer.</p>
+
+      <h3>Secrets Tespiti</h3>
+      <p>Şu pattern'lerden biri eşleşirse yazma reddedilir, <code>log.md</code>'ye <code>[blocked]</code> eklenir:</p>
+      <ul>
+        <li>OpenAI API anahtarları (<code>sk-...</code>)</li>
+        <li>GitHub token'ları (<code>ghp_...</code>, <code>github_pat_...</code>)</li>
+        <li>Slack token'ları (<code>xoxb-...</code>)</li>
+        <li>PEM blokları (<code>-----BEGIN ...-----</code>)</li>
+      </ul>
+
+      <h3>Path Kısıtlamaları</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Yol</th><th>Ajan Yazabilir mi?</th><th>Sebep</th></tr>
+          <tr><td><code>archive/**</code></td><td>❌ Hayır</td><td>Salt-okunur arşiv</td></tr>
+          <tr><td><code>templates/**</code></td><td>❌ Hayır</td><td>Yalnızca kullanıcı eli</td></tr>
+          <tr><td><code>agents/*/profile.md</code></td><td>❌ Hayır</td><td><code>sync_profiles.py</code> yönetir</td></tr>
+          <tr><td><code>agents/*/log.md</code></td><td>Sadece append</td><td>Atomik <code>vault_agent_log</code></td></tr>
+          <tr><td>Diğer tüm yollar</td><td>✅ Evet</td><td>Secrets kontrolü ile</td></tr>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="/vendor/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', darkMode: true,
+    themeVariables: {
+      background: '#111111',
+      primaryColor: '#1a1a1a',
+      primaryTextColor: '#f5f5f5',
+      primaryBorderColor: '#2a2a2a',
+      lineColor: '#404040',
+      secondaryColor: '#1a1a1a',
+      tertiaryColor: '#0a0a0a',
+      nodeBorder: '#404040',
+      clusterBkg: '#111111',
+      titleColor: '#f5f5f5',
+      edgeLabelBackground: '#1a1a1a',
+      fontSize: '13px'
+    }
+  });
+</script>
+</body>
+</html>

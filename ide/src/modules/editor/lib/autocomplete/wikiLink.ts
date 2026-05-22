@@ -11,7 +11,6 @@ export async function wikiLinkCompletion(
   if (!word) return null;
 
   const query = word.text.slice(2);
-  // Veritabanından veya dosya sisteminden not başlıklarını getir
   const notes: string[] = await invoke("vault_get_note_titles", { query });
 
   return {

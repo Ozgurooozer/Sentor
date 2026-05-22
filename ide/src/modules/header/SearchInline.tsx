@@ -7,7 +7,6 @@ import { getBindingTokens, SHORTCUTS } from "@/modules/shortcuts/shortcuts";
 import { Cancel01Icon, Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { SearchAddon } from "@xterm/addon-search";
-import { AnimatePresence, motion } from "motion/react";
 import {
   forwardRef,
   useCallback,
@@ -126,23 +125,15 @@ export const SearchInline = forwardRef<SearchInlineHandle, Props>(
     };
 
     return (
-      <motion.div
-        layout
-        initial={false}
-        animate={{ width: expanded ? 192 : 28 }}
-        transition={{ type: "spring", stiffness: 380, damping: 34 }}
-        className="relative h-7 shrink-0"
+      <div
+        style={{ width: expanded ? 192 : 28 }}
+        className="relative h-7 shrink-0 transition-[width] duration-200 ease-out"
       >
-        <AnimatePresence initial={false} mode="wait">
-          {expanded ? (
-            <motion.div
-              key="input"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.12 }}
-              className="absolute inset-0"
-            >
+        {expanded ? (
+          <div
+            key="input"
+            className="absolute inset-0 duration-150 ease-out animate-in fade-in"
+          >
               <HugeiconsIcon
                 icon={Search01Icon}
                 size={13}
@@ -195,16 +186,12 @@ export const SearchInline = forwardRef<SearchInlineHandle, Props>(
                   />
                 </button>
               )}
-            </motion.div>
-          ) : (
-            <motion.div
-              key="icon"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.12 }}
-              className="absolute inset-0 flex items-center justify-end"
-            >
+          </div>
+        ) : (
+          <div
+            key="icon"
+            className="absolute inset-0 flex items-center justify-end duration-150 ease-out animate-in fade-in"
+          >
               <Button
                 variant="ghost"
                 size="icon"
@@ -218,10 +205,9 @@ export const SearchInline = forwardRef<SearchInlineHandle, Props>(
                   strokeWidth={1.75}
                 />
               </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+          </div>
+        )}
+      </div>
     );
   },
 );

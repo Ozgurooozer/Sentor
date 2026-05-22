@@ -9,32 +9,47 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import {
+  ANTHROPIC_DEFAULT_CHAT_MODEL,
   AUTOCOMPLETE_PROVIDERS,
+  CUSTOM_DEFAULT_BASE_URL,
   DEFAULT_AUTOCOMPLETE_MODEL,
+  GROQ_DEFAULT_CHAT_MODEL,
   MODELS,
+  OPENAI_DEFAULT_CHAT_MODEL,
   PROVIDERS,
   getModel,
   getProvider,
   type AutocompleteProviderId,
   type ModelId,
 } from "@/modules/ai/config";
+import { clearKey, getKey, setKey } from "@/modules/ai/lib/keyring";
+import { emitKeysChanged } from "@/modules/settings/store";
 import { usePreferencesStore } from "@/modules/settings/preferences";
 import {
+  setAnthropicChatModelId,
   setAutocompleteEnabled,
   setAutocompleteModelId,
   setAutocompleteProvider,
+  setCustomProviderBaseURL,
+  setCustomProviderModelId,
   setDefaultModel,
+  setEmbeddingBackend,
+  setEmbeddingOllamaModel,
+  setGroqChatModelId,
   setLmstudioBaseURL,
   setLmstudioChatModelId,
   setOllamaBaseURL,
   setOllamaChatModelId,
+  setOpenaiChatModelId,
   setSearxngUrl,
+  type EmbeddingBackend,
 } from "@/modules/settings/store";
 import { invoke } from "@tauri-apps/api/core";
 import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useEffect, useState } from "react";
 import { ProviderIcon } from "../components/ProviderIcon";
+import { ProviderKeyCard } from "../components/ProviderKeyCard";
 import { SectionHeader } from "../components/SectionHeader";
 
 export function ModelsSection() {
@@ -45,7 +60,7 @@ export function ModelsSection() {
     <div className="flex flex-col gap-7">
       <SectionHeader
         title="Models"
-        description="Local models only — no API keys required. Configure LM Studio or Ollama below."
+        description="Configure local and cloud AI providers. Local providers need no API keys."
       />
 
       <div className="flex flex-col gap-2">
@@ -105,8 +120,161 @@ export function ModelsSection() {
       </div>
 
       <ChatModelBlock />
+      <CloudProvidersBlock />
+      <CustomProviderBlock />
       <AutocompleteBlock />
       <SearxngBlock />
+      <EmbeddingBlock />
+    </div>
+  );
+}
+
+const CLOUD_PROVIDERS = [
+  { id: "openai" as const, defaultModel: OPENAI_DEFAULT_CHAT_MODEL, setModel: setOpenaiChatModelId, getPref: (s: { openaiChatModelId: string }) => s.openaiChatModelId },
+  { id: "anthropic" as const, defaultModel: ANTHROPIC_DEFAULT_CHAT_MODEL, setModel: setAnthropicChatModelId, getPref: (s: { anthropicChatModelId: string }) => s.anthropicChatModelId },
+  { id: "groq" as const, defaultModel: GROQ_DEFAULT_CHAT_MODEL, setModel: setGroqChatModelId, getPref: (s: { groqChatModelId: string }) => s.groqChatModelId },
+] as const;
+
+function CloudProvidersBlock() {
+  const openaiModel = usePreferencesStore((s) => s.openaiChatModelId);
+  const anthropicModel = usePreferencesStore((s) => s.anthropicChatModelId);
+  const groqModel = usePreferencesStore((s) => s.groqChatModelId);
+
+  const modelByProvider = { openai: openaiModel, anthropic: anthropicModel, groq: groqModel };
+  const [drafts, setDrafts] = useState(modelByProvider);
+  const [keys, setKeys] = useState<Record<"openai" | "anthropic" | "groq", string | null>>({
+    openai: null, anthropic: null, groq: null,
+  });
+
+  useEffect(() => {
+    setDrafts({ openai: openaiModel, anthropic: anthropicModel, groq: groqModel });
+  }, [openaiModel, anthropicModel, groqModel]);
+
+  useEffect(() => {
+    void Promise.all(
+      (["openai", "anthropic", "groq"] as const).map(async (id) => {
+        const k = await getKey(id);
+        return [id, k] as const;
+      }),
+    ).then((pairs) => {
+      const next = { openai: null, anthropic: null, groq: null } as typeof keys;
+      pairs.forEach(([id, k]) => { next[id] = k; });
+      setKeys(next);
+    });
+  }, []);
+
+  const handleSave = async (id: "openai" | "anthropic" | "groq", k: string) => {
+    await setKey(id, k);
+    setKeys((prev) => ({ ...prev, [id]: k }));
+    await emitKeysChanged();
+  };
+
+  const handleClear = async (id: "openai" | "anthropic" | "groq") => {
+    await clearKey(id);
+    setKeys((prev) => ({ ...prev, [id]: null }));
+    await emitKeysChanged();
+  };
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div>
+        <Label>Cloud providers</Label>
+        <p className="mt-0.5 text-[10.5px] leading-relaxed text-muted-foreground">
+          API keys are stored in the OS keychain. Model ID is optional — leave blank to use the provider default.
+        </p>
+      </div>
+      {CLOUD_PROVIDERS.map(({ id, defaultModel, setModel }) => {
+        const info = getProvider(id);
+        return (
+          <div key={id} className="flex flex-col gap-2 rounded-lg border border-border/60 bg-card/60 px-3 py-2.5">
+            <ProviderKeyCard
+              provider={info}
+              currentKey={keys[id]}
+              onSave={(k) => handleSave(id, k)}
+              onClear={() => handleClear(id)}
+            />
+            <div className="flex flex-col gap-1.5">
+              <Label>Model identifier</Label>
+              <Input
+                value={drafts[id]}
+                onChange={(e) => setDrafts((prev) => ({ ...prev, [id]: e.target.value }))}
+                onBlur={() => { const v = drafts[id].trim(); void setModel(v); }}
+                placeholder={defaultModel}
+                spellCheck={false}
+                className="h-8 font-mono text-[11.5px]"
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function CustomProviderBlock() {
+  const baseURL = usePreferencesStore((s) => s.customProviderBaseURL);
+  const modelId = usePreferencesStore((s) => s.customProviderModelId);
+  const [urlDraft, setUrlDraft] = useState(baseURL);
+  const [modelDraft, setModelDraft] = useState(modelId);
+  const [apiKey, setApiKey] = useState<string | null>(null);
+
+  useEffect(() => { setUrlDraft(baseURL); }, [baseURL]);
+  useEffect(() => { setModelDraft(modelId); }, [modelId]);
+
+  useEffect(() => {
+    void getKey("custom").then(setApiKey);
+  }, []);
+
+  const handleSaveKey = async (k: string) => {
+    await setKey("custom", k);
+    setApiKey(k);
+    await emitKeysChanged();
+  };
+
+  const handleClearKey = async () => {
+    await clearKey("custom");
+    setApiKey(null);
+    await emitKeysChanged();
+  };
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div>
+        <Label>Custom provider</Label>
+        <p className="mt-0.5 text-[10.5px] leading-relaxed text-muted-foreground">
+          Any OpenAI-compatible endpoint (LiteLLM, vLLM, local proxies, etc.).
+        </p>
+      </div>
+      <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-card/60 px-3 py-2.5">
+        <ProviderKeyCard
+          provider={getProvider("custom")}
+          currentKey={apiKey}
+          onSave={handleSaveKey}
+          onClear={handleClearKey}
+        />
+        <div className="flex flex-col gap-1.5">
+          <Label>Base URL</Label>
+          <Input
+            value={urlDraft}
+            onChange={(e) => setUrlDraft(e.target.value)}
+            onBlur={() => { const v = urlDraft.trim(); if (v !== baseURL) void setCustomProviderBaseURL(v); }}
+            placeholder={CUSTOM_DEFAULT_BASE_URL}
+            spellCheck={false}
+            className="h-8 font-mono text-[11.5px]"
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label>Model identifier</Label>
+          <Input
+            value={modelDraft}
+            onChange={(e) => setModelDraft(e.target.value)}
+            onBlur={() => { const v = modelDraft.trim(); if (v !== modelId) void setCustomProviderModelId(v); }}
+            placeholder="my-model-id"
+            spellCheck={false}
+            className="h-8 font-mono text-[11.5px]"
+          />
+        </div>
+      </div>
     </div>
   );
 }
@@ -330,6 +498,111 @@ function SearxngBlock() {
         spellCheck={false}
         className="h-8 font-mono text-[11.5px]"
       />
+    </div>
+  );
+}
+
+const EMBEDDING_BACKENDS: { id: EmbeddingBackend; label: string; hint: string }[] = [
+  {
+    id: "sentence-transformers",
+    label: "sentence-transformers",
+    hint: "pip install sentence-transformers · downloads ~22 MB once · fully offline",
+  },
+  {
+    id: "ollama",
+    label: "Ollama",
+    hint: "requires Ollama running · ollama pull all-minilm",
+  },
+];
+
+function EmbeddingBlock() {
+  const backend = usePreferencesStore((s) => s.embeddingBackend);
+  const ollamaModel = usePreferencesStore((s) => s.embeddingOllamaModel);
+  const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot);
+  const [modelDraft, setModelDraft] = useState(ollamaModel);
+  const [writeStatus, setWriteStatus] = useState<"idle" | "ok" | "fail">("idle");
+
+  useEffect(() => setModelDraft(ollamaModel), [ollamaModel]);
+
+  const writeConfig = async (b: EmbeddingBackend, model: string) => {
+    if (!workspaceRoot) return;
+    const cfg = JSON.stringify({ backend: b, ollamaUrl: "http://localhost:11434", ollamaModel: model }, null, 2);
+    const path = workspaceRoot.replace(/[\\/]$/, "") + "/.atlas-embed.json";
+    try {
+      await invoke("fs_write_file", { path, content: cfg });
+      setWriteStatus("ok");
+      setTimeout(() => setWriteStatus("idle"), 2000);
+    } catch {
+      setWriteStatus("fail");
+    }
+  };
+
+  const onBackendChange = async (b: EmbeddingBackend) => {
+    await setEmbeddingBackend(b);
+    await writeConfig(b, modelDraft);
+  };
+
+  const onModelSave = async () => {
+    const v = modelDraft.trim() || "all-minilm";
+    if (v !== ollamaModel) await setEmbeddingOllamaModel(v);
+    await writeConfig(backend, v);
+  };
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div>
+        <Label>Embedding backend</Label>
+        <p className="mt-0.5 text-[10.5px] leading-relaxed text-muted-foreground">
+          Used by <code className="font-mono">tools/embedder.py</code> and <code className="font-mono">api/server.py</code> for semantic vault search.
+          Writes <code className="font-mono">.atlas-embed.json</code> to the workspace root.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-0.5 rounded-lg border border-border/60 bg-card/60 p-0.5">
+        {EMBEDDING_BACKENDS.map(({ id, label, hint }) => {
+          const active = id === backend;
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => void onBackendChange(id)}
+              className={cn(
+                "flex flex-col gap-0.5 rounded-md px-3 py-2 text-left transition-colors",
+                active ? "bg-accent/60" : "hover:bg-accent/20",
+              )}
+            >
+              <span className="text-[12px] font-medium">{label}</span>
+              <span className="text-[10.5px] text-muted-foreground">{hint}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {backend === "ollama" && (
+        <div className="flex flex-col gap-1.5">
+          <Label>Ollama model</Label>
+          <Input
+            value={modelDraft}
+            onChange={(e) => setModelDraft(e.target.value)}
+            onBlur={() => void onModelSave()}
+            placeholder="all-minilm"
+            spellCheck={false}
+            className="h-8 font-mono text-[11.5px]"
+          />
+        </div>
+      )}
+
+      {!workspaceRoot && (
+        <p className="text-[10.5px] text-amber-500">
+          Set a workspace root in Preferences to auto-write <code className="font-mono">.atlas-embed.json</code>.
+        </p>
+      )}
+      {writeStatus === "ok" && (
+        <p className="text-[10.5px] text-emerald-500">Config saved to .atlas-embed.json</p>
+      )}
+      {writeStatus === "fail" && (
+        <p className="text-[10.5px] text-destructive">Could not write .atlas-embed.json</p>
+      )}
     </div>
   );
 }

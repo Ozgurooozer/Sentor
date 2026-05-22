@@ -1,9 +1,4 @@
 @echo off
-title Atlas OS — API Server
-cd /d "%~dp0"
-echo.
-echo   Atlas OS API Server
-echo   http://localhost:4242
-echo.
-python api\server.py %*
-pause
+rem Thin wrapper — delegates to atlas.bat for the single source of truth.
+rem Usage:  atlas-serve [port]
+"%~dp0atlas.bat" serve %*

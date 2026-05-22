@@ -5,6 +5,7 @@ import {
   type LanguageModel,
 } from "ai";
 import {
+  CUSTOM_DEFAULT_BASE_URL,
   DEFAULT_MODEL_ID,
   getModel,
   LMSTUDIO_DEFAULT_BASE_URL,
@@ -18,7 +19,18 @@ import {
 import type { ProviderKeys } from "./keyring";
 import { buildTools, type ToolContext } from "../tools/tools";
 
-type AgentDeps = {
+/** Per-provider configuration: base URL and model identifier overrides. */
+export type ProviderConfig = {
+  /** Override the OpenAI-compatible base URL (LM Studio / Ollama / custom). */
+  baseURL?: string;
+  /** Override the model identifier sent to the provider. */
+  modelId?: string;
+};
+
+/** Map of provider id → its config. Missing entries fall back to defaults. */
+export type ProviderConfigs = Partial<Record<ProviderId, ProviderConfig>>;
+
+export type AgentDeps = {
   keys: ProviderKeys;
   modelId?: ModelId;
   customInstructions?: string;
@@ -26,18 +38,16 @@ type AgentDeps = {
   agentPersona?: { name: string; instructions: string } | null;
   toolContext: ToolContext;
   onStep?: (step: string | null) => void;
-  /** Override base URL for LM Studio. */
-  lmstudioBaseURL?: string;
-  /** Override base URL for Ollama. */
-  ollamaBaseURL?: string;
-  /** Model identifier to send to LM Studio (e.g. "google/gemma-4-e4b"). */
-  lmstudioModelId?: string;
-  /** Model identifier to send to Ollama (e.g. "qwen2.5-coder:7b"). */
-  ollamaModelId?: string;
+  /** Per-provider base URL + model overrides. Replaces the flat per-provider fields. */
+  providers?: ProviderConfigs;
   /** True when /plan is active — agent should batch edits for review. */
   planMode?: boolean;
   /** Contents of ATLAS.md at workspace root, if present. Appended verbatim. */
   projectMemory?: string | null;
+  /** Formatted self-context block from this agent's vault office (state + recent log). */
+  agentSelfContext?: string | null;
+  /** Tool names this agent is allowed to call. Undefined = all tools allowed. */
+  toolset?: string[];
 };
 
 const TOOL_LABELS: Record<string, (input: Record<string, unknown>) => string> = {
@@ -76,12 +86,8 @@ function ellipsize(s: string, max: number): string {
 }
 
 export type BuildModelOptions = {
-  /** Override the model id sent to the provider (e.g. "google/gemma-4-e4b"). */
-  modelIdOverride?: string;
-  /** Override LM Studio base URL. Defaults to `LMSTUDIO_DEFAULT_BASE_URL`. */
-  lmstudioBaseURL?: string;
-  /** Override Ollama base URL. Defaults to `OLLAMA_DEFAULT_BASE_URL`. */
-  ollamaBaseURL?: string;
+  /** Per-provider base URL + model overrides. */
+  providers?: ProviderConfigs;
 };
 
 // In dev, route localhost provider URLs through the Vite proxy to avoid CORS.
@@ -98,6 +104,18 @@ function toDevProxyURL(url: string): string {
 // Memoize built models — provider clients are not free to construct.
 const modelCache = new Map<string, LanguageModel>();
 
+const PROVIDER_DEFAULT_BASE_URL: Partial<Record<ProviderId, string>> = {
+  lmstudio: LMSTUDIO_DEFAULT_BASE_URL,
+  ollama: OLLAMA_DEFAULT_BASE_URL,
+  custom: CUSTOM_DEFAULT_BASE_URL,
+};
+
+function resolveBaseURL(provider: ProviderId, providers?: ProviderConfigs): string {
+  const fromConfig = providers?.[provider]?.baseURL;
+  const fallback = PROVIDER_DEFAULT_BASE_URL[provider] ?? "";
+  return toDevProxyURL(fromConfig ?? fallback);
+}
+
 export async function buildLanguageModel(
   provider: ProviderId,
   keys: ProviderKeys,
@@ -109,33 +127,46 @@ export async function buildLanguageModel(
       `No API key configured for ${provider}. Open Settings → AI to add one.`,
     );
   }
-  const effectiveModelId = options.modelIdOverride || resolvedModelId;
-  const lmstudioBase = toDevProxyURL(options.lmstudioBaseURL ?? LMSTUDIO_DEFAULT_BASE_URL);
-  const ollamaBase = toDevProxyURL(options.ollamaBaseURL ?? OLLAMA_DEFAULT_BASE_URL);
-  const cacheKey = `${provider} ${effectiveModelId} ${lmstudioBase} ${ollamaBase}`;
+  const effectiveModelId =
+    options.providers?.[provider]?.modelId || resolvedModelId;
+  const baseURL = resolveBaseURL(provider, options.providers);
+  const cacheKey = `${provider} ${effectiveModelId} ${baseURL}`;
   const hit = modelCache.get(cacheKey);
   if (hit) return hit;
 
   let built: LanguageModel;
   switch (provider) {
     case "lmstudio": {
-      const { createOpenAICompatible } = await import(
-        "@ai-sdk/openai-compatible"
-      );
-      built = createOpenAICompatible({
-        name: "lmstudio",
-        baseURL: lmstudioBase,
-      })(effectiveModelId);
+      const { createOpenAICompatible } = await import("@ai-sdk/openai-compatible");
+      built = createOpenAICompatible({ name: "lmstudio", baseURL })(effectiveModelId);
       break;
     }
     case "ollama": {
-      const { createOpenAICompatible } = await import(
-        "@ai-sdk/openai-compatible"
-      );
-      built = createOpenAICompatible({
-        name: "ollama",
-        baseURL: ollamaBase,
-      })(effectiveModelId);
+      const { createOpenAICompatible } = await import("@ai-sdk/openai-compatible");
+      built = createOpenAICompatible({ name: "ollama", baseURL })(effectiveModelId);
+      break;
+    }
+    case "openai": {
+      const { createOpenAI } = await import("@ai-sdk/openai");
+      built = createOpenAI({ apiKey: keys.openai ?? "" })(effectiveModelId);
+      break;
+    }
+    case "anthropic": {
+      const { createAnthropic } = await import("@ai-sdk/anthropic");
+      built = createAnthropic({ apiKey: keys.anthropic ?? "" })(effectiveModelId);
+      break;
+    }
+    case "groq": {
+      const { createGroq } = await import("@ai-sdk/groq");
+      built = createGroq({ apiKey: keys.groq ?? "" })(effectiveModelId);
+      break;
+    }
+    case "custom": {
+      const { createOpenAICompatible } = await import("@ai-sdk/openai-compatible");
+      const headers: Record<string, string> = keys.custom
+        ? { Authorization: `Bearer ${keys.custom}` }
+        : {};
+      built = createOpenAICompatible({ name: "custom", baseURL, headers })(effectiveModelId);
       break;
     }
     default: {
@@ -150,18 +181,10 @@ export async function buildLanguageModel(
 function buildModel(
   modelId: ModelId,
   keys: ProviderKeys,
-  lmstudioBaseURL?: string,
-  ollamaBaseURL?: string,
-  lmstudioModelId?: string,
-  ollamaModelId?: string,
+  providers: ProviderConfigs,
 ): Promise<LanguageModel> {
   const m = getModel(modelId);
-  const modelIdOverride = m.provider === "lmstudio" ? lmstudioModelId : ollamaModelId;
-  return buildLanguageModel(m.provider, keys, m.id, {
-    lmstudioBaseURL,
-    ollamaBaseURL,
-    modelIdOverride,
-  });
+  return buildLanguageModel(m.provider, keys, m.id, { providers });
 }
 
 export async function createAtlasAgent({
@@ -171,12 +194,11 @@ export async function createAtlasAgent({
   agentPersona,
   toolContext,
   onStep,
-  lmstudioBaseURL,
-  ollamaBaseURL,
-  lmstudioModelId,
-  ollamaModelId,
+  providers = {},
   planMode,
   projectMemory,
+  agentSelfContext,
+  toolset,
 }: AgentDeps) {
   const trimmedCustom = customInstructions?.trim();
   const personaBlock = agentPersona?.instructions.trim()
@@ -189,15 +211,26 @@ export async function createAtlasAgent({
     projectMemory && projectMemory.trim().length > 0
       ? `\n\n## PROJECT — ATLAS.md\n${projectMemory.trim()}`
       : "";
+  const selfContextBlock =
+    agentSelfContext && agentSelfContext.trim().length > 0
+      ? `\n\n${agentSelfContext.trim()}`
+      : "";
   const planBlock = planMode
     ? `\n\n## PLAN MODE — ACTIVE\nMutating tools (write_file, edit, multi_edit, create_directory) will queue their changes for the user to review as a single diff. Do NOT execute bash_run or bash_background while plan mode is active — restrict yourself to reads (read_file, grep, glob, list_directory) and the queued mutations. After queueing the full set of edits, stop and return a brief summary; do not continue acting until the user has accepted/rejected.`
     : "";
-  const instructions = `${SYSTEM_PROMPT}${memoryBlock}${personaBlock}${customBlock}${planBlock}`;
-  const model = await buildModel(modelId, keys, lmstudioBaseURL, ollamaBaseURL, lmstudioModelId, ollamaModelId);
+  const instructions = `${SYSTEM_PROMPT}${memoryBlock}${selfContextBlock}${personaBlock}${customBlock}${planBlock}`;
+  const model = await buildModel(modelId, keys, providers);
+  const allTools = buildTools(toolContext);
+  const tools =
+    toolset && toolset.length > 0
+      ? (Object.fromEntries(
+          Object.entries(allTools).filter(([name]) => toolset.includes(name)),
+        ) as typeof allTools)
+      : allTools;
   return new Agent({
     model,
     instructions,
-    tools: buildTools(toolContext),
+    tools,
     stopWhen: stepCountIs(MAX_AGENT_STEPS),
     onStepFinish: (step) => {
       if (!onStep) return;

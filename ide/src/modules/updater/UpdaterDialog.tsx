@@ -17,7 +17,7 @@ function formatBytes(n: number): string {
 }
 
 export function UpdaterDialog() {
-  const { status, install, dismiss } = useUpdater();
+  const { status, install, dismiss } = useUpdater({ autoCheck: false });
 
   const open =
     status.kind === "available" ||

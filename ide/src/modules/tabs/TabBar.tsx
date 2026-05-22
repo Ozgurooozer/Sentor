@@ -10,6 +10,8 @@ import { fmtShortcut, MOD_KEY } from "@/lib/platform";
 import { cn } from "@/lib/utils";
 import { fileIconUrl } from "@/modules/explorer/lib/iconResolver";
 import {
+  AbsoluteIcon,
+  BookOpenIcon,
   Cancel01Icon,
   ComputerTerminal02Icon,
   GitCompareIcon,
@@ -19,9 +21,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useEffect, useRef } from "react";
-import {
-  BookOpenIcon,
-} from "@hugeicons/core-free-icons";
 import type { EditorTab, Tab } from "./lib/useTabs";
 
 type Props = {
@@ -33,6 +32,7 @@ type Props = {
   onNewEditor: () => void;
   onNewBrowser?: () => void;
   onNewVaultHome?: () => void;
+  onNewSentor?: () => void;
   onClose: (id: number) => void;
   /** Pin (promote) a preview tab to persistent on double-click. */
   onPin: (id: number) => void;
@@ -48,6 +48,7 @@ export function TabBar({
   onNewEditor,
   onNewBrowser,
   onNewVaultHome,
+  onNewSentor,
   onClose,
   onPin,
   compact,
@@ -193,6 +194,12 @@ export function TabBar({
                 <span className="flex-1">Vault Home</span>
               </DropdownMenuItem>
             )}
+            {onNewSentor && (
+              <DropdownMenuItem onSelect={() => onNewSentor()}>
+                <HugeiconsIcon icon={AbsoluteIcon} size={14} strokeWidth={1.75} />
+                <span className="flex-1">Sentor</span>
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -252,6 +259,8 @@ function labelFor(t: Tab): string {
   if (t.kind === "vault") return t.title;
   if (t.kind === "web") return t.title;
   if (t.kind === "vault-home") return t.title;
+  if (t.kind === "agents-office") return t.title;
+  if (t.kind === "graph") return t.title;
   if (!t.cwd) return t.title;
   const parts = t.cwd.split(/[\\/]/).filter(Boolean);
   return parts.length ? parts[parts.length - 1] : "/";

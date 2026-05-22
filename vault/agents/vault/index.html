@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Vault — Office</title>
+  <meta name="description" content="Vault agent ofisi — durum, son olaylar, açık projeler.">
+  <style>
+    :root {
+      --bg: #0a0a0a; --surface: #111; --elevated: #1a1a1a;
+      --border: #2a2a2a; --text: #f5f5f5; --dim: #888; --accent: #5b8def;
+    }
+    * { box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif;
+           margin: 0; padding: 2rem; max-width: 820px; margin-inline: auto; line-height: 1.55; }
+    header { display: flex; align-items: baseline; gap: 1rem;
+             border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+    header h1 { margin: 0; font-size: 1.6rem; }
+    .phase { color: var(--accent); font-size: 0.9rem; font-weight: 500; }
+    .updated { color: var(--dim); font-size: 0.8rem; margin-left: auto; }
+    h2 { font-size: 1.05rem; color: var(--dim); text-transform: uppercase;
+         letter-spacing: 0.05em; margin: 1.8rem 0 0.6rem; font-weight: 500; }
+    section { margin-bottom: 1rem; }
+    .row { border-bottom: 1px solid var(--border); padding: 0.55rem 0;
+           display: flex; gap: 0.8rem; align-items: baseline; }
+    .row:last-child { border-bottom: none; }
+    .ts { color: var(--dim); font-size: 0.78rem; font-variant-numeric: tabular-nums; min-width: 9ch; }
+    .tag { color: var(--accent); font-size: 0.78rem; min-width: 8ch; }
+    a { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--border); }
+    a:hover { border-bottom-color: var(--accent); }
+    .empty { color: var(--dim); font-style: italic; padding: 0.4rem 0; }
+    .next-action { background: var(--surface); border: 1px solid var(--border);
+                   padding: 0.8rem 1rem; border-radius: 4px; }
+  </style>
+</head>
+<body>
+<!-- generated:start -->
+<header>
+  <h1>Vault</h1>
+  <span class="phase">build · vault-rewrite</span>
+  <span class="updated">2026-05-19T16:00:00</span>
+</header>
+
+<section>
+  <h2>Next Action</h2>
+  <div class="next-action">Faz 4 — Rust watcher (notify) + --changed-files akışı; veya Faz 5 frontend ofis tab</div>
+</section>
+
+<section>
+  <h2>Recent Activity</h2>
+  <div class="row"><span class="ts">19T16:00</span><span class="tag">done</span><span>Faz 3 backend: modules/vault/{mod, guard, agent, index_lookup} yazıldı; 7 yeni Tauri komutu kayıtlı; stub&#x27;lar gerçekleştirildi; cargo build temiz.</span></div>
+  <div class="row"><span class="ts">19T15:30</span><span class="tag">done</span><span>Faz 2: 3 agent ofis (vault, coder, atlas-maker) seed + render edildi, /api/agent/vault snapshot doğrulandı.</span></div>
+  <div class="row"><span class="ts">19T15:00</span><span class="tag">progress</span><span>Faz 2: templates yazıldı, sync_profiles + render_office hazır, seed devam ediyor.</span></div>
+  <div class="row"><span class="ts">19T14:50</span><span class="tag">done</span><span>Faz 1: indexer v2 (esnek derinlik, type/scope, MD, --changed-files) + embedder Ollama-only + API scope params + /api/agent/{slug}.</span></div>
+  <div class="row"><span class="ts">19T14:40</span><span class="tag">done</span><span>Faz 0 temizlik tamamlandı.</span></div>
+  <div class="row"><span class="ts">19T14:32</span><span class="tag">decision</span><span>vault/prototypes vault dışına taşındı (kök prototypes/).</span></div>
+  <div class="row"><span class="ts">19T14:30</span><span class="tag">decision</span><span>Sentor agent BUILTIN_AGENTS&#x27;tan kaldırıldı.</span></div>
+  <div class="row"><span class="ts">19T14:05</span><span class="tag">meeting</span><span>vault tasarım toplantısı — 10 uzman, 4 tur, 18 karar.</span></div>
+</section>
+
+<section>
+  <h2>Open Projects</h2>
+  <div class="row"><a href="./projects/vault-rewrite/">vault-rewrite</a></div>
+</section>
+
+<section>
+  <h2>Recent Meetings</h2>
+  <div class="empty">No recent meetings.</div>
+</section>
+<!-- generated:end -->
+
+<!-- User notes below this line are preserved across re-renders. -->
+</body>
+</html>

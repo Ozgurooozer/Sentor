@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background: #0a0a0a;
+      color: #f5f5f5;
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    .diagram {
+      margin-bottom: 1.25rem;
+      border: 1px solid #2a2a2a;
+      border-radius: 4px;
+      padding: 1rem;
+      overflow: auto;
+    }
+    .diagram svg { max-width: 100%; display: block; }
+    .error {
+      color: #e06c75;
+      font-size: 0.8rem;
+      background: #1a1a1a;
+      border: 1px solid #3a2a2a;
+      padding: 0.75rem;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+    .empty {
+      color: #555;
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+    .hint {
+      color: #888;
+      font-size: 0.8rem;
+      text-align: center;
+      padding: 2rem 1rem;
+      line-height: 1.6;
+    }
+    .hint code {
+      display: inline-block;
+      margin-top: 0.5rem;
+      background: #111;
+      border: 1px solid #2a2a2a;
+      padding: 0.4rem 0.75rem;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: #5b8def;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <div id="hint" class="hint" style="display:none">
+    <p>mermaid.min.js not found in /vendor/.</p>
+    <code>curl -L https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js -o ide/public/vendor/mermaid.min.js</code>
+  </div>
+
+  <script>
+    var mermaidReady = false;
+    var queue = null;
+
+    function loadScript(src, onload, onerror) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = onload;
+      s.onerror = onerror;
+      document.head.appendChild(s);
+    }
+
+    loadScript('/vendor/mermaid.min.js', function () {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'loose',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        darkMode: true,
+      });
+      mermaidReady = true;
+      if (queue !== null) {
+        renderDiagrams(queue);
+        queue = null;
+      }
+    }, function () {
+      document.getElementById('hint').style.display = 'block';
+    });
+
+    async function renderDiagrams(diagrams) {
+      var root = document.getElementById('root');
+      root.innerHTML = '';
+
+      if (!diagrams || diagrams.length === 0) {
+        var empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = 'No mermaid blocks';
+        root.appendChild(empty);
+        return;
+      }
+
+      for (var i = 0; i < diagrams.length; i++) {
+        var code = diagrams[i];
+        var wrap = document.createElement('div');
+        wrap.className = 'diagram';
+        try {
+          var uid = 'mmd-' + Date.now() + '-' + i;
+          var result = await mermaid.render(uid, code);
+          wrap.innerHTML = result.svg;
+        } catch (err) {
+          var errDiv = document.createElement('div');
+          errDiv.className = 'error';
+          errDiv.textContent = String(err);
+          wrap.appendChild(errDiv);
+        }
+        root.appendChild(wrap);
+      }
+    }
+
+    window.addEventListener('message', function (e) {
+      if (!e.data || e.data.type !== 'mermaid-render') return;
+      var diagrams = e.data.diagrams;
+      if (!mermaidReady) {
+        queue = diagrams;
+        return;
+      }
+      void renderDiagrams(diagrams);
+    });
+  </script>
+</body>
+</html>

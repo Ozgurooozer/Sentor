@@ -25,7 +25,7 @@ import type {
   UIMessage,
   UIMessagePart,
 } from "ai";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useEffect } from "react";
 import { AiToolApproval } from "./AiToolApproval";
 
 function CommandSnippet({ name }: { name: string }) {
@@ -88,6 +88,17 @@ export function AiChatView({
     (id: string, approved: boolean) => addToolApprovalResponse({ id, approved }),
     [addToolApprovalResponse],
   );
+
+  // Listen for the scroll-to-top event dispatched by the AiMiniWindow header button.
+  useEffect(() => {
+    const handler = () => {
+      // StickToBottom renders the outer element with role="log"; scroll it to top.
+      const el = document.querySelector('[data-ai-mini-window] [role="log"]') as HTMLElement | null;
+      if (el) el.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    window.addEventListener("atlas:scroll-chat-top", handler);
+    return () => window.removeEventListener("atlas:scroll-chat-top", handler);
+  }, []);
 
   if (messages.length === 0) {
     return (

@@ -136,6 +136,13 @@
     }
 }
 
+/* Focused overlay mode: the window is transparent + always-on-top.
+ * body's bg-background must be cleared or it blocks the see-through effect. */
+html[data-layout="focused"],
+html[data-layout="focused"] body {
+  background: transparent !important;
+}
+
 /* Custom window chrome (Linux/Windows): the OS gives us a transparent
  * borderless window, and we paint the rounded corners + border + shadow
  * ourselves so the app doesn't look naked on GNOME/KDE/Hyprland. */
@@ -239,4 +246,18 @@ html[data-chrome="borderless"] *::-webkit-scrollbar {
   width: 0;
   height: 0;
   display: none;
+}
+
+@keyframes launcherFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes atlasShimmer {
+  from { background-position: 100% center; }
+  to   { background-position: 0% center; }
+}
+
+.atlas-shimmer {
+  animation: atlasShimmer var(--atlas-shimmer-duration, 2s) linear infinite;
 }

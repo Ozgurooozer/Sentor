@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlas — Agent Builder & Orkestra</title>
+<link href="https://fonts.googleapis.com/css2?family=Departure+Mono&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808; --bg1: #0f0f0f; --bg2: #161616; --bg3: #1e1e1e;
+  --border: #252525; --border2: #333; --text: #e8e5de; --muted: #666; --muted2: #888;
+  --accent: #5b8def; --accent2: #c8f560; --amber: #f0a050; --red: #ef4444;
+  --teal: #2dd4bf; --purple: #a78bfa;
+  --mono: 'Departure Mono', monospace; --sans: 'DM Sans', sans-serif; --display: 'Syne', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.6; overflow-x: hidden; }
+
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; border-bottom: 1px solid var(--border); background: rgba(8,8,8,0.92); backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 52px; }
+.nav-logo { font-family: var(--display); font-weight: 800; font-size: 16px; color: var(--accent2); letter-spacing: -0.5px; }
+.nav-logo span { color: var(--muted2); font-weight: 400; }
+.nav-links { display: flex; gap: 4px; }
+.nav-links a { font-family: var(--mono); font-size: 11px; color: var(--muted2); text-decoration: none; padding: 6px 14px; border-radius: 4px; transition: all 0.15s; letter-spacing: 0.04em; }
+.nav-links a:hover { background: var(--bg2); color: var(--text); }
+.nav-links a.active { color: var(--accent2); }
+
+.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 40px 60px; text-align: center; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 600px 400px at 20% 50%, rgba(91,141,239,0.06) 0%, transparent 70%), radial-gradient(ellipse 400px 300px at 80% 30%, rgba(200,245,96,0.05) 0%, transparent 70%); pointer-events: none; }
+.hero-badge { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(91,141,239,0.3); padding: 5px 14px; border-radius: 100px; margin-bottom: 28px; display: inline-block; }
+.hero h1 { font-family: var(--display); font-weight: 800; font-size: clamp(36px, 6vw, 72px); line-height: 1.05; letter-spacing: -2px; margin-bottom: 20px; background: linear-gradient(135deg, #e8e5de 0%, #888 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero h1 em { font-style: normal; -webkit-text-fill-color: var(--accent2); }
+.hero p { font-size: 16px; color: var(--muted2); max-width: 600px; margin: 0 auto 40px; font-weight: 300; line-height: 1.8; }
+.hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; padding: 11px 24px; border-radius: 4px; border: none; cursor: pointer; transition: all 0.15s; text-decoration: none; display: inline-block; }
+.btn-primary { background: var(--accent2); color: #0a0a0a; font-weight: 600; }
+.btn-primary:hover { background: #d4ff6e; transform: translateY(-1px); }
+.btn-ghost { background: transparent; border: 1px solid var(--border2); color: var(--muted2); }
+.btn-ghost:hover { border-color: var(--text); color: var(--text); }
+
+section { padding: 80px 40px; max-width: 1200px; margin: 0 auto; }
+.section-tag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+.section-title { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 3vw, 40px); letter-spacing: -1px; margin-bottom: 16px; line-height: 1.15; }
+.section-sub { color: var(--muted2); font-size: 15px; max-width: 620px; line-height: 1.7; }
+hr.divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+/* ARCH */
+.arch-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; margin-top: 48px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.arch-col { background: var(--bg1); padding: 28px; }
+.arch-col:not(:last-child) { border-right: 1px solid var(--border); }
+.arch-col-header { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.arch-agent { background: var(--bg2); border: 1px solid var(--border2); border-radius: 6px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+.arch-agent:hover { border-color: var(--accent); background: var(--bg3); }
+.arch-agent-name { font-family: var(--display); font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+.arch-agent-desc { font-size: 11px; color: var(--muted2); line-height: 1.5; }
+.arch-agent-tag { display: inline-block; margin-top: 8px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 3px; }
+.tag-sentor { background: rgba(167,139,250,0.15); color: var(--purple); }
+.tag-orch { background: rgba(91,141,239,0.15); color: var(--accent); }
+.tag-builtin { background: rgba(45,212,191,0.15); color: var(--teal); }
+.tag-blueprint { background: rgba(200,245,96,0.15); color: var(--accent2); }
+
+/* NODE PALETTE */
+.palette { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 48px; }
+.pal-card { background: var(--bg1); border: 1px solid var(--border); border-radius: 6px; padding: 14px; transition: all 0.15s; }
+.pal-card:hover { border-color: var(--border2); background: var(--bg2); }
+.pal-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.pal-ico { width: 24px; height: 24px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 11px; font-weight: 600; }
+.pal-name { font-family: var(--display); font-weight: 600; font-size: 12px; }
+.pal-desc { font-size: 11px; color: var(--muted2); line-height: 1.5; }
+.pal-ports { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-top: 6px; }
+
+/* CANVAS DEMO */
+.canvas-demo { margin-top: 48px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg1); position: relative; }
+.canvas-toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--bg2); }
+.canvas-toolbar-title { font-family: var(--mono); font-size: 11px; color: var(--muted2); flex: 1; }
+.toolbar-btn { font-family: var(--mono); font-size: 10px; padding: 5px 12px; border-radius: 3px; border: 1px solid var(--border2); background: transparent; color: var(--muted2); cursor: pointer; transition: all 0.15s; }
+.toolbar-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+.toolbar-btn.active { background: var(--accent2); border-color: var(--accent2); color: #0a0a0a; }
+.canvas-area { min-height: 560px; position: relative; overflow: hidden; background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px); background-size: 24px 24px; }
+
+.cnode { position: absolute; background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; font-size: 12px; user-select: none; }
+.cnode:hover { border-color: var(--border); }
+.cnode.focused { border-color: var(--accent); }
+.cnode.blueprint { border-color: rgba(200,245,96,0.4); }
+.cnode-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.cnode-icon { width: 20px; height: 20px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-family: var(--mono); font-weight: 600; }
+.icon-vault { background: rgba(91,141,239,0.2); color: var(--accent); }
+.icon-terminal { background: rgba(45,212,191,0.2); color: var(--teal); }
+.icon-agent { background: rgba(167,139,250,0.2); color: var(--purple); }
+.icon-blueprint { background: rgba(200,245,96,0.2); color: var(--accent2); }
+.icon-web { background: rgba(240,160,80,0.2); color: var(--amber); }
+.icon-orch { background: rgba(91,141,239,0.2); color: var(--accent); }
+.icon-start { background: rgba(200,245,96,0.2); color: var(--accent2); }
+.icon-output { background: rgba(45,212,191,0.2); color: var(--teal); }
+.icon-cond { background: rgba(240,160,80,0.2); color: var(--amber); }
+.cnode-title { font-family: var(--display); font-weight: 600; font-size: 12px; flex: 1; }
+.cnode-body { padding: 10px 12px; }
+.cnode-body p { color: var(--muted2); font-size: 11px; line-height: 1.5; }
+.cnode-port { position: absolute; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--border2); background: var(--bg2); cursor: crosshair; transition: border-color 0.15s, background 0.15s; }
+.cnode-port:hover { border-color: var(--accent); background: var(--accent); }
+.port-out { right: -5px; top: 50%; transform: translateY(-50%); }
+.port-in { left: -5px; top: 50%; transform: translateY(-50%); }
+
+.ctx-menu { position: absolute; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 6px; min-width: 200px; z-index: 50; box-shadow: 0 16px 40px rgba(0,0,0,0.6); animation: menuIn 0.12s ease; }
+@keyframes menuIn { from { opacity: 0; transform: scale(0.95) translateY(-4px); } to { opacity: 1; transform: none; } }
+.ctx-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; color: var(--muted2); transition: all 0.1s; }
+.ctx-item:hover { background: var(--bg2); color: var(--text); }
+.ctx-item .ctx-icon { width: 16px; text-align: center; font-size: 11px; font-family: var(--mono); }
+.ctx-item.highlight { color: var(--accent2); }
+.ctx-item.disabled { opacity: 0.4; cursor: not-allowed; }
+.ctx-sep { height: 1px; background: var(--border); margin: 4px 0; }
+.ctx-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--muted); padding: 4px 10px 2px; }
+
+.connections-svg { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+
+.agent-editor { position: absolute; right: 16px; top: 16px; width: 300px; background: var(--bg2); border: 1px solid var(--accent); border-radius: 8px; overflow: hidden; z-index: 20; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+.ae-header { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--border); background: var(--bg3); }
+.ae-title { font-family: var(--display); font-weight: 600; font-size: 13px; flex: 1; }
+.ae-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 0 2px; }
+.ae-close:hover { color: var(--text); }
+.ae-body { padding: 14px; max-height: 460px; overflow-y: auto; }
+.ae-field { margin-bottom: 12px; }
+.ae-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--muted2); margin-bottom: 6px; display: block; }
+.ae-input, .ae-textarea { width: 100%; background: var(--bg); border: 1px solid var(--border2); color: var(--text); font-family: var(--mono); font-size: 11px; padding: 8px 10px; border-radius: 4px; outline: none; transition: border-color 0.15s; }
+.ae-textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
+.ae-input:focus, .ae-textarea:focus { border-color: var(--accent); }
+.ae-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ae-chip { font-family: var(--mono); font-size: 10px; padding: 4px 10px; border-radius: 3px; border: 1px solid var(--border2); cursor: pointer; color: var(--muted2); transition: all 0.15s; background: var(--bg); }
+.ae-chip:hover, .ae-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(91,141,239,0.1); }
+.ae-toggle { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; }
+.ae-toggle-label { font-size: 11px; color: var(--text); }
+.ae-toggle-hint { font-size: 10px; color: var(--muted); }
+.ae-actions { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--border); background: var(--bg3); }
+.ae-btn { flex: 1; font-family: var(--mono); font-size: 10px; padding: 8px; border-radius: 4px; border: 1px solid var(--border2); cursor: pointer; transition: all 0.15s; letter-spacing: 0.05em; }
+.ae-btn-save { background: var(--accent2); border-color: var(--accent2); color: #0a0a0a; font-weight: 600; }
+.ae-btn-save:hover { background: #d4ff6e; }
+.ae-btn-cancel { background: transparent; color: var(--muted2); }
+.ae-btn-cancel:hover { color: var(--text); border-color: var(--text); }
+
+.blueprint-shelf { position: absolute; left: 16px; bottom: 16px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; min-width: 220px; z-index: 20; }
+.bp-header { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--accent2); margin-bottom: 10px; }
+.bp-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 4px; cursor: pointer; transition: background 0.15s; font-size: 11px; }
+.bp-item:hover { background: var(--bg3); }
+.bp-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); flex-shrink: 0; }
+.bp-name { color: var(--muted2); }
+.bp-item:hover .bp-name { color: var(--text); }
+.bp-meta { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-left: auto; }
+
+.vault-notif { position: absolute; bottom: 16px; right: 16px; background: rgba(200,245,96,0.1); border: 1px solid rgba(200,245,96,0.4); border-radius: 6px; padding: 12px 16px; z-index: 30; max-width: 280px; animation: notifIn 0.3s ease; }
+@keyframes notifIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.notif-title { font-family: var(--mono); font-size: 11px; color: var(--accent2); margin-bottom: 4px; }
+.notif-body { font-size: 11px; color: var(--muted2); line-height: 1.5; }
+.notif-close { position: absolute; top: 8px; right: 10px; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; }
+
+/* TABS */
+.tab-row { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+.tab-btn { font-family: var(--mono); font-size: 11px; padding: 10px 20px; background: none; border: none; color: var(--muted2); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; letter-spacing: 0.05em; }
+.tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+.tab-btn:hover:not(.active) { color: var(--text); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.flow-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.flow-card { background: var(--bg1); border: 1px solid var(--border); border-radius: 8px; padding: 24px; transition: all 0.2s; }
+.flow-card:hover { border-color: var(--border2); background: var(--bg2); }
+.flow-num { font-family: var(--mono); font-size: 32px; color: var(--border2); margin-bottom: 16px; }
+.flow-title { font-family: var(--display); font-weight: 600; font-size: 16px; margin-bottom: 8px; }
+.flow-desc { font-size: 13px; color: var(--muted2); line-height: 1.7; }
+.flow-card.accent { border-color: rgba(91,141,239,0.3); }
+.flow-card.accent .flow-num { color: rgba(91,141,239,0.4); }
+.flow-card.green { border-color: rgba(200,245,96,0.3); }
+.flow-card.green .flow-num { color: rgba(200,245,96,0.3); }
+.flow-card.purple { border-color: rgba(167,139,250,0.3); }
+.flow-card.purple .flow-num { color: rgba(167,139,250,0.3); }
+
+/* ORKESTRA */
+.orch-diagram { display: grid; grid-template-columns: 1fr 2px 1fr 2px 1fr; gap: 0; margin-top: 48px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.orch-col { background: var(--bg1); padding: 24px; }
+.orch-divider { background: var(--border); }
+.orch-col-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 16px; }
+.orch-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; margin-bottom: 8px; }
+.orch-item-name { font-family: var(--display); font-weight: 600; font-size: 12px; margin-bottom: 4px; }
+.orch-item-desc { font-size: 11px; color: var(--muted2); line-height: 1.5; }
+.orch-arrow { text-align: center; color: var(--muted); font-size: 18px; margin: 8px 0; font-family: var(--mono); }
+
+/* BLUEPRINT */
+.blueprint-detail { margin-top: 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.bp-demo { background: var(--bg1); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.bp-demo-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.bp-demo-title { font-family: var(--display); font-weight: 600; font-size: 14px; flex: 1; }
+.bp-demo-badge { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border-radius: 3px; }
+.badge-saved { background: rgba(200,245,96,0.15); color: var(--accent2); }
+.badge-template { background: rgba(91,141,239,0.15); color: var(--accent); }
+.bp-nodes { padding: 20px; min-height: 200px; background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 20px 20px; display: flex; align-items: center; justify-content: center; gap: 0; }
+.bp-mini-node { background: var(--bg2); border: 1px solid var(--border2); border-radius: 6px; padding: 8px 12px; font-size: 11px; text-align: center; min-width: 80px; }
+.bp-mini-node .mini-icon { font-size: 14px; margin-bottom: 4px; font-family: var(--mono); }
+.bp-mini-node .mini-label { font-family: var(--mono); font-size: 10px; color: var(--muted2); }
+.bp-arrow { color: var(--border2); margin: 0 8px; font-size: 18px; }
+.bp-info { padding: 16px 20px; border-top: 1px solid var(--border); }
+.bp-info p { font-size: 12px; color: var(--muted2); line-height: 1.6; }
+
+/* PHASES */
+.phase-list { margin-top: 48px; }
+.phase-item { display: grid; grid-template-columns: 60px 1fr; gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--border); }
+.phase-item:last-child { border-bottom: none; }
+.phase-num { font-family: var(--mono); font-size: 24px; color: var(--border2); line-height: 1; padding-top: 4px; }
+.phase-title { font-family: var(--display); font-weight: 700; font-size: 18px; margin-bottom: 8px; }
+.phase-desc { color: var(--muted2); font-size: 13px; line-height: 1.7; margin-bottom: 12px; }
+.phase-tasks { display: flex; flex-wrap: wrap; gap: 6px; }
+.task { font-family: var(--mono); font-size: 10px; padding: 4px 10px; border-radius: 3px; border: 1px solid var(--border); color: var(--muted2); }
+.task.done { border-color: rgba(45,212,191,0.3); color: var(--teal); }
+.task.next { border-color: rgba(200,245,96,0.4); color: var(--accent2); }
+.task.mvp { border-color: rgba(167,139,250,0.4); color: var(--purple); }
+
+/* SCENARIOS */
+.scn-list { margin-top: 32px; display: grid; gap: 12px; }
+.scn { background: var(--bg1); border: 1px solid var(--border); border-radius: 8px; padding: 18px 22px; }
+.scn-head { font-family: var(--display); font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+.scn-head .scn-tag { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; padding: 2px 8px; border-radius: 3px; margin-left: 8px; vertical-align: middle; }
+.scn-body { font-size: 12px; color: var(--muted2); line-height: 1.7; }
+.scn-body code { font-family: var(--mono); font-size: 11px; background: var(--bg2); padding: 1px 6px; border-radius: 3px; color: var(--accent2); }
+
+footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--muted); font-family: var(--mono); font-size: 11px; }
+
+@media (max-width: 900px) {
+  .arch-grid, .flow-grid, .palette { grid-template-columns: 1fr 1fr; }
+  .orch-diagram { grid-template-columns: 1fr; }
+  .orch-divider { display: none; }
+  .blueprint-detail { grid-template-columns: 1fr; }
+  section { padding: 60px 20px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Atlas <span>/ agent system</span></div>
+  <div class="nav-links">
+    <a href="#mimari" class="active">Mimari</a>
+    <a href="#nodes">Node'lar</a>
+    <a href="#canvas">Canvas</a>
+    <a href="#blueprint">Blueprint</a>
+    <a href="#orkestra">Orkestra</a>
+    <a href="#senaryo">Senaryolar</a>
+    <a href="#sentor-proto">Sentor</a>
+    <a href="#guvenlik">Güvenlik</a>
+    <a href="#plan">Plan</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Atlas OS — Agent Builder v0.1</div>
+  <h1>Canvas'ta agent üret,<br><em>orkestra ile yönet.</em></h1>
+  <p>Sentor agent tasarlar. Orkestra koordine eder. Blueprint'ler fonksiyona dönüşür, vault'ta saklanır, her canvas'ta yeniden kullanılır. Flowise'ın node tabanlı yaklaşımı; Atlas'ın vault-native, lokal-öncelikli felsefesi.</p>
+  <div class="hero-btns">
+    <a href="#canvas" class="btn btn-primary">Canvas Demo →</a>
+    <a href="#plan" class="btn btn-ghost">Faz Planı</a>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- MIMARI -->
+<section id="mimari">
+  <div class="section-tag">// 01 · sistem mimarisi</div>
+  <div class="section-title">Üç katman, sonsuz canvas.</div>
+  <p class="section-sub">Sentor agent yapar. Orkestra agentleri yönetir. Blueprint sistemi çalışmayı fonksiyona dönüştürür. Vault her şeyi saklar — agentler, blueprint'ler, log'lar, kararlar.</p>
+
+  <div class="arch-grid">
+    <div class="arch-col">
+      <div class="arch-col-header" style="color: var(--purple)">// SENTOR — Agent Builder</div>
+      <div class="arch-agent">
+        <div class="arch-agent-name">Sentor Agent</div>
+        <div class="arch-agent-desc">Kullanıcının dilinden ve canvas state'inden çalışan agent çıkarır. <code style="font-family:var(--mono);font-size:10px;color:var(--accent2)">canvas_read_state</code> + <code style="font-family:var(--mono);font-size:10px;color:var(--accent2)">agent_spawn</code> araçları.</div>
+        <span class="arch-agent-tag tag-sentor">builtin:sentor</span>
+      </div>
+      <div class="arch-agent">
+        <div class="arch-agent-name">Sentor Canvas</div>
+        <div class="arch-agent-desc">Sentor'a özel sub-canvas. FocusedBar ikonundan açılır. Burada node bağlar, blueprint üretir. Diğer agentler bu canvas'a yazamaz.</div>
+        <span class="arch-agent-tag tag-sentor">parentId: sentor</span>
+      </div>
+      <div class="arch-agent">
+        <div class="arch-agent-name">Agent Editor Panel</div>
+        <div class="arch-agent-desc">Sağ tık → Agent Ekle. İsim, görev, tool seçimi, base agent (Vault/Coder), hafıza modu (session/ephemeral). Inline.</div>
+        <span class="arch-agent-tag tag-sentor">UI</span>
+      </div>
+    </div>
+
+    <div class="arch-col">
+      <div class="arch-col-header" style="color: var(--accent)">// ORKESTRA — Conductor</div>
+      <div class="arch-agent">
+        <div class="arch-agent-name">Orkestra Agent</div>
+        <div class="arch-agent-desc">Ana chat'ten gelen isteği sınıflandırır. Mevcut agent yeterli mi? Yoksa Sentor tetikle. <code style="font-family:var(--mono);font-size:10px;color:var(--accent2)">agent_invoke</code> + <code style="font-family:var(--mono);font-size:10px;color:var(--accent2)">sentor_trigger</code>.</div>
+        <span class="arch-agent-tag tag-orch">builtin:orkestra</span>
+      </div>
+      <div class="arch-agent">
+        <div class="arch-agent-name">Canvas State Reader</div>
+        <div class="arch-agent-desc">Hangi paneller açık, hangi vault dosyaları yüklü, hangi node bağlantısı kurulu — özet olarak agent context'ine ekler.</div>
+        <span class="arch-agent-tag tag-orch">context</span>
+      </div>
+      <div class="arch-agent">
+        <div class="arch-agent-name">Agent Router</div>
+        <div class="arch-agent-desc">Paralel agent çağırabilir, sonuçları merge eder. Supervisor/Worker (Flowise multiagents) deseni.</div>
+        <span class="arch-agent-tag tag-orch">router</span>
+      </div>
+    </div>
+
+    <div class="arch-col">
+      <div class="arch-col-header" style="color: var(--accent2)">// BLUEPRINT — Fonksiyon</div>
+      <div class="arch-agent">
+        <div class="arch-agent-name">Blueprint JSON</div>
+        <div class="arch-agent-desc">Node + edge grafı. <code style="font-family:var(--mono);font-size:10px;color:var(--accent2)">vault/blueprints/{slug}/blueprint.json</code>. HTML önizleme yanında.</div>
+        <span class="arch-agent-tag tag-blueprint">kayıtlı akış</span>
+      </div>
+      <div class="arch-agent">
+        <div class="arch-agent-name">Projeye Çevir</div>
+        <div class="arch-agent-desc">Sub canvas içeriği Vault-Exporter agent ile vault HTML sayfasına dönüşür. Format kontrol, Atlas-Maker stili, native bildirim.</div>
+        <span class="arch-agent-tag tag-blueprint">vault export</span>
+      </div>
+      <div class="arch-agent">
+        <div class="arch-agent-name">Vault Entegrasyonu</div>
+        <div class="arch-agent-desc">Her şey vault'ta. Indexer otomatik. Sağ tık → "Blueprint İmport" ile başka canvas'a spawn.</div>
+        <span class="arch-agent-tag tag-builtin">vault</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- NODE PALETTE -->
+<section id="nodes">
+  <div class="section-tag">// 02 · node taksonomisi</div>
+  <div class="section-title">12 node tipi. Flowise'tan ilham, Atlas'a uyarlandı.</div>
+  <p class="section-sub">Her node'un <strong>inputs[]</strong> ve <strong>outputs[]</strong> portları var. Port tipleri: text · json · trigger · stream. Edge sadece uyumlu portları bağlar.</p>
+
+  <div class="palette">
+    <div class="pal-card">
+      <div class="pal-head"><div class="pal-ico icon-start">▶</div><div class="pal-name">Start</div></div>
+      <div class="pal-desc">Akışın giriş noktası. Kullanıcı promptu buradan girer.</div>
+      <div class="pal-ports">→ trigger, text</div>
+    </div>
+    <div class="pal-card">
+      <div class="pal-head"><div class="pal-ico icon-vault">V</div><div class="pal-name">Vault</div></div>
+      <div class="pal-desc">Vault HTML/MD dosyasını okur. Path veya slug ile.</div>
+      <div class="pal-ports">in: text → out: text</div>
+    </div>
+    <div class="pal-card">
+      <div class="pal-head"><div class="pal-ico icon-terminal">$</div><div class="pal-name">Terminal</div></div>
+      <div class="pal-desc">Aktif terminal çıktısını dinler veya komut çalıştırır.</div>
+      <div class="pal-ports">in: trigger → out: stream</div>
+    </div>
+    <div class="pal-card">
+      <div class="pal-head"><div class="pal-ico icon-web">W</div><div class="pal-name">Web</div></div>
+      <div class="pal-desc">URL fetch veya search query. Sayfa metni döner.</div>
+      <div class="pal-ports">in: text → out: text</div>
+    </div>
+    <div class="pal-card">
+      <div class="pal-head"><div class="pal-ico icon-vault">E</div><div class="pal-name">Editor</div></div>
+      <div class="pal-desc">Aktif editor selection veya dosya içeriği.</div>
+      <div class="pal-ports">in: text → out: text</div>
+    </div>
+    <div class="pal-card">
+      <div class="pal-head"><div class="pal-ico icon-agent">A</div><div class="pal-name">Agent</div></div>
+      <div class="pal-desc">LLM + system prompt + tool seti. Sentor üretir.</div>
+      <div class="pal-ports">in: text,json → out: text, tool_calls</div>
+    </div>
+    <div class="pal-card">
+      <div class="pal-head"><div class="pal-ico icon-agent" style="background:rgba(91,141,239,0.2);color:var(--accent)">L</div><div class="pal-name">LLM</div></div>
+      <div class="pal-desc">Düz LLM çağrısı, tool yok. Hızlı prompt.</div>
+      <div class="pal-ports">in: text → out: text</div>
+    </div>
+    <div class="pal-card">
+      <div class="pal-head"><div class="pal-ico icon-blueprint">T</div><div class="pal-name">Tool</div></div>
+      <div class="pal-desc">Tek tool çağrısı. vault_search, web_fetch, vb.</div>
+      <div class="pal-ports">in: json → out: json</div>
+    </div>
+    <div class="pal-card">
+      <div class="pal-head"><div class="pal-ico icon-cond">?</div><div class="pal-name">Condition</div></div>
+      <div class="pal-desc">If/else routing. Bir input → iki output branch.</div>
+      <div class="pal-ports">in: any → out: true|false</div>
+    </div>
+    <div class="pal-card">
+      <div class="pal-head"><div class="pal-ico icon-cond" style="background:rgba(167,139,250,0.2);color:var(--purple)">H</div><div class="pal-name">HumanInput</div></div>
+      <div class="pal-desc">Akışı durdur, kullanıcıdan input bekle. Onay/seçim için.</div>
+      <div class="pal-ports">in: text → out: text</div>
+    </div>
+    <div class="pal-card">
+      <div class="pal-head"><div class="pal-ico icon-blueprint" style="background:rgba(91,141,239,0.2);color:var(--accent)">◻</div><div class="pal-name">SubCanvas</div></div>
+      <div class="pal-desc">Başka bir canvas'ı child olarak göm. Fonksiyon-içinde-fonksiyon.</div>
+      <div class="pal-ports">in: any → out: any</div>
+    </div>
+    <div class="pal-card">
+      <div class="pal-head"><div class="pal-ico icon-output">◉</div><div class="pal-name">Output</div></div>
+      <div class="pal-desc">Akışın çıkış noktası. Ana chat'e veya vault'a döner.</div>
+      <div class="pal-ports">in: text → —</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CANVAS DEMO -->
+<section id="canvas" style="max-width: 100%; padding: 80px 0;">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 0 40px;">
+    <div class="section-tag">// 03 · canvas demo (interaktif)</div>
+    <div class="section-title">Sağ tık → agent, bağla, çalıştır.</div>
+    <p class="section-sub">Aşağıdaki demo gerçek davranışı taklit eder. Boşluğa sağ tık menü açar; "Agent Ekle"yi tıkla, panel açılır. Düğümleri sürükle, port'tan port'a sürükle bağlantı kur.</p>
+  </div>
+
+  <div class="canvas-demo" style="margin: 48px 0; border-radius: 0; border-left: none; border-right: none;">
+    <div class="canvas-toolbar">
+      <span class="canvas-toolbar-title">Sentor Canvas — Ana Çalışma Alanı (mock)</span>
+      <button class="toolbar-btn" onclick="toggleBpShelf()">Blueprints</button>
+      <button class="toolbar-btn" onclick="saveBlueprint()">Blueprint Kaydet</button>
+      <button class="toolbar-btn active" onclick="toProject()">Projeye Çevir</button>
+    </div>
+
+    <div class="canvas-area" id="canvasArea" oncontextmenu="showCtx(event)">
+
+      <svg class="connections-svg" id="connSvg">
+        <defs>
+          <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="rgba(91,141,239,0.5)" />
+          </marker>
+        </defs>
+      </svg>
+
+      <div class="cnode" id="nodeVault" style="left:40px; top:60px; width:180px;" oncontextmenu="showCtx(event,this)" onclick="focusNode(this)">
+        <div class="cnode-header"><div class="cnode-icon icon-vault">V</div><div class="cnode-title">canvas-plan.html</div></div>
+        <div class="cnode-body"><p>vault/projects/canvas-plan</p></div>
+        <div class="cnode-port port-out" data-port="vault-out"></div>
+      </div>
+
+      <div class="cnode" id="nodeTerminal" style="left:40px; top:200px; width:180px;" oncontextmenu="showCtx(event,this)" onclick="focusNode(this)">
+        <div class="cnode-header"><div class="cnode-icon icon-terminal">$</div><div class="cnode-title">Terminal</div></div>
+        <div class="cnode-body"><p>cargo check · aktif</p></div>
+        <div class="cnode-port port-out" data-port="term-out"></div>
+      </div>
+
+      <div class="cnode focused" id="nodeAgent" style="left:300px; top:120px; width:200px;" oncontextmenu="showCtx(event,this)" onclick="focusNode(this); showEditor()">
+        <div class="cnode-header"><div class="cnode-icon icon-agent">S</div><div class="cnode-title">Sentor</div></div>
+        <div class="cnode-body"><p>Canvas dosyalarını okur, agent taslağı üretir</p></div>
+        <div class="cnode-port port-in" data-port="agent-in"></div>
+        <div class="cnode-port port-out" data-port="agent-out"></div>
+      </div>
+
+      <div class="cnode blueprint" id="nodeBlueprint" style="left:580px; top:140px; width:180px;" oncontextmenu="showCtx(event,this)" onclick="focusNode(this)">
+        <div class="cnode-header"><div class="cnode-icon icon-blueprint">B</div><div class="cnode-title">vault-agent-v1</div></div>
+        <div class="cnode-body"><p>Blueprint · 3 node · kaydedildi</p></div>
+        <div class="cnode-port port-in" data-port="bp-in"></div>
+      </div>
+
+      <div class="cnode" id="nodeCond" style="left:580px; top:300px; width:180px;" oncontextmenu="showCtx(event,this)" onclick="focusNode(this)">
+        <div class="cnode-header"><div class="cnode-icon icon-cond">?</div><div class="cnode-title">Vault'ta var mı?</div></div>
+        <div class="cnode-body"><p>score ≥ 6 → true · değilse → web</p></div>
+        <div class="cnode-port port-in" data-port="cond-in"></div>
+        <div class="cnode-port port-out" data-port="cond-out" style="top:35%;"></div>
+        <div class="cnode-port port-out" data-port="cond-out2" style="top:75%;"></div>
+      </div>
+
+      <div class="ctx-menu" id="ctxMenu" style="display:none;">
+        <div class="ctx-label">CANVAS</div>
+        <div class="ctx-item highlight" onclick="addAgentFromCtx()"><span class="ctx-icon">⊕</span> Agent Ekle</div>
+        <div class="ctx-sep"></div>
+        <div class="ctx-label">PANEL EKLE</div>
+        <div class="ctx-item" onclick="hideCtx()"><span class="ctx-icon">V</span> Vault Paneli</div>
+        <div class="ctx-item" onclick="hideCtx()"><span class="ctx-icon">$</span> Terminal</div>
+        <div class="ctx-item" onclick="hideCtx()"><span class="ctx-icon">W</span> Web</div>
+        <div class="ctx-item" onclick="hideCtx()"><span class="ctx-icon">◻</span> Sub Canvas</div>
+        <div class="ctx-sep"></div>
+        <div class="ctx-label">BLUEPRINT</div>
+        <div class="ctx-item" onclick="hideCtx()"><span class="ctx-icon">◈</span> Blueprint İmport</div>
+        <div class="ctx-item disabled"><span class="ctx-icon">→</span> Selection → Blueprint</div>
+      </div>
+
+      <div class="agent-editor" id="agentEditor" style="display:none;">
+        <div class="ae-header">
+          <div class="cnode-icon icon-agent" style="width:22px;height:22px;font-size:12px;">S</div>
+          <div class="ae-title">Agent Düzenle</div>
+          <button class="ae-close" onclick="hideEditor()">×</button>
+        </div>
+        <div class="ae-body">
+          <div class="ae-field"><label class="ae-label">AGENT ADI</label><input class="ae-input" value="Sentor" type="text"></div>
+          <div class="ae-field"><label class="ae-label">GÖREV</label><input class="ae-input" value="Canvas dosyalarını analiz et, agent üret" type="text"></div>
+          <div class="ae-field">
+            <label class="ae-label">BASE AGENT</label>
+            <div class="ae-chips">
+              <div class="ae-chip active">Sıfırdan</div>
+              <div class="ae-chip" onclick="toggleChip(this)">Vault</div>
+              <div class="ae-chip" onclick="toggleChip(this)">Coder</div>
+              <div class="ae-chip" onclick="toggleChip(this)">Atlas-Maker</div>
+            </div>
+          </div>
+          <div class="ae-field">
+            <label class="ae-label">TOOLS</label>
+            <div class="ae-chips">
+              <div class="ae-chip active" onclick="toggleChip(this)">vault_search</div>
+              <div class="ae-chip active" onclick="toggleChip(this)">vault_read</div>
+              <div class="ae-chip" onclick="toggleChip(this)">web_fetch</div>
+              <div class="ae-chip active" onclick="toggleChip(this)">canvas_read_state</div>
+              <div class="ae-chip" onclick="toggleChip(this)">agent_spawn</div>
+            </div>
+          </div>
+          <div class="ae-field">
+            <label class="ae-label">HAFIZA</label>
+            <div class="ae-toggle">
+              <div><div class="ae-toggle-label">Session geçmişi</div><div class="ae-toggle-hint">Sohbet geçmişini hatırla (yoksa ephemeral)</div></div>
+              <div class="ae-chip active">session</div>
+            </div>
+          </div>
+          <div class="ae-field">
+            <label class="ae-label">SISTEM PROMPTU</label>
+            <textarea class="ae-textarea">You are Sentor, Atlas's Agent Builder. Read the current canvas via canvas_read_state. Propose an agent design (name, role, tools, base) in 3-5 lines. Wait for confirmation, then call agent_spawn.</textarea>
+          </div>
+        </div>
+        <div class="ae-actions">
+          <button class="ae-btn ae-btn-cancel" onclick="hideEditor()">İptal</button>
+          <button class="ae-btn ae-btn-save" onclick="saveAgent()">Kaydet</button>
+        </div>
+      </div>
+
+      <div class="blueprint-shelf" id="bpShelf" style="display:none;">
+        <div class="bp-header">// BLUEPRINTS</div>
+        <div class="bp-item"><div class="bp-dot"></div><div class="bp-name">vault-agent-v1</div><div class="bp-meta">3n</div></div>
+        <div class="bp-item"><div class="bp-dot"></div><div class="bp-name">terminal-to-vault</div><div class="bp-meta">3n</div></div>
+        <div class="bp-item"><div class="bp-dot"></div><div class="bp-name">doc-analyzer</div><div class="bp-meta">5n</div></div>
+        <div class="bp-item"><div class="bp-dot" style="background:var(--accent)"></div><div class="bp-name">research-router</div><div class="bp-meta">7n</div></div>
+        <div class="bp-item" style="color:var(--muted); font-size:11px; padding: 8px 8px 0;">+ Yeni import...</div>
+      </div>
+
+      <div class="vault-notif" id="vaultNotif" style="display:none;">
+        <button class="notif-close" onclick="hideNotif()">×</button>
+        <div class="notif-title">✓ Vault'a Hazır</div>
+        <div class="notif-body">canvas-agent-blueprint.html vault/projects/ dizinine eklendi. Indexer yeniden çalıştı, 28 sayfa.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="max-width: 1200px; margin: 0 auto; padding: 0 40px;">
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab('ctx')">Sağ Tık Menüsü</button>
+      <button class="tab-btn" onclick="switchTab('editor')">Agent Editörü</button>
+      <button class="tab-btn" onclick="switchTab('bpflow')">Blueprint Akışı</button>
+    </div>
+    <div id="tab-ctx" class="tab-panel active">
+      <div class="flow-grid">
+        <div class="flow-card accent">
+          <div class="flow-num">01</div>
+          <div class="flow-title">Boş alana sağ tık</div>
+          <div class="flow-desc">Canvas menüsü açılır. <strong>Agent Ekle</strong> + panel ekle seçenekleri + Blueprint İmport. A1'de sadece "Agent Ekle" aktif.</div>
+        </div>
+        <div class="flow-card accent">
+          <div class="flow-num">02</div>
+          <div class="flow-title">Node'a sağ tık</div>
+          <div class="flow-desc">Node-spesifik menü. Vault: "Agent'a bağla". Terminal: "Çıktıyı yönlendir". Agent: "Düzenle / Sil / Blueprint olarak kaydet".</div>
+        </div>
+        <div class="flow-card accent">
+          <div class="flow-num">03</div>
+          <div class="flow-title">Edge'e sağ tık</div>
+          <div class="flow-desc">Bağlantıyı sil, kind değiştir (text/json/stream), bu zinciri blueprint olarak izole et.</div>
+        </div>
+      </div>
+    </div>
+    <div id="tab-editor" class="tab-panel">
+      <div class="flow-grid">
+        <div class="flow-card purple">
+          <div class="flow-num">01</div>
+          <div class="flow-title">Adı + Görev</div>
+          <div class="flow-desc">İsim ve bir satır görev tanımı. Sentor bunu okuyup sistem promptu önerebilir.</div>
+        </div>
+        <div class="flow-card purple">
+          <div class="flow-num">02</div>
+          <div class="flow-title">Base + Tools + Hafıza</div>
+          <div class="flow-desc">Mevcut agent'tan türet (Vault, Coder...) veya sıfırdan. Tool whitelist seç. Hafıza: <code>session</code> (geçmişli) veya <code>ephemeral</code> (tek seferlik).</div>
+        </div>
+        <div class="flow-card purple">
+          <div class="flow-num">03</div>
+          <div class="flow-title">Kaydet → Spawn</div>
+          <div class="flow-desc"><code>agentsStore</code>'a yazılır, canvas üzerinde Agent node belirir. Diğer canvas'larda da çağrılabilir.</div>
+        </div>
+      </div>
+    </div>
+    <div id="tab-bpflow" class="tab-panel">
+      <div class="flow-grid">
+        <div class="flow-card green">
+          <div class="flow-num">01</div>
+          <div class="flow-title">Port → Port sürükle</div>
+          <div class="flow-desc">Out port'tan in port'a sürükle. Bezier eğrisi çizilir. Tip uyumsuzsa kırmızı highlight + reddedilir.</div>
+        </div>
+        <div class="flow-card green">
+          <div class="flow-num">02</div>
+          <div class="flow-title">Blueprint Kaydet</div>
+          <div class="flow-desc">Toolbar butonu veya seçim → sağ tık. İsim ver. <code>vault/blueprints/{slug}/blueprint.json</code> + <code>index.html</code> önizleme yazılır.</div>
+        </div>
+        <div class="flow-card green">
+          <div class="flow-num">03</div>
+          <div class="flow-title">Başka canvas'ta kullan</div>
+          <div class="flow-desc">Sağ tık → Blueprint İmport → vault listesi → seç. Tüm node'lar viewport merkezine spawn olur, edge'ler bağlı gelir.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- BLUEPRINT DETAIL -->
+<section id="blueprint">
+  <div class="section-tag">// 04 · blueprint sistemi</div>
+  <div class="section-title">Node zinciri → kayıt → fonksiyon.</div>
+  <p class="section-sub">Yaptığın çalışmayı tekrar kullanılabilir fonksiyona dönüştür. Blueprint çoğaldıkça Atlas'ın kabiliyeti birikir. Bir blueprint başka blueprint içinde <code>SubCanvas</code> node olarak da kullanılabilir.</p>
+
+  <div class="blueprint-detail">
+    <div class="bp-demo">
+      <div class="bp-demo-header">
+        <div class="bp-demo-title">vault-agent-v1</div>
+        <div class="bp-demo-badge badge-saved">● kaydedildi</div>
+      </div>
+      <div class="bp-nodes">
+        <div class="bp-mini-node"><div class="mini-icon">V</div><div class="mini-label">Vault</div></div>
+        <div class="bp-arrow">→</div>
+        <div class="bp-mini-node" style="border-color: rgba(167,139,250,0.4);"><div class="mini-icon">S</div><div class="mini-label">Sentor</div></div>
+        <div class="bp-arrow">→</div>
+        <div class="bp-mini-node" style="border-color: rgba(200,245,96,0.3);"><div class="mini-icon">◉</div><div class="mini-label">Output</div></div>
+      </div>
+      <div class="bp-info"><p>Vault dosyasını oku → Sentor analiz et → Agent taslağı üret. 3 node, 2 edge.</p></div>
+    </div>
+
+    <div class="bp-demo">
+      <div class="bp-demo-header">
+        <div class="bp-demo-title">research-router</div>
+        <div class="bp-demo-badge badge-template">▲ şablon</div>
+      </div>
+      <div class="bp-nodes">
+        <div class="bp-mini-node" style="border-color: rgba(200,245,96,0.3);"><div class="mini-icon">▶</div><div class="mini-label">Start</div></div>
+        <div class="bp-arrow">→</div>
+        <div class="bp-mini-node" style="border-color: rgba(240,160,80,0.4);"><div class="mini-icon">?</div><div class="mini-label">Vault var?</div></div>
+        <div class="bp-arrow">→</div>
+        <div class="bp-mini-node" style="border-color: rgba(91,141,239,0.4);"><div class="mini-icon">W</div><div class="mini-label">Web fallback</div></div>
+      </div>
+      <div class="bp-info"><p>Sorgu geldi → Vault'ta ara → bulamadıysa web'e düş → cevap üret. <code>Condition</code> node ile branching.</p></div>
+    </div>
+  </div>
+
+  <!-- PROJEYE ÇEVİR AKIŞI -->
+  <div style="margin-top: 32px; background: var(--bg1); border: 1px solid rgba(200,245,96,0.2); border-radius: 8px; padding: 28px;">
+    <div class="section-tag" style="margin-bottom: 12px;">// PROJEYE ÇEVİR AKIŞI</div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative;">
+      <div style="padding: 16px; border-right: 1px solid var(--border); text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 8px; font-family:var(--mono);">◻</div>
+        <div style="font-family: var(--mono); font-size: 11px; color: var(--accent2); margin-bottom: 6px;">Sub Canvas</div>
+        <div style="font-size: 11px; color: var(--muted2);">Kullanıcı sub canvas'ta çalışıyor — dosyalar, terminal, agent'lar bağlı.</div>
+      </div>
+      <div style="padding: 16px; border-right: 1px solid var(--border); text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 8px;">⊡</div>
+        <div style="font-family: var(--mono); font-size: 11px; color: var(--accent2); margin-bottom: 6px;">Projeye Çevir</div>
+        <div style="font-size: 11px; color: var(--muted2);">Sub canvas toolbar butonu tıklanır. Vault-Exporter agent devreye girer.</div>
+      </div>
+      <div style="padding: 16px; border-right: 1px solid var(--border); text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 8px; font-family:var(--mono);">S</div>
+        <div style="font-family: var(--mono); font-size: 11px; color: var(--purple); margin-bottom: 6px;">Format Denetle</div>
+        <div style="font-size: 11px; color: var(--muted2);">HTML formatı, CSS variable'lar, inline style — vault standartlarına uygun mu? Değilse düzelt.</div>
+      </div>
+      <div style="padding: 16px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 8px;">✓</div>
+        <div style="font-family: var(--mono); font-size: 11px; color: var(--accent2); margin-bottom: 6px;">Vault'a Hazır</div>
+        <div style="font-size: 11px; color: var(--muted2);">Native bildirim. <code>vault/projects/</code> altına yazılır, indexer tetiklenir.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ORKESTRA -->
+<section id="orkestra">
+  <div class="section-tag">// 05 · orkestra agent</div>
+  <div class="section-title">Agentleri orkestra yönetir.</div>
+  <p class="section-sub">Orkestra agent'in işi doğru zamanda doğru agent'ı çağırmak. Kullanıcı "agent builder aç" derse Sentor'u tetikler. Paralel agent çağrısı + sonuç merge desteği (Flowise Supervisor/Worker deseni).</p>
+
+  <div class="orch-diagram">
+    <div class="orch-col">
+      <div class="orch-col-label">// GİRİŞ</div>
+      <div class="orch-item"><div class="orch-item-name">Kullanıcı İsteği</div><div class="orch-item-desc">"Bu iki dosyayı analiz eden bir agent yap"</div></div>
+      <div class="orch-arrow">↓</div>
+      <div class="orch-item"><div class="orch-item-name">Canvas State</div><div class="orch-item-desc">Hangi paneller açık, vault dosyaları, aktif node bağlantıları</div></div>
+      <div class="orch-arrow">↓</div>
+      <div class="orch-item"><div class="orch-item-name">Agent Listesi</div><div class="orch-item-desc">Vault, Coder, Atlas-Maker, Sentor + custom agentler</div></div>
+    </div>
+    <div class="orch-divider"></div>
+    <div class="orch-col">
+      <div class="orch-col-label">// ORKESTRA KARAR</div>
+      <div class="orch-item" style="border-color: rgba(91,141,239,0.4);"><div class="orch-item-name" style="color: var(--accent)">Mevcut yeterli mi?</div><div class="orch-item-desc">Evet → <code>agent_invoke</code>. Hayır → <code>sentor_trigger(reason)</code>.</div></div>
+      <div class="orch-arrow">↓</div>
+      <div class="orch-item" style="border-color: rgba(91,141,239,0.4);"><div class="orch-item-name" style="color: var(--accent)">Context hazırla</div><div class="orch-item-desc">Canvas state + vault context + selected files → agent'a ilet</div></div>
+      <div class="orch-arrow">↓</div>
+      <div class="orch-item" style="border-color: rgba(91,141,239,0.4);"><div class="orch-item-name" style="color: var(--accent)">Paralel mi?</div><div class="orch-item-desc">Birden çok agent gerekiyorsa Supervisor moduna geç</div></div>
+    </div>
+    <div class="orch-divider"></div>
+    <div class="orch-col">
+      <div class="orch-col-label">// ÇIKIŞ</div>
+      <div class="orch-item" style="border-color: rgba(167,139,250,0.4);"><div class="orch-item-name" style="color: var(--purple)">Sentor Tetiklendi</div><div class="orch-item-desc">Sentor sub-canvas açılır, seed context yüklenir</div></div>
+      <div class="orch-arrow">↓</div>
+      <div class="orch-item" style="border-color: rgba(200,245,96,0.4);"><div class="orch-item-name" style="color: var(--accent2)">Vault'a Kaydet</div><div class="orch-item-desc">Blueprint / agent / proje vault'a yazıldı</div></div>
+      <div class="orch-arrow">↓</div>
+      <div class="orch-item" style="border-color: rgba(45,212,191,0.4);"><div class="orch-item-name" style="color: var(--teal)">Raporla</div><div class="orch-item-desc">Ne yapıldı, hangi agent oluştu, vault path</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SCENARIOS -->
+<section id="senaryo">
+  <div class="section-tag">// 06 · tipik senaryolar</div>
+  <div class="section-title">Sistemin nasıl çalıştığı, örnek üzerinden.</div>
+  <p class="section-sub">Beş tipik akış: agent üretmek, paralel sorgu, sentor pencere bağlama, MCP önerisi, projeye çevir.</p>
+
+  <div class="scn-list">
+
+    <div class="scn">
+      <div class="scn-head">1. Sıfırdan agent üret <span class="scn-tag tag-sentor">Sentor</span></div>
+      <div class="scn-body">
+        Kullanıcı: <em>"vault'taki tüm meeting notlarımı özetleyen bir agent yap"</em><br>
+        → Orkestra Sentor'u tetikler. Sentor canvas'ı açılır, seed context yüklenir.<br>
+        → Sentor önerir: <code>name: meeting-summarizer</code>, <code>tools: [vault_search, vault_read, llm]</code>, <code>base: Vault</code>.<br>
+        → Kullanıcı onaylar. <code>agent_spawn</code> çağrılır. Yeni agent <code>agentsStore</code>'a yazılır, sidebar'da görünür.
+      </div>
+    </div>
+
+    <div class="scn">
+      <div class="scn-head">2. İki paneli tek agent'a bağla <span class="scn-tag tag-blueprint">Canvas</span></div>
+      <div class="scn-body">
+        Canvas'ta açık: <code>vault/projects/canvas-plan.html</code> + Terminal (cargo check çıktısı).<br>
+        → Sağ tık → Agent Ekle. Panel açılır.<br>
+        → "İsim: build-doctor, Görev: derleme hatalarını canvas-plan ile karşılaştır".<br>
+        → Vault node'unun out port'undan agent in port'una sürükle. Terminal node'undan da bağla.<br>
+        → Agent'a soru sor: <em>"Bu hata plan ile uyumlu mu?"</em> — agent her iki context'i okur, cevap verir.
+      </div>
+    </div>
+
+    <div class="scn">
+      <div class="scn-head">3. Sentor pencereye bakar, MCP önerir <span class="scn-tag tag-sentor">Sentor</span></div>
+      <div class="scn-body">
+        Sentor'u canvas'a pencere olarak çağır, bir terminal node'una bağla.<br>
+        → Sentor: <em>"Bu <code>cargo check</code> programını agent ile kullanmak için MCP'ye ihtiyaç yok — doğrudan <code>bash_run</code> tool yeterli. Ama <code>cargo clippy</code> warning'lerini structured olarak istersen MCP wrapper yazılabilir. Hangisini istersin?"</em><br>
+        → Kullanıcı seçer. Sentor gerekirse Orkestra'ya plan iletir, gerekirse doğrudan agent_spawn ile çözer.
+      </div>
+    </div>
+
+    <div class="scn">
+      <div class="scn-head">4. Blueprint'i başka canvas'a taşı <span class="scn-tag tag-blueprint">Blueprint</span></div>
+      <div class="scn-body">
+        <code>research-router</code> blueprint mevcut canvas'ta üretildi, kaydedildi.<br>
+        → Yeni canvas aç. Sağ tık → Blueprint İmport → <code>research-router</code> seç.<br>
+        → 7 node + 6 edge spawn olur. Sadece <code>Start</code> input'unu yeni canvas'taki bir kaynağa bağla → hazır.
+      </div>
+    </div>
+
+    <div class="scn">
+      <div class="scn-head">5. Sub canvas → Vault projesi <span class="scn-tag tag-blueprint">Export</span></div>
+      <div class="scn-body">
+        Sub canvas'ta bir araştırma yapıldı, 3 vault dosyası okundu, agent yorumlar üretti.<br>
+        → Toolbar → <strong>Projeye Çevir</strong> butonu.<br>
+        → Vault-Exporter agent canvas state'i toplar, HTML üretir, Atlas-Maker stil rulebook'una göre formatlar.<br>
+        → <em>"Vault'a Hazır: vault/projects/aralık-araştırma/"</em> bildirimi gelir. Indexer otomatik çalışır.
+      </div>
+    </div>
+
+    <div class="scn">
+      <div class="scn-head">6. Sentor belirsiz istek → clarify <span class="scn-tag tag-sentor">Edge case</span></div>
+      <div class="scn-body">
+        Kullanıcı: <em>"şu işi yapan bir agent yap"</em><br>
+        → Sentor: <em>"Hangi 'şu iş'? (1) plan analiz / (2) hata özetleme"</em> — tek tur clarify.<br>
+        → Kullanıcı "2" → Sentor spec gösterir → onay → <code>agent_spawn</code>.
+      </div>
+    </div>
+
+    <div class="scn">
+      <div class="scn-head">7. Blueprint import çakışması <span class="scn-tag tag-blueprint">Edge case</span></div>
+      <div class="scn-body">
+        Import edilen blueprint'in içindeki <code>web-fetcher</code> agent zaten mevcut.<br>
+        → Diyalog: <strong>[Mevcut'u kullan]</strong> · [Yeniden adlandır → web-fetcher-2] · [İptal].<br>
+        → Yeniden adlandırılırsa edge'ler yeni id'ye otomatik remap.
+      </div>
+    </div>
+
+    <div class="scn">
+      <div class="scn-head">8. Recursive builder reddi <span class="scn-tag tag-orch">Güvenlik</span></div>
+      <div class="scn-body">
+        Kullanıcı Sentor'a: <em>"İçinde Sentor olan bir agent yap"</em>.<br>
+        → <code>agent_spawn</code> tools listesinde <code>agent_spawn</code> görür → <code>permission_denied</code> döner.<br>
+        → Sentor: <em>"Recursive builder yasak. Orkestra üzerinden tetikleyebilirsin."</em>
+      </div>
+    </div>
+
+    <div class="scn">
+      <div class="scn-head">9. Orkestra paralel agent (Supervisor) <span class="scn-tag tag-orch">Orkestra</span></div>
+      <div class="scn-body">
+        <em>"Bu üç vault sayfasını oku, her birini ayrı agent özetlesin"</em> → Orkestra <code>agent_invoke × 3</code> paralel.<br>
+        → Sonuçlar bir LLM node ile merge edilir → tek cevap.<br>
+        → UI'da küçük progress bar: <em>"3 agent çalışıyor (1/3 tamam)"</em>.
+      </div>
+    </div>
+
+    <div class="scn">
+      <div class="scn-head">10. Format validator yakalar <span class="scn-tag tag-blueprint">Export</span></div>
+      <div class="scn-body">
+        Sub canvas'ta inline <code>&lt;script src="https://cdn..."&gt;</code> var → Vault-Exporter <strong>reddeder</strong>:<br>
+        <em>"CDN link yasak. <code>/vendor/mermaid.min.js</code> mevcut. Otomatik düzeltsem mi?"</em><br>
+        → Onay → düzelt → tekrar denetle → yaz.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SENTOR PROTOCOL -->
+<section id="sentor-proto">
+  <div class="section-tag">// 07 · sentor protokolü</div>
+  <div class="section-title">Sentor nasıl konuşur — sıkı 5 adım.</div>
+  <p class="section-sub">Belirsizlik → tek tur clarify. Sonra YAML-ish spec → onay → <code>agent_spawn</code>. Asla onaysız spawn yok. Asla recursive builder yok.</p>
+
+  <div style="margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+    <div style="background: var(--bg1); border: 1px solid rgba(167,139,250,0.3); border-radius: 8px; overflow: hidden;">
+      <div style="padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--bg2);">
+        <div style="font-family: var(--mono); font-size: 10px; color: var(--purple); letter-spacing: 0.1em;">// SENTOR SİSTEM PROMPTU (özet)</div>
+      </div>
+      <pre style="padding: 18px 22px; font-family: var(--mono); font-size: 11px; color: var(--text); line-height: 1.7; margin: 0; white-space: pre-wrap; background: transparent;">You are Sentor, Atlas's Agent Builder.
+
+1. Ambiguous? Ask ONE clarifying question.
+2. Propose spec (YAML):
+     name, role, base, tools[],
+     memory, prompt
+3. "Onaylıyor musun? (evet/değiştir/iptal)"
+4. evet → agent_spawn(spec)
+   değiştir → diff + re-show
+   iptal → stop
+5. "✓ {name} kaydedildi"
+
+REFUSALS
+• Never spawn empty tools[]
+• Never include agent_spawn in tools
+• Never expose vault_write
+  unless Atlas-Maker pattern</pre>
+    </div>
+
+    <div style="background: var(--bg1); border: 1px solid rgba(91,141,239,0.3); border-radius: 8px; overflow: hidden;">
+      <div style="padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--bg2);">
+        <div style="font-family: var(--mono); font-size: 10px; color: var(--accent); letter-spacing: 0.1em;">// TOOL KONTRATI — agent_spawn</div>
+      </div>
+      <pre style="padding: 18px 22px; font-family: var(--mono); font-size: 11px; color: var(--text); line-height: 1.7; margin: 0; white-space: pre-wrap; background: transparent;">type AgentSpawnSpec = {
+  name: string;       // kebab, 2-40
+  role: string;       // 1 sentence
+  prompt: string;     // ≤ 4000 chars
+  tools: string[];    // ≥ 1, in registry
+  memory: "session" | "ephemeral";
+  baseAgentId?: string;
+  parentCanvasId?: string;
+}
+
+type Result =
+  | { ok: true; id: string }
+  | { ok: false; error:
+      | "name_taken"
+      | "invalid_tool"
+      | "rate_limit"    // max 10/session
+      | "permission_denied" }</pre>
+    </div>
+
+    <div style="background: var(--bg1); border: 1px solid rgba(200,245,96,0.3); border-radius: 8px; overflow: hidden;">
+      <div style="padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--bg2);">
+        <div style="font-family: var(--mono); font-size: 10px; color: var(--accent2); letter-spacing: 0.1em;">// TOOL KONTRATI — blueprint_save</div>
+      </div>
+      <pre style="padding: 18px 22px; font-family: var(--mono); font-size: 11px; color: var(--text); line-height: 1.7; margin: 0; white-space: pre-wrap; background: transparent;">type BlueprintSaveSpec = {
+  slug: string;
+  name: string;
+  description: string;
+  selection: {
+    nodeIds: string[];   // empty = whole canvas
+    edgeIds: string[];
+  };
+}
+
+type Result =
+  | { ok: true; path: string;
+      nodeCount: number;
+      edgeCount: number }
+  | { ok: false; error:
+      | "slug_taken"
+      | "empty_selection"
+      | "invalid_graph" }</pre>
+    </div>
+
+    <div style="background: var(--bg1); border: 1px solid rgba(45,212,191,0.3); border-radius: 8px; overflow: hidden;">
+      <div style="padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--bg2);">
+        <div style="font-family: var(--mono); font-size: 10px; color: var(--teal); letter-spacing: 0.1em;">// TOOL KONTRATI — canvas_read_state</div>
+      </div>
+      <pre style="padding: 18px 22px; font-family: var(--mono); font-size: 11px; color: var(--text); line-height: 1.7; margin: 0; white-space: pre-wrap; background: transparent;">type CanvasStateSnapshot = {
+  canvasId: string;
+  parentCanvasId: string | null;
+  nodes: Array&lt;{
+    id; type; summary; data
+  }&gt;;
+  edges: Array&lt;{ from; to; kind }&gt;;
+  agents: Array&lt;{ id; name; role }&gt;;
+  openVaultFiles: string[];
+  activeTerminalCwd: string | null;
+}
+
+// Always succeeds.
+// vault/agents/{slug}/ is hidden
+// for privacy.</pre>
+    </div>
+
+  </div>
+
+  <!-- Port compatibility matrix -->
+  <div style="margin-top: 32px; background: var(--bg1); border: 1px solid var(--border); border-radius: 8px; padding: 24px;">
+    <div class="section-tag" style="margin-bottom: 16px;">// PORT UYUM MATRİSİ — edge sürüklerken enforce edilir</div>
+    <table style="width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 11px;">
+      <thead>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <th style="padding: 8px; text-align: left; color: var(--muted);">from \ to</th>
+          <th style="padding: 8px; color: var(--text);">text</th>
+          <th style="padding: 8px; color: var(--text);">json</th>
+          <th style="padding: 8px; color: var(--text);">trigger</th>
+          <th style="padding: 8px; color: var(--text);">stream</th>
+          <th style="padding: 8px; color: var(--text);">any</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--text);">text</td><td style="text-align:center;color:var(--accent2)">✓</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--accent2)">✓</td></tr>
+        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--text);">json</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--accent2)">✓</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--accent2)">✓</td></tr>
+        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--text);">trigger</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--accent2)">✓</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--accent2)">✓</td></tr>
+        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--text);">stream</td><td style="text-align:center;color:var(--accent2)">✓</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--accent2)">✓</td><td style="text-align:center;color:var(--accent2)">✓</td></tr>
+        <tr><td style="padding: 8px; color: var(--text);">any</td><td style="text-align:center;color:var(--accent2)">✓</td><td style="text-align:center;color:var(--accent2)">✓</td><td style="text-align:center;color:var(--accent2)">✓</td><td style="text-align:center;color:var(--accent2)">✓</td><td style="text-align:center;color:var(--accent2)">✓</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</section>
+
+<hr class="divider">
+
+<!-- SECURITY -->
+<section id="guvenlik">
+  <div class="section-tag">// 08 · güvenlik & izolasyon</div>
+  <div class="section-title">Kimin nereye yazma izni var?</div>
+  <p class="section-sub">Canvas izolasyon matrisi + tool whitelist + blueprint import sandbox + onay flow. Atlas'ın mevcut "read-only auto, mutating prompt" deseni üzerine kurulu.</p>
+
+  <!-- Canvas isolation matrix -->
+  <div style="margin-top: 48px; background: var(--bg1); border: 1px solid var(--border); border-radius: 8px; padding: 24px;">
+    <div class="section-tag" style="margin-bottom: 16px;">// CANVAS İZOLASYON MATRİSİ</div>
+    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+      <thead>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <th style="padding: 12px; text-align: left; color: var(--muted); font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;">AKTÖR \ HEDEF</th>
+          <th style="padding: 12px; color: var(--purple); font-family: var(--mono); font-size: 10px;">Sentor Canvas</th>
+          <th style="padding: 12px; color: var(--accent); font-family: var(--mono); font-size: 10px;">User Canvas</th>
+          <th style="padding: 12px; color: var(--accent2); font-family: var(--mono); font-size: 10px;">Sub-Canvas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 12px; color: var(--text); font-family: var(--display); font-weight: 600;">Sentor</td>
+          <td style="text-align: center; color: var(--accent2); font-family: var(--mono);">RW</td>
+          <td style="text-align: center; color: var(--muted); font-family: var(--mono);">R</td>
+          <td style="text-align: center; color: var(--muted); font-family: var(--mono);">R</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 12px; color: var(--text); font-family: var(--display); font-weight: 600;">Orkestra</td>
+          <td style="text-align: center; color: var(--muted); font-family: var(--mono);">R</td>
+          <td style="text-align: center; color: var(--muted); font-family: var(--mono);">R</td>
+          <td style="text-align: center; color: var(--muted); font-family: var(--mono);">R</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 12px; color: var(--text); font-family: var(--display); font-weight: 600;">User Agent</td>
+          <td style="text-align: center; color: var(--red); font-family: var(--mono);">—</td>
+          <td style="text-align: center; color: var(--muted); font-family: var(--mono);">R</td>
+          <td style="text-align: center; color: var(--accent2); font-family: var(--mono);">RW*</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px; color: var(--text); font-family: var(--display); font-weight: 600;">Vault-Exporter</td>
+          <td style="text-align: center; color: var(--red); font-family: var(--mono);">—</td>
+          <td style="text-align: center; color: var(--muted); font-family: var(--mono);">R</td>
+          <td style="text-align: center; color: var(--muted); font-family: var(--mono);">R</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top: 14px; font-size: 11px; color: var(--muted); font-family: var(--mono);">
+      RW = node/edge ekle-sil &nbsp;·&nbsp; R = canvas_read_state &nbsp;·&nbsp; — = hiç erişim yok &nbsp;·&nbsp; * yalnız kendi parent sub-canvas'ı
+    </div>
+  </div>
+
+  <!-- Approval flow -->
+  <div style="margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+    <div class="flow-card accent">
+      <div class="flow-num">·</div>
+      <div class="flow-title">agent_invoke</div>
+      <div class="flow-desc">Per-agent ilk seferde onay diyalogu. <strong>"Always allow X?"</strong> checkbox kaydedilir. Sonraki invoke'lar sessiz.</div>
+    </div>
+    <div class="flow-card purple">
+      <div class="flow-num">·</div>
+      <div class="flow-title">agent_spawn</div>
+      <div class="flow-desc"><strong>Her zaman</strong> onay. Sentor önerdiği spec'i gösterir, kullanıcı tek tıkla onaylar. Rate limit: 10/session.</div>
+    </div>
+    <div class="flow-card green">
+      <div class="flow-num">·</div>
+      <div class="flow-title">blueprint_save</div>
+      <div class="flow-desc">Otomatik onay (kullanıcı "Save" tuşuna zaten bastı). Slug çakışması varsa rename önerir.</div>
+    </div>
+  </div>
+
+  <!-- Blueprint import sandbox -->
+  <div style="margin-top: 24px; background: var(--bg1); border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 24px;">
+    <div class="section-tag" style="margin-bottom: 12px; color: var(--red);">// BLUEPRINT IMPORT SANDBOX</div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+      <div>
+        <div style="font-family: var(--mono); font-size: 11px; color: var(--red); margin-bottom: 6px;">1. Path</div>
+        <div style="font-size: 11px; color: var(--muted2); line-height: 1.6;">Sadece <code>vault/blueprints/</code> altı. <code>..</code> traversal reddi.</div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 11px; color: var(--red); margin-bottom: 6px;">2. Schema</div>
+        <div style="font-size: 11px; color: var(--muted2); line-height: 1.6;"><code>$schema: "atlas-blueprint-v1"</code> zorunlu. JSON schema doğrulama.</div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 11px; color: var(--red); margin-bottom: 6px;">3. Agent onayı</div>
+        <div style="font-size: 11px; color: var(--muted2); line-height: 1.6;">İçindeki agent tanımları <strong>otomatik spawn EDİLMEZ</strong>. Ayrı diyalog.</div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 11px; color: var(--red); margin-bottom: 6px;">4. Least privilege</div>
+        <div style="font-size: 11px; color: var(--muted2); line-height: 1.6;">Read-only tool'lar auto-onay. Mutating tool'lar manuel onay.</div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<hr class="divider">
+
+<!-- PLAN -->
+<section id="plan">
+  <div class="section-tag">// 09 · implementasyon planı</div>
+  <div class="section-title">Adım adım, çalışan önce.</div>
+  <p class="section-sub">A1–A4 = MVP. A5–A9 polish. Her faz öncekinin üstüne oturur. Canvas çekirdek (CANVAS_PLAN P0-P2) tamamlanmadan başlayamaz.</p>
+
+  <div class="phase-list">
+
+    <div class="phase-item">
+      <div class="phase-num">A0</div>
+      <div>
+        <div class="phase-title">Önkoşul — Canvas + Web Layer</div>
+        <div class="phase-desc">CANVAS_PLAN P0-P2 (infinite canvas, sub-canvas, hit-bitmap) + WEB_LAYER W1-W2. Sub canvas çalışıyor olmalı.</div>
+        <div class="phase-tasks"><span class="task">canvas core</span><span class="task">sub canvas</span><span class="task">hit-bitmap</span></div>
+      </div>
+    </div>
+
+    <div class="phase-item">
+      <div class="phase-num">A1</div>
+      <div>
+        <div class="phase-title">Sağ Tık Menüsü + Agent Node + Editor Panel</div>
+        <div class="phase-desc">Canvas'a sağ tık → Agent Ekle. AgentEditorPanel açılır (inline). İsim/görev/tools/base/memory. Kaydet → <code>agentsStore</code>'a yazılır + Agent node spawn olur.</div>
+        <div class="phase-tasks"><span class="task mvp">ContextMenu.tsx</span><span class="task mvp">AgentNode.tsx</span><span class="task mvp">AgentEditorPanel.tsx</span><span class="task mvp">canvasStore.agents[]</span></div>
+      </div>
+    </div>
+
+    <div class="phase-item">
+      <div class="phase-num">A2</div>
+      <div>
+        <div class="phase-title">Sentor Agent + Sub Canvas</div>
+        <div class="phase-desc"><code>builtin:sentor</code> agents.ts'e eklenir. Kendi sub-canvas'ı: <code>sentorCanvasStore.ts</code>. FocusedBar'a Sentor ikonu. Sentor'un sistem promptu: canvas state oku, agent öner, agent_spawn çağır.</div>
+        <div class="phase-tasks"><span class="task mvp">builtin:sentor</span><span class="task mvp">sentorCanvasStore.ts</span><span class="task mvp">SentorCanvas.tsx</span><span class="task mvp">FocusedBar ikon</span></div>
+      </div>
+    </div>
+
+    <div class="phase-item">
+      <div class="phase-num">A3</div>
+      <div>
+        <div class="phase-title">Port + Edge Sürükleme</div>
+        <div class="phase-desc">NodePort.tsx, drag handler, bezier curve, tip uyum kontrolü. SVG layer canvas üstünde. Edge'e sağ tık → sil/değiştir.</div>
+        <div class="phase-tasks"><span class="task mvp">NodePort.tsx</span><span class="task mvp">connections.ts (bezier)</span><span class="task mvp">edge drag</span><span class="task mvp">edge ctx menu</span></div>
+      </div>
+    </div>
+
+    <div class="phase-item">
+      <div class="phase-num">A4</div>
+      <div>
+        <div class="phase-title">Blueprint Kaydet + İmport</div>
+        <div class="phase-desc"><code>blueprintStore.ts</code>, Tauri <code>blueprint_save</code>/<code>blueprint_load</code> komutları. <code>vault/blueprints/</code> dizini. Toolbar butonu + sağ tık → Blueprint İmport listesi. = <strong>MVP TAMAM</strong>.</div>
+        <div class="phase-tasks"><span class="task mvp">blueprintStore.ts</span><span class="task mvp">Tauri commands</span><span class="task mvp">vault/blueprints/</span><span class="task mvp">import modal</span></div>
+      </div>
+    </div>
+
+    <div class="phase-item">
+      <div class="phase-num">A5</div>
+      <div>
+        <div class="phase-title">Vault-Exporter + Projeye Çevir</div>
+        <div class="phase-desc"><code>builtin:vault-exporter</code> agent. Sub canvas toolbar'a "Projeye Çevir" butonu. Format validator (CSS variable'lar, inline style). Tauri native bildirim API.</div>
+        <div class="phase-tasks"><span class="task next">builtin:vault-exporter</span><span class="task next">SubCanvas toolbar btn</span><span class="task next">format validator</span><span class="task next">native notif</span></div>
+      </div>
+    </div>
+
+    <div class="phase-item">
+      <div class="phase-num">A6</div>
+      <div>
+        <div class="phase-title">Orkestra Agent + Routing</div>
+        <div class="phase-desc"><code>builtin:orkestra</code>. Tool seti: <code>agent_list</code>, <code>agent_invoke</code>, <code>sentor_trigger</code>, <code>canvas_read_state</code>. Settings'te toggle: "Orkestra varsayılan chat agentı".</div>
+        <div class="phase-tasks"><span class="task next">builtin:orkestra</span><span class="task next">agent_invoke tool</span><span class="task next">sentor_trigger tool</span><span class="task next">settings toggle</span></div>
+      </div>
+    </div>
+
+    <div class="phase-item">
+      <div class="phase-num">A7</div>
+      <div>
+        <div class="phase-title">Canvas-aware tool seti</div>
+        <div class="phase-desc"><code>canvas_read_state</code>, <code>agent_spawn</code>, <code>blueprint_save</code> tools (frontend Tauri komutları). Sentor + Orkestra için. Sentor canvas'ında write izni kısıtlı.</div>
+        <div class="phase-tasks"><span class="task next">canvas_read_state</span><span class="task next">agent_spawn</span><span class="task next">blueprint_save</span></div>
+      </div>
+    </div>
+
+    <div class="phase-item">
+      <div class="phase-num">A8</div>
+      <div>
+        <div class="phase-title">MCP Önerici (Sentor)</div>
+        <div class="phase-desc">Sentor bir pencereye bağlandığında programın MCP'ye uygun olup olmadığını analiz eder. Önerirse user onayı ile MCP wrapper'ı üretir, agent'a tool olarak ekler.</div>
+        <div class="phase-tasks"><span class="task">mcp_analyze tool</span><span class="task">mcp_wrap tool</span></div>
+      </div>
+    </div>
+
+    <div class="phase-item">
+      <div class="phase-num">A9</div>
+      <div>
+        <div class="phase-title">Per-Agent Memory Toggle</div>
+        <div class="phase-desc">Editor panel'de "session / ephemeral" toggle. Ephemeral = her invoke fresh context. Session = chat history vault'ta saklı.</div>
+        <div class="phase-tasks"><span class="task">memory field</span><span class="task">vault/agents/{slug}/sessions/</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  ATLAS OS — Agent Builder Prototip · v0.1 · prototypes/agent-builder/index.html
+</footer>
+
+<script>
+function showCtx(e, node) {
+  e.preventDefault(); e.stopPropagation();
+  const menu = document.getElementById('ctxMenu');
+  const area = document.getElementById('canvasArea').getBoundingClientRect();
+  const x = e.clientX - area.left, y = e.clientY - area.top;
+  menu.style.left = Math.min(x, area.width - 220) + 'px';
+  menu.style.top = Math.min(y, area.height - 280) + 'px';
+  menu.style.display = 'block';
+  document.addEventListener('click', hideCtxOnce, { once: true });
+}
+function hideCtxOnce(e) { if (!e.target.closest('.ctx-menu')) hideCtx(); }
+function hideCtx() { document.getElementById('ctxMenu').style.display = 'none'; }
+function addAgentFromCtx() { hideCtx(); showEditor(); }
+
+function showEditor() { document.getElementById('agentEditor').style.display = 'block'; }
+function hideEditor() { document.getElementById('agentEditor').style.display = 'none'; }
+function saveAgent() {
+  hideEditor();
+  showNotif('Agent Kaydedildi', 'Sentor agentsStore\'a yazıldı. Canvas\'ta görünür durumda.');
+}
+function toggleChip(el) { el.classList.toggle('active'); }
+
+function focusNode(n) {
+  document.querySelectorAll('.cnode').forEach(c => c.classList.remove('focused'));
+  if (!n.classList.contains('blueprint')) n.classList.add('focused');
+}
+
+function toggleBpShelf() {
+  const s = document.getElementById('bpShelf');
+  s.style.display = s.style.display === 'none' ? 'block' : 'none';
+}
+function saveBlueprint() { showNotif('Blueprint Kaydedildi', 'sentor-canvas-v1 vault/blueprints/ dizinine yazıldı. 4 node, 3 edge.'); }
+function toProject() { showNotif('✓ Vault\'a Hazır', 'canvas-agent-blueprint.html vault/projects/ dizinine eklendi. Indexer çalıştı.'); }
+
+function showNotif(t, b) {
+  const n = document.getElementById('vaultNotif');
+  n.querySelector('.notif-title').textContent = '✓ ' + t;
+  n.querySelector('.notif-body').textContent = b;
+  n.style.display = 'block';
+  setTimeout(hideNotif, 4500);
+}
+function hideNotif() { document.getElementById('vaultNotif').style.display = 'none'; }
+
+function switchTab(id) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+}
+
+// Draw connections
+function drawConnections() {
+  const svg = document.getElementById('connSvg');
+  const area = document.getElementById('canvasArea').getBoundingClientRect();
+  const pairs = [
+    ['nodeVault', 'nodeAgent', 'rgba(91,141,239,0.5)'],
+    ['nodeTerminal', 'nodeAgent', 'rgba(45,212,191,0.5)'],
+    ['nodeAgent', 'nodeBlueprint', 'rgba(200,245,96,0.4)'],
+    ['nodeAgent', 'nodeCond', 'rgba(240,160,80,0.4)'],
+  ];
+  svg.querySelectorAll('path').forEach(p => p.remove());
+  for (const [fromId, toId, color] of pairs) {
+    const a = document.getElementById(fromId).getBoundingClientRect();
+    const b = document.getElementById(toId).getBoundingClientRect();
+    const x1 = a.right - area.left, y1 = a.top + a.height/2 - area.top;
+    const x2 = b.left - area.left, y2 = b.top + b.height/2 - area.top;
+    const cx = (x1 + x2) / 2;
+    const d = `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`;
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', d);
+    p.setAttribute('stroke', color);
+    p.setAttribute('stroke-width', '1.5');
+    p.setAttribute('fill', 'none');
+    p.setAttribute('stroke-dasharray', '4 3');
+    p.setAttribute('marker-end', 'url(#arrowhead)');
+    svg.appendChild(p);
+  }
+}
+window.addEventListener('load', drawConnections);
+window.addEventListener('resize', drawConnections);
+
+// Nav active on scroll
+const navLinks = document.querySelectorAll('.nav-links a');
+const sections = ['mimari','nodes','canvas','blueprint','orkestra','senaryo','sentor-proto','guvenlik','plan'].map(id => document.getElementById(id));
+window.addEventListener('scroll', () => {
+  let active = sections[0];
+  for (const s of sections) if (s && s.getBoundingClientRect().top < 120) active = s;
+  navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + active.id));
+});
+</script>
+
+</body>
+</html>

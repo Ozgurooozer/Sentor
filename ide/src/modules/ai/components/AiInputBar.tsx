@@ -7,10 +7,11 @@ import {
   CodeIcon,
   HashtagIcon,
   Key01Icon,
+  Mic01Icon,
+  MicOff01Icon,
   TerminalIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { type FileAttachment } from "../lib/composer";
 import { useComposer } from "../lib/useComposer";
@@ -157,6 +158,7 @@ export function AiInputBar() {
           <PopoverAnchor asChild>
             <div className="flex items-start gap-2">
               <textarea
+                name="ai-message"
                 ref={c.textareaRef}
                 value={c.value}
                 onChange={(e) => c.setValue(e.target.value)}
@@ -214,15 +216,11 @@ export function AiInputBar() {
           />
         </Popover>
 
-        <AnimatePresence initial={false}>
-          {voiceLabel && (
-            <motion.div
+        <div className="flex items-center justify-between gap-2 px-0.5">
+          {voiceLabel ? (
+            <div
               key={voiceLabel}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.12 }}
-              className="flex items-center gap-1.5 px-1 text-[11px] text-muted-foreground"
+              className="flex items-center gap-1.5 text-[11px] text-muted-foreground duration-150 ease-out animate-in fade-in"
             >
               {c.voice.recording ? (
                 <span className="size-1.5 animate-pulse rounded-full bg-destructive" />
@@ -230,9 +228,31 @@ export function AiInputBar() {
                 <Spinner className="size-3" />
               )}
               <span className="truncate">{voiceLabel}</span>
-            </motion.div>
+            </div>
+          ) : (
+            <div />
           )}
-        </AnimatePresence>
+
+          {c.voice.supported && (
+            <button
+              type="button"
+              title={c.voice.recording ? "Stop recording" : "Voice note (mic)"}
+              onClick={() => (c.voice.recording ? c.voice.stop() : c.voice.start())}
+              className={cn(
+                "flex items-center justify-center rounded p-1 transition-colors",
+                c.voice.recording
+                  ? "text-destructive hover:bg-destructive/10"
+                  : "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground",
+              )}
+            >
+              <HugeiconsIcon
+                icon={c.voice.recording ? MicOff01Icon : Mic01Icon}
+                size={14}
+                strokeWidth={1.75}
+              />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -257,18 +277,12 @@ function ChipsRow({
     return null;
   return (
     <div className="flex flex-wrap gap-1">
-      <AnimatePresence initial={false}>
-        {commands.map((cmd) => (
-          <motion.div
-            key={`cmd-${cmd.name}`}
-            layout
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.92 }}
-            transition={{ duration: 0.12 }}
-            className="group flex items-center gap-1 rounded-md border border-border/60 bg-card px-1.5 py-0.5 text-[11px]"
-            title={cmd.label}
-          >
+      {commands.map((cmd) => (
+        <div
+          key={`cmd-${cmd.name}`}
+          className="group flex items-center gap-1 rounded-md border border-border/60 bg-card px-1.5 py-0.5 text-[11px] duration-150 ease-out animate-in fade-in zoom-in-95"
+          title={cmd.label}
+        >
             <HugeiconsIcon
               icon={cmd.icon}
               size={11}
@@ -283,20 +297,15 @@ function ChipsRow({
               aria-label="Remove command"
             >
               <HugeiconsIcon icon={Cancel01Icon} size={10} strokeWidth={2} />
-            </button>
-          </motion.div>
-        ))}
-        {snippets.map((s) => (
-          <motion.div
-            key={`snip-${s.id}`}
-            layout
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.92 }}
-            transition={{ duration: 0.12 }}
-            className="group flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[11px] text-primary"
-            title={s.description || s.name}
-          >
+          </button>
+        </div>
+      ))}
+      {snippets.map((s) => (
+        <div
+          key={`snip-${s.id}`}
+          className="group flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[11px] text-primary duration-150 ease-out animate-in fade-in zoom-in-95"
+          title={s.description || s.name}
+        >
             <HugeiconsIcon
               icon={HashtagIcon}
               size={11}
@@ -311,19 +320,14 @@ function ChipsRow({
               aria-label="Remove snippet"
             >
               <HugeiconsIcon icon={Cancel01Icon} size={10} strokeWidth={2} />
-            </button>
-          </motion.div>
-        ))}
-        {files.map((f) => (
-          <motion.div
-            key={f.id}
-            layout
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.92 }}
-            transition={{ duration: 0.12 }}
-            className="group flex items-center gap-1 rounded-md border border-border/60 bg-card px-1.5 py-0.5 text-[11px]"
-          >
+          </button>
+        </div>
+      ))}
+      {files.map((f) => (
+        <div
+          key={f.id}
+          className="group flex items-center gap-1 rounded-md border border-border/60 bg-card px-1.5 py-0.5 text-[11px] duration-150 ease-out animate-in fade-in zoom-in-95"
+        >
             {f.kind === "image" && f.url ? (
               <img src={f.url} alt="" className="size-4 rounded object-cover" />
             ) : f.kind === "selection" ? (
@@ -354,9 +358,8 @@ function ChipsRow({
             >
               <HugeiconsIcon icon={Cancel01Icon} size={10} strokeWidth={2} />
             </button>
-          </motion.div>
+          </div>
         ))}
-      </AnimatePresence>
     </div>
   );
 }

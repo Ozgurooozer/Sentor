@@ -207,6 +207,7 @@ async function semanticSearch(
   query: string,
   limit: number,
   category: string | undefined,
+  scope?: string,
   timeoutMs = 1500,
 ): Promise<SemanticResult[]> {
   try {
@@ -214,6 +215,7 @@ async function semanticSearch(
     const timer = setTimeout(() => ctrl.abort(), timeoutMs);
     const params = new URLSearchParams({ q: query, limit: String(limit) });
     if (category) params.set("category", category);
+    if (scope) params.set("scope", scope);
     const res = await fetch(`${ATLAS_API}/api/semantic?${params}`, {
       signal: ctrl.signal,
     });
@@ -333,13 +335,25 @@ export function buildVaultTools(ctx: ToolContext) {
     vault_search: tool({
       description: `Search the Atlas OS knowledge vault (your persistent memory). Hybrid search: fast local keyword index first, augmented with semantic (embedding) search when keyword results are weak and the local API is reachable. ALWAYS call this before answering any question about the user's notes or knowledge base.
 
-Returns: title, category, slug, description, snippet, score, source ("keyword" | "semantic" | "hybrid"). Use vault_read for full content. Pass mode="semantic" to force embedding search for fuzzy / conceptual queries.`,
+Returns: title, category, slug, description, snippet, score, source ("keyword" | "semantic" | "hybrid"). Use vault_read for full content. Pass mode="semantic" to force embedding search for fuzzy / conceptual queries.
+
+Use scope to isolate results to a specific agent office (e.g. "agent:vault") or "vault" for all user notes.`,
       inputSchema: z.object({
         query: z.string().describe("Search query"),
         category: z
           .string()
           .optional()
           .describe("Limit results to a specific category"),
+        scope: z
+          .string()
+          .optional()
+          .describe(
+            'Scope filter: "agent:vault", "agent:coder", "agent:atlas-maker", "agent:sentor" to limit to one agent\'s office, or "vault" for all user notes. Omit for global search.',
+          ),
+        include_archive: z
+          .boolean()
+          .optional()
+          .describe("Include archived pages in results (default false)"),
         limit: z
           .number()
           .int()
@@ -354,7 +368,7 @@ Returns: title, category, slug, description, snippet, score, source ("keyword" |
             "auto: hybrid when keyword results are weak; keyword: local only; semantic: force embedding API",
           ),
       }),
-      execute: async ({ query, category, limit, mode }) => {
+      execute: async ({ query, category, scope, include_archive, limit, mode }) => {
         const cap = limit ?? 8;
         const searchMode = mode ?? "auto";
         const root = ctx.getWorkspaceRoot();
@@ -367,13 +381,25 @@ Returns: title, category, slug, description, snippet, score, source ("keyword" |
           return { error: `Cannot read .index/pages.json: ${String(e)}` };
         }
 
+        // Scope and type filtering
+        const EXCLUDED_TYPES = new Set(["template", "agent-log", "agent-project-log"]);
+        const filteredPages = pages.filter((p) => {
+          const pAny = p as unknown as Record<string, unknown>;
+          const pType = pAny["type"] as string | undefined;
+          const pScope = pAny["scope"] as string | undefined;
+          if (pType === "archive" && !include_archive) return false;
+          if (EXCLUDED_TYPES.has(pType ?? "")) return false;
+          if (scope && pScope !== scope) return false;
+          if (category && p.category !== category) return false;
+          return true;
+        });
+
         const terms = query
           .toLowerCase()
           .split(/\s+/)
           .filter(Boolean);
 
-        const keywordHits = pages
-          .filter((p) => !category || p.category === category)
+        const keywordHits = filteredPages
           .map((p) => ({ page: p, score: scoreMatch(p, terms) }))
           .filter(({ score }) => score > 0)
           .sort((a, b) => b.score - a.score);
@@ -387,12 +413,12 @@ Returns: title, category, slug, description, snippet, score, source ("keyword" |
         let semantic: SemanticResult[] = [];
         if (needSemantic) {
           // Try Atlas API first; if offline, fall back to local embeddings + Ollama/LM Studio
-          semantic = await semanticSearch(query, cap * 2, category);
+          semantic = await semanticSearch(query, cap * 2, category, scope);
           if (semantic.length === 0) {
             const prefs = (await import("@/modules/settings/preferences"))
               .usePreferencesStore.getState();
             semantic = await localSemanticSearch(
-              query, pages, cap * 2, category, root,
+              query, filteredPages, cap * 2, category, root,
               prefs.ollamaBaseURL || OLLAMA_DEFAULT_BASE_URL,
               prefs.lmstudioBaseURL || LMSTUDIO_DEFAULT_BASE_URL,
             );
@@ -413,7 +439,7 @@ Returns: title, category, slug, description, snippet, score, source ("keyword" |
           return { query, total_found: results.length, source: "keyword", results };
         }
 
-        const merged = mergeResults(keywordHits, semantic, pages, cap, terms);
+        const merged = mergeResults(keywordHits, semantic, filteredPages, cap, terms);
         const allKw = merged.every((r) => r.source === "keyword");
         const allSem = merged.every((r) => r.source === "semantic");
         return {
@@ -517,6 +543,32 @@ Returns: title, category, slug, description, snippet, score, source ("keyword" |
         const sep = root.includes("\\") ? "\\" : "/";
         const dir = `${root}${sep}vault${sep}${category}${sep}${slug}`;
         const filePath = `${dir}${sep}index.html`;
+
+        // Backup any existing page to .vault-trash/ before overwriting, so
+        // an accidental agent overwrite is recoverable. Trash filename uses
+        // an ISO-like timestamp so multiple writes don't clobber each other.
+        let trashPath: string | null = null;
+        try {
+          const existing = await native.readFile(filePath);
+          if (existing.kind === "text") {
+            const ts = new Date()
+              .toISOString()
+              .replace(/[:.]/g, "-")
+              .replace("T", "_")
+              .slice(0, 19);
+            const trashDir = `${root}${sep}.vault-trash${sep}${category}`;
+            trashPath = `${trashDir}${sep}${slug}-${ts}.html`;
+            try {
+              await native.createDir(trashDir);
+            } catch {
+              // already exists
+            }
+            await native.writeFile(trashPath, existing.content);
+          }
+        } catch {
+          // no prior version — nothing to back up
+        }
+
         try {
           await native.createDir(dir);
         } catch {
@@ -524,36 +576,167 @@ Returns: title, category, slug, description, snippet, score, source ("keyword" |
         }
         await native.writeFile(filePath, content);
 
-        // Fire-and-forget re-index so the new page is searchable on the next turn.
-        void (async () => {
-          const py = await findPython(root);
-          if (!py) return;
-          const sep2 = root.includes("\\") ? "\\" : "/";
-          await invoke("shell_bg_spawn", {
-            command: `${py} tools${sep2}indexer.py`,
-            cwd: root,
-          }).catch(() => {});
-          // Only re-embed if embeddings.json already exists (model may not be installed).
-          const embPath = `${root}${sep2}.index${sep2}embeddings.json`;
-          try {
-            await native.readFile(embPath);
+        // Probe Python now so the response accurately reflects whether
+        // re-indexing was actually scheduled or silently skipped.
+        const py = await findPython(root);
+        if (py) {
+          void (async () => {
+            const sep2 = root.includes("\\") ? "\\" : "/";
             await invoke("shell_bg_spawn", {
-              command: `${py} tools${sep2}embedder.py`,
+              command: `${py} tools${sep2}indexer.py`,
               cwd: root,
             }).catch(() => {});
-          } catch {
-            // embeddings not set up — skip
-          }
-        })();
+            // Only re-embed if embeddings.json already exists (model may not be installed).
+            const embPath = `${root}${sep2}.index${sep2}embeddings.json`;
+            try {
+              await native.readFile(embPath);
+              await invoke("shell_bg_spawn", {
+                command: `${py} tools${sep2}embedder.py`,
+                cwd: root,
+              }).catch(() => {});
+            } catch {
+              // embeddings not set up — skip
+            }
+          })();
+        }
 
-        await emit("atlas://vault-page-written", { path: filePath, category, slug });
+        await emit("atlas://vault-page-written", {
+          path: filePath,
+          category,
+          slug,
+          previousVersion: trashPath,
+        });
 
         return {
           id: `${category}/${slug}`,
           path: filePath,
           written: true,
-          reindex: "scheduled",
+          previousVersion: trashPath,
+          reindex: py
+            ? "scheduled"
+            : "skipped — python not found; run `python tools/indexer.py` manually",
         };
+      },
+    }),
+
+    // ── Agent Office tools (wrap Rust vault::agent + vault::index_lookup) ──
+
+    vault_agent_snapshot: tool({
+      description:
+        "Get a snapshot of an agent office: frontmatter state, recent log entries, and open project list. Use this to orient yourself before reading or updating agent state.",
+      inputSchema: z.object({
+        slug: z.string().describe("Agent slug (folder name under vault/agents/)"),
+      }),
+      execute: async ({ slug }) => {
+        try {
+          return await invoke<unknown>("vault_agent_snapshot", { slug });
+        } catch (e) {
+          return { error: String(e) };
+        }
+      },
+    }),
+
+    vault_agent_log: tool({
+      description:
+        'Append an event line to vault/agents/{slug}/log.md. Use event="decision" to also record a structured entry in decisions.md. Common events: "note", "progress", "decision", "error".',
+      inputSchema: z.object({
+        slug: z.string().describe("Agent slug"),
+        event: z.string().describe('Event type, e.g. "note", "progress", "decision"'),
+        msg: z.string().describe("Log message (no secrets)"),
+      }),
+      execute: async ({ slug, event, msg }) => {
+        try {
+          await invoke("vault_agent_log", { slug, event, msg });
+          return { logged: true, slug, event };
+        } catch (e) {
+          return { error: String(e) };
+        }
+      },
+    }),
+
+    vault_agent_state_read: tool({
+      description:
+        "Read vault/agents/{slug}/state.md, returning parsed frontmatter and body. Use vault_agent_snapshot first if you need recent log + project list too.",
+      inputSchema: z.object({
+        slug: z.string().describe("Agent slug"),
+      }),
+      execute: async ({ slug }) => {
+        try {
+          return await invoke<unknown>("vault_agent_state_read", { slug });
+        } catch (e) {
+          return { error: String(e) };
+        }
+      },
+    }),
+
+    vault_agent_state_update: tool({
+      description:
+        "Patch vault/agents/{slug}/state.md. Supply frontmatter keys to merge and/or a new block body for the <!-- agent:start -->...<!-- agent:end --> section. Only include keys you want to change.",
+      inputSchema: z.object({
+        slug: z.string().describe("Agent slug"),
+        frontmatter: z
+          .record(z.string(), z.unknown())
+          .optional()
+          .describe("Frontmatter keys to merge (partial update)"),
+        block: z
+          .string()
+          .optional()
+          .describe("New content for the agent:start..agent:end block"),
+      }),
+      execute: async ({ slug, frontmatter, block }) => {
+        try {
+          await invoke("vault_agent_state_update", {
+            slug,
+            patch: { frontmatter: frontmatter ?? null, block: block ?? null },
+          });
+          return { updated: true, slug };
+        } catch (e) {
+          return { error: String(e) };
+        }
+      },
+    }),
+
+    vault_self_context: tool({
+      description:
+        "Read THIS agent's own office context: current state (status, focus, goals), recent log entries, and open projects. Call at the start of a complex multi-step task to orient yourself. Returns an error (not a crash) if the agent office has not been initialized yet.",
+      inputSchema: z.object({
+        depth: z
+          .number()
+          .int()
+          .min(0)
+          .max(1)
+          .optional()
+          .describe(
+            "0 = summary only (state + project list, no log), 1 = full snapshot with recent log (default 1)",
+          ),
+      }),
+      execute: async ({ depth = 1 }) => {
+        const { useAgentsStore } = await import("@/modules/ai/store/agentsStore");
+        const activeId = useAgentsStore.getState().activeId;
+        const slug = activeId.startsWith("builtin:")
+          ? activeId.slice("builtin:".length)
+          : activeId;
+        try {
+          const snapshot = await invoke<{
+            agent: string;
+            state: Record<string, unknown>;
+            recent_log: string[];
+            open_projects: string[];
+          }>("vault_agent_snapshot", { slug });
+          if (depth === 0) {
+            return {
+              agent: snapshot.agent,
+              state: snapshot.state,
+              open_projects: snapshot.open_projects,
+            };
+          }
+          return snapshot;
+        } catch (e) {
+          return {
+            error: String(e),
+            note: "Agent office not found — it must be created under vault/agents/{slug}/ first.",
+          };
+        }
       },
     }),
   } as const;

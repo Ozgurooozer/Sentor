@@ -11,8 +11,12 @@ import { fmtShortcut, MOD_KEY } from "@/lib/platform";
 import { cn } from "@/lib/utils";
 import {
   Add01Icon,
+  AiBrain01Icon,
+  AiScanIcon,
+  ApiIcon,
   ArrowDown01Icon,
   ArrowUpIcon,
+  ChipIcon,
   ComputerIcon,
   CpuIcon,
   Message01Icon,
@@ -20,7 +24,6 @@ import {
   StopCircleIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { motion } from "motion/react";
 import { useRef } from "react";
 import {
   getModel,
@@ -34,27 +37,30 @@ import { ACCEPTED_FILES } from "../lib/composer";
 import { useComposer } from "../lib/useComposer";
 import { useChatStore } from "../store/chatStore";
 
-const PROVIDER_ICON = {
+const PROVIDER_ICON: Record<ProviderId, typeof ComputerIcon> = {
   lmstudio: ComputerIcon,
   ollama: CpuIcon,
-} as const satisfies Record<ProviderId, typeof ComputerIcon>;
+  openai: AiScanIcon,
+  anthropic: AiBrain01Icon,
+  groq: ChipIcon,
+  custom: ApiIcon,
+};
 
 export function AiOpenButton({ onOpen }: { onOpen: () => void }) {
   return (
-    <motion.button
-      initial={{ y: -15 }}
-      animate={{ y: 0 }}
+    <button
       type="button"
       onClick={onOpen}
       className={cn(
         "flex h-6 items-center gap-1.5 rounded-md border border-border/60 bg-card px-2 text-xs",
         "text-muted-foreground transition-colors hover:border-border hover:bg-accent hover:text-foreground",
+        "duration-200 ease-out animate-in slide-in-from-top-2",
       )}
       title="Open AI agent"
     >
       <span>Open AI agent</span>
       <Kbd className="h-4 min-w-4 px-1">{fmtShortcut(MOD_KEY, "I")}</Kbd>
-    </motion.button>
+    </button>
   );
 }
 
@@ -67,20 +73,8 @@ export function AiStatusBarControls() {
 
   return (
     <div className="flex items-center gap-0.5">
-      {/* <Button
-        onClick={closePanel}
-        title="Close AI panel"
-        size="xs"
-        variant="outline"
-        aria-label="Close AI panel"
-        className="text-[11px] text-foreground/85 pl-1.5"
-      > */}
-      {/* <Kbd className="h-4 gap-px text-[11px]">
-          ⌘<span className="font-mono">I</span>
-        </Kbd> */}
-      {/* Close */}
-      {/* </Button> */}
       <input
+        name="ai-file-attach"
         ref={fileInputRef}
         type="file"
         multiple
@@ -188,12 +182,11 @@ function ModelDropdown() {
   const apiKeys = useChatStore((s) => s.apiKeys);
   const setSelected = useChatStore((s) => s.setSelectedModelId);
   const current = getModel(selected);
-  const currentProviderHasKey =
-    providerNeedsKey(current.provider) ? !!apiKeys[current.provider] : true;
 
-  const onPick = (id: ModelId, _providerId: ProviderId) => {
-    setSelected(id);
-  };
+  const hasKey = (providerId: ProviderId) =>
+    providerNeedsKey(providerId) ? !!apiKeys[providerId] : true;
+
+  const currentHasKey = hasKey(current.provider);
 
   return (
     <DropdownMenu>
@@ -204,21 +197,16 @@ function ModelDropdown() {
           size="sm"
           className={cn(
             "h-5.5 gap-1 rounded-md px-1.5 my-1 text-xs hover:bg-accent hover:text-foreground",
-            currentProviderHasKey
+            currentHasKey
               ? "text-muted-foreground"
               : "text-amber-600 dark:text-amber-400",
           )}
           title={
-            currentProviderHasKey
+            currentHasKey
               ? `Model: ${current.label}`
               : `${current.label} — no key configured`
           }
         >
-          {/* <HugeiconsIcon
-            icon={PROVIDER_ICON[current.provider]}
-            size={12}
-            strokeWidth={1.25}
-          /> */}
           {current.label}
           <HugeiconsIcon
             icon={ArrowDown01Icon}
@@ -231,7 +219,7 @@ function ModelDropdown() {
       <DropdownMenuContent align="end" className="min-w-[240px]">
         {PROVIDERS.map((p) => {
           const models = MODELS.filter((m) => m.provider === p.id);
-          const hasKey = providerNeedsKey(p.id) ? !!apiKeys[p.id] : true;
+          const providerHasKey = hasKey(p.id);
           return (
             <div key={p.id} className="px-1 pt-1.5 first:pt-1">
               <div className="mb-0.5 flex items-center gap-1.5 px-2 text-[9.5px] font-medium tracking-wide text-muted-foreground uppercase">
@@ -241,12 +229,12 @@ function ModelDropdown() {
                   strokeWidth={1.25}
                 />
                 <span>{p.label}</span>
-                </div>
+              </div>
               {models.map((m) => (
                 <DropdownMenuItem
                   key={m.id}
-                  disabled={!hasKey}
-                  onSelect={() => onPick(m.id as ModelId, p.id)}
+                  disabled={!providerHasKey}
+                  onSelect={() => setSelected(m.id as ModelId)}
                   className={cn(
                     "flex flex-col items-start gap-0 text-xs",
                     m.id === selected && "bg-accent/40",

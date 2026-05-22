@@ -32,12 +32,12 @@ export function useWorkspaceCwd(
   }, [pinnedRoot, activeTab, tabs, home]);
 
   const inheritedCwdForNewTab = useCallback((): string | undefined => {
+    // Pinned vault/workspace root wins: every terminal belongs to its canvas's
+    // vault and should not leak into the OS home or an unrelated cwd.
+    if (pinnedRoot) return pinnedRoot;
     if (activeTab?.kind === "terminal" && activeTab.cwd) return activeTab.cwd;
-    // Editor tabs inherit the last terminal's cwd (or workspace home), not
-    // the file's folder — opening a new terminal from a file shouldn't
-    // hijack the user's working directory context.
     return lastTerminalCwd.current ?? home ?? undefined;
-  }, [activeTab, home]);
+  }, [pinnedRoot, activeTab, home]);
 
   return { explorerRoot, inheritedCwdForNewTab };
 }

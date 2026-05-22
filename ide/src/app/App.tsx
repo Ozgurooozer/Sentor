@@ -3,6 +3,8 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { ErrorBoundary } from "./ErrorBoundary";
+import { OnboardingWizard } from "@/modules/onboarding/OnboardingWizard";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   AlertDialog,
@@ -19,7 +21,6 @@ import {
   AgentRunBridge,
   AiInputBar,
   AiMiniWindow,
-  getAllKeys,
   hasAnyKey,
   SelectionAskAi,
   useChatStore,
@@ -43,19 +44,38 @@ import {
 import { PreviewStack, type PreviewPaneHandle } from "@/modules/preview";
 import { openSettingsWindow } from "@/modules/settings/openSettingsWindow";
 import { usePreferencesStore } from "@/modules/settings/preferences";
-import { onKeysChanged } from "@/modules/settings/store";
+import {
+  setBarCollapsed,
+  setFocusedLeftOpen,
+  setFocusedTopOpen,
+  setLayoutMode,
+} from "@/modules/settings/store";
+import { installLogInterceptor, setLogVaultRoot } from "@/modules/logs/logStore";
+import { startSentorIfNeeded, waitForSentor } from "@/modules/ai/tools/sentor";
 import {
   ShortcutsDialog,
   useGlobalShortcuts,
   type ShortcutHandlers,
 } from "@/modules/shortcuts";
+import { BAR_HEIGHT } from "@/lib/constants";
+import { FocusedBar } from "./FocusedChatCenter";
+import { useApiKeys } from "./hooks/useApiKeys";
+import { useDiffReloadTrigger } from "./hooks/useDiffReloadTrigger";
+import { useLeafLifecycle } from "./hooks/useLeafLifecycle";
+import { useMcpBridge } from "./hooks/useMcpBridge";
+import { useVaultTrashCleanup } from "./hooks/useVaultTrashCleanup";
+import { LauncherScreen } from "./LauncherScreen";
+import { HitBitmapSync } from "@/modules/input";
+import { InfiniteCanvas, PinnedPanelsPortal, useCanvasStore } from "@/modules/canvas";
 import { BrowserStack } from "@/modules/browser/BrowserStack";
 import { localToAsset } from "@/modules/browser/assetUrl";
 import { VaultHomePane } from "@/modules/vault-home/VaultHomePane";
+import { AgentsOfficePane } from "@/modules/agents-office/AgentsOfficePane";
+import { GraphPane } from "@/modules/graph/GraphPane";
+import { AgentSwitcherModal } from "@/modules/agents-office/AgentSwitcherModal";
 import { StatusBar } from "@/modules/statusbar";
-import { MAX_PANES_PER_TAB, useTabs, useWorkspaceCwd, type NavigableTab } from "@/modules/tabs";
+import { MAX_PANES_PER_TAB, useTabs, useWorkspaceCwd, type NavigableTab, type Tab } from "@/modules/tabs";
 import {
-  disposeSession,
   hasLeaf,
   leafIds,
   respawnSession,
@@ -68,7 +88,6 @@ import { UpdaterDialog } from "@/modules/updater";
 import { listen } from "@tauri-apps/api/event";
 import { homeDir } from "@tauri-apps/api/path";
 import type { SearchAddon } from "@xterm/addon-search";
-import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PanelImperativeHandle } from "react-resizable-panels";
 
@@ -81,6 +100,13 @@ function sameOrigin(a: string, b: string): boolean {
     return a === b;
   }
 }
+
+function isNavigableTab(t: Tab): t is NavigableTab {
+  return t.kind === "vault" || t.kind === "web";
+}
+
+/** Tailwind class shared by all full-bleed workspace pane wrappers. */
+const STACK_CLASS = "absolute inset-0 px-3 pt-2 pb-2";
 
 export default function App() {
   const {
@@ -105,6 +131,8 @@ export default function App() {
     openVaultTab,
     openWebTab,
     openVaultHomeTab,
+    openGraphTab,
+    openAgentsOfficeTab,
     updateNavTabUrl,
     navigateTabHistory,
   } = useTabs();
@@ -134,6 +162,7 @@ export default function App() {
   const [activeEditorHandle, setActiveEditorHandle] =
     useState<EditorPaneHandle | null>(null);
   const sidebarRef = useRef<PanelImperativeHandle | null>(null);
+  const [sidebarMode, setSidebarMode] = useState<"workspace" | "vault">("workspace");
   const toggleSidebar = useCallback(() => {
     const p = sidebarRef.current;
     if (!p) return;
@@ -150,8 +179,18 @@ export default function App() {
       .catch(() => setHome(null));
   }, []);
 
+  // Backslash-format fallback used when the user hasn't picked a workspace yet.
+  // workspaceRoot from prefs is already backslash-form; home arrives as forward-slash.
+  const fallbackWorkspace = useMemo(
+    () => (home ? home.replace(/\//g, "\\") : ""),
+    [home],
+  );
+
+  const [showLauncher, setShowLauncher] = useState(false);
+  const [clickThrough, setClickThrough] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [newEditorOpen, setNewEditorOpen] = useState(false);
+  const [agentSwitcherOpen, setAgentSwitcherOpen] = useState(false);
   const miniOpen = useChatStore((s) => s.mini.open);
   const openMini = useChatStore((s) => s.openMini);
   const focusInput = useChatStore((s) => s.focusInput);
@@ -163,33 +202,65 @@ export default function App() {
   const setLive = useChatStore((s) => s.setLive);
   const respondToApproval = useChatStore((s) => s.respondToApproval);
   const hasComposer = hasAnyKey(apiKeys);
+  const agentStatus = useChatStore((s) => s.agentMeta.status);
 
-  const [keysLoaded, setKeysLoaded] = useState(false);
-  useEffect(() => {
-    let alive = true;
-    const reload = () => {
-      void getAllKeys().then((keys) => {
-        if (!alive) return;
-        setApiKeys(keys);
-        setKeysLoaded(true);
-      });
-    };
-    reload();
-    const unlistenP = onKeysChanged(reload);
-    return () => {
-      alive = false;
-      void unlistenP.then((fn) => fn());
-    };
-  }, [setApiKeys]);
+  const { keysLoaded } = useApiKeys(setApiKeys);
 
   // Hydrate the cross-window preference store and mirror the default model
   // into chatStore so the dropdown reflects what the user picked in Settings.
   const initPrefs = usePreferencesStore((s) => s.init);
   const prefDefaultModel = usePreferencesStore((s) => s.defaultModelId);
   const prefsHydrated = usePreferencesStore((s) => s.hydrated);
+  const layoutMode = usePreferencesStore((s) => s.layoutMode);
+  const sentorPath = usePreferencesStore((s) => s.sentorPath);
+  const barCollapsed = usePreferencesStore((s) => s.barCollapsed);
+  const focusedTopOpen = usePreferencesStore((s) => s.focusedTopOpen);
+  const focusedLeftOpen = usePreferencesStore((s) => s.focusedLeftOpen);
+  const onboarded = usePreferencesStore((s) => s.onboarded);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const activeAgentId = useAgentsStore((s) => s.activeId);
+  const hasPinnedPanel = useCanvasStore((s) => s.panels.some((p) => p.pinned));
+  const canvasHydrated = useCanvasStore((s) => s.hydrated);
+  const ensureSystemCanvas = useCanvasStore((s) => s.ensureSystemCanvas);
+  const switchVault = useCanvasStore((s) => s.switchVault);
+  const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot);
+
+  // Switch per-vault canvas when the workspace root changes.
+  useEffect(() => {
+    if (workspaceRoot) void switchVault(workspaceRoot);
+  }, [workspaceRoot, switchVault]);
+
+  useEffect(() => {
+    if (!canvasHydrated) return;
+    ensureSystemCanvas(workspaceRoot ?? fallbackWorkspace);
+  }, [canvasHydrated, ensureSystemCanvas, workspaceRoot]);
+
+  // Show onboarding wizard on first launch (before prefs hydrated, keep hidden)
+  useEffect(() => {
+    if (prefsHydrated && !onboarded) {
+      setShowOnboarding(true);
+    }
+  }, [prefsHydrated, onboarded]);
+
+  useMcpBridge({
+    canvasHydrated,
+    workspaceRoot: workspaceRoot ?? fallbackWorkspace,
+    openVaultTab,
+    openWebTab,
+    openPanel,
+    focusInput,
+  });
+
+  useVaultTrashCleanup(workspaceRoot ?? fallbackWorkspace);
   useEffect(() => {
     void initPrefs();
+    installLogInterceptor();
   }, [initPrefs]);
+
+  // Keep log store's vault root in sync with workspace root
+  useEffect(() => {
+    if (workspaceRoot) setLogVaultRoot(workspaceRoot);
+  }, [workspaceRoot]);
   useEffect(() => {
     if (!prefsHydrated) return;
     setSelectedModelId(prefDefaultModel);
@@ -209,25 +280,10 @@ export default function App() {
   const isAiDiffTab = activeTab?.kind === "ai-diff";
   const isBrowserTab = activeTab?.kind === "vault" || activeTab?.kind === "web";
   const isVaultHomeTab = activeTab?.kind === "vault-home";
+  const isAgentsOfficeTab = activeTab?.kind === "agents-office";
+  const isGraphTab = activeTab?.kind === "graph";
 
-  // When an AI diff is approved (write_file applied to disk), reload any
-  // open editor tabs for that path so the user sees the new content. We
-  // track which approvalIds we've already handled to fire the reload only
-  // once per applied diff.
-  const appliedDiffsRef = useRef<Set<string>>(new Set());
-  useEffect(() => {
-    for (const t of tabs) {
-      if (t.kind !== "ai-diff") continue;
-      if (t.status !== "approved") continue;
-      if (appliedDiffsRef.current.has(t.approvalId)) continue;
-      appliedDiffsRef.current.add(t.approvalId);
-      for (const e of tabs) {
-        if (e.kind !== "editor") continue;
-        if (e.path !== t.path) continue;
-        editorRefs.current.get(e.id)?.reload();
-      }
-    }
-  }, [tabs]);
+  useDiffReloadTrigger(tabs, editorRefs);
 
   const { explorerRoot, inheritedCwdForNewTab } = useWorkspaceCwd(
     activeTab,
@@ -283,27 +339,7 @@ export default function App() {
     [closeTab],
   );
 
-  // Drives session disposal off the pane tree, not React lifecycles —
-  // split/unsplit re-mount components but the leaf is still live.
-  const liveLeavesRef = useRef<Set<number>>(new Set());
-  useEffect(() => {
-    const live = new Set<number>();
-    for (const t of tabs) {
-      if (t.kind === "terminal") {
-        for (const id of leafIds(t.paneTree)) live.add(id);
-      }
-    }
-    for (const id of liveLeavesRef.current) {
-      if (!live.has(id)) disposeSession(id);
-    }
-    liveLeavesRef.current = live;
-    for (const k of [...terminalRefs.current.keys()])
-      if (!live.has(k)) terminalRefs.current.delete(k);
-    for (const k of [...searchAddons.current.keys()])
-      if (!live.has(k)) searchAddons.current.delete(k);
-    for (const k of [...detectedUrls.current.keys()])
-      if (!live.has(k)) detectedUrls.current.delete(k);
-  }, [tabs]);
+  useLeafLifecycle(tabs, { terminalRefs, searchAddons, detectedUrls });
 
   const handleClose = useCallback(
     (id: number) => {
@@ -572,6 +608,77 @@ export default function App() {
     handleClose(activeId);
   }, [activeId, closeActivePane, handleClose]);
 
+  // Gathers all interactive screen regions (chat + pinned panels) and pushes them to the
+  // OS hit-bitmap so those areas stay visible AND receive mouse events when click-through
+  // is active. SetWindowRgn clips everything outside the region — panels MUST be included.
+  const applyClickThrough = useCallback((enabled: boolean) => {
+    const dpr = window.devicePixelRatio || 1;
+    const sw = Math.round(window.screen.width * dpr);
+    const sh = Math.round(window.screen.height * dpr);
+    const bh = Math.round(BAR_HEIGHT * dpr);
+
+    const regions: number[][] = [];
+
+    if (enabled) {
+      // Chat balloon — read from DOM so we get the live rect after drag/resize
+      const chatEl = document.querySelector("[data-ai-mini-window]");
+      if (chatEl) {
+        const r = chatEl.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0) {
+          regions.push([
+            Math.round(r.left * dpr),
+            Math.round(r.top * dpr),
+            Math.round(r.width * dpr),
+            Math.round(r.height * dpr),
+          ]);
+        }
+      }
+      // Every pinned canvas panel — use store screen-space positions
+      for (const panel of useCanvasStore.getState().panels) {
+        if (!panel.pinned) continue;
+        const sx = panel.screenX ?? 0;
+        const sy = panel.screenY ?? 0;
+        regions.push([
+          Math.round(sx * dpr),
+          Math.round(sy * dpr),
+          Math.round(panel.width * dpr),
+          Math.round(panel.height * dpr),
+        ]);
+      }
+    }
+
+    import("@tauri-apps/api/core").then(({ invoke }) => {
+      invoke("set_click_through", { enabled, screenW: sw, screenH: sh, barH: bh, regions })
+        .catch((e) => console.error("[invoke] set_click_through failed:", e));
+    }).catch(() => undefined);
+  }, []);
+
+  const toggleClickThrough = useCallback(() => {
+    if (layoutMode !== "focused") return;
+    const next = !clickThrough;
+    setClickThrough(next);
+    applyClickThrough(next);
+  }, [layoutMode, clickThrough, applyClickThrough]);
+
+  // Tray menu wiring — Rust emits these events when the user picks a tray item.
+  useEffect(() => {
+    let unsubA: (() => void) | undefined;
+    let unsubB: (() => void) | undefined;
+    let unsubC: (() => void) | undefined;
+    import("@tauri-apps/api/event").then(async ({ listen }) => {
+      unsubA = await listen("atlas://tray-toggle-focused", () => {
+        void setLayoutMode(layoutMode === "focused" ? "classic" : "focused");
+      });
+      unsubB = await listen("atlas://tray-toggle-click-through", () => {
+        toggleClickThrough();
+      });
+      unsubC = await listen("atlas://open-launcher", () => {
+        setShowLauncher(true);
+      });
+    }).catch(() => undefined);
+    return () => { unsubA?.(); unsubB?.(); unsubC?.(); };
+  }, [layoutMode, toggleClickThrough]);
+
   const shortcutHandlers = useMemo<ShortcutHandlers>(
     () => ({
       "tab.new": openNewTab,
@@ -592,11 +699,17 @@ export default function App() {
       "settings.open": () => void openSettingsWindow(),
       "sidebar.toggle": toggleSidebar,
       "tab.vaultHome": () => openVaultHomeTab(),
+      "ai.switchAgent": () => setAgentSwitcherOpen((v) => !v),
+      "layout.toggleFocused": () =>
+        void setLayoutMode(layoutMode === "focused" ? "classic" : "focused"),
+      "layout.toggleClickThrough": toggleClickThrough,
+      "graph.open": () => openGraphTab(),
     }),
     [
       activeId,
       cycleTab,
       handleCloseTabOrPane,
+      layoutMode,
       openNewTab,
       openPreviewTab,
       selectByIndex,
@@ -606,6 +719,8 @@ export default function App() {
       askFromSelection,
       toggleSidebar,
       openVaultHomeTab,
+      openGraphTab,
+      toggleClickThrough,
     ],
   );
 
@@ -716,14 +831,12 @@ export default function App() {
     setLive({
       getCwd: findCwd,
       getTerminalContext: () => {
-        const t = tabs.find((x) => x.id === activeId);
-        if (t?.kind !== "terminal") return null;
-        return terminalRefs.current.get(t.activeLeafId)?.getBuffer(300) ?? null;
+        if (activeTab?.kind !== "terminal") return null;
+        return terminalRefs.current.get(activeTab.activeLeafId)?.getBuffer(300) ?? null;
       },
       injectIntoActivePty: (text) => {
-        const t = tabs.find((x) => x.id === activeId);
-        if (t?.kind !== "terminal") return false;
-        const term = terminalRefs.current.get(t.activeLeafId);
+        if (activeTab?.kind !== "terminal") return false;
+        const term = terminalRefs.current.get(activeTab.activeLeafId);
         if (!term) return false;
         term.write(text);
         term.focus();
@@ -731,8 +844,7 @@ export default function App() {
       },
       getWorkspaceRoot: () => explorerRoot ?? home ?? null,
       getActiveFile: () => {
-        const t = tabs.find((x) => x.id === activeId);
-        return t?.kind === "editor" ? t.path : null;
+        return activeTab?.kind === "editor" ? activeTab.path : null;
       },
       openPreview: (url: string) => {
         openPreviewTab(url);
@@ -741,10 +853,91 @@ export default function App() {
     });
   }, [setLive, activeId, tabs, explorerRoot, home, openPreviewTab]);
 
-  const shell = (
-    <ThemeProvider>
-      <TooltipProvider>
-        <div className="relative flex h-screen flex-col overflow-hidden bg-background text-foreground">
+  // Toggle always-on-top + fill the screen when entering focused mode.
+  // Also stay on top in classic mode when the user has pinned floating panels,
+  // so those panels remain visible above other application windows.
+  useEffect(() => {
+    import("@tauri-apps/api/window").then(async ({ getCurrentWindow, LogicalSize, LogicalPosition }) => {
+      const win = getCurrentWindow();
+      if (layoutMode === "focused") {
+        await win.setAlwaysOnTop(true);
+        const w = window.screen.width;
+        const h = window.screen.height;
+        await win.setSize(new LogicalSize(w, h));
+        await win.setPosition(new LogicalPosition(0, 0));
+      } else {
+        // Keep always-on-top if user has pinned panels floating above desktop
+        await win.setAlwaysOnTop(hasPinnedPanel);
+        await win.setSize(new LogicalSize(1280, 800));
+      }
+    }).catch(() => undefined);
+  }, [layoutMode, hasPinnedPanel]);
+
+  // Sync layoutMode to <html data-layout="..."> so CSS can make body transparent.
+  useEffect(() => {
+    document.documentElement.dataset.layout = layoutMode;
+    return () => { delete document.documentElement.dataset.layout; };
+  }, [layoutMode]);
+
+  // Disable click-through when leaving focused mode.
+  useEffect(() => {
+    if (layoutMode !== "focused" && clickThrough) {
+      setClickThrough(false);
+      applyClickThrough(false);
+    }
+  }, [layoutMode, clickThrough, applyClickThrough]);
+
+  // Re-sync the OS hit region whenever the chat opens/closes while click-through is ON
+  useEffect(() => {
+    if (!clickThrough) return;
+    applyClickThrough(true);
+  }, [miniOpen, clickThrough, applyClickThrough]);
+
+  // Re-sync when pinned panels are added, moved, or resized while click-through is ON.
+  // SetWindowRgn must include every panel rect or those areas become invisible.
+  const pinnedPanelsSig = useCanvasStore((s) =>
+    s.panels
+      .filter((p) => p.pinned)
+      .map((p) => `${p.id}:${p.screenX ?? 0}:${p.screenY ?? 0}:${p.width}:${p.height}`)
+      .join("|"),
+  );
+  useEffect(() => {
+    if (!clickThrough || layoutMode !== "focused") return;
+    applyClickThrough(true);
+  }, [pinnedPanelsSig, clickThrough, layoutMode, applyClickThrough]);
+
+  // Auto-open chat balloon when the agent starts responding in focused mode.
+  useEffect(() => {
+    if (layoutMode === "focused" && !miniOpen && agentStatus === "thinking") {
+      openMini();
+    }
+  }, [agentStatus, layoutMode, miniOpen, openMini]);
+
+  // When the Sentor agent is selected: auto-start the server and open its UI in a Web tab.
+  // We use a ref to fire only once per agent-selection, not on every tabs change.
+  const sentorInitRef = useRef(false);
+  useEffect(() => {
+    if (activeAgentId !== "builtin:sentor") {
+      sentorInitRef.current = false;
+      return;
+    }
+    if (sentorInitRef.current) return;
+    sentorInitRef.current = true;
+    const tabId = openWebTab("");
+    void (async () => {
+      await startSentorIfNeeded(sentorPath);
+      const ready = await waitForSentor();
+      if (ready) updateNavTabUrl(tabId, "http://localhost:3000");
+    })();
+  }, [activeAgentId, sentorPath, openWebTab, updateNavTabUrl]);
+
+  // Focused = transparent overlay window with full IDE features.
+  // Top header (collapsible) + left panel (collapsible) + content stacks + log bar.
+  const focusedMain = (
+    <main className="flex min-h-0 flex-1 flex-col">
+      {/* Collapsible top header with tab bar */}
+      {focusedTopOpen && (
+        <div className="shrink-0 border-b border-border/40">
           <Header
             tabs={tabs}
             activeId={activeId}
@@ -754,9 +947,17 @@ export default function App() {
             onNewEditor={() => setNewEditorOpen(true)}
             onNewBrowser={() => openWebTab("")}
             onNewVaultHome={() => openVaultHomeTab()}
+            onNewSentor={() => {
+              const tabId = openWebTab("");
+              void (async () => {
+                await startSentorIfNeeded(sentorPath);
+                const ready = await waitForSentor();
+                if (ready) updateNavTabUrl(tabId, "http://localhost:3000");
+              })();
+            }}
             onClose={handleClose}
             onPin={pinTab}
-            onToggleSidebar={toggleSidebar}
+            onToggleSidebar={() => void setFocusedLeftOpen(!focusedLeftOpen)}
             onSplit={splitActivePaneInActiveTab}
             canSplit={
               activeTerminalTab !== null &&
@@ -764,11 +965,222 @@ export default function App() {
             }
             onOpenShortcuts={() => setShortcutsOpen(true)}
             onOpenSettings={() => void openSettingsWindow()}
+            onEnterFocusedMode={() => void setLayoutMode("classic")}
+            onOpenAgentSwitcher={() => setAgentSwitcherOpen(true)}
+            onOpenGraph={() => openGraphTab()}
+            onOpenLauncher={() => setShowLauncher(true)}
             searchTarget={searchTarget}
             searchRef={searchInlineRef}
           />
+        </div>
+      )}
 
-          <main className="flex min-h-0 flex-1 flex-col">
+      {/* Body: left panel + content */}
+      <div className="flex min-h-0 flex-1">
+        {/* Collapsible left panel — file explorer */}
+        {focusedLeftOpen && (
+          <div className="flex w-[220px] shrink-0 flex-col overflow-hidden border-r border-border/40 bg-[#111111]/95">
+            <div className="flex h-7 shrink-0 items-center gap-1 border-b border-border/40 px-1.5">
+              {(["workspace", "vault"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setSidebarMode(mode)}
+                  className={cn(
+                    "flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors",
+                    sidebarMode === mode
+                      ? "bg-accent/60 text-foreground"
+                      : "text-muted-foreground hover:bg-accent/30 hover:text-foreground",
+                  )}
+                >
+                  {mode === "workspace" ? "Files" : "Vault"}
+                </button>
+              ))}
+            </div>
+            <div className="min-h-0 flex-1">
+              <FileExplorer
+                rootPath={
+                  sidebarMode === "vault"
+                    ? ((workspaceRoot ?? explorerRoot ?? "").replace(/\\/g, "/") + "/vault")
+                    : explorerRoot
+                }
+                onOpenFile={handleOpenFile}
+                onOpenBrowserTab={(url) => openVaultTab(url)}
+                onPathRenamed={handlePathRenamed}
+                onPathDeleted={handlePathDeleted}
+                onRevealInTerminal={cdInNewTab}
+                onAttachToAgent={handleAttachFileToAgent}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Center: canvas + tab content stacks */}
+        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+          {/* Infinite canvas — background layer */}
+          <InfiniteCanvas />
+
+          {/* Tab content stacks overlay the canvas when a tab is active */}
+          <div
+            className={cn(STACK_CLASS, !isTerminalTab && "invisible pointer-events-none")}
+            aria-hidden={!isTerminalTab}
+          >
+            <TerminalStack
+              tabs={tabs}
+              activeId={activeId}
+              registerHandle={registerTerminalHandle}
+              onSearchReady={handleSearchReady}
+              onCwd={handleTerminalCwd}
+              onDetectedLocalUrl={handleDetectedLocalUrl}
+              onExit={handleLeafExit}
+              onAtlasOpen={handleAtlasOpen}
+              onFocusLeaf={handleFocusLeaf}
+            />
+          </div>
+          <div
+            className={cn(STACK_CLASS, !isEditorTab && "invisible pointer-events-none")}
+            aria-hidden={!isEditorTab}
+          >
+            <EditorStack
+              tabs={tabs}
+              activeId={activeId}
+              registerHandle={registerEditorHandle}
+              onDirtyChange={handleEditorDirty}
+              onCloseTab={disposeTab}
+            />
+          </div>
+          <div
+            className={cn(STACK_CLASS, !isPreviewTab && "invisible pointer-events-none")}
+            aria-hidden={!isPreviewTab}
+          >
+            <PreviewStack
+              tabs={tabs}
+              activeId={activeId}
+              registerHandle={registerPreviewHandle}
+              onUrlChange={handlePreviewUrl}
+            />
+          </div>
+          <div
+            className={cn(STACK_CLASS, !isAiDiffTab && "invisible pointer-events-none")}
+            aria-hidden={!isAiDiffTab}
+          >
+            <AiDiffStack
+              tabs={tabs}
+              activeId={activeId}
+              onAccept={(id) => respondToApproval(id, true)}
+              onReject={(id) => respondToApproval(id, false)}
+            />
+          </div>
+          <div
+            className={cn("absolute inset-0", !isBrowserTab && "invisible pointer-events-none")}
+            aria-hidden={!isBrowserTab}
+          >
+            <BrowserStack
+              tabs={tabs.filter(isNavigableTab)}
+              activeId={activeId}
+              onNavigate={(tabId, url) => updateNavTabUrl(tabId, url)}
+              onGoBack={(tabId) => navigateTabHistory(tabId, -1)}
+              onGoForward={(tabId) => navigateTabHistory(tabId, 1)}
+              onTitleChange={(tabId, title) => updateTab(tabId, { title })}
+              onCrossScheme={(_src, url) => {
+                if (/^https?:\/\//i.test(url)) openWebTab(url);
+                else openVaultTab(url);
+              }}
+            />
+          </div>
+          <div
+            className={cn("absolute inset-0", !isVaultHomeTab && "invisible pointer-events-none")}
+            aria-hidden={!isVaultHomeTab}
+          >
+            <VaultHomePane
+              workspaceRoot={explorerRoot}
+              onOpenBrowserTab={openVaultTab}
+            />
+          </div>
+          <div
+            className={cn("absolute inset-0", !isAgentsOfficeTab && "invisible pointer-events-none")}
+            aria-hidden={!isAgentsOfficeTab}
+          >
+            {isAgentsOfficeTab && activeTab?.kind === "agents-office" && (
+              <AgentsOfficePane agentSlug={activeTab.agentSlug} />
+            )}
+          </div>
+          <div
+            className={cn("absolute inset-0", !isGraphTab && "invisible pointer-events-none")}
+            aria-hidden={!isGraphTab}
+          >
+            {isGraphTab && (
+              <GraphPane workspaceRoot={explorerRoot} onOpenVaultTab={openVaultTab} />
+            )}
+          </div>
+
+        </div>
+      </div>
+
+      {/* Bottom bar: log pane + AI header */}
+      <FocusedBar
+        keysLoaded={keysLoaded}
+        hasComposer={hasComposer}
+        onOpenSettings={() => void openSettingsWindow("models")}
+        onOpenChat={openMini}
+        clickThrough={clickThrough}
+        onToggleClickThrough={toggleClickThrough}
+        onExitFocusedMode={() => void setLayoutMode("classic")}
+        collapsed={barCollapsed}
+        onToggleCollapsed={() => void setBarCollapsed(!barCollapsed)}
+        topOpen={focusedTopOpen}
+        onToggleTop={() => void setFocusedTopOpen(!focusedTopOpen)}
+        leftOpen={focusedLeftOpen}
+        onToggleLeft={() => void setFocusedLeftOpen(!focusedLeftOpen)}
+      />
+    </main>
+  );
+
+  const shell = (
+    <ThemeProvider>
+      <TooltipProvider>
+        <div className={cn(
+          "relative flex h-screen flex-col overflow-hidden text-foreground",
+          layoutMode === "focused" ? "bg-transparent" : "bg-background",
+        )}>
+          {layoutMode !== "focused" && (
+            <Header
+              tabs={tabs}
+              activeId={activeId}
+              onSelect={setActiveId}
+              onNew={openNewTab}
+              onNewPreview={() => openPreviewTab("")}
+              onNewEditor={() => setNewEditorOpen(true)}
+              onNewBrowser={() => openWebTab("")}
+              onNewVaultHome={() => openVaultHomeTab()}
+              onNewSentor={() => {
+                const tabId = openWebTab("");
+                void (async () => {
+                  await startSentorIfNeeded(sentorPath);
+                  const ready = await waitForSentor();
+                  if (ready) updateNavTabUrl(tabId, "http://localhost:3000");
+                })();
+              }}
+              onClose={handleClose}
+              onPin={pinTab}
+              onToggleSidebar={toggleSidebar}
+              onSplit={splitActivePaneInActiveTab}
+              canSplit={
+                activeTerminalTab !== null &&
+                leafIds(activeTerminalTab.paneTree).length < MAX_PANES_PER_TAB
+              }
+              onOpenShortcuts={() => setShortcutsOpen(true)}
+              onOpenSettings={() => void openSettingsWindow()}
+              onEnterFocusedMode={() => void setLayoutMode("focused")}
+              onOpenAgentSwitcher={() => setAgentSwitcherOpen(true)}
+              onOpenGraph={() => openGraphTab()}
+              onOpenLauncher={() => setShowLauncher(true)}
+              searchTarget={searchTarget}
+              searchRef={searchInlineRef}
+            />
+          )}
+
+          {layoutMode === "focused" ? focusedMain : <main className="flex min-h-0 flex-1 flex-col">
             <ResizablePanelGroup
               orientation="horizontal"
               className="min-h-0 flex-1"
@@ -782,16 +1194,39 @@ export default function App() {
                 collapsible
                 collapsedSize={0}
               >
-                <div className="h-full border-r border-border/60 bg-card">
-                  <FileExplorer
-                    rootPath={explorerRoot}
-                    onOpenFile={handleOpenFile}
-                    onOpenBrowserTab={(url) => openVaultTab(url)}
-                    onPathRenamed={handlePathRenamed}
-                    onPathDeleted={handlePathDeleted}
-                    onRevealInTerminal={cdInNewTab}
-                    onAttachToAgent={handleAttachFileToAgent}
-                  />
+                <div className="flex h-full flex-col border-r border-border/60 bg-card">
+                  <div className="flex shrink-0 items-center gap-1 border-b border-border/40 px-1.5 py-1">
+                    {(["workspace", "vault"] as const).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => setSidebarMode(mode)}
+                        className={cn(
+                          "flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors",
+                          sidebarMode === mode
+                            ? "bg-accent/60 text-foreground"
+                            : "text-muted-foreground hover:bg-accent/30 hover:text-foreground",
+                        )}
+                      >
+                        {mode === "workspace" ? "Files" : "Vault"}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="min-h-0 flex-1">
+                    <FileExplorer
+                      rootPath={
+                        sidebarMode === "vault"
+                          ? ((workspaceRoot ?? explorerRoot ?? "").replace(/\\/g, "/") + "/vault")
+                          : explorerRoot
+                      }
+                      onOpenFile={handleOpenFile}
+                      onOpenBrowserTab={(url) => openVaultTab(url)}
+                      onPathRenamed={handlePathRenamed}
+                      onPathDeleted={handlePathDeleted}
+                      onRevealInTerminal={cdInNewTab}
+                      onAttachToAgent={handleAttachFileToAgent}
+                    />
+                  </div>
                 </div>
               </ResizablePanel>
               <ResizableHandle withHandle />
@@ -800,7 +1235,7 @@ export default function App() {
                   <div className="relative min-h-0 flex-1">
                     <div
                       className={cn(
-                        "absolute inset-0 px-3 pt-2 pb-2",
+                        STACK_CLASS,
                         !isTerminalTab && "invisible pointer-events-none",
                       )}
                       aria-hidden={!isTerminalTab}
@@ -819,7 +1254,7 @@ export default function App() {
                     </div>
                     <div
                       className={cn(
-                        "absolute inset-0 px-3 pt-2 pb-2",
+                        STACK_CLASS,
                         !isEditorTab && "invisible pointer-events-none",
                       )}
                       aria-hidden={!isEditorTab}
@@ -834,7 +1269,7 @@ export default function App() {
                     </div>
                     <div
                       className={cn(
-                        "absolute inset-0 px-3 pt-2 pb-2",
+                        STACK_CLASS,
                         !isPreviewTab && "invisible pointer-events-none",
                       )}
                       aria-hidden={!isPreviewTab}
@@ -848,7 +1283,7 @@ export default function App() {
                     </div>
                     <div
                       className={cn(
-                        "absolute inset-0 px-3 pt-2 pb-2",
+                        STACK_CLASS,
                         !isAiDiffTab && "invisible pointer-events-none",
                       )}
                       aria-hidden={!isAiDiffTab}
@@ -868,9 +1303,7 @@ export default function App() {
                       aria-hidden={!isBrowserTab}
                     >
                       <BrowserStack
-                        tabs={tabs.filter(
-                          (t): t is NavigableTab => t.kind === "vault" || t.kind === "web",
-                        )}
+                        tabs={tabs.filter(isNavigableTab)}
                         activeId={activeId}
                         onNavigate={(tabId, url) => updateNavTabUrl(tabId, url)}
                         onGoBack={(tabId) => navigateTabHistory(tabId, -1)}
@@ -896,18 +1329,40 @@ export default function App() {
                         onOpenBrowserTab={openVaultTab}
                       />
                     </div>
+
+                    <div
+                      className={cn(
+                        "absolute inset-0",
+                        !isAgentsOfficeTab && "invisible pointer-events-none",
+                      )}
+                      aria-hidden={!isAgentsOfficeTab}
+                    >
+                      {isAgentsOfficeTab && activeTab?.kind === "agents-office" && (
+                        <AgentsOfficePane agentSlug={activeTab.agentSlug} />
+                      )}
+                    </div>
+
+                    <div
+                      className={cn(
+                        "absolute inset-0",
+                        !isGraphTab && "invisible pointer-events-none",
+                      )}
+                      aria-hidden={!isGraphTab}
+                    >
+                      {isGraphTab && (
+                        <GraphPane
+                          workspaceRoot={explorerRoot}
+                          onOpenVaultTab={openVaultTab}
+                        />
+                      )}
+                    </div>
                   </div>
 
                   {keysLoaded ? (
-                    <motion.div
+                    <div
                       data-ai-input-bar
-                      initial={false}
-                      animate={{
-                        height: panelOpen ? "auto" : 0,
-                        opacity: panelOpen ? 1 : 0,
-                      }}
-                      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                      className="overflow-hidden"
+                      data-state={panelOpen ? "open" : "closed"}
+                      className="overflow-hidden transition-all duration-200 ease-out data-[state=closed]:max-h-0 data-[state=closed]:opacity-0 data-[state=open]:max-h-[600px] data-[state=open]:opacity-100"
                       aria-hidden={!panelOpen}
                     >
                       {hasComposer ? (
@@ -917,25 +1372,29 @@ export default function App() {
                           onAdd={() => void openSettingsWindow("models")}
                         />
                       )}
-                    </motion.div>
+                    </div>
                   ) : null}
                 </div>
               </ResizablePanel>
             </ResizablePanelGroup>
-          </main>
+          </main>}
 
-          <StatusBar
-            cwd={activeCwd}
-            filePath={activeFilePath}
-            home={home}
-            onCd={sendCd}
-            onOpenMini={openMini}
-            hasComposer={hasComposer}
-            detectedPreviewUrl={detectedPreviewUrl}
-            onOpenPreview={() => {
-              if (detectedPreviewUrl) openPreviewTab(detectedPreviewUrl);
-            }}
-          />
+          {layoutMode !== "focused" && (
+            <StatusBar
+              cwd={activeCwd}
+              filePath={activeFilePath}
+              home={home}
+              onCd={sendCd}
+              onOpenMini={openMini}
+              hasComposer={hasComposer}
+              detectedPreviewUrl={detectedPreviewUrl}
+              onOpenPreview={() => {
+                if (detectedPreviewUrl) openPreviewTab(detectedPreviewUrl);
+              }}
+              onOpenAgentSwitcher={() => setAgentSwitcherOpen(true)}
+              onOpenAgentOffice={(slug) => openAgentsOfficeTab(slug)}
+            />
+          )}
 
           {hasComposer ? (
             <AgentRunBridge
@@ -944,22 +1403,72 @@ export default function App() {
             />
           ) : null}
 
-          <AnimatePresence>
-            {miniOpen && hasComposer ? <AiMiniWindow key="ai-mini" /> : null}
-            {askPopup ? (
-              <SelectionAskAi
-                key="ask-ai-popup"
-                x={askPopup.x}
-                y={askPopup.y}
-                onAsk={onAskFromSelection}
-                onDismiss={() => setAskPopup(null)}
-              />
-            ) : null}
-          </AnimatePresence>
+          {/* Native Input Core: paints the zone registry into the OS-level
+              hit-bitmap so transparent areas pass clicks to the desktop. Only
+              active in focused overlay mode. */}
+          {layoutMode === "focused" ? <HitBitmapSync /> : null}
+
+          {/* Startup launcher — pick Studio or a packaged build */}
+          {showLauncher && (
+            <LauncherScreen
+              workspaceRoot={workspaceRoot ?? fallbackWorkspace}
+              onRootChange={(_r) => {
+                // workspaceRoot preference was already written; store will re-hydrate.
+              }}
+              onStudio={() => {
+                setShowLauncher(false);
+                // Force a viewport tick so CanvasWeb sync restores hidden native WebViews.
+                requestAnimationFrame(() => {
+                  const { viewport } = useCanvasStore.getState();
+                  useCanvasStore.getState().setViewport({ ...viewport });
+                });
+              }}
+              onBuild={(exePath, name) => {
+                // Derive vault root: exe lives at build\vX.Y.Z\atlas.exe → go up 3 levels.
+                const parts = exePath.replace(/\//g, "\\").split("\\");
+                const vaultRoot = parts.slice(0, -3).join("\\") || (workspaceRoot ?? fallbackWorkspace);
+                const { addPanel, updatePanel } = useCanvasStore.getState();
+                const id = addPanel("instance");
+                updatePanel(id, { title: name, meta: { vaultRoot } });
+                setShowLauncher(false);
+                requestAnimationFrame(() => {
+                  const { viewport } = useCanvasStore.getState();
+                  useCanvasStore.getState().setViewport({ ...viewport });
+                });
+              }}
+            />
+          )}
+
+          {/* Pinned canvas panels — rendered via portal so they float above
+              everything in both focused and classic mode. */}
+          <PinnedPanelsPortal />
+
+          {miniOpen && hasComposer ? (
+            <AiMiniWindow
+              key="ai-mini"
+              isFocused={layoutMode === "focused"}
+              onBoundsChange={clickThrough ? () => applyClickThrough(true) : undefined}
+            />
+          ) : null}
+          {askPopup ? (
+            <SelectionAskAi
+              key="ask-ai-popup"
+              x={askPopup.x}
+              y={askPopup.y}
+              onAsk={onAskFromSelection}
+              onDismiss={() => setAskPopup(null)}
+            />
+          ) : null}
 
           <ShortcutsDialog
             open={shortcutsOpen}
             onOpenChange={setShortcutsOpen}
+          />
+
+          <AgentSwitcherModal
+            open={agentSwitcherOpen}
+            onClose={() => setAgentSwitcherOpen(false)}
+            onOpenOffice={(slug) => openAgentsOfficeTab(slug)}
           />
 
           <NewEditorDialog
@@ -1001,5 +1510,14 @@ export default function App() {
     </ThemeProvider>
   );
 
-  return <AiComposerProvider>{shell}</AiComposerProvider>;
+  return (
+    <ErrorBoundary name="app">
+      <AiComposerProvider>
+        {shell}
+        {showOnboarding && (
+          <OnboardingWizard onComplete={() => setShowOnboarding(false)} />
+        )}
+      </AiComposerProvider>
+    </ErrorBoundary>
+  );
 }

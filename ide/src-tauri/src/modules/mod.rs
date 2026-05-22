@@ -1,7 +1,11 @@
 pub mod fs;
+pub mod input;
+pub mod mcp;
 pub mod net;
 pub mod pty;
 pub mod secrets;
+pub mod sentor;
 pub mod shell;
+pub mod vault;
 pub mod web;
 pub mod webview;

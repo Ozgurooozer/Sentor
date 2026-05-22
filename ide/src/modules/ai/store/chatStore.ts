@@ -203,6 +203,12 @@ function makeChat(sessionId: string): Chat<UIMessage> {
       const a = all.find((x) => x.id === activeId) ?? BUILTIN_AGENTS[0];
       return { name: a.name, instructions: a.instructions };
     },
+    getAgentToolset: () => {
+      const { activeId, customAgents } = useAgentsStore.getState();
+      const all = [...BUILTIN_AGENTS, ...customAgents];
+      const a = all.find((x) => x.id === activeId) ?? BUILTIN_AGENTS[0];
+      return a.toolset;
+    },
     getLive: () => {
       const live = useChatStore.getState().live;
       return {
@@ -212,10 +218,17 @@ function makeChat(sessionId: string): Chat<UIMessage> {
         activeFile: live.getActiveFile(),
       };
     },
-    getLmstudioBaseURL: () => usePreferencesStore.getState().lmstudioBaseURL,
-    getOllamaBaseURL: () => usePreferencesStore.getState().ollamaBaseURL,
-    getLmstudioModelId: () => usePreferencesStore.getState().lmstudioChatModelId || undefined,
-    getOllamaModelId: () => usePreferencesStore.getState().ollamaChatModelId || undefined,
+    getProviders: () => {
+      const p = usePreferencesStore.getState();
+      return {
+        lmstudio: { baseURL: p.lmstudioBaseURL, modelId: p.lmstudioChatModelId || undefined },
+        ollama:   { baseURL: p.ollamaBaseURL,   modelId: p.ollamaChatModelId   || undefined },
+        openai:    { modelId: p.openaiChatModelId    || undefined },
+        anthropic: { modelId: p.anthropicChatModelId || undefined },
+        groq:      { modelId: p.groqChatModelId      || undefined },
+        custom:    { baseURL: p.customProviderBaseURL || undefined, modelId: p.customProviderModelId || undefined },
+      };
+    },
     getPlanMode: () => usePlanStore.getState().active,
     onStep: (step) => {
       useChatStore.getState().patchAgentMeta({ step });
@@ -419,6 +432,12 @@ export const useChatStore = create<StoreState>((set, get) => ({
   },
 
   persistMessages: (id, messages) => {
+    // Ephemeral agents do not persist history to disk.
+    const { activeId, customAgents } = useAgentsStore.getState();
+    const allAgents = [...BUILTIN_AGENTS, ...customAgents];
+    const activeAgent = allAgents.find((a) => a.id === activeId);
+    if (activeAgent?.memory === "ephemeral") return;
+
     // Debounce the message-blob write so streaming doesn't pound the store.
     const existing = pendingPersist.get(id);
     if (existing) clearTimeout(existing.timer);
@@ -447,6 +466,17 @@ export const useChatStore = create<StoreState>((set, get) => ({
     void saveSessionsList(next);
   },
 }));
+
+// When the user switches to an ephemeral agent, start a fresh session so the
+// model never sees previous conversation history.
+useAgentsStore.subscribe((state, prevState) => {
+  if (state.activeId === prevState.activeId) return;
+  const all = [...BUILTIN_AGENTS, ...state.customAgents];
+  const next = all.find((a) => a.id === state.activeId);
+  if (next?.memory === "ephemeral") {
+    useChatStore.getState().newSession();
+  }
+});
 
 export function getAgentMeta(): AgentMeta {
   return useChatStore.getState().agentMeta;

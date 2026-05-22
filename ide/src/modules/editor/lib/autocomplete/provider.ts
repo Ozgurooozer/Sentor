@@ -30,8 +30,10 @@ export async function requestCompletion(
   const modelId =
     deps.modelId.trim() || DEFAULT_AUTOCOMPLETE_MODEL[deps.provider];
   const model = await buildLanguageModel(deps.provider, EMPTY_PROVIDER_KEYS, modelId, {
-    lmstudioBaseURL: deps.lmstudioBaseURL || LMSTUDIO_DEFAULT_BASE_URL,
-    ollamaBaseURL: deps.ollamaBaseURL || OLLAMA_DEFAULT_BASE_URL,
+    providers: {
+      lmstudio: { baseURL: deps.lmstudioBaseURL || LMSTUDIO_DEFAULT_BASE_URL },
+      ollama: { baseURL: deps.ollamaBaseURL || OLLAMA_DEFAULT_BASE_URL },
+    },
   });
 
   const { text } = await generateText({

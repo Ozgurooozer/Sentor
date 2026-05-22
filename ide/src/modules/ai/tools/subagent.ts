@@ -38,10 +38,10 @@ Auto-executes (no approval) — subagents are read-only by design.`,
             keys: apiKeys,
             modelId: selectedModelId,
             toolContext: ctx,
-            lmstudioBaseURL: prefs.lmstudioBaseURL,
-            ollamaBaseURL: prefs.ollamaBaseURL,
-            lmstudioModelId: prefs.lmstudioChatModelId || undefined,
-            ollamaModelId: prefs.ollamaChatModelId || undefined,
+            providers: {
+              lmstudio: { baseURL: prefs.lmstudioBaseURL, modelId: prefs.lmstudioChatModelId || undefined },
+              ollama:   { baseURL: prefs.ollamaBaseURL,   modelId: prefs.ollamaChatModelId   || undefined },
+            },
           });
           return {
             type,

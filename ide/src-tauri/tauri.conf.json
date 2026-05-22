@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Atlas",
+  "productName": "Atlas OS Studio",
   "version": "0.6.1",
   "identifier": "app.atlas.ide",
   "build": {
@@ -13,21 +13,27 @@
   "app": {
     "windows": [
       {
-        "title": "Atlas",
+        "title": "Atlas OS Studio",
         "width": 800,
         "height": 600,
         "minWidth": 420,
         "minHeight": 280,
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
+        "transparent": true,
         "visible": false
       }
     ],
     "security": {
-      "csp": null,
+      "csp": "default-src 'self'; img-src 'self' asset: data: https: blob:; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://127.0.0.1:* http://localhost:* https: ws://127.0.0.1:* ws://localhost:*; frame-src asset: https:; media-src 'self' blob:; font-src 'self' data:",
       "assetProtocol": {
         "enable": true,
-        "scope": ["**"]
+        "scope": [
+          "$HOME/Atlas OS/**",
+          "$HOME/.atlas/**",
+          "$APPDATA/atlas/**",
+          "$LOCALAPPDATA/atlas/**"
+        ]
       }
     }
   },
@@ -65,18 +71,19 @@
         "installMode": "currentUser",
         "languages": ["English"],
         "displayLanguageSelector": false
+      },
+      "wix": {
+        "language": "en-US"
       }
     },
     "category": "DeveloperTool",
-    "shortDescription": "AI-native terminal emulator",
-    "longDescription": "Atlas — an open-source AI-native terminal emulator with multi-tab, file explorer, code editor, web preview, voice input, and AI agents."
+    "shortDescription": "Local-first AI knowledge base and IDE",
+    "longDescription": "Atlas OS is a local-first second brain and AI IDE. Store your knowledge as vault pages, chat with local AI (LM Studio/Ollama), browse the web, and write code — all offline, all on your machine."
   },
   "plugins": {
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDNCQUJGRDhBQjYwRTM0NjkKUldScE5BNjJpdjJyT3dIN0dqbUpHaDA4QW1GaDVmTTllRXdZVk96dFNTRUZ3Y2hiVGszYjFqRloK",
-      "endpoints": [
-        "https://github.com/atlas-ide/atlas/releases/latest/download/latest.json"
-      ]
+      "endpoints": []
     }
   }
 }

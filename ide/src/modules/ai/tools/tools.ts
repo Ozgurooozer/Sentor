@@ -1,6 +1,10 @@
+import { buildCanvasTools } from "./canvas";
+import { buildCodegraphTools } from "./codegraph";
 import { buildEditTools } from "./edit";
 import { buildFsTools } from "./fs";
+import { buildOrchestrationTools } from "./orchestration";
 import { buildSearchTools } from "./search";
+import { buildSentorTools } from "./sentor";
 import { buildShellTools } from "./shell";
 import { buildSubagentTools } from "./subagent";
 import { buildTerminalTools } from "./terminal";
@@ -40,6 +44,10 @@ export function buildTools(ctx: import("./context").ToolContext) {
     ...buildTodoTools(ctx),
     ...buildVaultTools(ctx),
     ...buildWebTools(ctx),
+    ...buildSentorTools(ctx),
+    ...buildCanvasTools(ctx),
+    ...buildOrchestrationTools(ctx),
+    ...buildCodegraphTools(ctx),
   } as const;
 }
 

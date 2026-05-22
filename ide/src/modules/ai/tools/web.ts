@@ -34,7 +34,7 @@ export function buildWebTools(_ctx: ToolContext) {
 
     web_fetch: tool({
       description:
-        "Fetch a URL and return its readable text content (scripts, nav, footer stripped; capped at 50 KB). Use after web_search to read the full content of a promising result.",
+        "Fetch a URL and return its readable text content (scripts, nav, footer stripped; capped at 50 KB). Use after web_search to read the full content of a promising result. Check `truncated: true` in the result — if set, the page exceeded 50 KB and the text was cut off; mention this caveat when using the content.",
       inputSchema: z.object({
         url: z.string().url().describe("https:// URL to fetch"),
       }),

@@ -5,7 +5,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useWhisperRecording } from "../hooks/useWhisperRecording";
+import { useSpeechRecognition } from "../hooks/useSpeechRecognition";
 import { expandSnippetTokens, type Snippet } from "../lib/snippets";
 import { tryRunSlashCommand, type SlashCommandMeta } from "./slashCommands";
 import { getOrCreateChat, useChatStore } from "../store/chatStore";
@@ -31,7 +31,7 @@ export const MAX_TEXT_INLINE = 200_000;
 export const ACCEPTED_FILES =
   "image/*,.txt,.md,.json,.yaml,.yml,.toml,.sh,.zsh,.bash,.py,.js,.jsx,.ts,.tsx,.rs,.go,.java,.c,.cpp,.h,.hpp,.html,.css,.csv,.log,.env,.config,.conf,.ini,Dockerfile,.dockerfile";
 
-type Voice = ReturnType<typeof useWhisperRecording>;
+type Voice = ReturnType<typeof useSpeechRecognition>;
 
 export type ComposerCtx = {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
@@ -41,6 +41,8 @@ export type ComposerCtx = {
   addFiles: (list: FileList | null) => Promise<void>;
   /** Attach a file by absolute path — used by the file explorer's "Attach to Agent". */
   attachFileByPath: (path: string) => Promise<void>;
+  /** Attach an image from a data-URL (base64) — used by canvas wire image injection. */
+  attachImageDataUrl: (dataUrl: string, name: string) => void;
   removeFile: (id: string) => void;
   pickedSnippets: Snippet[];
   addSnippet: (s: Snippet) => void;
@@ -59,10 +61,24 @@ export const ComposerContext = createContext<ComposerCtx | null>(null);
 
 type ProviderProps = {
   children: React.ReactNode;
+  /** When provided (canvas chat panels), overrides the global activeSessionId. */
+  sessionId?: string;
+  /** Canvas wire context — called on each submit to prepend connected panel data. */
+  contextPrefix?: () => string;
+  /** Canvas trigger hook — called with the user's raw text after the chat
+   * message is dispatched. Used by ChatPanel to fan the message out over
+   * outgoing trigger wires (chat → terminal command pulses). */
+  onSubmit?: (userText: string) => void;
 };
 
-export function AiComposerProvider({ children }: ProviderProps) {
-  const sessionId = useChatStore((s) => s.activeSessionId);
+export function AiComposerProvider({
+  children,
+  sessionId: sessionIdProp,
+  contextPrefix,
+  onSubmit,
+}: ProviderProps) {
+  const storeSessionId = useChatStore((s) => s.activeSessionId);
+  const sessionId = sessionIdProp ?? storeSessionId;
   const status = useChatStore((s) => s.agentMeta.status);
   const isBusy = status === "thinking" || status === "streaming";
 
@@ -127,9 +143,9 @@ export function AiComposerProvider({ children }: ProviderProps) {
     });
   }, [pendingSelections, consumeSelections]);
 
-  const voice = useWhisperRecording({
+  const voice = useSpeechRecognition({
     onResult: (transcript: string) => {
-      setValue((v) => (v ? `${v} ${transcript}` : transcript));
+      setValue(`/voice ${transcript}`);
       requestAnimationFrame(() => textareaRef.current?.focus());
     },
   });
@@ -194,7 +210,23 @@ export function AiComposerProvider({ children }: ProviderProps) {
     }
   };
 
-  const submit = () => {
+  const attachImageDataUrl = (dataUrl: string, name: string) => {
+    const id = `wire-img-${name}`;
+    setFiles((prev) => {
+      if (prev.some((f) => f.id === id)) return prev;
+      const att: FileAttachment = {
+        id,
+        name,
+        kind: "image",
+        mediaType: dataUrl.match(/^data:([^;]+)/)?.[1] ?? "image/png",
+        url: dataUrl,
+        size: Math.round(dataUrl.length * 0.75),
+      };
+      return [...prev, att];
+    });
+  };
+
+  const submit = async () => {
     if (isBusy) return;
     const trimmed = value.trim();
     if (
@@ -214,7 +246,7 @@ export function AiComposerProvider({ children }: ProviderProps) {
       commandSource = `#${pickedCommands[0].name} ${trimmed}`.trim();
     }
     if (commandSource.startsWith("/") || commandSource.startsWith("#")) {
-      const outcome = tryRunSlashCommand(commandSource);
+      const outcome = await tryRunSlashCommand(commandSource);
       if (outcome.kind === "handled") {
         setValue("");
         if (outcome.toast) console.info(outcome.toast);
@@ -260,8 +292,10 @@ export function AiComposerProvider({ children }: ProviderProps) {
       if (m) seenHandles.add(m[1]);
       allSnippetBlocks.push(block);
     }
+    const wirePrefix = contextPrefix?.() ?? "";
     const composed = [
       commandMarker ?? "",
+      wirePrefix,
       allSnippetBlocks.join("\n\n"),
       selectionBlocks.join("\n\n"),
       fileBlocks.join("\n\n"),
@@ -287,6 +321,15 @@ export function AiComposerProvider({ children }: ProviderProps) {
     void chat.sendMessage({ role: "user", parts } as Parameters<
       typeof chat.sendMessage
     >[0]);
+    // Fire the canvas trigger hook with the user's raw text (no wire prefix,
+    // no snippet wrapping). ChatPanel uses this to dispatch trigger wires.
+    if (onSubmit) {
+      try {
+        onSubmit(bodyAfterTokens || trimmed);
+      } catch (e) {
+        console.error("composer onSubmit hook failed:", e);
+      }
+    }
     setValue("");
     setFiles([]);
     setPickedSnippets([]);
@@ -312,6 +355,7 @@ export function AiComposerProvider({ children }: ProviderProps) {
     files,
     addFiles,
     attachFileByPath,
+    attachImageDataUrl,
     removeFile,
     pickedSnippets,
     addSnippet,

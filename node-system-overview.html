@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlas OS — Node Context System</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --elevated: #1a1a1a;
+    --overlay: #222222;
+    --border: #2a2a2a;
+    --border-active: #404040;
+    --text: #f5f5f5;
+    --dim: #888888;
+    --faint: #555555;
+    --accent: #5b8def;
+    --accent-hover: #4a7de0;
+    --green: #4db89a;
+    --purple: #9b72ef;
+    --amber: #e8a44a;
+    --red: #e05252;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 0;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    border-bottom: 1px solid var(--border);
+    padding: 64px 48px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .hero-eyebrow {
+    font-size: 10px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .hero h1 {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -.02em;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub {
+    font-size: 16px;
+    color: var(--dim);
+    max-width: 560px;
+    line-height: 1.7;
+  }
+  .hero-badges {
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    border: 1px solid;
+  }
+  .badge-blue { background: rgba(91,141,239,.1); border-color: rgba(91,141,239,.3); color: var(--accent); }
+  .badge-green { background: rgba(77,184,154,.1); border-color: rgba(77,184,154,.3); color: var(--green); }
+  .badge-amber { background: rgba(232,164,74,.1); border-color: rgba(232,164,74,.3); color: var(--amber); }
+  .badge-purple { background: rgba(155,114,239,.1); border-color: rgba(155,114,239,.3); color: var(--purple); }
+
+  /* ── CONTENT ── */
+  .content { max-width: 900px; margin: 0 auto; padding: 0 48px 80px; }
+
+  /* ── SECTION ── */
+  section { padding: 48px 0 0; }
+  .section-label {
+    font-size: 9px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 8px;
+  }
+  section h2 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  section p { color: var(--dim); line-height: 1.75; }
+  section p + p { margin-top: 10px; }
+
+  /* ── DIAGRAM ── */
+  .diagram {
+    margin: 32px 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .diagram::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+  }
+  .diagram-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    row-gap: 20px;
+  }
+
+  /* Panel nodes in diagram */
+  .dnode {
+    background: var(--elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--dim);
+    position: relative;
+    min-width: 90px;
+    text-align: center;
+    transition: border-color 150ms ease-out;
+  }
+  .dnode-icon {
+    font-size: 16px;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .dnode.active { border-color: var(--accent); color: var(--text); }
+  .dnode.chat-node {
+    background: rgba(91,141,239,.06);
+    border-color: rgba(91,141,239,.4);
+    color: var(--text);
+    min-width: 110px;
+  }
+
+  /* Port dots */
+  .port {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 1.5px solid var(--accent);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .port-right { right: -4px; }
+  .port-left { left: -4px; }
+
+  /* Wire arrows */
+  .wire-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .wire {
+    height: 2px;
+    width: 48px;
+    position: relative;
+  }
+  .wire-data { background: linear-gradient(90deg, rgba(91,141,239,.6), rgba(91,141,239,.8)); }
+  .wire-trigger { background: linear-gradient(90deg, rgba(77,184,154,.6), rgba(77,184,154,.8)); }
+  .wire-context { background: linear-gradient(90deg, rgba(155,114,239,.6), rgba(155,114,239,.8)); }
+  .wire::after {
+    content: '▶';
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 8px;
+    color: inherit;
+  }
+  .wire-data::after { color: var(--accent); }
+  .wire-trigger::after { color: var(--green); }
+  .wire-context::after { color: var(--purple); }
+
+  /* ── STATUS TABLE ── */
+  .status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  @media (max-width: 640px) { .status-grid { grid-template-columns: 1fr; } }
+
+  .status-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .status-card h4 {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .status-card.done h4 { color: var(--green); }
+  .status-card.todo h4 { color: var(--amber); }
+  .status-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--dim);
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .status-item:last-child { border-bottom: none; }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .dot-done { background: var(--green); }
+  .dot-todo { background: var(--amber); }
+  .dot-later { background: var(--faint); }
+
+  /* ── MVP PHASES ── */
+  .phase-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 24px;
+  }
+  .phase-row {
+    background: var(--surface);
+    display: grid;
+    grid-template-columns: 60px 1fr 200px;
+    gap: 16px;
+    padding: 16px 20px;
+    align-items: start;
+  }
+  .phase-row:hover { background: var(--elevated); }
+  .phase-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    padding: 3px 8px;
+    border-radius: 5px;
+    text-align: center;
+    width: fit-content;
+  }
+  .tag-n1 { background: rgba(91,141,239,.15); color: var(--accent); border: 1px solid rgba(91,141,239,.3); }
+  .tag-n2 { background: rgba(77,184,154,.12); color: var(--green); border: 1px solid rgba(77,184,154,.3); }
+  .tag-n3 { background: rgba(155,114,239,.12); color: var(--purple); border: 1px solid rgba(155,114,239,.3); }
+  .phase-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .phase-desc { font-size: 11px; color: var(--dim); line-height: 1.5; }
+  .phase-files { font-size: 10px; color: var(--faint); font-family: monospace; line-height: 1.8; }
+
+  /* ── DATA FLOW ── */
+  .flow-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .flow-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .flow-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .flow-icon {
+    font-size: 18px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--elevated);
+    border-radius: 7px;
+    border: 1px solid var(--border);
+  }
+  .flow-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .flow-output { font-size: 10px; color: var(--dim); font-family: monospace; }
+  .flow-status {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    width: fit-content;
+    margin-top: auto;
+  }
+  .status-ready { background: rgba(77,184,154,.12); color: var(--green); }
+  .status-n1 { background: rgba(91,141,239,.12); color: var(--accent); }
+  .status-n2 { background: rgba(155,114,239,.12); color: var(--purple); }
+
+  /* ── OPPORTUNITIES ── */
+  .opp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .opp-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    transition: border-color 150ms;
+  }
+  .opp-card:hover { border-color: var(--border-active); }
+  .opp-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .opp-desc { font-size: 11px; color: var(--dim); line-height: 1.5; }
+  .opp-icon { font-size: 20px; margin-bottom: 8px; }
+
+  /* ── RULES ── */
+  .rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  @media (max-width: 640px) { .rules-grid { grid-template-columns: 1fr; } }
+  .rule-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .rule-card h4 {
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: .03em;
+  }
+  .rule-card.do h4 { color: var(--green); }
+  .rule-card.dont h4 { color: var(--red); }
+  .rule-item {
+    font-size: 11px;
+    color: var(--dim);
+    padding: 4px 0;
+    display: flex;
+    gap: 8px;
+  }
+  .rule-item::before { flex-shrink: 0; margin-top: 1px; }
+  .do .rule-item::before { content: '✓'; color: var(--green); }
+  .dont .rule-item::before { content: '✕'; color: var(--red); }
+
+  /* ── WIRE LEGEND ── */
+  .legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--dim);
+  }
+  .legend-line {
+    width: 28px;
+    height: 2px;
+    border-radius: 1px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+    color: var(--faint);
+    font-size: 11px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Atlas OS · Phase N</div>
+  <h1>Node Context <span>System</span></h1>
+  <p class="hero-sub">
+    Her canvas paneli canlı bir veri düğümüdür. Bir panelden chat'e tel çek —
+    o panelin anlık içeriği AI'nın context'i haline gelir.
+    Kopyala-yapıştır yok. Tool çağrısı yok. Tel, context'tir.
+  </p>
+  <div class="hero-badges">
+    <span class="badge badge-blue">● Veri teli — mavi</span>
+    <span class="badge badge-green">● Tetik teli — yeşil</span>
+    <span class="badge badge-purple">● Context teli — mor</span>
+    <span class="badge badge-amber">Phase N1 önce, N2-N3 sonra</span>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- DIAGRAM -->
+  <section>
+    <div class="section-label">Sistem Diyagramı</div>
+    <h2>Nasıl çalışır</h2>
+    <p>Her panel tipi <code>outputData</code> üretir. Bağlantı teli bu veriyi Chat panel'e taşır. Chat mesaj gönderilince bağlı tüm panellerin içeriği context block olarak prepend edilir.</p>
+
+    <div class="diagram">
+      <div style="position:relative; display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:center; min-height:160px;">
+
+        <!-- Source nodes -->
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div class="dnode active">
+            <span class="dnode-icon">>_</span>
+            Terminal
+            <div class="port port-right" style="background: var(--accent);"></div>
+          </div>
+          <div class="dnode active">
+            <span class="dnode-icon">{}</span>
+            Editor
+            <div class="port port-right" style="background: var(--accent);"></div>
+          </div>
+          <div class="dnode">
+            <span class="dnode-icon">⊕</span>
+            Web
+            <div class="port port-right"></div>
+          </div>
+          <div class="dnode">
+            <span class="dnode-icon">■</span>
+            Input
+            <div class="port port-right" style="background: var(--accent);"></div>
+          </div>
+        </div>
+
+        <!-- Wires -->
+        <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
+          <div class="wire wire-data" style="width:60px;"></div>
+          <div class="wire wire-data" style="width:60px;"></div>
+          <div class="wire wire-data" style="width:60px; opacity:.35;"></div>
+          <div class="wire wire-data" style="width:60px;"></div>
+        </div>
+
+        <!-- Chat node -->
+        <div class="dnode chat-node" style="min-height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;">
+          <div class="port port-left" style="background: var(--accent);"></div>
+          <span style="font-size:22px;">💬</span>
+          <span style="font-size:12px; font-weight:600; color: var(--accent);">Chat</span>
+          <span style="font-size:9px; color: var(--faint); margin-top:4px;">context-aware</span>
+          <div class="port port-right"></div>
+        </div>
+
+        <!-- Right side: trigger wire to terminal -->
+        <div style="display:flex; flex-direction:column; gap:8px; align-items:center;">
+          <div class="wire wire-trigger" style="width:48px;"></div>
+          <span style="font-size:9px; color: var(--green); text-align:center; max-width:70px;">mesaj → terminale komut</span>
+        </div>
+
+        <div class="dnode">
+          <span class="dnode-icon">>_</span>
+          Terminal 2
+          <div class="port port-left"></div>
+        </div>
+
+      </div>
+
+      <!-- Legend -->
+      <div class="legend" style="margin-top:24px; padding-top:16px; border-top:1px solid var(--border);">
+        <div class="legend-item">
+          <div class="legend-line" style="background: var(--accent);"></div>
+          Data — panel içeriği → chat context
+        </div>
+        <div class="legend-item">
+          <div class="legend-line" style="background: var(--green);"></div>
+          Trigger — chat gönderimi → panel tetikle
+        </div>
+        <div class="legend-item">
+          <div class="legend-line" style="background: var(--purple);"></div>
+          Context — sadece context, veri akışı yok
+        </div>
+        <div class="legend-item">
+          <div class="legend-line" style="background: var(--faint); opacity:.5;"></div>
+          N2'de gelecek
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CURRENT STATE -->
+  <section>
+    <div class="section-label">Mevcut Kod Durumu</div>
+    <h2>Ne var, ne eksik</h2>
+    <p>Kod incelemesinden elde edilen gerçek durum. Sistem %60 hazır — port UI, tel çizimi, store, InputPanel tam çalışıyor.</p>
+
+    <div class="status-grid">
+      <div class="status-card done">
+        <h4>✓ Hazır — dokunma</h4>
+        <div class="status-item"><span class="status-dot dot-done"></span>Port noktaları (ConnectionLayer.tsx)</div>
+        <div class="status-item"><span class="status-dot dot-done"></span>Drag-to-connect + rubber-band</div>
+        <div class="status-item"><span class="status-dot dot-done"></span>Connection.kind data/trigger rengi</div>
+        <div class="status-item"><span class="status-dot dot-done"></span>setOutputData(id, {kind, value})</div>
+        <div class="status-item"><span class="status-dot dot-done"></span>InputPanel → outputData</div>
+        <div class="status-item"><span class="status-dot dot-done"></span>useIncomingWireData (tek bağlantı)</div>
+        <div class="status-item"><span class="status-dot dot-done"></span>ChatPanel injectedContext + banner</div>
+        <div class="status-item"><span class="status-dot dot-done"></span>canvas_read_state AI aracı</div>
+      </div>
+      <div class="status-card todo">
+        <h4>⚠ Eksik — yapılacak</h4>
+        <div class="status-item"><span class="status-dot dot-todo"></span>Terminal buffer → outputData (N1)</div>
+        <div class="status-item"><span class="status-dot dot-todo"></span>Editor dosya içeriği → outputData (N1)</div>
+        <div class="status-item"><span class="status-dot dot-todo"></span>Multi-wire aggregation (N1)</div>
+        <div class="status-item"><span class="status-dot dot-todo"></span>Chat auto-prepend context (N1)</div>
+        <div class="status-item"><span class="status-dot dot-todo"></span>Bağlı panel badge'leri (N1)</div>
+        <div class="status-item"><span class="status-dot dot-later"></span>Web → URL/title outputData (N2)</div>
+        <div class="status-item"><span class="status-dot dot-later"></span>Tel kind seçim UI (N2)</div>
+        <div class="status-item"><span class="status-dot dot-later"></span>"Apply to all" modu (N3)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATA FLOW PER PANEL -->
+  <section>
+    <div class="section-label">Panel Veri Akışı</div>
+    <h2>Her panel ne üretir</h2>
+    <p>Her panel tipi kendi <code>outputData</code> sorumluluğunu taşır. Chat bu veriyi context olarak tüketir.</p>
+    <div class="flow-grid">
+      <div class="flow-card">
+        <div class="flow-header">
+          <div class="flow-icon">>_</div>
+          <div class="flow-name">Terminal</div>
+        </div>
+        <div class="flow-output">kind: "text"<br>value: son 80 satır<br>güncelleme: 3s interval</div>
+        <div class="flow-status status-n1">Phase N1</div>
+      </div>
+      <div class="flow-card">
+        <div class="flow-header">
+          <div class="flow-icon">{}</div>
+          <div class="flow-name">Editor</div>
+        </div>
+        <div class="flow-output">kind: "text"<br>value: dosya içeriği (4000 char)<br>güncelleme: dosya yükü + 1.5s debounce</div>
+        <div class="flow-status status-n1">Phase N1</div>
+      </div>
+      <div class="flow-card">
+        <div class="flow-header">
+          <div class="flow-icon">■</div>
+          <div class="flow-name">Input</div>
+        </div>
+        <div class="flow-output">kind: text|image|file<br>value: kullanıcı girdisi<br>güncelleme: anlık</div>
+        <div class="flow-status status-ready">Hazır ✓</div>
+      </div>
+      <div class="flow-card">
+        <div class="flow-header">
+          <div class="flow-icon">⊕</div>
+          <div class="flow-name">Web</div>
+        </div>
+        <div class="flow-output">kind: "text"<br>value: "Başlık | URL"<br>güncelleme: nav-changed event</div>
+        <div class="flow-status status-n2">Phase N2</div>
+      </div>
+      <div class="flow-card">
+        <div class="flow-header">
+          <div class="flow-icon">⌂</div>
+          <div class="flow-name">Vault</div>
+        </div>
+        <div class="flow-output">kind: "text"<br>value: sayfa başlık + metin<br>güncelleme: iframe postMessage</div>
+        <div class="flow-status status-n2">Phase N2</div>
+      </div>
+      <div class="flow-card">
+        <div class="flow-header">
+          <div class="flow-icon">A</div>
+          <div class="flow-name">Agent</div>
+        </div>
+        <div class="flow-output">kind: "text"<br>value: son agent çıktısı<br>güncelleme: agent tamamlanınca</div>
+        <div class="flow-status status-n2">Phase N2</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MVP PHASES -->
+  <section>
+    <div class="section-label">Uygulama Planı</div>
+    <h2>MVP'den bitişe fazlar</h2>
+
+    <div class="phase-grid">
+      <div class="phase-row">
+        <div><span class="phase-tag tag-n1">N1.1</span></div>
+        <div>
+          <div class="phase-title">Multi-wire aggregation hook</div>
+          <div class="phase-desc">useAllIncomingWireData — tek bağlantı yerine tüm upstream bağlantıları döndürür. WireBlock tipi. Risk yok, saf TypeScript.</div>
+        </div>
+        <div class="phase-files">
+          CanvasPanelContent.tsx<br>types.ts
+        </div>
+      </div>
+      <div class="phase-row">
+        <div><span class="phase-tag tag-n1">N1.2</span></div>
+        <div>
+          <div class="phase-title">ChatPanel badge + auto-context</div>
+          <div class="phase-desc">Bağlı panel ikonları header'da gösterilir. Mesaj gönderilince bağlı text wire'ları &lt;connected-context&gt; block olarak prepend edilir.</div>
+        </div>
+        <div class="phase-files">
+          ChatPanel.tsx
+        </div>
+      </div>
+      <div class="phase-row">
+        <div><span class="phase-tag tag-n1">N1.3</span></div>
+        <div>
+          <div class="phase-title">Terminal → outputData</div>
+          <div class="phase-desc">TerminalPane'e getLastLines(n) handle metodu eklenir. CanvasTerminal 3s interval ile buffer okur, setOutputData yazar.</div>
+        </div>
+        <div class="phase-files">
+          TerminalPane.tsx<br>CanvasPanelContent.tsx
+        </div>
+      </div>
+      <div class="phase-row">
+        <div><span class="phase-tag tag-n1">N1.4</span></div>
+        <div>
+          <div class="phase-title">Editor → outputData</div>
+          <div class="phase-desc">Dosya yüklenince fs_read_file → setOutputData. CodeMirror onChange → 1.5s debounce. Maks 4000 karakter.</div>
+        </div>
+        <div class="phase-files">
+          CanvasPanelContent.tsx
+        </div>
+      </div>
+      <div class="phase-row">
+        <div><span class="phase-tag tag-n2">N2.1</span></div>
+        <div>
+          <div class="phase-title">Web + Vault → outputData</div>
+          <div class="phase-desc">Web paneli nav-changed event'i ile URL+title yazar. Vault iframe postMessage bridge.</div>
+        </div>
+        <div class="phase-files">
+          CanvasPanelContent.tsx<br>WebLayerManager.ts
+        </div>
+      </div>
+      <div class="phase-row">
+        <div><span class="phase-tag tag-n2">N2.2</span></div>
+        <div>
+          <div class="phase-title">Connection kind seçim UI</div>
+          <div class="phase-desc">Tel bırakılınca mini menü: Data / Trigger / Context. Renk kodlaması güncellenir. Trigger tel: chat send → terminal write.</div>
+        </div>
+        <div class="phase-files">
+          ConnectionLayer.tsx<br>canvasStore.ts
+        </div>
+      </div>
+      <div class="phase-row">
+        <div><span class="phase-tag tag-n3">N3.1</span></div>
+        <div>
+          <div class="phase-title">"Apply to all" komut modu</div>
+          <div class="phase-desc">AiInputBar'da toggle: aktifken tüm bağlı paneller context'e girer. Keyboard shortcut. Snapshot modu (gönderim anında freeze).</div>
+        </div>
+        <div class="phase-files">
+          AiInputBar.tsx<br>ChatPanel.tsx
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DESIGN RULES -->
+  <section>
+    <div class="section-label">Mimari Kurallar</div>
+    <h2>Yapılacak / yapılmayacak</h2>
+
+    <div class="rules-grid">
+      <div class="rule-card do">
+        <h4>✓ YAPILACAK</h4>
+        <div class="rule-item">Her panel tipi kendi outputData sorumluluğunu taşır</div>
+        <div class="rule-item">Wire data 4000 karakter ile kesilir (token koruması)</div>
+        <div class="rule-item">setOutputData çağrıları debounce edilir</div>
+        <div class="rule-item">Context XML block olarak sarılır: &lt;connected-context&gt;</div>
+        <div class="rule-item">Mevcut canvasStore.meta.outputData kullanılır</div>
+        <div class="rule-item">N1 incremental — her adım bağımsız çalışır</div>
+      </div>
+      <div class="rule-card dont">
+        <h4>✕ YAPILMAYACAK</h4>
+        <div class="rule-item">Terminal buffer'ı &lt; 1s interval ile okuma (CPU israfı)</div>
+        <div class="rule-item">Web panel için tam sayfa scraping (native webview erişimi yok)</div>
+        <div class="rule-item">Wire data için yeni Zustand store açma</div>
+        <div class="rule-item">Context AI tool çağrısından geçirme (performans kaybı)</div>
+        <div class="rule-item">Boyut sınırsız dosya içeriği gönderme</div>
+        <div class="rule-item">Chat history'yi silme veya reset etme</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPPORTUNITIES -->
+  <section>
+    <div class="section-label">Gelecek Fırsatlar</div>
+    <h2>Bu sistem nelere kapı açar</h2>
+    <p>Node sistemi tamamlandıktan sonra çıkan mimari fırsatlar — bunlar geliştirilmeden şimdi tasarlanmamalı.</p>
+
+    <div class="opp-grid">
+      <div class="opp-card">
+        <div class="opp-icon">🔗</div>
+        <div class="opp-title">Agent Chaining</div>
+        <div class="opp-desc">Agent panel çıktısı → başka agent girişi. Görsel AI pipeline. Sentor + LLM hybrid.</div>
+      </div>
+      <div class="opp-card">
+        <div class="opp-icon">📐</div>
+        <div class="opp-title">Blueprint + Node</div>
+        <div class="opp-desc">Bağlantı layout'u blueprint'e kaydedilir. Paylaşılabilir "iş akışı recipe'leri".</div>
+      </div>
+      <div class="opp-card">
+        <div class="opp-icon">🕸</div>
+        <div class="opp-title">Vault Graph Wiring</div>
+        <div class="opp-desc">A vault sayfası → B vault sayfası data teli: backlink = context wire.</div>
+      </div>
+      <div class="opp-card">
+        <div class="opp-icon">⏰</div>
+        <div class="opp-title">CRON Panel</div>
+        <div class="opp-desc">Zamanlayıcı panel → trigger tel → chat/terminal. Otomatik tetikleme.</div>
+      </div>
+      <div class="opp-card">
+        <div class="opp-icon">⚡</div>
+        <div class="opp-title">Diff Wires</div>
+        <div class="opp-desc">İki editor paneli → chat: "Bu iki dosyayı karşılaştır" tek tıkla.</div>
+      </div>
+      <div class="opp-card">
+        <div class="opp-icon">🖼</div>
+        <div class="opp-title">Multi-modal Pipeline</div>
+        <div class="opp-desc">Image input → web search panel → chat: görsel araştırma pipeline.</div>
+      </div>
+      <div class="opp-card">
+        <div class="opp-icon">📦</div>
+        <div class="opp-title">Exportable Workflows</div>
+        <div class="opp-desc">Wire layout + panel config → tek JSON. Toplulukla paylaşılabilir.</div>
+      </div>
+      <div class="opp-card">
+        <div class="opp-icon">🔄</div>
+        <div class="opp-title">Live Feedback Loop</div>
+        <div class="opp-desc">Terminal çıktısı → chat → kod düzelt → terminal → döngü. Tam otonom debug.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <span>Atlas OS · Node Context System · Phase N</span>
+  <span>NODE_SYSTEM_PLAN.md · 2026-05-21</span>
+</footer>
+
+</body>
+</html>

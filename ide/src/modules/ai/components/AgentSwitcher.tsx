@@ -10,8 +10,10 @@ import { cn } from "@/lib/utils";
 import { openSettingsWindow } from "@/modules/settings/openSettingsWindow";
 import {
   AbsoluteIcon,
+  AiMagicIcon,
   ArrowDown01Icon,
   CodeIcon,
+  CpuIcon,
   PaintBrush04Icon,
   PencilEdit02Icon,
   Settings01Icon,
@@ -20,7 +22,7 @@ import {
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import type { AgentIconId } from "../lib/agents";
+import { BUILTIN_AGENTS, type AgentIconId } from "../lib/agents";
 import { useAgentsStore } from "../store/agentsStore";
 
 const ICONS: Record<AgentIconId, typeof CodeIcon> = {
@@ -30,6 +32,8 @@ const ICONS: Record<AgentIconId, typeof CodeIcon> = {
   security: ShieldUserIcon,
   designer: PaintBrush04Icon,
   spark: SparklesIcon,
+  sentor: AiMagicIcon,
+  orkestra: CpuIcon,
 };
 
 export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
@@ -38,8 +42,7 @@ export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
   const activeId = useAgentsStore((s) => s.activeId);
   const setActiveId = useAgentsStore((s) => s.setActiveId);
 
-  const list = useAgentsStore.getState().all();
-  void customAgents; // keeps the store subscription alive
+  const list = [...BUILTIN_AGENTS, ...customAgents];
 
   const active = list.find((a) => a.id === activeId) ?? list[0];
   const builtIn = list.filter((a) => a.builtIn);

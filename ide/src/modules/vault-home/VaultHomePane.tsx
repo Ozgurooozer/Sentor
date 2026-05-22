@@ -9,6 +9,7 @@ import {
   type SearchResult,
 } from "@/modules/ai/tools/vault";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { useEffect, useRef, useState } from "react";
 
 type Props = {
@@ -61,6 +62,22 @@ export function VaultHomePane({ workspaceRoot, onOpenBrowserTab }: Props) {
     inputRef.current?.focus();
   }, []);
 
+  // Refresh index whenever the watcher signals a reindex completed.
+  useEffect(() => {
+    if (!workspaceRoot) return;
+    let unlisten: (() => void) | undefined;
+    listen("vault:reindexed", () => {
+      readIndex(workspaceRoot)
+        .then((pages) => {
+          setAllPages(pages);
+          setCategories([...new Set(pages.map((p) => p.category))].sort());
+          setIndexState(pages.length === 0 ? "empty" : "ready");
+        })
+        .catch(() => undefined);
+    }).then((fn) => { unlisten = fn; });
+    return () => unlisten?.();
+  }, [workspaceRoot]);
+
   const handleRunIndexer = async () => {
     if (!workspaceRoot) return;
     setRunningIndexer(true);
@@ -98,6 +115,7 @@ export function VaultHomePane({ workspaceRoot, onOpenBrowserTab }: Props) {
       {/* Search bar */}
       <div className="shrink-0 border-b border-border/60 px-4 py-3">
         <input
+          name="vault-search"
           ref={inputRef}
           value={query}
           onChange={(e) => setQuery(e.target.value)}

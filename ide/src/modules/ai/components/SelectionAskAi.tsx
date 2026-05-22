@@ -1,6 +1,5 @@
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { fmtShortcut, MOD_KEY } from "@/lib/platform";
-import { motion } from "motion/react";
 import { useEffect } from "react";
 
 type Props = {
@@ -26,14 +25,10 @@ export function SelectionAskAi({ x, y, onAsk, onDismiss }: Props) {
   const left = Math.max(8, Math.min(x - W / 2, window.innerWidth - W - 8));
 
   return (
-    <motion.div
+    <div
       data-selection-ask-ai
-      initial={{ opacity: 0, y: 4, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 4, scale: 0.95 }}
-      transition={{ duration: 0.12, ease: "easeOut" }}
       style={{ top, left, width: W }}
-      className="fixed z-50"
+      className="fixed z-50 duration-150 ease-out animate-in fade-in slide-in-from-top-1 zoom-in-95"
     >
       <button
         type="button"
@@ -48,6 +43,6 @@ export function SelectionAskAi({ x, y, onAsk, onDismiss }: Props) {
           <Kbd className="h-4 min-w-4 px-1 text-[10px]">{fmtShortcut(MOD_KEY, "L")}</Kbd>
         </KbdGroup>
       </button>
-    </motion.div>
+    </div>
   );
 }

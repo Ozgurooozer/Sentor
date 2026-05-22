@@ -1,10 +1,12 @@
 import { usePreferencesStore } from "@/modules/settings/preferences";
 import type { WebTab } from "@/modules/tabs";
 import { invoke } from "@tauri-apps/api/core";
+import { safeInvoke } from "@/lib/safeInvoke";
 import { listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { useEffect, useRef, useState } from "react";
 import { AddressBar } from "./AddressBar";
+import { addUrl, getHistory } from "./browserHistory";
 import { loadBookmarks, toggleBookmark } from "./bookmarks";
 
 type SearchResult = { url: string; title: string; snippet: string };
@@ -43,11 +45,15 @@ export function WebBrowserPane({
   const [isLoading, setIsLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult[] | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [urlHistory, setUrlHistory] = useState(() => getHistory());
   const searxngUrl = usePreferencesStore((s) => s.searxngUrl);
   // Tracks whether web_open has been called successfully.
   const openedRef = useRef(false);
   // The last URL we sent to the native webview, to avoid duplicate navigates.
   const lastNavUrlRef = useRef<string>("");
+  // Tracks the URL currently loaded in the native webview (may differ from lastNavUrlRef
+  // when a navigation fails and the webview lands on an error page).
+  const liveUrlRef = useRef<string>("");
   // Mirror isActive prop so the async open callback can read current value.
   const isActiveRef = useRef(isActive);
   isActiveRef.current = isActive;
@@ -58,6 +64,8 @@ export function WebBrowserPane({
     loadBookmarks().then((bm) => {
       setIsBookmarked(bm.some((b) => b.url === tab.url));
     });
+    addUrl(tab.url);
+    setUrlHistory(getHistory());
   }, [tab.url]);
 
   const readBounds = () => {
@@ -86,7 +94,7 @@ export function WebBrowserPane({
         openedRef.current = true;
         // Apply correct visibility now that the webview exists.
         if (!isActiveRef.current) {
-          void invoke("web_set_visible", { label, visible: false });
+          void safeInvoke("web_set_visible", { label, visible: false });
         }
       } catch (e) {
         console.error("web_open failed", e);
@@ -96,7 +104,7 @@ export function WebBrowserPane({
 
     return () => {
       openedRef.current = false;
-      void invoke("web_close", { label });
+      invoke("web_close", { label }).catch(() => {/* already closed */});
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -106,9 +114,12 @@ export function WebBrowserPane({
     if (!openedRef.current) return;
     if (!tab.url) return;
     if (tab.url === lastNavUrlRef.current) return;
+    // Never navigate from inside a chrome-error page — it will be blocked by Chromium.
+    // Wait for a real navigation (e.g. user types a new URL) to escape the error state.
+    if (liveUrlRef.current.startsWith("chrome-error://")) return;
     lastNavUrlRef.current = tab.url;
     setIsLoading(true);
-    void invoke("web_navigate", { label, url: tab.url });
+    void safeInvoke("web_navigate", { label, url: tab.url });
     const t = setTimeout(() => setIsLoading(false), 6000);
     return () => clearTimeout(t);
   }, [tab.url, label]);
@@ -122,7 +133,7 @@ export function WebBrowserPane({
       if (!openedRef.current) return;
       const b = readBounds();
       if (!b) return;
-      void invoke("web_set_bounds", { label, ...b });
+      void safeInvoke("web_set_bounds", { label, ...b });
     };
     const schedule = () => {
       if (pending) return;
@@ -147,10 +158,10 @@ export function WebBrowserPane({
   // The native view sits above the DOM, so CSS alone can't cover it.
   useEffect(() => {
     if (!openedRef.current) return;
-    void invoke("web_set_visible", { label, visible: isActive });
+    void safeInvoke("web_set_visible", { label, visible: isActive });
     if (isActive) {
       const b = readBounds();
-      if (b) void invoke("web_set_bounds", { label, ...b });
+      if (b) void safeInvoke("web_set_bounds", { label, ...b });
     }
   }, [isActive, label]);
 
@@ -160,6 +171,12 @@ export function WebBrowserPane({
     listen<{ label: string; url: string }>("web://nav-changed", (e) => {
       if (e.payload.label !== label) return;
       setIsLoading(false);
+      // Always track the live URL so we know when we're stuck on an error page.
+      liveUrlRef.current = e.payload.url ?? "";
+      // Ignore chrome-error pages: they mean the load failed (e.g. server not ready).
+      // Keeping lastNavUrlRef as the intended URL lets the URL-change effect retry
+      // once tab.url is updated again, rather than entering an infinite retry loop.
+      if (e.payload.url?.startsWith("chrome-error://")) return;
       if (e.payload.url && e.payload.url !== lastNavUrlRef.current) {
         lastNavUrlRef.current = e.payload.url;
         onNavigate(e.payload.url);
@@ -230,11 +247,12 @@ export function WebBrowserPane({
         onReload={() => {
           if (tab.url) {
             setIsLoading(true);
-            void invoke("web_navigate", { label, url: tab.url });
+            void safeInvoke("web_navigate", { label, url: tab.url });
           }
         }}
         onToggleBookmark={handleToggleBookmark}
         onOpenExternal={handleOpenExternal}
+        history={urlHistory}
       />
 
       {/*

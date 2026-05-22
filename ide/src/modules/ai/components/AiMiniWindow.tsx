@@ -21,14 +21,16 @@ import {
   Add01Icon,
   AlertCircleIcon,
   ArrowDown01Icon,
+  ArrowUp01Icon,
   Cancel01Icon,
   Delete02Icon,
   FilterIcon,
   TerminalIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { motion } from "motion/react";
-import { useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { BAR_HEIGHT } from "@/lib/constants";
 import { getModel, getModelContextLimit } from "../config";
 import type { SessionMeta } from "../lib/sessions";
 import { useAgentsStore } from "../store/agentsStore";
@@ -38,6 +40,7 @@ import { AgentSwitcher } from "./AgentSwitcher";
 import { AiChatView } from "./AiChat";
 import { PlanDiffReview } from "./PlanDiffReview";
 import { TodoStrip } from "./TodoStrip";
+import { useZoneRegistration, ZoneType } from "@/modules/input";
 
 const SUGGESTIONS = [
   {
@@ -60,7 +63,25 @@ const SUGGESTIONS = [
   },
 ];
 
-export function AiMiniWindow() {
+type DragOrigin = { mx: number; my: number; px: number; py: number };
+
+const DEFAULT_W = 544;
+const DEFAULT_H = 672;
+const MIN_W = 320;
+const MIN_H = 280;
+const GAP_BOTTOM = 12;
+const GAP_TOP = 16;
+
+export function AiMiniWindow({
+  className,
+  isFocused,
+  onBoundsChange,
+}: {
+  className?: string;
+  isFocused?: boolean;
+  /** Called after drag/resize so the caller can re-sync the OS hit region. */
+  onBoundsChange?: () => void;
+} = {}) {
   const closeMini = useChatStore((s) => s.closeMini);
   const sessionId = useChatStore((s) => s.activeSessionId);
   const openPanel = useChatStore((s) => s.openPanel);
@@ -68,6 +89,134 @@ export function AiMiniWindow() {
     closeMini();
     openPanel();
   };
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useZoneRegistration(containerRef, ZoneType.Panel, { zIndex: 200, enabled: !!isFocused });
+
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  // User-controlled size in focused mode; null = CSS defaults
+  const [size, setSize] = useState<{ w: number; h: number } | null>(null);
+  // Live size ref for drag/resize clamping — always reflects actual displayed size
+  const sizeRef = useRef({ w: DEFAULT_W, h: DEFAULT_H });
+
+  const dragOrigin = useRef<DragOrigin | null>(null);
+
+  // Layout function — called on mount (when isFocused=true) and on resize
+  const doLayout = useCallback(() => {
+    const available = window.innerHeight - BAR_HEIGHT - GAP_BOTTOM - GAP_TOP;
+    const h = Math.max(MIN_H, Math.min(DEFAULT_H, available));
+    const w = Math.min(DEFAULT_W, Math.max(MIN_W, window.innerWidth - 32));
+    sizeRef.current = { w, h };
+    setSize({ w, h });
+    const y = Math.max(GAP_TOP, window.innerHeight - BAR_HEIGHT - GAP_BOTTOM - h);
+    const x = Math.max(16, window.innerWidth - w - 16);
+    setPos({ x, y });
+  }, []);
+
+  useEffect(() => {
+    if (!isFocused) {
+      setPos(null);
+      setSize(null);
+      sizeRef.current = { w: DEFAULT_W, h: DEFAULT_H };
+      return;
+    }
+    doLayout();
+    window.addEventListener("resize", doLayout);
+    return () => window.removeEventListener("resize", doLayout);
+  }, [isFocused, doLayout]);
+
+  useEffect(() => {
+    if (!onBoundsChange || pos === null) return;
+    onBoundsChange();
+  }, [pos, size, onBoundsChange]);
+
+  // ── Drag ────────────────────────────────────────────────────────────────────
+  const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('button,[role="button"],input,textarea,select,[data-resize-handle]')) return;
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    dragOrigin.current = { mx: e.clientX, my: e.clientY, px: rect.left, py: rect.top };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }, []);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragOrigin.current) return;
+    const dx = e.clientX - dragOrigin.current.mx;
+    const dy = e.clientY - dragOrigin.current.my;
+    const { w, h } = sizeRef.current;
+    setPos({
+      x: Math.max(0, Math.min(window.innerWidth - w, dragOrigin.current.px + dx)),
+      y: Math.max(0, Math.min(window.innerHeight - h, dragOrigin.current.py + dy)),
+    });
+  }, []);
+
+  const handlePointerUp = useCallback(() => {
+    if (!dragOrigin.current) return;
+    dragOrigin.current = null;
+    onBoundsChange?.();
+  }, [onBoundsChange]);
+
+  // ── Resize (bottom-right corner + right edge + bottom edge) ─────────────────
+  const resizeOrigin = useRef<{
+    mx: number; my: number;
+    origW: number; origH: number;
+    origX: number; origY: number;
+    edge: string;
+  } | null>(null);
+
+  const onResizePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>, edge: string) => {
+      e.stopPropagation();
+      if (!containerRef.current || !pos) return;
+      resizeOrigin.current = {
+        mx: e.clientX, my: e.clientY,
+        origW: sizeRef.current.w, origH: sizeRef.current.h,
+        origX: pos.x, origY: pos.y,
+        edge,
+      };
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    },
+    [pos],
+  );
+
+  const onResizePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const r = resizeOrigin.current;
+      if (!r) return;
+      const dx = e.clientX - r.mx;
+      const dy = e.clientY - r.my;
+      let { origW: w, origH: h, origX: x, origY: y } = r;
+
+      if (r.edge.includes("e")) w = Math.max(MIN_W, r.origW + dx);
+      if (r.edge.includes("s")) h = Math.max(MIN_H, r.origH + dy);
+      if (r.edge.includes("w")) {
+        const nw = Math.max(MIN_W, r.origW - dx);
+        x = r.origX + (r.origW - nw);
+        w = nw;
+      }
+      if (r.edge.includes("n")) {
+        const nh = Math.max(MIN_H, r.origH - dy);
+        y = r.origY + (r.origH - nh);
+        h = nh;
+      }
+
+      sizeRef.current = { w, h };
+      setSize({ w, h });
+      setPos({ x, y });
+    },
+    [],
+  );
+
+  const onResizePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      resizeOrigin.current = null;
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+      onBoundsChange?.();
+    },
+    [onBoundsChange],
+  );
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -82,45 +231,99 @@ export function AiMiniWindow() {
     return () => window.removeEventListener("keydown", onKey);
   }, [closeMini]);
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 12, scale: 0.98 }}
-      transition={{ type: "spring", stiffness: 320, damping: 32 }}
+  const posStyle: React.CSSProperties | undefined = pos
+    ? {
+        left: pos.x,
+        top: pos.y,
+        right: "auto",
+        bottom: "auto",
+        width: size?.w,
+        height: size?.h,
+      }
+    : undefined;
+
+  const dragHandlers = isFocused
+    ? {
+        onPointerDown: handlePointerDown,
+        onPointerMove: handlePointerMove,
+        onPointerUp: handlePointerUp,
+        style: { touchAction: "none" as const, userSelect: "none" as const },
+      }
+    : undefined;
+
+  const resizeHandle = (edge: string, cls: string) =>
+    isFocused ? (
+      <div
+        key={edge}
+        data-resize-handle
+        className={cn("absolute z-20", cls)}
+        onPointerDown={(e) => onResizePointerDown(e, edge)}
+        onPointerMove={onResizePointerMove}
+        onPointerUp={onResizePointerUp}
+      />
+    ) : null;
+
+  // Render via portal so no parent overflow:hidden / CSS transform can clip us.
+  // Mount uses a simple Tailwind enter animation (no exit anim — component unmounts).
+  return createPortal(
+    <div
+      ref={containerRef}
       data-ai-mini-window
       className={cn(
-        "no-scrollbar-deep fixed right-4 bottom-24 z-40 flex h-[42rem] w-[34rem] flex-col overflow-hidden",
-        "rounded-2xl border border-border/40 bg-card/90 shadow-2xl ring-1 ring-black/5 backdrop-blur-2xl dark:ring-white/5",
+        "duration-200 ease-out animate-in fade-in slide-in-from-bottom-2",
+        "no-scrollbar-deep fixed right-4 bottom-[96px] z-[9000] flex h-[42rem] w-[34rem] flex-col overflow-hidden",
+        // Prevent the window from overflowing in small windows / after mode-switch
+        "max-h-[calc(100vh-9rem)]",
+        // Canvas-panel theme: single border, no shadow, light backdrop blur only.
+        "rounded-lg border border-[#2a2a2a] bg-[#0a0a0a]/97 backdrop-blur-sm",
         "text-[12px]",
+        pos && "right-auto bottom-auto",
+        className,
       )}
+      style={posStyle}
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-foreground/[0.03] to-transparent"
-      />
       {sessionId ? (
         <Body
           sessionId={sessionId}
           onClose={closeMini}
           onExpand={expandToPanel}
+          dragHandlers={dragHandlers}
         />
       ) : (
-        <EmptyShell onClose={closeMini} onExpand={expandToPanel} />
+        <EmptyShell onClose={closeMini} onExpand={expandToPanel} dragHandlers={dragHandlers} />
       )}
       <PlanDiffReview />
-    </motion.div>
+      {/* Resize handles — only active in focused mode */}
+      {resizeHandle("n", "inset-x-2 top-0 h-1.5 cursor-n-resize")}
+      {resizeHandle("s", "inset-x-2 bottom-0 h-1.5 cursor-s-resize")}
+      {resizeHandle("w", "inset-y-2 left-0 w-1.5 cursor-w-resize")}
+      {resizeHandle("e", "inset-y-2 right-0 w-1.5 cursor-e-resize")}
+      {resizeHandle("nw", "left-0 top-0 h-3 w-3 cursor-nw-resize")}
+      {resizeHandle("ne", "right-0 top-0 h-3 w-3 cursor-ne-resize")}
+      {resizeHandle("sw", "left-0 bottom-0 h-3 w-3 cursor-sw-resize")}
+      {resizeHandle("se", "right-0 bottom-0 h-3 w-3 cursor-se-resize")}
+    </div>,
+    document.body,
   );
 }
+
+type HeaderDragHandlers = {
+  onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => void;
+  onPointerMove: (e: React.PointerEvent<HTMLDivElement>) => void;
+  onPointerUp: (e: React.PointerEvent<HTMLDivElement>) => void;
+  style?: React.CSSProperties;
+} | undefined;
 
 function Body({
   sessionId,
   onClose,
   onExpand,
+  dragHandlers,
 }: {
   sessionId: string;
   onClose: () => void;
   onExpand: () => void;
+  dragHandlers: HeaderDragHandlers;
 }) {
   const focusInput = useChatStore((s) => s.focusInput);
   const step = useChatStore((s) => s.agentMeta.step);
@@ -138,6 +341,7 @@ function Body({
         onClose={onClose}
         onExpand={onExpand}
         messages={helpers.messages}
+        dragHandlers={dragHandlers}
       />
 
       <PlanModeStrip />
@@ -191,9 +395,11 @@ function PlanModeStrip() {
 function EmptyShell({
   onClose,
   onExpand,
+  dragHandlers,
 }: {
   onClose: () => void;
   onExpand: () => void;
+  dragHandlers: HeaderDragHandlers;
 }) {
   return (
     <>
@@ -202,6 +408,7 @@ function EmptyShell({
         isBusy={false}
         onClose={onClose}
         onExpand={onExpand}
+        dragHandlers={dragHandlers}
       />
       <div className="flex flex-1 items-center justify-center text-[11px] text-muted-foreground">
         Loading sessions…
@@ -215,18 +422,30 @@ function Header({
   isBusy,
   onClose,
   messages,
+  dragHandlers,
 }: {
   step: string | null;
   isBusy: boolean;
   onClose: () => void;
   onExpand: () => void;
   messages?: UIMessage[];
+  dragHandlers: HeaderDragHandlers;
 }) {
   const customAgents = useAgentsStore((s) => s.customAgents);
   void customAgents;
 
+  const scrollToTop = useCallback(() => {
+    window.dispatchEvent(new Event("atlas:scroll-chat-top"));
+  }, []);
+
   return (
-    <div className="relative flex h-11 shrink-0 items-center justify-between gap-2 border-b border-border/60 px-3">
+    <div
+      {...dragHandlers}
+      className={cn(
+        "relative flex h-9 shrink-0 items-center justify-between gap-2 border-b border-[#2a2a2a] bg-[#111111] px-2",
+        dragHandlers && "cursor-grab active:cursor-grabbing",
+      )}
+    >
       <div className="flex min-w-0 items-center gap-1.5">
         <AgentSwitcher isMiniWindow />
         {messages !== undefined ? (
@@ -241,6 +460,18 @@ function Header({
           </span>
         ) : null}
         <SessionPicker />
+        {/* Scroll to top of conversation */}
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          onClick={scrollToTop}
+          className="size-5"
+          aria-label="Scroll to top"
+          title="Scroll to top"
+        >
+          <HugeiconsIcon icon={ArrowUp01Icon} size={11} strokeWidth={1.75} />
+        </Button>
         <Button
           type="button"
           size="icon"
@@ -396,7 +627,6 @@ function SessionRow({
   return (
     <DropdownMenuItem
       onSelect={(e) => {
-        // Don't dismiss if user clicked the trash icon — handle below.
         const target = e.target as HTMLElement | null;
         if (target?.closest("[data-session-delete]")) {
           e.preventDefault();

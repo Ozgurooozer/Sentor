@@ -1,7 +1,7 @@
 import type { UIMessage } from "@ai-sdk/react";
 import { DirectChatTransport } from "ai";
 import { TERMINAL_BUFFER_LINES, type ModelId } from "../config";
-import { createAtlasAgent } from "./agent";
+import { createAtlasAgent, type ProviderConfigs } from "./agent";
 import type { ProviderKeys } from "./keyring";
 import { native } from "./native";
 import type { ToolContext } from "../tools/tools";
@@ -9,6 +9,45 @@ import type { ToolContext } from "../tools/tools";
 const ATLAS_MD_MAX_BYTES = 32 * 1024;
 type MemoryCacheEntry = { content: string | null; mtime: number };
 const projectMemoryCache = new Map<string, MemoryCacheEntry>();
+
+type SelfContextCacheEntry = { content: string | null; mtime: number };
+const selfContextCache = new Map<string, SelfContextCacheEntry>();
+
+async function readAgentSelfContext(): Promise<string | null> {
+  try {
+    const { useAgentsStore } = await import("@/modules/ai/store/agentsStore");
+    const activeId = useAgentsStore.getState().activeId;
+    const slug = activeId.startsWith("builtin:")
+      ? activeId.slice("builtin:".length)
+      : activeId;
+    const cacheKey = slug;
+    const cached = selfContextCache.get(cacheKey);
+    if (cached && Date.now() - cached.mtime < 15_000) return cached.content;
+    const { invoke } = await import("@tauri-apps/api/core");
+    const snap = await invoke<{
+      agent: string;
+      state: Record<string, unknown>;
+      recent_log: string[];
+      open_projects: string[];
+    }>("vault_agent_snapshot", { slug });
+    const lines = [`## AGENT SELF-CONTEXT [${snap.agent}]`];
+    const st = snap.state ?? {};
+    if (st.status) lines.push(`status: ${String(st.status)}`);
+    if (st.focus) lines.push(`focus: ${String(st.focus)}`);
+    if (st.updated) lines.push(`updated: ${String(st.updated)}`);
+    if (snap.open_projects.length > 0)
+      lines.push(`open_projects: ${snap.open_projects.join(", ")}`);
+    if (snap.recent_log.length > 0) {
+      lines.push("recent_log (last 10):");
+      snap.recent_log.slice(-10).forEach((l) => lines.push(`  ${l}`));
+    }
+    const content = lines.join("\n");
+    selfContextCache.set(cacheKey, { content, mtime: Date.now() });
+    return content;
+  } catch {
+    return null;
+  }
+}
 
 async function readAtlasMd(workspaceRoot: string | null): Promise<string | null> {
   if (!workspaceRoot) return null;
@@ -50,12 +89,11 @@ type Deps = {
   getCustomInstructions: () => string;
   getAgentPersona: () => { name: string; instructions: string } | null;
   getLive: () => LiveSnapshot;
-  getLmstudioBaseURL?: () => string | undefined;
-  getOllamaBaseURL?: () => string | undefined;
-  getLmstudioModelId?: () => string | undefined;
-  getOllamaModelId?: () => string | undefined;
+  /** Per-provider base URL + model overrides. */
+  getProviders?: () => ProviderConfigs;
   onStep?: (step: string | null) => void;
   getPlanMode?: () => boolean;
+  getAgentToolset?: () => string[] | undefined;
 };
 
 export function createContextAwareTransport(deps: Deps) {
@@ -65,7 +103,10 @@ export function createContextAwareTransport(deps: Deps) {
       [k: string]: unknown;
     }) {
       const live = deps.getLive();
-      const projectMemory = await readAtlasMd(live.workspaceRoot);
+      const [projectMemory, agentSelfContext] = await Promise.all([
+        readAtlasMd(live.workspaceRoot),
+        readAgentSelfContext(),
+      ]);
       const agent = await createAtlasAgent({
         keys: deps.getKeys(),
         modelId: deps.getModelId(),
@@ -73,12 +114,11 @@ export function createContextAwareTransport(deps: Deps) {
         agentPersona: deps.getAgentPersona(),
         toolContext: deps.toolContext,
         onStep: deps.onStep,
-        lmstudioBaseURL: deps.getLmstudioBaseURL?.(),
-        ollamaBaseURL: deps.getOllamaBaseURL?.(),
-        lmstudioModelId: deps.getLmstudioModelId?.(),
-        ollamaModelId: deps.getOllamaModelId?.(),
+        providers: deps.getProviders?.(),
         planMode: deps.getPlanMode?.(),
         projectMemory,
+        agentSelfContext,
+        toolset: deps.getAgentToolset?.(),
       });
       const base = new DirectChatTransport({ agent });
       const augmented = injectContext(options.messages, deps.getLive());
@@ -89,7 +129,10 @@ export function createContextAwareTransport(deps: Deps) {
     },
     async reconnectToStream(options: unknown) {
       const live = deps.getLive();
-      const projectMemory = await readAtlasMd(live.workspaceRoot);
+      const [projectMemory, agentSelfContext] = await Promise.all([
+        readAtlasMd(live.workspaceRoot),
+        readAgentSelfContext(),
+      ]);
       const agent = await createAtlasAgent({
         keys: deps.getKeys(),
         modelId: deps.getModelId(),
@@ -97,12 +140,11 @@ export function createContextAwareTransport(deps: Deps) {
         agentPersona: deps.getAgentPersona(),
         toolContext: deps.toolContext,
         onStep: deps.onStep,
-        lmstudioBaseURL: deps.getLmstudioBaseURL?.(),
-        ollamaBaseURL: deps.getOllamaBaseURL?.(),
-        lmstudioModelId: deps.getLmstudioModelId?.(),
-        ollamaModelId: deps.getOllamaModelId?.(),
+        providers: deps.getProviders?.(),
         planMode: deps.getPlanMode?.(),
         projectMemory,
+        agentSelfContext,
+        toolset: deps.getAgentToolset?.(),
       });
       const base = new DirectChatTransport({ agent });
       type ReconnectArg = Parameters<typeof base.reconnectToStream>[0];

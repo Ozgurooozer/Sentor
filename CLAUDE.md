@@ -31,6 +31,13 @@ python cli/atlas.py <cmd>   # index | search "query" | list [category] | open ca
 python tools/test_api.py
 ```
 
+**Run the MCP server** (stdio JSON-RPC; for Claude Code / Cursor / Continue):
+```bash
+python tools/mcp_server.py        # speaks MCP on stdin/stdout
+```
+Register in an MCP client (e.g. `.mcp.json`) so external assistants can query
+the vault without opening the IDE.
+
 **Start IDE** (API server optional — IDE works offline for keyword search):
 ```bash
 # Windows launcher — starts API then IDE
@@ -97,7 +104,7 @@ ide/                                 ← Tauri v2 + React AI IDE
 
 **app.js** — 3-state view machine: `empty` → `no-results` → `results`. Category nav built once at boot. Fuse.js weights: title(3) > headings/desc(2) > body(1), threshold 0.35, `ignoreLocation: true`. All user content via `textContent`; only category badge uses `innerHTML` after `escapeHtml()`.
 
-**Scoring (CLI + API):** title(3) > headings/desc(2) > body(1). This function is **intentionally duplicated** in `cli/atlas.py` and `api/server.py` so each file is independently runnable. Keep them in sync manually.
+**Scoring (CLI + API):** title(3) > headings/desc(2) > body(1). Shared module at `tools/scoring.py` — both `cli/atlas.py` and `api/server.py` `sys.path.insert("tools/")` then `from scoring import score as _score, passes_default_filter as _passes_default_filter, DEFAULT_EXCLUDE_TYPES`. Edit the shared module, not the call sites.
 
 **API endpoints** (port 4242):
 - `GET /api/search?q=&limit=&category=` — keyword search (TF-IDF-style)
@@ -121,6 +128,7 @@ ide/src-tauri/src/
     pty/              ← portable-pty terminal emulator
     shell/            ← shell_run_command, session management, bg process management
     secrets.rs        ← OS keyring (keyring crate, platform-native)
+    sentor.rs         ← `sentor_api` Tauri command; proxies GET/POST to local Flowise at port 3000
     web.rs            ← web_search (SearXNG JSON API) + web_fetch (reqwest + scraper)
     webview.rs        ← native child WebView: web_open/navigate/set_bounds/set_visible/close/go
 ```
@@ -129,6 +137,12 @@ ide/src-tauri/src/
 
 **fs path normalization:** `modules/fs/to_canon()` always returns forward-slash paths to the frontend, on all platforms.
 
+**MCP bridge (`modules/mcp.rs`):** `mcp_dequeue` reads + atomically clears `ROOT/.mcp-queue.json`. `mcp_export_state` writes the live canvas snapshot to `ROOT/.ide-state.json`. `mcp_watch_start` starts a `notify` filesystem watcher on the queue file and emits `atlas:mcp-cmd` on each write — the frontend drains the queue on every event, with a 30s polling timer as a defensive fallback. The watcher is singleton (idempotent), kept in a `static Mutex<Option<RecommendedWatcher>>`.
+
+This bridge handles **external→IDE commands** (queue file pushed by the REST API). The complementary direction — **external assistants reading the vault** — is served by the stand-alone `tools/mcp_server.py` (stdio JSON-RPC), which runs independently of the IDE and reuses `tools/scoring.py` so its results match the CLI/API. Two surfaces, one mental model: queue file for state mutations, MCP stdio server for read access.
+
+**Cross-platform guards:** `set_click_through` is `#[cfg(target_os = "windows")]`-gated (Win32 `SetWindowRgn`); the non-Windows branch is a no-op `Ok(())`. UI surfaces a "Windows-only" hint in Settings → General. Linux support is a future task — `notify` already produces cross-platform watcher events.
+
 ### Frontend module structure
 
 ```
@@ -136,7 +150,9 @@ ide/src/modules/
   ai/
     config.ts           ← 2 local providers (LM Studio, Ollama), 2 models; compact SYSTEM_PROMPT (~120 tokens)
     lib/
-      agent.ts          ← agent runner loop; buildLanguageModel (+ toDevProxyURL CORS fix) + createAtlasAgent
+      agent.ts          ← agent runner loop; `ProviderConfig`/`ProviderConfigs` types,
+                          `buildLanguageModel(provider, keys, modelId, { providers })`,
+                          `createAtlasAgent`, `toDevProxyURL` (dev CORS proxy)
       agents.ts         ← 3 built-in agents: Vault (default), Atlas-Maker, Coder
       transport.ts      ← AI HTTP transport (DirectChatTransport + live context injection)
       composer.tsx      ← React context for shared input state (text, files, voice, snippets)
@@ -160,9 +176,12 @@ ide/src/modules/
       todoStore.ts      ← todo list state
     tools/
       tools.ts          ← buildTools (aggregates all tool modules)
-      fs.ts, edit.ts, search.ts, shell.ts, terminal.ts, todo.ts, subagent.ts, vault.ts, web.ts, context.ts
+      fs.ts, edit.ts, search.ts, shell.ts, terminal.ts, todo.ts, subagent.ts, vault.ts, web.ts, sentor.ts, context.ts
     hooks/
-      useWhisperRecording.ts  ← voice input via Whisper
+      useSpeechRecognition.ts ← voice input via `window.SpeechRecognition`
+                                (browser-native; the file used to be called
+                                `useWhisperRecording` — that name was misleading
+                                since no Whisper model is involved)
   browser/              ← Vault + Web browser panes, AddressBar, BrowserStack, bookmarks, assetUrl
   vault-home/           ← VaultHomePane — startup search tab over vault pages
   editor/               ← CodeMirror 6 editor with syntax highlighting, vim mode, inline AI autocomplete, wiki-link autocomplete
@@ -180,7 +199,19 @@ ide/src/modules/
   graph/                ← graph visualization
 ```
 
-**Agents (current):** Three built-in agents — **Vault** (default, research + memory), **Atlas-Maker** (writes vault HTML pages), **Coder** (edits source files). Subagent types: `explore` + `general` only. Do not add new agents without checking `ATLAS_PLAN.md`.
+**App-level components** (`ide/src/app/`):
+- `App.tsx` — root layout, tab orchestration, settings/mini-window wiring, `layoutMode` switching
+- `FocusedChatCenter.tsx` — `FocusedBar` component rendered in focused overlay mode (bottom bar only)
+- `hooks/useApiKeys.ts` — load provider keys + listen for `atlas:keys-changed`
+- `hooks/useDiffReloadTrigger.ts` — reload editor tabs when an AI diff is approved
+- `hooks/useLeafLifecycle.ts` — dispose terminal sessions when their pane-tree leaves disappear; prune per-leaf ref maps
+- `hooks/useMcpBridge.ts` — export canvas state + drain `.mcp-queue.json` on `atlas:mcp-cmd` events (and 30s fallback)
+- `hooks/useVaultTrashCleanup.ts` — sweep `.vault-trash/` of >7-day-old backups on startup
+
+**Shared lib** (`ide/src/lib/`):
+- `safeInvoke.ts` — fire-and-forget Tauri `invoke` wrapper that logs rejections through `console.error` (and the log store) instead of swallowing them silently. Use this for cleanup handlers, periodic background sync, and any `void invoke(...)` site. For user-initiated actions where the error should surface to the UI, use `invoke(...).then(...).catch(...)` directly.
+
+**Agents (current):** Three built-in agents — **Vault** (default, research + memory), **Atlas-Maker** (writes vault HTML pages), **Coder** (edits source files). Subagent types: `explore` + `general` only. Adding a fourth agent means broader scope creep — keep the set to three unless there's a concrete user-facing reason.
 
 **Fast Refresh:** Fixed — `useComposer` lives in `useComposer.ts`, `useTheme` lives in `useTheme.ts`. Do not re-merge hooks back into component files.
 
@@ -190,9 +221,13 @@ ide/src/modules/
 
 **CORS in dev mode:** `vite.config.ts` proxies `/lmstudio-proxy` → `:1234` and `/ollama-proxy` → `:11434` at the Node level, bypassing browser CORS. `agent.ts:toDevProxyURL()` rewrites localhost provider URLs to these proxy paths when `import.meta.env.DEV` is true. In production Tauri builds, providers must have CORS enabled in their own settings.
 
-**Model ID override:** `lmstudioChatModelId` / `ollamaChatModelId` preferences hold the exact model string sent to the provider (e.g. `google/gemma-4-e4b`). Empty = provider default. Set via Settings → Models → "Chat model identifier". Threaded through: `chatStore` → `transport` → `createAtlasAgent` → `buildLanguageModel(modelIdOverride)`.
+**Provider config shape:** `ProviderConfig = { baseURL?: string; modelId?: string }` and `ProviderConfigs = Partial<Record<ProviderId, ProviderConfig>>` live in `agent.ts`. `chatStore.getProviders()` assembles the map from preferences (`lmstudioBaseURL`, `lmstudioChatModelId`, …) and threads it through `transport` → `createAtlasAgent` → `buildLanguageModel(provider, keys, modelId, { providers })`. Adding a new provider is one entry in this map, not two extra `AgentDeps` fields. Empty string / missing entry = provider default. Set via Settings → Models → "Chat model identifier".
 
 **Tool approval policy:** Read-only tools (read_file, list_directory, grep, glob) auto-execute after security check. Mutating tools (write_file, edit, multi_edit, create_directory, bash_*) require user approval. `edit`/`multi_edit` additionally enforce read-before-edit via `readCache`.
+
+**Vault write backup:** `vault_write` (in `tools/vault.ts`) reads any existing `index.html` at the target path before overwriting and copies it to `.vault-trash/{category}/{slug}-{iso-timestamp}.html`. The trash path comes back in the tool result as `previousVersion` so the user can restore by hand. `useVaultTrashCleanup` sweeps the directory on IDE startup and deletes any file with `mtime` older than 7 days.
+
+**Sentor integration:** Sentor is a local [Flowise](https://flowiseai.com) visual-agent-flow runner at `http://127.0.0.1:3000`. `sentor.rs` exposes a `sentor_api` Tauri command that proxies raw GET/POST calls to its REST API. `tools/sentor.ts` wraps this into two agent tools (`sentor_list_flows`, `sentor_run_flow`) plus lifecycle helpers (`startSentorIfNeeded`, `waitForSentor`, `stopSentor`) that launch `start-sentor.bat` in the configured Sentor path before first use. Sentor path is stored in settings; if unset, Sentor tools are a no-op.
 
 ---
 
@@ -210,9 +245,9 @@ Read `interface-setup/.interface-design/system.md` before touching any UI. Key r
 
 **Typography:** `system-ui` font stack only. No Google Fonts.
 
-**Transitions:** 150ms ease-out only.
+**Transitions:** 150ms ease-out only. Tailwind `transition-{property} duration-150 ease-out`, optionally with `tw-animate-css` utilities (`animate-in fade-in slide-in-from-*`) for mount enter animations. Continuous loops use plain CSS `@keyframes` in `styles/globals.css` (see `atlas-shimmer`).
 
-**Forbidden:** gradient backgrounds, box-shadows, colorful large blocks, rounded corners beyond `rounded-lg`, external animation libraries.
+**Forbidden:** gradient backgrounds, box-shadows, colorful large blocks, rounded corners beyond `rounded-lg`, external animation runtimes (`motion/react`, `framer-motion`, etc. — they were removed in the v0.6 cleanup; use the patterns above instead).
 
 ---
 
@@ -236,8 +271,6 @@ Read `interface-setup/.interface-design/system.md` before touching any UI. Key r
 
 ## Roadmap
 
-The full build plan is in **`ATLAS_PLAN.md`**.
-
 ### Completed phases
 
 | Phase | Description |
@@ -248,6 +281,28 @@ The full build plan is in **`ATLAS_PLAN.md`**.
 | C | Auto re-index after `vault_write` via `findPython()` helper |
 | D | **Browser tabs** — Vault tab (asset:// iframe) + Web tab (native child WebView using Tauri `unstable` feature); address bar, back/forward, bookmarks, SearXNG search |
 | E | Vault Home tab — startup search front door over the user's own knowledge base |
+| F | **Release-quality cleanup** — see "Phase F notes" below |
+
+### Phase F notes (v0.6 cleanup)
+
+What changed from the rough v0.5 codebase:
+
+- **Security / correctness:** `api/server.py` `_static` switched from `startswith()` to `Path.is_relative_to()` (closes the `C:\Atlas OS-evil` traversal); `HTTPServer.allow_reuse_address = True` (no more 60s TIME_WAIT after Ctrl+C); all background `_cli_run` / `_cli_pipeline_run` / `_node_run` threads now wrap their work in `try/except` and print errors instead of swallowing them silently.
+- **AI internals:** `AgentDeps` flat per-provider fields collapsed into `providers: ProviderConfigs`. Adding a provider no longer touches 7 files. `chatStore.getProviders()` is the single source of truth.
+- **Silent failures:** new `lib/safeInvoke.ts` for fire-and-forget Tauri calls. `WebBrowserPane` and `App.tsx` MCP bridge use it; `AgentStatusPill` + `AiChat.tsx` error banner surface `agentMeta.error` so a crashed agent no longer hangs on "Thinking…".
+- **MCP polling → events:** Rust `mcp_watch_start` (`notify` crate) emits `atlas:mcp-cmd` on queue file change; frontend drains on each event and keeps a 30s defensive timer.
+- **MCP read surface:** `tools/mcp_server.py` (stdio, zero-dep) exposes `vault_search` / `vault_read` / `vault_categories` / `vault_pages` so external MCP clients (Claude Code, Cursor, Continue, Cline) can browse the vault without opening the IDE. Code graph tools stay IDE-bound for now — graph index lives in the Tauri process.
+- **Vault undo:** `vault_write` backs up the prior `index.html` to `.vault-trash/{cat}/{slug}-{ts}.html` before overwriting. `useVaultTrashCleanup` deletes >7-day-old backups on IDE startup.
+- **Onboarding:** new `StepIndex` (probe `.index/pages.json`, "Build now" → `python tools/indexer.py`). `StepProvider` gained an `all-minilm` model check + "Pull now" button (calls `ollama pull all-minilm` via `shell_run_command`).
+- **App.tsx:** five custom hooks extracted to `app/hooks/` (see "App-level components" above). 1610 → 1517 lines. Layout JSX split into `WorkspaceLayout` / `FocusedLayout` is still open — left for the next pass.
+- **Bundle hygiene:** `motion/react` removed (10 call sites → Tailwind + `tw-animate-css`). D3 default-import replaced with named imports so Rollup tree-shakes the unused force/zoom modules. Scoring duplication between `cli/atlas.py` and `api/server.py` consolidated into `tools/scoring.py`. `ort` ships with the `tls-rustls` feature so `ort-sys ≥ rc.10` builds (its `download-binaries` build script needs an explicit `ureq3` TLS provider).
+- **Misc renames:** `useWhisperRecording` → `useSpeechRecognition` (the hook was always using `window.SpeechRecognition`, never Whisper). The `c:\\Atlas OS` hardcoded workspace fallback in `App.tsx` was replaced with a memoised `home`-derived path.
+
+What is explicitly deferred:
+
+- **Layout JSX split** — `<WorkspaceLayout>` / `<FocusedLayout>` extraction from App.tsx's 1300-line JSX trunk. Needs manual UI testing across both modes; do it as its own PR.
+- **Vault undo snackbar** — the backend backup is done, but there's no in-app "Undo (5s)" surface yet. The tool result already returns `previousVersion` if a UI needs to wire it up.
+- **Linux / macOS click-through** — `set_click_through` is `#[cfg(target_os = "windows")]`. Adding X11 shape regions / macOS NSView event passthrough is its own piece of work.
 
 ### Browser tab architecture (Phase D)
 
@@ -264,6 +319,18 @@ Native WebView notes:
 - Bounds pushed via `ResizeObserver` + `requestAnimationFrame` debounce → `web_set_bounds`.
 - `web://nav-changed` event emitted by Rust when page navigates itself (link clicks, redirects) — syncs address bar.
 
-### Next (Phase F)
+### Focused Overlay Mode (v0.2)
 
-Polish — backlinks panel, mermaid editor preview, graph view, voice-to-vault.
+`layoutMode: "classic" | "focused"` preference (Settings → General). In focused mode the window is transparent and always-on-top; only a 148px bottom bar (`FocusedBar`) is opaque. The desktop is visible through the rest.
+
+Key implementation details:
+- `transparent: true` set in `tauri.conf.json`; entering focused mode also auto-resizes the window to full-width × 180px at the bottom of the screen (`setSize`/`setPosition` via Tauri `currentMonitor`).
+- `FocusedBar` (`ide/src/app/FocusedChatCenter.tsx`) — left: mini terminal strip, right: logo row (`data-tauri-drag-region`) + gear/chat icon buttons + `AiInputBar`.
+- `AiMiniWindow` gains `isFocused` (enables in-window pointer-drag) and `onBoundsChange` (reports its `DOMRect` for click-through region updates) props.
+- **Click-through** (`Ctrl+Alt+P`, `"layout.toggleClickThrough"`): calls `set_click_through` Tauri command (Windows-only, `lib.rs:set_click_through`) which uses `SetWindowRgn` Win32 API to make the transparent area pass mouse events to the desktop. The hit region is always bar ∪ chat balloon (when open); all coordinates in physical pixels (`logical × devicePixelRatio`).
+- Shortcuts: `Ctrl+Alt+F` (`"layout.toggleFocused"`), `Ctrl+Alt+P` (`"layout.toggleClickThrough"`). (`Ctrl+Shift+F` is taken by `explorer.search` on Windows.)
+- Chat balloon auto-opens when `agentMeta.status === "thinking"` in focused mode (G6 in `OVERLAY_PLAN.md`).
+
+### Next (Phase G — feature polish)
+
+Now that the v0.6 cleanup is in: backlinks panel UX, mermaid editor preview, richer graph view interactions, voice-to-vault flow, plus the three deferred items listed above (layout JSX split, vault undo snackbar, cross-platform click-through).

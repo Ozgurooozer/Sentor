@@ -1,11 +1,15 @@
 import type { ProviderId } from "@/modules/ai/config";
-import { ComputerIcon, CpuIcon } from "@hugeicons/core-free-icons";
+import { AiBrain01Icon, AiScanIcon, ApiIcon, ChipIcon, ComputerIcon, CpuIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
-const ICON_BY_PROVIDER = {
+const ICON_BY_PROVIDER: Record<ProviderId, typeof ComputerIcon> = {
   lmstudio: ComputerIcon,
   ollama: CpuIcon,
-} as const satisfies Record<ProviderId, typeof ComputerIcon>;
+  openai: AiScanIcon,
+  anthropic: AiBrain01Icon,
+  groq: ChipIcon,
+  custom: ApiIcon,
+};
 
 type Props = {
   provider: ProviderId;

@@ -1,6 +1,8 @@
 # Atlas OS
 
-A local-first second brain — personal knowledge base, AI IDE, and web browser in one desktop app.
+**A local-first second brain.** Personal knowledge base + AI IDE + web browser — offline, no cloud, no API keys.
+
+> **Platform:** Windows 10/11 64-bit · **Requirements:** 8 GB RAM · Python 3.10+ · Node.js 20+ · Rust toolchain · *(Optional)* Ollama for semantic search
 
 ## What it is
 
@@ -30,17 +32,19 @@ Three jobs:
 | Web search | SearXNG JSON API (self-hosted or public instance) |
 | Indexer | Python stdlib — zero dependencies |
 
-## Quick Start
+## Installation (Windows)
 
-**Prerequisites:** Node.js, Rust toolchain, Python 3, a running LM Studio or Ollama instance.
+**Recommended:** Download the latest installer from [Releases](../../releases/latest), run it, done. The first-run wizard walks you through four short steps: pick a vault folder, probe local AI providers (LM Studio + Ollama, with a one-click `all-minilm` pull), build the vault index, and optionally start SearXNG for web search.
+
+**From source:**
 
 ```bash
 # 1 — Clone
 git clone https://github.com/YOUR_USERNAME/atlas-os
 cd atlas-os
 
-# 2 — Install IDE dependencies
-cd ide && npm install && cd ..
+# 2 — Install IDE dependencies (requires pnpm)
+cd ide && pnpm install && cd ..
 
 # 3 — Index your vault (creates .index/)
 python tools/indexer.py
@@ -49,10 +53,24 @@ python tools/indexer.py
 atlas-ide.bat
 ```
 
-Or run the IDE directly:
+Or run the IDE directly in dev mode:
 
 ```bash
 cd ide && npm run tauri dev
+```
+
+### Optional: Semantic search (Ollama)
+
+```bash
+# Install Ollama from https://ollama.com/download/windows then:
+ollama pull all-minilm
+python tools/embedder.py
+```
+
+### Optional: Web search (SearXNG via Docker)
+
+```bash
+docker run -d -p 8888:8080 --name searxng searxng/searxng
 ```
 
 ## IDE Features
@@ -66,7 +84,7 @@ cd ide && npm run tauri dev
 | **Editor** | CodeMirror 6 with syntax highlighting, vim mode, inline AI autocomplete |
 | **Terminal** | PTY-backed xterm.js, multi-pane |
 | **Explorer** | File tree with context menu, file icons |
-| **Voice input** | Whisper-powered speech-to-text in chat |
+| **Voice input** | Browser-native speech-to-text in chat (uses your OS / Chromium speech recognition; no audio leaves your machine on Windows) |
 
 ## Vault
 
@@ -102,6 +120,30 @@ GET /api/pages
 ```
 
 Start: `python api/server.py` (default port 4242)
+
+## MCP server (Claude Code, Cursor, Continue, …)
+
+`tools/mcp_server.py` speaks the Model Context Protocol on stdio so any MCP
+client can read your vault without opening the IDE.
+
+Tools exposed: `vault_search`, `vault_read`, `vault_categories`, `vault_pages`.
+
+Register in your client's MCP config (e.g. `.mcp.json` for Claude Code):
+
+```json
+{
+  "mcpServers": {
+    "atlas": {
+      "command": "python",
+      "args": ["C:/Atlas OS/tools/mcp_server.py"],
+      "env": { "ATLAS_VAULT_ROOT": "C:/Atlas OS" }
+    }
+  }
+}
+```
+
+Code-graph tools (`code_search`, `code_callers`, …) are still IDE-bound — the
+graph index lives in the Tauri process. Use the in-IDE chat for those.
 
 ## Browser Search UI
 
@@ -153,6 +195,27 @@ ide/                                 ← Tauri v2 desktop app
 - Vault pages are plain HTML — readable by any browser, not locked in
 - Fewer lines > more lines
 
+## Troubleshooting
+
+| Problem | Solution |
+|---|---|
+| "Ollama not found" | Install from [ollama.com/download/windows](https://ollama.com/download/windows), then `ollama pull all-minilm` |
+| API server won't start | Check port 4242 isn't already used: `netstat -an \| findstr 4242` |
+| Blank screen on launch | Check `~/.atlas/logs/` for errors; try Settings → Reset Window |
+| Search returns no results | Run `python tools/indexer.py` to re-index the vault |
+| Semantic search empty | Run `python tools/embedder.py` (requires Ollama) |
+| SmartScreen warning on install | Click "More info" → "Run anyway" (installer is unsigned in early releases) |
+| Accidentally overwrote a vault page via AI | The previous version is in `.vault-trash/{category}/{slug}-{timestamp}.html`. Backups older than 7 days are removed on next IDE launch. |
+| Build fails on `ort-sys` with a "TLS feature must be configured" error | Make sure `Cargo.toml` has `ort = { version = "2.0.0-rc.9", features = ["tls-rustls"] }`. The `tls-rustls` feature is required from `ort-sys ≥ rc.10`. |
+
+## Security
+
+- The REST API (`localhost:4242`) and MCP server (`localhost:4244`) are **loopback-only** and require a Bearer token.
+- The token is generated on first launch and stored at `~/.atlas/api-token` (permissions: 600).
+- See [docs/security.md](docs/security.md) for the full threat model.
+
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE)
+
+Third-party notices: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
