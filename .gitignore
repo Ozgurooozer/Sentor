@@ -55,5 +55,11 @@ ide/src-tauri/gen/schemas/windows-schema.json
 .mcp-queue.json
 .vault-trash/
 
-# Third-party module bundles (Flowise, codegraph)
-modules/
+# Editor / IDE scratch files
+*.bak
+*.orig
+*.rej
+
+# Third-party module bundles (Flowise, codegraph) — root-only.
+# A bare `modules/` would also match ide/src/modules/, ide/src-tauri/src/modules/, etc.
+/modules/

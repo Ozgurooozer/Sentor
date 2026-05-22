@@ -1,0 +1,389 @@
+import { useRef, useCallback, useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
+import { CANVAS_PANEL_MIN_H, CANVAS_PANEL_MIN_W } from "@/lib/constants";
+import { Cancel01Icon, Maximize01Icon, Minimize01Icon, Pin02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { useZoneRegistration, ZoneType } from "@/modules/input";
+import { CanvasPanelContent } from "./CanvasPanelContent";
+import { useCanvasStore } from "./canvasStore";
+import { accentFor, GLOW_ALPHA } from "./nodeAccent";
+import type { CanvasPanelNode, Viewport } from "./types";
+
+const PANEL_ICONS: Record<string, string> = {
+  terminal: ">_",
+  editor: "{}",
+  preview: "◻",
+  "vault-home": "⌂",
+  web: "⊕",
+  chat: "💬",
+  canvas: "⊞",
+  agent: "A",
+  instance: "◈",
+  header: "◆",
+  checklist: "✓",
+  gallery: "⊞",
+  input: "□",
+  pipeline: "↯",
+  codegraph: "⌬",
+};
+
+
+interface Props {
+  panel: CanvasPanelNode;
+  viewport: Viewport;
+  /** Callback from InfiniteCanvas so it can suppress canvas-pan when dragging a panel */
+  onDragStart(): void;
+  onDragEnd(): void;
+  children?: React.ReactNode;
+}
+
+export function CanvasPanel({ panel, viewport, onDragStart, onDragEnd, children }: Props) {
+  const updatePanel = useCanvasStore((s) => s.updatePanel);
+  const removePanel = useCanvasStore((s) => s.removePanel);
+  const bringToFront = useCanvasStore((s) => s.bringToFront);
+  const togglePin = useCanvasStore((s) => s.togglePin);
+  const toggleMinimized = useCanvasStore((s) => s.toggleMinimized);
+
+  const ref = useRef<HTMLDivElement>(null);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [titleDraft, setTitleDraft] = useState(panel.title);
+
+  useZoneRegistration(
+    ref,
+    panel.pinned ? ZoneType.PinnedPanel : ZoneType.Panel,
+    { zIndex: panel.zIndex + 10 },
+  );
+
+  // ── Drag ────────────────────────────────────────────────────────────────────
+  // Pinned panels drag in screen-space; canvas panels drag in canvas-space.
+  const dragState = useRef<{
+    startX: number; startY: number;
+    origX: number; origY: number;
+  } | null>(null);
+
+  const onTitlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.button !== 0) return;
+      e.stopPropagation();
+      bringToFront(panel.id);
+      onDragStart();
+      dragState.current = {
+        startX: e.clientX,
+        startY: e.clientY,
+        origX: panel.pinned ? (panel.screenX ?? 0) : panel.x,
+        origY: panel.pinned ? (panel.screenY ?? 0) : panel.y,
+      };
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    },
+    [panel, bringToFront, onDragStart],
+  );
+
+  const onTitlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!dragState.current) return;
+      const dx = e.clientX - dragState.current.startX;
+      const dy = e.clientY - dragState.current.startY;
+      if (panel.pinned) {
+        // Screen-space: no scale factor
+        updatePanel(panel.id, {
+          screenX: dragState.current.origX + dx,
+          screenY: dragState.current.origY + dy,
+        });
+      } else {
+        // Canvas-space: divide by scale
+        updatePanel(panel.id, {
+          x: dragState.current.origX + dx / viewport.scale,
+          y: dragState.current.origY + dy / viewport.scale,
+        });
+      }
+    },
+    [panel.id, panel.pinned, viewport.scale, updatePanel],
+  );
+
+  const onTitlePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      dragState.current = null;
+      onDragEnd();
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    },
+    [onDragEnd],
+  );
+
+  // ── Resize ───────────────────────────────────────────────────────────────────
+  const resizeState = useRef<{
+    edge: string;
+    startX: number; startY: number;
+    origX: number; origY: number;
+    origW: number; origH: number;
+  } | null>(null);
+
+  const onResizePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>, edge: string) => {
+      if (e.button !== 0) return;
+      e.stopPropagation();
+      bringToFront(panel.id);
+      onDragStart();
+      resizeState.current = {
+        edge,
+        startX: e.clientX, startY: e.clientY,
+        origX: panel.pinned ? (panel.screenX ?? 0) : panel.x,
+        origY: panel.pinned ? (panel.screenY ?? 0) : panel.y,
+        origW: panel.width, origH: panel.height,
+      };
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    },
+    [panel, bringToFront, onDragStart],
+  );
+
+  const onResizePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const s = resizeState.current;
+      if (!s) return;
+      // Pinned panels resize in screen-space (scale = 1); canvas panels use viewport scale
+      const scaleFactor = panel.pinned ? 1 : viewport.scale;
+      const dx = (e.clientX - s.startX) / scaleFactor;
+      const dy = (e.clientY - s.startY) / scaleFactor;
+      let { x, y, w, h } = { x: s.origX, y: s.origY, w: s.origW, h: s.origH };
+
+      if (s.edge.includes("e")) w = Math.max(CANVAS_PANEL_MIN_W, s.origW + dx);
+      if (s.edge.includes("s")) h = Math.max(CANVAS_PANEL_MIN_H, s.origH + dy);
+      if (s.edge.includes("w")) {
+        const nw = Math.max(CANVAS_PANEL_MIN_W, s.origW - dx);
+        x = s.origX + (s.origW - nw);
+        w = nw;
+      }
+      if (s.edge.includes("n")) {
+        const nh = Math.max(CANVAS_PANEL_MIN_H, s.origH - dy);
+        y = s.origY + (s.origH - nh);
+        h = nh;
+      }
+
+      const patch = panel.pinned
+        ? { screenX: x, screenY: y, width: w, height: h }
+        : { x, y, width: w, height: h };
+      updatePanel(panel.id, patch);
+    },
+    [panel.id, panel.pinned, viewport.scale, updatePanel],
+  );
+
+  const onResizePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      resizeState.current = null;
+      onDragEnd();
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    },
+    [onDragEnd],
+  );
+
+  // Esc exits fullscreen
+  useEffect(() => {
+    if (!fullscreen) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") setFullscreen(false); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [fullscreen]);
+
+  const resizeHandle = (edge: string, cls: string) => (
+    <div
+      className={cn("absolute z-10", cls)}
+      onPointerDown={(e) => onResizePointerDown(e, edge)}
+      onPointerMove={onResizePointerMove}
+      onPointerUp={onResizePointerUp}
+    />
+  );
+
+  // Pinned panels render with position:fixed in screen-space (handled by InfiniteCanvas
+  // which wraps them in a fixed overlay). Canvas panels use absolute position inside
+  // the transform layer. The style here handles ONLY the panel's own geometry.
+  // Minimized panels are hidden from canvas — shown in CanvasDock instead.
+  if (panel.minimized) return null;
+
+  // Blueprint-style accent: each panel type carries a distinct border colour
+  // plus a barely-there glow so the canvas reads as a graph of typed nodes.
+  // The header panel chooses its own colour via panel.meta.headerColor.
+  const accent = accentFor(panel);
+
+  const baseStyle: React.CSSProperties = {
+    borderColor: accent,
+    boxShadow: `0 0 12px ${accent}${GLOW_ALPHA}`,
+  };
+
+  const panelStyle: React.CSSProperties = fullscreen
+    ? { position: "fixed", inset: 0, zIndex: 9999, ...baseStyle }
+    : panel.pinned
+      ? {
+          position: "fixed",
+          left: panel.screenX ?? 0,
+          top: panel.screenY ?? 0,
+          width: panel.width,
+          height: panel.height,
+          zIndex: 1000 + panel.zIndex,
+          ...baseStyle,
+        }
+      : {
+          position: "absolute",
+          left: panel.x,
+          top: panel.y,
+          width: panel.width,
+          height: panel.height,
+          zIndex: panel.zIndex,
+          ...baseStyle,
+        };
+
+  return (
+    <div
+      ref={ref}
+      data-canvas-panel
+      style={panelStyle}
+      className={cn(
+        "flex flex-col overflow-hidden rounded-lg",
+        "border bg-[#0a0a0a]/90 backdrop-blur-md",
+        "transition-[border-color,box-shadow] duration-150",
+        panel.pinned && "ring-1 ring-[#5b8def]/30",
+      )}
+      onPointerDownCapture={() => bringToFront(panel.id)}
+    >
+      {/* Title bar — drag handle; double-click anywhere on the bar toggles fullscreen */}
+      <div
+        className="flex h-8 shrink-0 cursor-move select-none items-center gap-2 border-b border-[#2a2a2a] bg-[#222222] px-2"
+        onPointerDown={onTitlePointerDown}
+        onPointerMove={onTitlePointerMove}
+        onPointerUp={onTitlePointerUp}
+        onDoubleClick={() => setFullscreen((v) => !v)}
+      >
+        <span className="text-[10px] text-[#555555]">{PANEL_ICONS[panel.type] ?? "□"}</span>
+        {editingTitle ? (
+          <input
+            autoFocus
+            value={titleDraft}
+            onChange={(e) => setTitleDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                if (titleDraft.trim()) updatePanel(panel.id, { title: titleDraft.trim() });
+                setEditingTitle(false);
+              } else if (e.key === "Escape") {
+                setEditingTitle(false);
+              }
+            }}
+            onBlur={() => {
+              if (titleDraft.trim()) updatePanel(panel.id, { title: titleDraft.trim() });
+              setEditingTitle(false);
+            }}
+            onClick={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            className="min-w-0 flex-1 bg-transparent text-[11px] font-medium text-[#f5f5f5] outline-none"
+          />
+        ) : (
+          <span
+            className="min-w-0 flex-1 truncate text-[11px] font-medium text-[#888888]"
+            onDoubleClick={(e) => { e.stopPropagation(); setTitleDraft(panel.title); setEditingTitle(true); }}
+          >
+            {panel.title}
+          </span>
+        )}
+        {/* Snapshot toggle — freezes the panel's current outputData so
+            downstream wires keep reading the same value while the producer
+            continues to churn. Only meaningful when the panel actually
+            produces wire data. */}
+        {(panel.meta?.outputData != null || panel.meta?.snapshotData != null) && (
+          <button
+            type="button"
+            title={
+              panel.meta?.snapshotData != null
+                ? "Snapshot ON — downstream wires read the frozen value. Click to thaw."
+                : "Snapshot OFF — wires follow live outputData. Click to freeze the current value."
+            }
+            onPointerDown={(e) => e.stopPropagation()}
+            onDoubleClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              const live = panel.meta?.outputData;
+              const snap = panel.meta?.snapshotData;
+              const next = { ...panel.meta } as Record<string, unknown>;
+              if (snap != null) {
+                delete next.snapshotData;
+              } else if (live != null) {
+                next.snapshotData = live;
+              }
+              updatePanel(panel.id, { meta: next });
+            }}
+            className={cn(
+              "flex size-5 items-center justify-center rounded text-[11px] leading-none transition-colors",
+              panel.meta?.snapshotData != null
+                ? "bg-[#5b8def]/20 text-[#5b8def]"
+                : "text-[#555555] hover:bg-[#2a2a2a] hover:text-[#888888]",
+            )}
+          >
+            ❄
+          </button>
+        )}
+        {/* Controls */}
+        <button
+          type="button"
+          title={panel.pinned ? "Unpin — return to canvas" : "Pin — keep visible above canvas"}
+          onPointerDown={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => e.stopPropagation()}
+          onClick={() => togglePin(panel.id)}
+          className={cn(
+            "flex size-5 items-center justify-center rounded transition-colors",
+            panel.pinned
+              ? "bg-[#5b8def]/20 text-[#5b8def]"
+              : "text-[#555555] hover:bg-[#2a2a2a] hover:text-[#888888]",
+          )}
+        >
+          <HugeiconsIcon icon={Pin02Icon} size={11} strokeWidth={1.75} />
+        </button>
+        <button
+          type="button"
+          title="Minimize to dock"
+          onPointerDown={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); toggleMinimized(panel.id); }}
+          className="flex size-5 items-center justify-center rounded text-[#555555] transition-colors hover:bg-[#2a2a2a] hover:text-[#888888]"
+        >
+          <HugeiconsIcon icon={Minimize01Icon} size={11} strokeWidth={1.75} />
+        </button>
+        <button
+          type="button"
+          title={fullscreen ? "Exit fullscreen (Esc)" : "Fullscreen"}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); setFullscreen((v) => !v); }}
+          onDoubleClick={(e) => e.stopPropagation()}
+          className="flex size-5 items-center justify-center rounded text-[#555555] transition-colors hover:bg-[#2a2a2a] hover:text-[#888888]"
+        >
+          <HugeiconsIcon icon={Maximize01Icon} size={11} strokeWidth={1.75} />
+        </button>
+        <button
+          type="button"
+          title="Close"
+          onPointerDown={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => e.stopPropagation()}
+          onClick={() => removePanel(panel.id)}
+          className="flex size-5 items-center justify-center rounded text-[#555555] transition-colors hover:bg-[#2a2a2a] hover:text-red-400"
+        >
+          <HugeiconsIcon icon={Cancel01Icon} size={11} strokeWidth={1.75} />
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="relative min-h-0 flex-1 overflow-hidden">
+        {children ?? <CanvasPanelContent panel={panel} />}
+      </div>
+
+      {/* Resize handles */}
+      {!fullscreen && (
+        <>
+          {resizeHandle("n", "inset-x-2 top-0 h-1 cursor-n-resize")}
+          {resizeHandle("s", "inset-x-2 bottom-0 h-1 cursor-s-resize")}
+          {resizeHandle("w", "inset-y-2 left-0 w-1 cursor-w-resize")}
+          {resizeHandle("e", "inset-y-2 right-0 w-1 cursor-e-resize")}
+          {resizeHandle("nw", "left-0 top-0 h-3 w-3 cursor-nw-resize")}
+          {resizeHandle("ne", "right-0 top-0 h-3 w-3 cursor-ne-resize")}
+          {resizeHandle("sw", "left-0 bottom-0 h-3 w-3 cursor-sw-resize")}
+          {resizeHandle("se", "right-0 bottom-0 h-3 w-3 cursor-se-resize")}
+        </>
+      )}
+    </div>
+  );
+}
