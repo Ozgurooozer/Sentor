@@ -8,6 +8,9 @@ import { ThemeProvider } from "@/modules/theme";
 import { USE_CUSTOM_WINDOW_CONTROLS } from "@/lib/platform";
 import { SettingsApp } from "./SettingsApp";
 
+// Always force dark mode — settings window follows canvas theme.
+document.documentElement.classList.add("dark");
+
 if (USE_CUSTOM_WINDOW_CONTROLS) {
   document.documentElement.dataset.chrome = "borderless";
 }
