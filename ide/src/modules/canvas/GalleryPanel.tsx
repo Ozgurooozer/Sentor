@@ -76,45 +76,19 @@ export function GalleryPanel({ panel }: { panel: CanvasPanelNode }) {
   const selectImage = useCallback(
     async (absPath: string) => {
       try {
-        // Read the file as bytes via the Tauri command, then base64-encode
-        // to build a data URL. asset:// works for <img src> but downstream
-        // wire consumers expect a self-contained dataUrl they can attach.
-        const result = await invoke<{ kind: string; content?: string; size: number }>(
-          "fs_read_file",
-          { path: absPath, asBase64: true },
-        ).catch(async () => {
-          // Fallback: fetch via asset:// (works because the image is in scope).
-          const r = await fetch(localToAsset(absPath));
-          const b = await r.blob();
+        // Fetch via asset:// so the browser handles encoding (works for all types including SVG).
+        const r = await fetch(localToAsset(absPath));
+        if (!r.ok) throw new Error(`fetch ${r.status}`);
+        const b = await r.blob();
+        const dataUrl = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
-          return await new Promise<{ kind: string; content: string; size: number }>(
-            (resolve, reject) => {
-              reader.onload = () =>
-                resolve({
-                  kind: "binary",
-                  content: String(reader.result ?? ""),
-                  size: b.size,
-                });
-              reader.onerror = () => reject(reader.error);
-              reader.readAsDataURL(b);
-            },
-          );
+          reader.onload = () => resolve(String(reader.result ?? ""));
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(b);
         });
-        const dataUrl = result?.content ?? "";
         if (!dataUrl) return;
-        // If the Rust command returned raw base64 without a prefix, wrap it.
-        const ext = absPath.toLowerCase().split(".").pop() || "png";
-        const mime =
-          ext === "svg"
-            ? "image/svg+xml"
-            : ext === "jpg" || ext === "jpeg"
-              ? "image/jpeg"
-              : `image/${ext}`;
-        const finalUrl = dataUrl.startsWith("data:")
-          ? dataUrl
-          : `data:${mime};base64,${dataUrl}`;
         updatePanel(panel.id, { meta: { ...panel.meta, selected: absPath } });
-        setOutputData(panel.id, { kind: "image", value: finalUrl });
+        setOutputData(panel.id, { kind: "image", value: dataUrl });
       } catch (e) {
         setError(String(e));
       }

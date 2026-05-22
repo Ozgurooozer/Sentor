@@ -20,7 +20,8 @@ export function NotePanel({ panelId, initialText = "" }: Props) {
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const v = e.target.value;
-      updatePanel(panelId, { meta: { text: v } });
+      const curMeta = useCanvasStore.getState().panels.find((p) => p.id === panelId)?.meta ?? {};
+      updatePanel(panelId, { meta: { ...curMeta, text: v } });
       setOutputData(panelId, { kind: "text", value: v });
     },
     [panelId, updatePanel, setOutputData],

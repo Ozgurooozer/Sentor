@@ -195,27 +195,26 @@ function CanvasEditor({ panel }: { panel: CanvasPanelNode }) {
   const path = panel.meta?.path as string | undefined;
   const [input, setInput] = useState("");
 
+  type ReadResult = { kind: string; content?: string; size: number };
+  const readToWire = (p: string) =>
+    invoke<ReadResult>("fs_read_file", { path: p })
+      .then((r) => {
+        if (r.kind === "text" && r.content) {
+          setOutputData(panel.id, { kind: "text", value: r.content.slice(0, 4000) });
+        }
+      })
+      .catch(() => undefined);
+
   // Write file content to wire when path changes (initial load).
   useEffect(() => {
     if (!path) return;
-    invoke<string>("fs_read_file", { path })
-      .then((content) => {
-        setOutputData(panel.id, { kind: "text", value: content.slice(0, 4000) });
-      })
-      .catch(() => undefined);
+    void readToWire(path);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path, panel.id, setOutputData]);
 
   // Memoised debounced re-read so the ref stays stable across renders.
   const debouncedReread = useMemo(
-    () =>
-      debounce(() => {
-        if (!path) return;
-        invoke<string>("fs_read_file", { path })
-          .then((content) => {
-            setOutputData(panel.id, { kind: "text", value: content.slice(0, 4000) });
-          })
-          .catch(() => undefined);
-      }, 500),
+    () => debounce(() => { if (path) void readToWire(path); }, 500),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [path, panel.id],
   );
