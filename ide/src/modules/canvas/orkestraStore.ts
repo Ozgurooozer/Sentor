@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { useCanvasStore } from "./canvasStore";
 import { usePreferencesStore } from "@/modules/settings/preferences";
+import { useVariableStore } from "./variableStore";
 import { PORT_DEFS } from "./portDefs";
 import type { PanelType } from "./types";
 
@@ -250,6 +251,34 @@ function execTool(call: ToolCall): string {
       return `NODES:\n${nodes.join("\n") || "(none)"}\nWIRES:\n${wires.join("\n") || "(none)"}`;
     }
 
+    case "var_set": {
+      // {"tool":"var_set","name":"myVar","value":"hello"}
+      const name  = String((call as Record<string, unknown>).name ?? "").trim();
+      const value = (call as Record<string, unknown>).value ?? "";
+      if (!name) return "error: name is required";
+      useVariableStore.getState().setVariable(name, String(value), "any");
+      // Sync any variable panel with matching varName
+      const varPanel = s.panels.find((p) => p.type === "variable" && p.meta?.varName === name);
+      if (varPanel) s.setOutputData(varPanel.id, { kind: "text", value: String(value) });
+      return `set $${name} = ${String(value).slice(0, 60)}`;
+    }
+
+    case "var_get": {
+      // {"tool":"var_get","name":"myVar"}
+      const name = String((call as Record<string, unknown>).name ?? "").trim();
+      if (!name) return "error: name is required";
+      const rec = useVariableStore.getState().getVariable(name);
+      if (!rec) return `$${name} = (undefined)`;
+      return `$${name} = ${String(rec.value).slice(0, 120)}`;
+    }
+
+    case "var_list": {
+      // {"tool":"var_list"}
+      const vars = useVariableStore.getState().listVariables();
+      if (vars.length === 0) return "no variables set";
+      return vars.map((v) => `$${v.name} = ${String(v.value).slice(0, 60)}`).join("\n");
+    }
+
     // Legacy aliases
     case "add_node":      return execTool({ ...call, tool: "add" });
     case "write_terminal":return execTool({ ...call, tool: "run", cmd: call.text });
@@ -292,6 +321,11 @@ function buildSystem(): string {
     return `  ${fa}[${c.fromPort ?? "out"}] →(${c.kind ?? "data"})→ ${ta}[${c.toPort ?? "in"}]`;
   }).join("\n") || "  (none)";
 
+  const vars = useVariableStore.getState().listVariables();
+  const varSection = vars.length > 0
+    ? `\nVARIABLES:\n${vars.map((v) => `$${v.name}=${String(v.value).slice(0, 40)}`).join(" | ")}`
+    : "";
+
   return `Atlas canvas AI. Node editor control. Reply in user's language. Be concise.
 WS:${workspaceRoot}
 NODES:
@@ -308,8 +342,8 @@ set: {"tool":"set","id":"n1","value":"text"}
 rename: {"tool":"rename","id":"n1","title":"Name"}
 remove: {"tool":"remove","id":"n1"}
 clear: {"tool":"clear"}
-PORTS: input→value | terminal in:cmd,trigger out:stdout | chat in:context,data out:response | note→text
-RULES: use n1,n2 aliases; emit all tools at once; prefer build for pipelines`;
+PORTS: input→value | terminal in:cmd,trigger out:stdout | chat in:context,data out:response | note→text | vars: var_set/var_get/var_list
+RULES: use n1,n2 aliases; emit all tools at once; prefer build for pipelines${varSection}`;
 }
 
 // ── Store ─────────────────────────────────────────────────────────────────────
