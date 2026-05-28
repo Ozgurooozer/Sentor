@@ -27,11 +27,12 @@ const _store = new LazyStore("atlas-variables.json", { defaults: {}, autoSave: 4
 
 let _saveTimer: ReturnType<typeof setTimeout> | null = null;
 
-function scheduleFlush(state: VariableState) {
+function scheduleFlush() {
   if (_saveTimer) clearTimeout(_saveTimer);
   _saveTimer = setTimeout(async () => {
     _saveTimer = null;
-    await _store.set("variables", state.variables).catch(() => undefined);
+    const currentVars = useVariableStore.getState().variables;
+    await _store.set("variables", currentVars).catch(() => undefined);
     await _store.save().catch(() => undefined);
   }, 400);
 }
@@ -58,7 +59,7 @@ export const useVariableStore = create<VariableState & VariableActions>((set, ge
       updated = [...get().variables, newVar];
     }
     set({ variables: updated });
-    scheduleFlush({ variables: updated, hydrated: true });
+    scheduleFlush();
   },
 
   getVariable(name) {
@@ -68,7 +69,7 @@ export const useVariableStore = create<VariableState & VariableActions>((set, ge
   removeVariable(name) {
     const updated = get().variables.filter((v) => v.name !== name);
     set({ variables: updated });
-    scheduleFlush({ variables: updated, hydrated: true });
+    scheduleFlush();
   },
 
   listVariables() {
@@ -77,6 +78,7 @@ export const useVariableStore = create<VariableState & VariableActions>((set, ge
 
   async hydrate() {
     if (get().hydrated) return;
+    if (_saveTimer) { clearTimeout(_saveTimer); _saveTimer = null; }
     try {
       const saved = await _store.get<VariableRecord[]>("variables");
       if (Array.isArray(saved)) set({ variables: saved, hydrated: true });
