@@ -4,6 +4,7 @@ import { AgentRunBridge, useChatStore } from "@/modules/ai";
 import { getModel } from "@/modules/ai/config";
 import { AiComposerProvider } from "@/modules/ai/lib/composer";
 import { PinnedPanelsPortal, useCanvasStore } from "@/modules/canvas";
+import { CanvasOrkestraBar } from "@/modules/canvas/CanvasOrkestraBar";
 import { useOrkestraStore } from "@/modules/canvas/orkestraStore";
 import { V3InfiniteCanvas, V3CanvasTopBar, V3SecondaryCanvas } from "@/modules/v3-canvas";
 import { CanvasSettingsOverlay } from "@/modules/canvas/CanvasSettingsOverlay";
@@ -126,6 +127,9 @@ function CanvasAppShellInner() {
       )}
 
       <PinnedPanelsPortal />
+
+      {/* Canvas Orkestra input — floating bottom bar for canvas AI commands */}
+      <CanvasOrkestraBar />
 
       <AgentRunBridge openAiDiffTab={openAiDiffTab} setAiDiffStatus={setAiDiffStatus} />
 
