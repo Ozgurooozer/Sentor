@@ -1,5 +1,6 @@
 ﻿import { create } from "zustand";
 import { LazyStore } from "@tauri-apps/plugin-store";
+import { emitTo } from "@tauri-apps/api/event";
 import { webLayerManager } from "./webLayer/WebLayerManager";
 import type { CanvasPanelNode, Connection, PortSide, PanelType, Viewport } from "./types";
 
@@ -56,10 +57,20 @@ interface CanvasState {
   activeCanvasId: string;
   /** Navigation stack for breadcrumb (array of canvas ids). */
   canvasHistory: string[];
+  /** Currently selected panel IDs (supports multi-select via Shift). */
+  selectedPanelIds: string[];
+  /** Split-view mode — two canvases side-by-side. */
+  isSplit: boolean;
+  secondaryTitle: string;
+  secondaryPanels: CanvasPanelNode[];
+  secondaryConnections: Connection[];
+  secondaryViewport: Viewport;
+  secondaryNextZ: number;
+  secondarySelectedIds: string[];
 }
 
 interface CanvasActions {
-  addPanel(type: PanelType, at?: { x: number; y: number }): string;
+  addPanel(type: PanelType, at?: { x: number; y: number }, initialMeta?: Record<string, unknown>): string;
   ensureSystemCanvas(workspaceRoot: string): void;
   /** Switch the active vault — saves current canvas, loads the vault`s own canvas. */
   switchVault(root: string): Promise<void>;
@@ -73,13 +84,33 @@ interface CanvasActions {
   enterCanvas(id: string): Promise<void>;
   /** Multi-canvas: navigate back in history. */
   exitCanvas(): Promise<void>;
+  /** Rename a canvas record by id. */
+  renameCanvas(id: string, title: string): void;
+  /** Open split view (secondary canvas). */
+  openSplit(): void;
+  /** Close split view. */
+  closeSplit(): void;
+  /** Secondary canvas CRUD. */
+  addSecondaryPanel(type: PanelType): string;
+  updateSecondaryPanel(id: string, patch: Partial<CanvasPanelNode>): void;
+  removeSecondaryPanel(id: string): void;
+  bringSecondaryToFront(id: string): void;
+  setSecondaryViewport(patch: Partial<Viewport>): void;
+  selectSecondaryPanel(id: string, add?: boolean): void;
+  deselectAllSecondary(): void;
+  deleteSecondarySelected(): void;
+  addSecondaryConnection(fromPanel: string, fromSide: PortSide, toPanel: string, toSide: PortSide, fromPort?: string, toPort?: string, kind?: "data" | "context" | "trigger"): string;
+  removeSecondaryConnection(id: string): void;
   removePanel(id: string): void;
   updatePanel(id: string, patch: Partial<CanvasPanelNode>): void;
   bringToFront(id: string): void;
   setViewport(patch: Partial<Viewport>): void;
   togglePin(id: string): void;
   toggleMinimized(id: string): void;
-  addConnection(fromPanel: string, fromSide: PortSide, toPanel: string, toSide: PortSide): string;
+  selectPanel(id: string, addToSelection?: boolean): void;
+  deselectAll(): void;
+  deleteSelected(): void;
+  addConnection(fromPanel: string, fromSide: PortSide, toPanel: string, toSide: PortSide, fromPort?: string, toPort?: string, kind?: "data" | "context" | "trigger"): string;
   removeConnection(id: string): void;
   updateConnectionKind(id: string, kind: "data" | "context" | "trigger"): void;
   /** Per-wire character limit (default 4000, clamped to [100, 32000]). */
@@ -94,6 +125,8 @@ interface CanvasActions {
   updateChildPanel(parentId: string, childId: string, patch: Partial<CanvasPanelNode>): void;
   removeChildPanel(parentId: string, childId: string): void;
   bringChildToFront(parentId: string, childId: string): void;
+  /** Send a command string to a terminal panel by id (same-window, no CustomEvent). */
+  triggerTerminal(panelId: string, cmd: string): void;
 }
 
 const PANEL_DEFAULTS: Record<PanelType, { width: number; height: number; title: string }> = {
@@ -116,6 +149,11 @@ const PANEL_DEFAULTS: Record<PanelType, { width: number; height: number; title: 
   sketch:      { width: 480, height: 360, title: "Sketch" },
   note:        { width: 260, height: 200, title: "Note" },
   tool:        { width: 200, height: 160, title: "Tool" },
+  pipe:        { width: 320, height: 260, title: "Auto-Pipe" },
+  stickman:    { width: 460, height: 520, title: "AtlasBot" },
+  "canvas-3d": { width: 640, height: 480, title: "3D Canvas" },
+  logs:        { width: 560, height: 400, title: "Logs" },
+  audio:       { width: 320, height: 380, title: "Audio" },
 };
 
 const DEFAULT_CANVAS_ID = "main";
@@ -129,8 +167,16 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
   canvases: [{ id: DEFAULT_CANVAS_ID, title: "Main", kind: "workspace" }],
   activeCanvasId: DEFAULT_CANVAS_ID,
   canvasHistory: [DEFAULT_CANVAS_ID],
+  selectedPanelIds: [],
+  isSplit: false,
+  secondaryTitle: "Canvas B",
+  secondaryPanels: [],
+  secondaryConnections: [],
+  secondaryViewport: { x: 0, y: 0, scale: 1 },
+  secondaryNextZ: 1,
+  secondarySelectedIds: [],
 
-  addPanel(type, at) {
+  addPanel(type, at, initialMeta) {
     const id = uid();
     const { viewport, nextZ } = get();
     const defaults = PANEL_DEFAULTS[type];
@@ -145,17 +191,42 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
       height: defaults.height,
       zIndex: nextZ,
       title: defaults.title,
-      meta: {},
+      meta: initialMeta ?? {},
       ...(type === "canvas" ? { viewport: { x: 0, y: 0, scale: 1 }, children: [] } : {}),
     };
     set((s) => ({ panels: [...s.panels, panel], nextZ: s.nextZ + 1 }));
     return id;
   },
 
+  selectPanel(id, addToSelection = false) {
+    set((s) => ({
+      selectedPanelIds: addToSelection
+        ? s.selectedPanelIds.includes(id)
+          ? s.selectedPanelIds.filter((i) => i !== id)
+          : [...s.selectedPanelIds, id]
+        : [id],
+    }));
+  },
+
+  deselectAll() {
+    set({ selectedPanelIds: [] });
+  },
+
+  deleteSelected() {
+    const ids = get().selectedPanelIds;
+    if (ids.length === 0) return;
+    set((s) => ({
+      panels: s.panels.filter((p) => !ids.includes(p.id)),
+      connections: s.connections.filter((c) => !ids.includes(c.fromPanel) && !ids.includes(c.toPanel)),
+      selectedPanelIds: [],
+    }));
+  },
+
   removePanel(id) {
     set((s) => ({
       panels: s.panels.filter((p) => p.id !== id),
       connections: s.connections.filter((c) => c.fromPanel !== id && c.toPanel !== id),
+      selectedPanelIds: s.selectedPanelIds.filter((i) => i !== id),
     }));
   },
 
@@ -210,9 +281,13 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
     }
   },
 
-  addConnection(fromPanel, fromSide, toPanel, toSide) {
+  addConnection(fromPanel, fromSide, toPanel, toSide, fromPort, toPort, kind) {
     const id = uid();
-    set((s) => ({ connections: [...s.connections, { id, fromPanel, fromSide, toPanel, toSide }] }));
+    const conn: import("./types").Connection = { id, fromPanel, fromSide, toPanel, toSide };
+    if (fromPort) conn.fromPort = fromPort;
+    if (toPort) conn.toPort = toPort;
+    if (kind) conn.kind = kind;
+    set((s) => ({ connections: [...s.connections, conn] }));
     return id;
   },
 
@@ -236,6 +311,7 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
   },
 
   setOutputData(id, data) {
+    const panel = get().panels.find(p => p.id === id);
     set((s) => ({
       panels: s.panels.map((p) => {
         if (p.id !== id) return p;
@@ -247,6 +323,11 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
         return { ...p, meta: { ...p.meta, outputData: data } };
       }),
     }));
+    // Forward to linked V3 window if configured
+    if (panel?.windowLabel && data !== null) {
+      const payload = typeof data.value === "string" ? data.value : JSON.stringify(data.value ?? "");
+      void emitTo(panel.windowLabel, "atlas:wire-data", { panelId: id, data: payload });
+    }
   },
 
   loadBlueprint({ panels: bpPanels, connections: bpConns, offsetX = 60, offsetY = 60 }) {
@@ -341,6 +422,14 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
     }));
   },
 
+  triggerTerminal(panelId, cmd) {
+    set((s) => ({
+      panels: s.panels.map((p) =>
+        p.id === panelId ? { ...p, meta: { ...p.meta, _termTrigger: { cmd, ts: Date.now() } } } : p,
+      ),
+    }));
+  },
+
   async switchVault(root) {
     const key = root ? `atlas-canvas-${_simpleHash(root)}.json` : "atlas-canvas.json";
     if (key === _persistKey) return;
@@ -401,6 +490,95 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
       ],
     };
     set((s) => ({ panels: [systemCanvas, ...s.panels], nextZ: s.nextZ + 1 }));
+  },
+
+  renameCanvas(id, title) {
+    set((s) => ({
+      canvases: s.canvases.map((c) => (c.id === id ? { ...c, title } : c)),
+    }));
+  },
+
+  openSplit() {
+    set({ isSplit: true, secondaryPanels: [], secondaryConnections: [], secondaryViewport: { x: 0, y: 0, scale: 1 }, secondaryNextZ: 1, secondarySelectedIds: [] });
+  },
+
+  closeSplit() {
+    set({ isSplit: false });
+  },
+
+  addSecondaryPanel(type) {
+    const id = uid();
+    const { secondaryViewport: vp, secondaryNextZ: nextZ } = get();
+    const defaults = PANEL_DEFAULTS[type];
+    const cx = (window.innerWidth / 4 - defaults.width / 2 - vp.x) / vp.scale;
+    const cy = (window.innerHeight / 2 - defaults.height / 2 - vp.y) / vp.scale;
+    const panel: CanvasPanelNode = {
+      id, type, x: cx, y: cy, width: defaults.width, height: defaults.height,
+      zIndex: nextZ, title: defaults.title, meta: {},
+      ...(type === "canvas" ? { viewport: { x: 0, y: 0, scale: 1 }, children: [] } : {}),
+    };
+    set((s) => ({ secondaryPanels: [...s.secondaryPanels, panel], secondaryNextZ: s.secondaryNextZ + 1 }));
+    return id;
+  },
+
+  updateSecondaryPanel(id, patch) {
+    set((s) => ({ secondaryPanels: s.secondaryPanels.map((p) => (p.id === id ? { ...p, ...patch } : p)) }));
+  },
+
+  removeSecondaryPanel(id) {
+    set((s) => ({
+      secondaryPanels: s.secondaryPanels.filter((p) => p.id !== id),
+      secondaryConnections: s.secondaryConnections.filter((c) => c.fromPanel !== id && c.toPanel !== id),
+      secondarySelectedIds: s.secondarySelectedIds.filter((i) => i !== id),
+    }));
+  },
+
+  bringSecondaryToFront(id) {
+    const { secondaryNextZ: nextZ } = get();
+    set((s) => ({
+      secondaryPanels: s.secondaryPanels.map((p) => (p.id === id ? { ...p, zIndex: nextZ } : p)),
+      secondaryNextZ: nextZ + 1,
+    }));
+  },
+
+  setSecondaryViewport(patch) {
+    set((s) => ({ secondaryViewport: { ...s.secondaryViewport, ...patch } }));
+  },
+
+  selectSecondaryPanel(id, add = false) {
+    set((s) => ({
+      secondarySelectedIds: add
+        ? s.secondarySelectedIds.includes(id) ? s.secondarySelectedIds.filter((i) => i !== id) : [...s.secondarySelectedIds, id]
+        : [id],
+    }));
+  },
+
+  deselectAllSecondary() {
+    set({ secondarySelectedIds: [] });
+  },
+
+  deleteSecondarySelected() {
+    const ids = get().secondarySelectedIds;
+    if (!ids.length) return;
+    set((s) => ({
+      secondaryPanels: s.secondaryPanels.filter((p) => !ids.includes(p.id)),
+      secondaryConnections: s.secondaryConnections.filter((c) => !ids.includes(c.fromPanel) && !ids.includes(c.toPanel)),
+      secondarySelectedIds: [],
+    }));
+  },
+
+  addSecondaryConnection(fromPanel, fromSide, toPanel, toSide, fromPort, toPort, kind) {
+    const id = uid();
+    const conn: import("./types").Connection = { id, fromPanel, fromSide, toPanel, toSide };
+    if (fromPort) conn.fromPort = fromPort;
+    if (toPort) conn.toPort = toPort;
+    if (kind) conn.kind = kind;
+    set((s) => ({ secondaryConnections: [...s.secondaryConnections, conn] }));
+    return id;
+  },
+
+  removeSecondaryConnection(id) {
+    set((s) => ({ secondaryConnections: s.secondaryConnections.filter((c) => c.id !== id) }));
   },
 
   addCanvas(title = "Canvas", kind = "workspace") {

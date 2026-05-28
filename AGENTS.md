@@ -3,22 +3,37 @@
 ## Commands
 
 ```bash
-# Re-index vault after adding/editing pages
+# Vault index (run after adding/editing pages)
 python tools/indexer.py
 
-# CLI (works if atlas.py on PATH, else: python cli/atlas.py <cmd>)
-atlas index                        # same as tools/indexer.py
-atlas search "query"               # term-frequency scoring
-atlas list [category]              # list pages
-atlas open category/slug           # open in browser
-atlas serve [port]                 # REST API (default 4242)
-atlas chat [--model MODEL]         # Ollama agent loop
+# Semantic embeddings (requires Ollama + all-minilm)
+python tools/embedder.py          # incremental; --force to rebuild
 
-# API test suite (custom runner, NOT pytest/unittest)
-python tools/test_api.py           # starts server on port 4299, runs 13 tests
+# CLI
+python cli/atlas.py <cmd>   # index | search "q" | list [cat] | open cat/slug | serve [port] | chat
 
-# UI — no server needed, open directly:
-#   ui/index.html
+# REST API (default 4242)
+python api/server.py [port]
+
+# API test suite (custom runner, port 4299, NOT pytest/unittest)
+python tests/test_api.py
+
+# MCP server (stdio JSON-RPC — Claude Code, Cursor, Continue, etc.)
+python tools/mcp_server.py        # vault + canvas tools; register in .mcp.json
+
+# Browser UI — open ui/index.html directly (no server, no CORS)
+
+# IDE (Tauri v2 desktop app)
+atlas-ide.bat                     # production launcher (Windows)
+cd ide && npm run tauri dev       # dev mode
+cd ide && npm run tauri build     # release build
+
+# Verify
+cd ide/src-tauri && cargo build   # Rust (zero warnings expected)
+cd ide && npx tsc --noEmit        # TypeScript (zero errors expected)
+
+# Design system install (one-time per machine)
+cd interface-setup && bash install.sh
 ```
 
 ## Architecture
@@ -26,40 +41,41 @@ python tools/test_api.py           # starts server on port 4299, runs 13 tests
 ```
 vault/{category}/{slug}/index.html   ← source of truth
     │
-tools/indexer.py                     ← HTML parser + two-pass indexer
-    │                                 (extract → resolve backlinks)
-.index/pages.json                    ← machine-readable (CLI, API)
-.index/pages.js                      ← browser-loadable (window.ATLAS_INDEX)
+tools/indexer.py                     ← HTML parser, two-pass (extract → backlinks)
+tools/embedder.py                    ← 384-dim vectors via Ollama all-minilm
     │
-ui/index.html + app.js + style.css   ← Fuse.js fuzzy search (CDN)
-cli/atlas.py                         ← CLI (term-frequency scoring)
-api/server.py                        ← REST API (stdlib http.server)
+.index/pages.json                    ← keyword search (CLI, API)
+.index/pages.js                      ← browser-loadable (window.ATLAS_INDEX)
+.index/embeddings.json               ← semantic search (cosine similarity)
+    │
+api/server.py                        ← REST API (stdlib http.server, Bearer auth)
+cli/atlas.py                         ← terminal CLI + chat loop
+ui/index.html + app.js + style.css   ← Fuse.js fuzzy search (CDN, standalone)
+tools/mcp_server.py                  ← MCP stdio server (vault + canvas + screenshot)
+ide/                                 ← Tauri v2 + React desktop app
 ```
 
 ## Key facts
 
-- **Zero deps:** Python stdlib for backend (indexer, CLI, API). Tailwind + Fuse.js loaded via CDN. No npm, pip, or virtualenv.
-- **file:// works:** Browser loads `.index/pages.js` via `<script src>` → `window.ATLAS_INDEX`, bypassing CORS. No server needed.
-- **Vault page format:** `vault/{category}/{slug}/index.html`. Category = folder name. Slug = page folder name (kebab-case). Indexer reads `<title>`, `<meta name="description">`, `<h1>`–`<h3>`, body text (capped 3000 chars).
-- **Scoring (CLI + API):** title(3) > headings/desc(2) > body(1). **Scoring code is duplicated** between `cli/atlas.py` and `api/server.py` (intentional — both remain independently runnable). Keep in sync.
-- **Fuse.js (browser):** weights title(3) > headings/desc(2) > body(1), threshold 0.35, `ignoreLocation: true`.
-- **API:** Default port 4242. Test suite uses port 4299. Endpoints: `/api/search`, `/api/page/{cat}/{slug}`, `/api/categories`, `/api/pages`.
-- **Ollama integration:** `tools/ollama-tools.json` defines `search_knowledge` + `get_page` tools. Requires `atlas serve` running. Falls back to auto-detect `qwen2.5-coder`.
-- **Design system:** Read `interface-setup/.interface-design/system.md` before UI changes. Dark theme (#0a0a0a base → #111111 → #1a1a1a → #222222), border-only depth (no box-shadow except focus ring), system-ui font, 150ms ease-out transitions.
-
-## Load order (ui/index.html)
-
-`style.css → Tailwind CDN → tailwind.config → Fuse.js → .index/pages.js → app.js`
+- **Zero deps (Python):** stdlib only for indexer, CLI, API, MCP. No npm/pip/venv.
+- **Zero deps (browser):** Tailwind + Fuse.js via CDN in `ui/index.html`. Open directly with `file://`.
+- **Scoring:** Shared in `tools/scoring.py`. Imported by `cli/atlas.py`, `api/server.py`, `tools/mcp_server.py` via `sys.path.insert(0, "tools/")`. Edit that one file.
+- **API auth:** Bearer token at `~/.atlas/api-token` (generated on first launch). Endpoints: `/api/search`, `/api/semantic`, `/api/page/{cat}/{slug}`, `/api/categories`, `/api/pages`, `/api/agent/{slug}`.
+- **MCP server:** `tools/mcp_server.py` — canonical stdio MCP server (vault + canvas + screenshot). Zero Python deps.
+- **IDE:** Tauri v2, React + Vite + Tailwind CSS v4, CodeMirror 6, xterm.js. Three AI agents: Vault (research), Atlas-Maker (writes vault pages), Coder (edits source files). Local AI via LM Studio + Ollama (`@ai-sdk/openai-compatible`).
+- **Design system:** Read `interface-setup/.interface-design/system.md` before UI changes. Dark theme (#0a0a0a→#111111→#1a1a1a→#222222), border-only depth (no box-shadow except `ring-2 ring-accent/40`), `system-ui` font, 150ms ease-out transitions.
+- **CLAUDE.md** contains a detailed architecture reference (377 lines). This file is the concise OpenCode companion.
 
 ## Testing quirks
 
-- `tools/test_api.py` uses a **custom test runner** (`test()` → global `_passed`/`_failed`), not pytest or unittest. Starts server in background thread on port 4299.
-- `tools/test_ollama.py` and `tools/test_multiturn.py` require a running Ollama instance and/or Atlas API — not part of CI.
-- No test runner config, no CI workflow.
+- `tests/test_api.py` uses a custom runner (`test()` → global `_passed`/`_failed`), not pytest/unittest. Starts server in background thread on port 4299.
+- `tests/test_ollama.py` and `tests/test_multiturn.py` require a running Ollama — not CI-safe.
+- CI (`.github/workflows/ci.yml`): Rust + clippy + fmt + `cargo test` on Windows; TypeScript + `tsc --noEmit` on Ubuntu; Python API test suite on Ubuntu.
 
-## Phase roadmap
+## Known issues
 
-- **Phase 1** (done): Browser UI + indexer
-- **Phase 2** (done): CLI + API
-- **Phase 3** (active): Ollama tool-calling
-- **Phase 4** (planned): `atlas new`, backlinks watcher, category landing pages, prev/next nav
+- **Sub-canvas drill-in** — double-click on `canvas`-type panel should enter it; not wired yet.
+- **Sub-canvas drill-in** — double-click on `canvas`-type panel should enter it; not wired yet.
+
+*(Fixed in v0.11: MCP consolidated to `tools/mcp_server.py`; queue uses atomic write; event names standardised.)*
+*(Fixed in v0.7.1: `sentor`/`pipeline` `sys.exit(1)` → exception; `serve_daemon` cron race guard; `atlas chat` 120s timeout; `embedder` double `_page_text()` call.)*

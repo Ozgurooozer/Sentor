@@ -2,7 +2,13 @@ import { tool } from "ai";
 import { z } from "zod";
 import { native } from "../lib/native";
 import { checkShellCommand } from "../lib/security";
+import { getLinkedTerminal } from "@/modules/canvas/terminalLink";
+import { useCanvasStore } from "@/modules/canvas/canvasStore";
 import type { ToolContext } from "./context";
+
+function mirrorToTerminal(panelId: string, command: string): void {
+  useCanvasStore.getState().triggerTerminal(panelId, command);
+}
 
 /**
  * Per-session lazy shell-session id. The agent gets one persistent shell per
@@ -40,6 +46,9 @@ export function buildShellTools(ctx: ToolContext) {
         try {
           const cwd = ctx.getCwd();
           const shellId = await getSessionShell(sid, cwd);
+          // Mirror command to the linked canvas terminal (if connected).
+          const terminalPanelId = getLinkedTerminal(sid);
+          if (terminalPanelId) mirrorToTerminal(terminalPanelId, command);
           const r = await native.shellSessionRun(
             shellId,
             command,

@@ -17,7 +17,12 @@ export type PanelType =
   | "filebrowser"
   | "sketch"
   | "note"
-  | "tool";
+  | "tool"
+  | "pipe"
+  | "stickman"
+  | "canvas-3d"
+  | "logs"
+  | "audio";
 
 export interface CanvasPanelNode {
   id: string;
@@ -45,6 +50,14 @@ export interface CanvasPanelNode {
   viewport?: Viewport;
   /** Sub-canvas only — children panels living in this panel's local coord system. */
   children?: CanvasPanelNode[];
+  /**
+   * When set, output data from this panel is forwarded to the named V3 floating
+   * window via Tauri emitTo(windowLabel, "atlas:wire-data", { panelId, data }).
+   * Example: "v3-output" links this panel as a context source for the V3 chat.
+   */
+  windowLabel?: string;
+  /** Runtime execution state — shown as a colored indicator dot in the header. */
+  status?: "idle" | "running" | "error" | "done";
 }
 
 export type PortSide = "top" | "right" | "bottom" | "left";
@@ -58,8 +71,12 @@ export interface Connection {
   id: string;
   fromPanel: string;
   fromSide: PortSide;
+  /** Named output port id on the source panel (optional — legacy wires omit this). */
+  fromPort?: string;
   toPanel: string;
   toSide: PortSide;
+  /** Named input port id on the destination panel (optional — legacy wires omit this). */
+  toPort?: string;
   /**
    * "data"    = explicit value wire (blue) — shown in the chat badge row
    * "context" = silent auto-context (purple) — prepended to every prompt, no badge
@@ -86,6 +103,8 @@ export type WireBlock = {
   connectionKind: ConnectionKind;
   charLimit: number;
   data: WireData | null;
+  /** Destination port id on the receiving panel (undefined for legacy unported wires). */
+  toPort?: string;
 };
 
 export interface Viewport {

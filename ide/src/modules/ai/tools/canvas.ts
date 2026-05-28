@@ -12,6 +12,7 @@ import { useCanvasStore } from "@/modules/canvas/canvasStore";
 import { useAgentsStore, newAgentId } from "@/modules/ai/store/agentsStore";
 import { invoke } from "@tauri-apps/api/core";
 import type { ToolContext } from "./context";
+import type { PanelType } from "@/modules/canvas/types";
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -196,6 +197,97 @@ export function buildCanvasTools(ctx: ToolContext) {
           name: agent.name,
           message: `Agent "${agent.name}" spawned and registered.`,
         };
+      },
+    }),
+
+    canvas_add_node: tool({
+      description:
+        "Add a new node panel to the canvas. Returns the new panel id. Use canvas_read_state first to understand the layout before adding.",
+      inputSchema: z.object({
+        type: z.enum(["terminal","editor","chat","agent","input","note","checklist","gallery",
+          "filebrowser","sketch","web","canvas","pipeline","codegraph","header","pipe"]).describe("Panel type"),
+        title: z.string().optional().describe("Display title"),
+        x: z.number().optional().describe("Canvas X position"),
+        y: z.number().optional().describe("Canvas Y position"),
+        meta: z.record(z.string(), z.unknown()).optional().describe("Panel-specific metadata"),
+      }),
+      execute: async ({ type, title, x, y, meta }) => {
+        const at = x != null ? { x, y: y ?? 200 } : undefined;
+        const id = useCanvasStore.getState().addPanel(type as PanelType, at, meta as Record<string, unknown>);
+        if (title) useCanvasStore.getState().updatePanel(id, { title });
+        return { ok: true, id, type, title: title ?? type };
+      },
+    }),
+
+    canvas_remove_node: tool({
+      description: "Remove a canvas panel by its id. Get ids from canvas_read_state.",
+      inputSchema: z.object({ id: z.string().describe("Panel id") }),
+      execute: async ({ id }) => {
+        useCanvasStore.getState().removePanel(id);
+        return { ok: true, removed: id };
+      },
+    }),
+
+    canvas_update_node: tool({
+      description: "Update a canvas panel's title, position, or meta. Supply only the fields to change.",
+      inputSchema: z.object({
+        id:    z.string().describe("Panel id"),
+        title: z.string().optional(),
+        x:     z.number().optional(),
+        y:     z.number().optional(),
+        meta:  z.record(z.string(), z.unknown()).optional(),
+      }),
+      execute: async ({ id, title, x, y, meta }) => {
+        const patch: Record<string, unknown> = {};
+        if (title !== undefined) patch.title = title;
+        if (x     !== undefined) patch.x = x;
+        if (y     !== undefined) patch.y = y;
+        if (meta  !== undefined) patch.meta = meta;
+        useCanvasStore.getState().updatePanel(id, patch);
+        return { ok: true, updated: id };
+      },
+    }),
+
+    canvas_connect: tool({
+      description:
+        "Wire two canvas panels together. kind: data (blue, value) | context (purple, silent) | trigger (green, execution signal).",
+      inputSchema: z.object({
+        from_id:   z.string().describe("Source panel id"),
+        to_id:     z.string().describe("Target panel id"),
+        from_port: z.string().optional().describe("Output port name (omit for default)"),
+        to_port:   z.string().optional().describe("Input port name (omit for default)"),
+        kind:      z.enum(["data","context","trigger"]).default("data"),
+      }),
+      execute: async ({ from_id, to_id, from_port, to_port, kind }) => {
+        const id = useCanvasStore.getState().addConnection(
+          from_id, "right", to_id, "left", from_port, to_port, kind,
+        );
+        return { ok: true, connectionId: id };
+      },
+    }),
+
+    canvas_clear: tool({
+      description:
+        "Remove ALL non-pinned panels and wires from the active canvas. Cannot be undone. Confirm with the user before calling.",
+      inputSchema: z.object({}),
+      execute: async () => {
+        const s = useCanvasStore.getState();
+        const toRemove = s.panels.filter((p) => !p.pinned).map((p) => p.id);
+        toRemove.forEach((id) => s.removePanel(id));
+        return { ok: true, removed: toRemove.length };
+      },
+    }),
+
+    canvas_send_to_terminal: tool({
+      description:
+        "Send a shell command to a terminal panel on the canvas. The terminal must already exist (use canvas_add_node to create one first).",
+      inputSchema: z.object({
+        panel_id: z.string().describe("Terminal panel id"),
+        cmd:      z.string().describe("Command to execute"),
+      }),
+      execute: async ({ panel_id, cmd }) => {
+        useCanvasStore.getState().triggerTerminal(panel_id, cmd);
+        return { ok: true, sent: cmd.slice(0, 80) };
       },
     }),
 

@@ -12,11 +12,9 @@ Run standalone:  python api/server.py [port]
 Via CLI:         atlas serve [port]            (default port: 4242)
 """
 
-import html as _html
 import json
 import math
 import mimetypes
-import re
 import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
@@ -84,31 +82,13 @@ from scoring import (  # noqa: E402  — sys.path already includes tools/
     DEFAULT_EXCLUDE_TYPES,
     score as _score,
     passes_default_filter as _passes_default_filter,
+    cosine as _cosine,
 )
 
 
 # ── HTML → plain text ──────────────────────────────────────────────────────────
 
-_BLOCK_TAGS = re.compile(
-    r'<(?:br|p|div|h[1-6]|li|tr|dt|dd|blockquote|section|article|header|footer|nav|main)[^>]*/?>',
-    re.IGNORECASE,
-)
-_SKIP_BLOCKS = re.compile(
-    r'<(script|style|noscript)[^>]*>.*?</\1>',
-    re.DOTALL | re.IGNORECASE,
-)
-_ANY_TAG = re.compile(r'<[^>]+>')
-
-
-def _strip_to_text(raw_html: str) -> str:
-    """Convert raw HTML to clean plain text for AI context windows."""
-    text = _SKIP_BLOCKS.sub(' ',  raw_html)   # drop script/style content
-    text = _BLOCK_TAGS.sub('\n',  text)        # block elements → newlines
-    text = _ANY_TAG.sub('',       text)        # remove remaining tags
-    text = _html.unescape(text)                # &amp; → & etc.
-    lines = [line.strip() for line in text.splitlines()]
-    text  = '\n'.join(line for line in lines if line)
-    return re.sub(r'\n{3,}', '\n\n', text).strip()
+from html_utils import strip_html as _strip_to_text  # noqa: E402
 
 
 # ── Index cache ────────────────────────────────────────────────────────────────
@@ -145,23 +125,20 @@ _sem_records:  list[dict] = []
 _sem_mtime:    float      = 0.0
 
 
-def _cosine(a: list[float], b: list[float]) -> float:
-    dot = sum(x * y for x, y in zip(a, b))
-    na  = math.sqrt(sum(x * x for x in a))
-    nb  = math.sqrt(sum(y * y for y in b))
-    return dot / (na * nb) if na and nb else 0.0
-
-
 def _ollama_embed(text: str, url: str, model: str) -> list[float]:
-    payload = json.dumps({"model": model, "prompt": text}).encode()
+    payload = json.dumps({"model": model, "input": text}).encode()
     req = urllib.request.Request(
-        f"{url.rstrip('/')}/api/embeddings",
+        f"{url.rstrip('/')}/api/embed",
         data=payload,
         headers={"Content-Type": "application/json"},
         method="POST",
     )
     with urllib.request.urlopen(req, timeout=15) as resp:
-        return json.loads(resp.read())["embedding"]
+        data = json.loads(resp.read())
+        vecs = data.get("embeddings", [])
+        if not vecs:
+            raise RuntimeError(f"Ollama returned no embeddings (model {model} not pulled?)")
+        return vecs[0]
 
 
 def _get_records() -> list[dict]:
@@ -239,6 +216,7 @@ class _Handler(BaseHTTPRequestHandler):
                 'endpoints': [
                     '/api/search?q=&limit=&category=&scope=&include=',
                     '/api/semantic?q=&limit=&scope=',
+                    '/api/hybrid?q=&limit=&category=&scope=&include=&alpha=',
                     '/api/page/{*path}',
                     '/api/agent/{slug}',
                     '/api/categories',
@@ -247,6 +225,8 @@ class _Handler(BaseHTTPRequestHandler):
             })
         elif path == '/api/search':
             self._search(params)
+        elif path == '/api/hybrid':
+            self._hybrid(params)
         elif path == '/api/semantic':
             self._semantic(params)
         elif path == '/api/categories':
@@ -338,6 +318,119 @@ class _Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     # ── Endpoints ──────────────────────────────────────────────────────────────
+
+    def _hybrid(self, params: dict) -> None:
+        """Hybrid search: merge keyword + semantic results, rerank by combined score.
+
+        Query params:
+          q        — search query (required)
+          limit    — max results (default 10, max 50)
+          category — filter by category
+          scope    — filter by scope
+          include  — comma-separated types to opt back in (e.g. archive)
+          alpha    — semantic weight 0.0–1.0 (default 0.6)
+        """
+        q        = params.get('q',        [''])[0].strip()
+        category = params.get('category', [''])[0].strip() or None
+        scope    = params.get('scope',    [''])[0].strip() or None
+        include  = set(params.get('include', [''])[0].split(',')) - {''}
+        try:
+            limit = max(1, min(int(params.get('limit', ['10'])[0]), 50))
+        except (ValueError, IndexError):
+            limit = 10
+        try:
+            alpha = max(0.0, min(float(params.get('alpha', ['0.6'])[0]), 1.0))
+        except (ValueError, IndexError):
+            alpha = 0.6
+
+        if not q:
+            self._json([])
+            return
+
+        # ── 1. Keyword pass ──────────────────────────────────────────────────
+        terms = q.lower().split()
+        candidates = [
+            p for p in _cache.pages()
+            if _passes_default_filter(p, include)
+            and (scope is None or p.get('scope') == scope)
+            and (category is None or p.get('category') == category)
+        ]
+        kw_raw = [(p, _score(p, terms)) for p in candidates]
+        kw_raw = [(p, s) for p, s in kw_raw if s > 0]
+
+        max_kw = max((s for _, s in kw_raw), default=1) or 1
+        # Normalised keyword scores keyed by page id
+        kw_scores: dict[str, float] = {
+            p['id']: s / max_kw for p, s in kw_raw
+        }
+        pages_by_id: dict[str, dict] = {p['id']: p for p in candidates}
+        # Also include semantic-only candidates not yet in pages_by_id
+        for p in _cache.pages():
+            if p['id'] not in pages_by_id:
+                pages_by_id[p['id']] = p
+
+        # ── 2. Semantic pass (optional — degrade gracefully) ─────────────────
+        sem_scores: dict[str, float] = {}
+        sem_available = False
+        if alpha > 0.0:
+            try:
+                records  = _get_records()
+                q_vec    = _embed_query(q)
+                filtered = [
+                    r for r in records
+                    if r.get('type') not in DEFAULT_EXCLUDE_TYPES
+                    and (scope is None or r.get('scope') == scope)
+                ]
+                for r in filtered:
+                    s = _cosine(q_vec, r['embedding'])
+                    if s > 0.1:
+                        sem_scores[r['id']] = round(s, 4)
+                sem_available = True
+            except RuntimeError:
+                pass  # embeddings not built yet — keyword-only
+            except urllib.error.URLError:
+                pass  # Ollama offline — keyword-only
+
+        # ── 3. Merge & rerank ────────────────────────────────────────────────
+        all_ids = set(kw_scores) | set(sem_scores)
+        if not all_ids:
+            self._json({'results': [], 'mode': 'empty'})
+            return
+
+        effective_alpha = alpha if sem_available else 0.0
+
+        combined: list[tuple[str, float]] = []
+        for pid in all_ids:
+            kw  = kw_scores.get(pid, 0.0)
+            sem = sem_scores.get(pid, 0.0)
+            final = effective_alpha * sem + (1.0 - effective_alpha) * kw
+            combined.append((pid, round(final, 4)))
+
+        combined.sort(key=lambda x: x[1], reverse=True)
+
+        result = []
+        for pid, final_score in combined[:limit]:
+            p = pages_by_id.get(pid)
+            if not p:
+                continue
+            entry: dict = {
+                'id':          pid,
+                'title':       p['title'],
+                'category':    p.get('category', ''),
+                'type':        p.get('type', 'note'),
+                'scope':       p.get('scope', 'vault'),
+                'description': p.get('description', ''),
+                'url':         p.get('url', ''),
+                'score':       final_score,
+            }
+            if kw_scores.get(pid, 0) > 0:
+                entry['keyword_score'] = round(kw_scores[pid], 4)
+            if sem_scores.get(pid, 0) > 0:
+                entry['semantic_score'] = sem_scores[pid]
+            result.append(entry)
+
+        mode = 'hybrid' if sem_available and sem_scores else ('keyword' if not sem_available else 'keyword')
+        self._json({'results': result, 'mode': mode, 'alpha': effective_alpha})
 
     def _search(self, params: dict) -> None:
         q        = params.get('q',        [''])[0].strip()
@@ -526,13 +619,18 @@ class _Handler(BaseHTTPRequestHandler):
     # ── IDE control endpoints ──────────────────────────────────────────────────
 
     def _ide_status(self) -> None:
+        queue_len = 0
+        if QUEUE_FILE.exists():
+            try:
+                queue_len = len(json.loads(QUEUE_FILE.read_text(encoding='utf-8')))
+            except Exception:
+                queue_len = 0
         self._json({
             'name': 'Atlas OS IDE',
             'mcp_version': '2024-11-05',
             'ide_running': STATE_FILE.exists(),
             'vault_pages': len(_cache.pages()),
-            'queue_pending': len(json.loads(QUEUE_FILE.read_text(encoding='utf-8'))
-                                  if QUEUE_FILE.exists() else []),
+            'queue_pending': queue_len,
             'endpoints': {
                 'GET  /api/ide/status':                'IDE status',
                 'GET  /api/ide/canvas':                'canvas state snapshot',
@@ -835,6 +933,7 @@ def serve(port: int = DEFAULT_PORT) -> None:
     print(f'  Token:      see ~/.atlas/api-token  ({_API_TOKEN[:8]}…)')
     print(f'  {base}/api/search?q=...')
     print(f'  {base}/api/semantic?q=...')
+    print(f'  {base}/api/hybrid?q=...&alpha=0.6')
     print(f'  {base}/api/page/{{category}}/{{slug}}')
     print(f'  {base}/api/categories')
     print(f'  {base}/api/pages')

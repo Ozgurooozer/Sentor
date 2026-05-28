@@ -94,6 +94,8 @@ type Deps = {
   onStep?: (step: string | null) => void;
   getPlanMode?: () => boolean;
   getAgentToolset?: () => string[] | undefined;
+  /** When set, the canvas node/wire snapshot is injected into the system context block. */
+  getCanvasSnapshot?: () => string | null;
 };
 
 export function createContextAwareTransport(deps: Deps) {
@@ -121,7 +123,7 @@ export function createContextAwareTransport(deps: Deps) {
         toolset: deps.getAgentToolset?.(),
       });
       const base = new DirectChatTransport({ agent });
-      const augmented = injectContext(options.messages, deps.getLive());
+      const augmented = injectContext(options.messages, deps.getLive(), deps.getCanvasSnapshot?.() ?? null);
       return base.sendMessages({
         ...options,
         messages: augmented,
@@ -153,12 +155,12 @@ export function createContextAwareTransport(deps: Deps) {
   };
 }
 
-function injectContext(messages: UIMessage[], live: LiveSnapshot): UIMessage[] {
-  if (!live.cwd && !live.terminal && !live.workspaceRoot) return messages;
+function injectContext(messages: UIMessage[], live: LiveSnapshot, canvasSnapshot: string | null): UIMessage[] {
+  if (!live.cwd && !live.terminal && !live.workspaceRoot && !canvasSnapshot) return messages;
   const lastUserIdx = lastIndex(messages, (m) => m.role === "user");
   if (lastUserIdx === -1) return messages;
 
-  const block = formatContextBlock(live);
+  const block = formatContextBlock(live, canvasSnapshot);
   return messages.map((m, i) => {
     if (i !== lastUserIdx) return m;
     const contextPart = { type: "text" as const, text: block };
@@ -169,7 +171,7 @@ function injectContext(messages: UIMessage[], live: LiveSnapshot): UIMessage[] {
   });
 }
 
-function formatContextBlock(live: LiveSnapshot): string {
+function formatContextBlock(live: LiveSnapshot, canvasSnapshot: string | null): string {
   const lines = [
     '<terminal-context note="auto-injected, read-only">',
     `workspace_root: ${live.workspaceRoot ?? "(unknown)"}`,
@@ -184,6 +186,12 @@ function formatContextBlock(live: LiveSnapshot): string {
     lines.push("recent_terminal_output:");
     lines.push("```");
     lines.push(trimmed);
+    lines.push("```");
+  }
+  if (canvasSnapshot) {
+    lines.push("canvas_state:");
+    lines.push("```");
+    lines.push(canvasSnapshot);
     lines.push("```");
   }
   lines.push("</terminal-context>");

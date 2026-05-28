@@ -38,6 +38,13 @@ python tools/mcp_server.py        # speaks MCP on stdin/stdout
 Register in an MCP client (e.g. `.mcp.json`) so external assistants can query
 the vault without opening the IDE.
 
+**Start transcription server** (Turkish voice input; requires faster-whisper):
+```bash
+# Windows — starts the server at localhost:3001
+transcribe\start.bat
+```
+Auto-started by `atlas-v3.bat`. Runs CPU/int8 by default. Restart if it crashes after a CUDA init attempt.
+
 **Start IDE** (API server optional — IDE works offline for keyword search):
 ```bash
 # Windows launcher — starts API then IDE
@@ -178,10 +185,11 @@ ide/src/modules/
       tools.ts          ← buildTools (aggregates all tool modules)
       fs.ts, edit.ts, search.ts, shell.ts, terminal.ts, todo.ts, subagent.ts, vault.ts, web.ts, sentor.ts, context.ts
     hooks/
-      useSpeechRecognition.ts ← voice input via `window.SpeechRecognition`
-                                (browser-native; the file used to be called
-                                `useWhisperRecording` — that name was misleading
-                                since no Whisper model is involved)
+      useSpeechRecognition.ts ← voice input; uses MediaRecorder → POST to local
+                                faster-whisper server at localhost:3001 for Turkish
+                                quality (not Web Speech API — original name
+                                `useWhisperRecording` was accurate, then misleadingly
+                                renamed; the Whisper server at `transcribe/` is real)
   browser/              ← Vault + Web browser panes, AddressBar, BrowserStack, bookmarks, assetUrl
   vault-home/           ← VaultHomePane — startup search tab over vault pages
   editor/               ← CodeMirror 6 editor with syntax highlighting, vim mode, inline AI autocomplete, wiki-link autocomplete
@@ -197,11 +205,14 @@ ide/src/modules/
   updater/              ← Tauri updater integration
   backlinks/            ← backlink/graph navigation
   graph/                ← graph visualization
+  v2/                   ← experimental v2 UI surfaces (currently: SidebarChatTab.tsx)
+  v3/                   ← V3 floating shells: V3InputShell, V3OutputShell, V3LauncherShell
+  v3-canvas/            ← V3 canvas UI: V3InfiniteCanvas, V3CanvasNode, V3WireLayer, V3NodePalette, V3CanvasTopBar, V3CanvasBg, V3SecondaryCanvas
+  archive/v2/           ← archived V2 components (AiMiniWindow, HitBitmapSync, LauncherScreen)
 ```
 
 **App-level components** (`ide/src/app/`):
-- `App.tsx` — root layout, tab orchestration, settings/mini-window wiring, `layoutMode` switching
-- `FocusedChatCenter.tsx` — `FocusedBar` component rendered in focused overlay mode (bottom bar only)
+- `App.tsx` — root entry; routes `#v3-*` hashes to V3 shells, otherwise `CanvasAppShell`
 - `hooks/useApiKeys.ts` — load provider keys + listen for `atlas:keys-changed`
 - `hooks/useDiffReloadTrigger.ts` — reload editor tabs when an AI diff is approved
 - `hooks/useLeafLifecycle.ts` — dispose terminal sessions when their pane-tree leaves disappear; prune per-leaf ref maps
@@ -283,6 +294,9 @@ Read `interface-setup/.interface-design/system.md` before touching any UI. Key r
 | E | Vault Home tab — startup search front door over the user's own knowledge base |
 | F | **Release-quality cleanup** — see "Phase F notes" below |
 | G | **Canvas UI full transition** — see "Phase G notes" below |
+| H | **Canvas V3 + Modular Wiring** — see "Phase H notes" below |
+| I | **V3-only mode + housekeeping** — V2 archived, npm pruned, window positioning fixed, transcription server fixed |
+| J | **Glass panel interiors** — 8 canvas panel content components redesigned to V3 glass aesthetic; `shadcn/tailwind.css` import removed |
 
 ### Phase F notes (v0.6 cleanup)
 
@@ -295,13 +309,12 @@ What changed from the rough v0.5 codebase:
 - **MCP read surface:** `tools/mcp_server.py` (stdio, zero-dep) exposes `vault_search` / `vault_read` / `vault_categories` / `vault_pages` so external MCP clients (Claude Code, Cursor, Continue, Cline) can browse the vault without opening the IDE. Code graph tools stay IDE-bound for now — graph index lives in the Tauri process.
 - **Vault undo:** `vault_write` backs up the prior `index.html` to `.vault-trash/{cat}/{slug}-{ts}.html` before overwriting. `useVaultTrashCleanup` deletes >7-day-old backups on IDE startup.
 - **Onboarding:** new `StepIndex` (probe `.index/pages.json`, "Build now" → `python tools/indexer.py`). `StepProvider` gained an `all-minilm` model check + "Pull now" button (calls `ollama pull all-minilm` via `shell_run_command`).
-- **App.tsx:** five custom hooks extracted to `app/hooks/` (see "App-level components" above). 1610 → 1517 lines. Layout JSX split into `WorkspaceLayout` / `FocusedLayout` is still open — left for the next pass.
+- **App.tsx:** five custom hooks extracted to `app/hooks/` (see "App-level components" above). 1610 → 1517 lines (further reduced in Phase I — V2 branches removed, now routes only `#v3-*` hashes + `CanvasAppShell`).
 - **Bundle hygiene:** `motion/react` removed (10 call sites → Tailwind + `tw-animate-css`). D3 default-import replaced with named imports so Rollup tree-shakes the unused force/zoom modules. Scoring duplication between `cli/atlas.py` and `api/server.py` consolidated into `tools/scoring.py`. `ort` ships with the `tls-rustls` feature so `ort-sys ≥ rc.10` builds (its `download-binaries` build script needs an explicit `ureq3` TLS provider).
-- **Misc renames:** `useWhisperRecording` → `useSpeechRecognition` (the hook was always using `window.SpeechRecognition`, never Whisper). The `c:\\Atlas OS` hardcoded workspace fallback in `App.tsx` was replaced with a memoised `home`-derived path.
+- **Misc renames:** `useWhisperRecording` → `useSpeechRecognition` (name was temporarily misleading; Phase I clarified the hook uses MediaRecorder → local Whisper server, not Web Speech API). The `c:\\Atlas OS` hardcoded workspace fallback in `App.tsx` was replaced with a memoised `home`-derived path.
 
 What is explicitly deferred:
 
-- **Layout JSX split** — `<WorkspaceLayout>` / `<FocusedLayout>` extraction from App.tsx's 1300-line JSX trunk. Needs manual UI testing across both modes; do it as its own PR.
 - **Vault undo snackbar** — the backend backup is done, but there's no in-app "Undo (5s)" surface yet. The tool result already returns `previousVersion` if a UI needs to wire it up.
 - **Linux / macOS click-through** — `set_click_through` is `#[cfg(target_os = "windows")]`. Adding X11 shape regions / macOS NSView event passthrough is its own piece of work.
 
@@ -320,21 +333,9 @@ Native WebView notes:
 - Bounds pushed via `ResizeObserver` + `requestAnimationFrame` debounce → `web_set_bounds`.
 - `web://nav-changed` event emitted by Rust when page navigates itself (link clicks, redirects) — syncs address bar.
 
-### Focused Overlay Mode (v0.2)
-
-`layoutMode: "classic" | "focused"` preference (Settings → General). In focused mode the window is transparent and always-on-top; only a 148px bottom bar (`FocusedBar`) is opaque. The desktop is visible through the rest.
-
-Key implementation details:
-- `transparent: true` set in `tauri.conf.json`; entering focused mode also auto-resizes the window to full-width × 180px at the bottom of the screen (`setSize`/`setPosition` via Tauri `currentMonitor`).
-- `FocusedBar` (`ide/src/app/FocusedChatCenter.tsx`) — left: mini terminal strip, right: logo row (`data-tauri-drag-region`) + gear/chat icon buttons + `AiInputBar`.
-- `AiMiniWindow` gains `isFocused` (enables in-window pointer-drag) and `onBoundsChange` (reports its `DOMRect` for click-through region updates) props.
-- **Click-through** (`Ctrl+Alt+P`, `"layout.toggleClickThrough"`): calls `set_click_through` Tauri command (Windows-only, `lib.rs:set_click_through`) which uses `SetWindowRgn` Win32 API to make the transparent area pass mouse events to the desktop. The hit region is always bar ∪ chat balloon (when open); all coordinates in physical pixels (`logical × devicePixelRatio`).
-- Shortcuts: `Ctrl+Alt+F` (`"layout.toggleFocused"`), `Ctrl+Alt+P` (`"layout.toggleClickThrough"`). (`Ctrl+Shift+F` is taken by `explorer.search` on Windows.)
-- Chat balloon auto-opens when `agentMeta.status === "thinking"` in focused mode (G6 in `OVERLAY_PLAN.md`).
-
 ### Phase G notes (v0.7 — Canvas UI transition)
 
-**`layoutMode: "canvas"` is now the default.** Eski `classic` ve `focused` modları silinmedi — `preferences.ts`'te default'u değiştirerek geri dönülür.
+**Canvas is the only active UI.** Classic and focused layout modes are archived in `ide/src/archive/v2/`. `App.tsx` routes `#v3-*` hashes to V3 floating shells and everything else to `CanvasAppShell`.
 
 New files and what they do:
 
@@ -348,8 +349,25 @@ New files and what they do:
 - **`modules/canvas/TweaksPanel.tsx`** — Slide-in panel (⚙ button, top-right): bg style, wire anim, guides, density, quality, node radius/header.
 - **`modules/canvas/canvasTweaksStore.ts`** — Zustand store for tweak settings (`BgStyle`, `WireAnim`, `WireStyle`, etc.).
 - **`modules/canvas/SketchPanel.tsx`** — HTML5 Canvas 2D drawing panel (pen/eraser/select/clear).
-- **`modules/canvas/NotePanel.tsx`** — Sticky-note panel (yellow gradient, textarea, wire output).
-- **`modules/canvas/ToolPanel.tsx`** — ComfyUI-style tool wrapper node (icon + label + hidden canvas badge).
+- **`modules/canvas/NotePanel.tsx`** — Sticky-note panel; amber-glass tint, warm text, wire output.
+- **`modules/canvas/ToolPanel.tsx`** — Tool wrapper node; glass icon bubble, label, hidden-canvas badge.
+- **`modules/canvas/InputPanel.tsx`** — User input panel (text/image/file); fully glass form; outputs to `value` port.
+- **`modules/canvas/ChecklistPanel.tsx`** — Checklist panel; glass rows, custom SVG checkbox, progress bar; outputs pending tasks as text.
+- **`modules/canvas/HeaderPanel.tsx`** — Label/section header node; `meta.headerColor` overrides accent + text glow.
+- **`modules/canvas/GalleryPanel.tsx`** — Image gallery; glass toolbar + grid cells; outputs selected image as `image` wire.
+- **`modules/canvas/FileBrowserPanel.tsx`** — File browser; glass sidebar (pinned + vault cats) + file list; outputs selected file content.
+- **`modules/canvas/PipePanel.tsx`** — Auto-transform node; glass prompt editor, status dot glow, glass output area; uses local model (Ollama/LM Studio).
+- **`modules/canvas/AgentEditorPanel.tsx`** — Full AI agent panel (agent type, separate from chat panel).
+- **`modules/canvas/PipelinePanel.tsx`** — Wraps a CLI pipeline node on the canvas.
+- **`modules/canvas/CodeGraphPanel.tsx`** — Code graph visualization; outputs graph JSON.
+- **`modules/canvas/SubCanvasContent.tsx`** — Renders the interior canvas of a `canvas`-type panel.
+- **`modules/canvas/CanvasDock.tsx`** — Bottom dock strip; renders panels with `minimized: true`.
+- **`modules/canvas/PinnedPanelsPortal.tsx`** — React portal that renders `pinned: true` panels at fixed viewport coords, above the canvas z-stack.
+- **`modules/canvas/orkestraStore.ts`** — Zustand store for the **Orkestra AI** chat: raw streaming fetch to Ollama (`/api/chat`) or LM Studio (`/v1/chat/completions`). Parses embedded JSON tool calls (`{"tool":"add_node",...}`) in the assistant response and executes them against `canvasStore`. Does **not** use the AI SDK — it's a direct fetch loop so it works with small local models. Terminal triggers go through `useCanvasStore.triggerTerminal()` (not CustomEvent). Alias map rebuilt once at message start via `buildSystem()`, then incrementally on each `add` call.
+- **`modules/canvas/terminalLink.ts`** — Module-level `Map` that tracks which canvas terminal panel a chat session is linked to. When a link is active, `bash_run` commands mirror output to that panel's PTY. `setLinkedTerminal(sessionId, panelId|null)` / `getLinkedTerminal(sessionId)`.
+- **`modules/canvas/portDefs.ts`** — Named port definitions for every `PanelType` (`PORT_DEFS`). Each port has `id`, `label`, `kind` (`ConnectionKind`), and `dataType` (`"text"|"image"|"json"|"trigger"|"any"`). `namedPortPoint()` computes canvas-space coordinates; `portIndex()` / `portKind()` look up port metadata.
+- **`modules/canvas/nodeAccent.ts`** — Per-type accent colors used for panel borders and faint glows. `accentFor(panel)` — honours `meta.headerColor` override for header nodes.
+- **`modules/canvas/useWireData.ts`** — `useAllIncomingWireData(panelId)` collects upstream wire values (excluding trigger wires). Respects `meta.snapshotData` (frozen snapshot) over live `meta.outputData` and clips each wire to `connection.charLimit ?? 4000` chars.
 
 **`canvasStore.ts` multi-canvas additions:**
 - `CanvasRecord` type: `{ id, title, kind, hidden?, parentCanvasId? }`
@@ -357,7 +375,20 @@ New files and what they do:
 - Actions: `addCanvas()`, `removeCanvas()`, `switchCanvas(id)`, `enterCanvas(id)`, `exitCanvas()`
 - Canvas switching persists to per-canvas `atlas-canvas-multi-{id}.json` files.
 
-**`types.ts`:** `"sketch"`, `"note"`, `"tool"` added to `PanelType`.
+**`types.ts` — full `PanelType` union:**
+`terminal | editor | preview | vault-home | web | chat | canvas | agent | instance | codegraph | input | pipeline | header | checklist | gallery | filebrowser | sketch | note | tool | pipe`
+
+**`CanvasPanelNode` extended fields:**
+- `pinned?: boolean` + `screenX/Y` — panel rendered at fixed viewport coords via `PinnedPanelsPortal`.
+- `minimized?: boolean` — panel collapsed into the `CanvasDock` strip at the bottom.
+- `viewport?: Viewport` + `children?: CanvasPanelNode[]` — sub-canvas nesting (used by `canvas`-type panels, rendered by `SubCanvasContent`).
+
+**Wire system — `Connection.kind` semantics:**
+- `"data"` (blue) — explicit value wire; value shown in the chat badge row.
+- `"context"` (purple) — silent auto-context; prepended to every prompt without a badge.
+- `"trigger"` (green) — execution signal; does **not** carry data, only a pulse.
+- `connection.charLimit` (default 4000) — per-wire cap on characters forwarded downstream; prevents a noisy terminal from blowing the token budget.
+- Upstream data lives in `meta.outputData: WireData`; `meta.snapshotData` freezes a stable snapshot so downstream chats see consistent values even while the producer keeps updating.
 
 **Wire animations:** `atlas-wire-flow` / `atlas-wire-pulse` keyframes in `globals.css`. Controlled by `canvasTweaksStore.wireAnim` → `ConnectionLayer.wireAnim` prop.
 
@@ -365,13 +396,97 @@ New files and what they do:
 
 **Alignment guides:** computed during panel drag when `canvasTweaksStore.showGuides` is true — red lines at x/y/center alignment positions.
 
-**Settings → General:** Layout option "Canvas" added (grid is now 3-column).
-
 What is deferred:
 - `CanvasPanel` drill-in for canvas nodes (double-click → `switchCanvas`) — ToolPanel stub is in place.
 - Vault undo snackbar (backend is already there).
-- Layout JSX split in App.tsx.
 
-### Next (Phase H)
+### Phase H notes (v0.8 — Canvas V3 + Modular Wiring)
 
-Backlinks panel UX, mermaid editor preview, richer graph view interactions, voice-to-vault flow, plus the three deferred items from Phase G above.
+**Canvas V3 UI (`ide/src/modules/v3-canvas/`):**
+- `V3InfiniteCanvas.tsx` — Three.js bg, glass nodes, named port dots, canvas INPUT/OUTPUT semicircle ports on left/right edges
+- `V3CanvasNode.tsx` — glass card; `storeOverrides?` prop lets secondary canvas redirect store mutations
+- `V3WireLayer.tsx` — bezier wires; `addConnectionOverride?` / `removeConnectionOverride?` for secondary canvas
+- `V3NodePalette.tsx` — 2D/3D tab palette; `onAddPanel?` override for secondary canvas
+- `V3CanvasTopBar.tsx` — editable title (double-click), `▶ Run` button (active when connections > 0), split-view toggle, `secondary` prop
+- `V3SecondaryCanvas.tsx` — second independent canvas with its own store slice; split via `isSplit` flag in canvasStore
+- `V3CanvasBg.tsx` / `V3CanvasBgPanel.tsx` — Three.js perspective grid + sparse particles
+
+**canvasStore additions (Phase H):**
+- `isSplit`, `secondaryTitle`, `secondaryPanels`, `secondaryConnections`, `secondaryViewport`, `secondarySelectedIds` — full secondary canvas state
+- `openSplit()` / `closeSplit()` — toggle split view, resets secondary state
+- `renameCanvas(id, title)` — update canvas title in the `canvases[]` array
+
+**Terminal panel (`CanvasPanelContent.tsx` → `V3TerminalPanel`):**
+- Mode toggle: `>_` (PTY shell) and `JS` (JS eval REPL with `JSON.stringify` pretty-printing)
+- `▶ Run` button in toolbar — green when wire data available, dispatches on `canvas:run` event
+- Bottom `$` command bar — sends to PTY without clicking into xterm; Escape→clear+refocus; ↑/↓ history
+- **Wired inputs panel** below command bar — shows each connected node with port badge (`cmd` in green, others purple), source title, content preview
+- Three.js overlay **removed** from terminal — it was intercepting xterm pointer events
+
+**Modular port system:**
+- `WireBlock.toPort?: string` — added so per-port wire filtering works
+- `terminal` ports: `cmd` (text data input) + `trigger` (run) → `stdout` (text output)
+- Terminal `▶ Run` uses `cmd` port wire; manual `$` bar overrides the wire
+
+**V3 Input → Canvas bridge:**
+- `V3InputShell` has a `⊞` canvas-link toggle button (persisted to `localStorage`)
+- When linked: window border turns green; placeholder changes; send routes to `emit("atlas:canvas-prompt", {text})`
+- `CanvasAppShell` listens for `atlas:canvas-prompt` → routes to `useOrkestraStore.send()` with current model preferences
+- `atlas:canvas-unlink` event clears `v3InputActive` flag
+- `OrkestraOutput` shows `● V3 bağlı` badge and auto-expands when linked messages arrive
+- `orkestraStore.v3InputActive: boolean` / `setV3InputActive(v)` tracks link state
+
+**Canvas Run button:**
+- `V3CanvasTopBar` `▶ Run` button — reads `connections`/`secondaryConnections`; active when `connections.length > 0`; dispatches `canvas:run` custom event
+
+### Phase I notes (v0.9 — V3-only mode + housekeeping)
+
+**V2 archived:** `AiMiniWindow.tsx`, `HitBitmapSync.tsx`, `LauncherScreen.tsx` moved to `ide/src/archive/v2/`. `tsconfig.json` excludes `src/archive` to prevent TS errors from broken relative imports. `App.tsx` simplified — no `USE_V3` flag, no `layoutMode` switch; canvas is the unconditional default.
+
+**Settings cleanup:** Layout section removed from Settings → General (only one mode exists). `setLayoutMode` / `LayoutMode` imports removed from `GeneralSection.tsx`.
+
+**npm pruned:** `@ai-sdk/cerebras`, `@ai-sdk/google`, `@ai-sdk/xai`, `shadcn` removed (~75 packages now). `@ai-sdk/anthropic` and `@ai-sdk/groq` kept — used via dynamic `await import(...)` in `agent.ts` lines 154–161.
+
+**Window positioning (`lib.rs`):** All V3 floating windows (`v3-input`, `v3-output`, `v3-launcher`) now use `monitor.work_area()` instead of hardcoded `taskbar_h = 48`. Input bar width = `clamp(40% of work area, 480–620 px)`. Window-state plugin excludes V3 windows via `skip_initial_state(label)` — they always open at computed positions, never at stale saved positions.
+
+**V3InputShell sizing:** `BAR_W` is now dynamic (`Math.round(window.outerWidth) || 600`) instead of hardcoded `680`. Panel height reduced from 300 → 260px. `resizeWindow` clamps y so the expanded panel cannot overflow above the work area top.
+
+**Transcription server (`transcribe/server.py`):** Fixed `UnboundLocalError: cannot access local variable 'model'` — root cause was Python's function-scoped `del model` in the except branch, which caused the interpreter to treat `model` as local throughout the entire function. Fix: `global model` declaration added inside the `with _model_lock:` block. Language locked to `tr` (Turkish) via `fd.append("language", "tr")` in `V3InputShell.transcribeBlob()`. Server now runs CPU/int8 by default (`start.bat`: `WHISPER_DEVICE=cpu`, `WHISPER_COMPUTE=int8`).
+
+**V3OutputShell TTS:** Each assistant message has a small speak button below it. Uses `speechSynthesis` Web API (`lang=tr-TR`, `rate=1.05`). Clicking the button for an already-speaking message cancels speech. `extractText(parts)` helper strips non-text parts from `UIMessage["parts"]`.
+
+### Phase J notes (v0.10 — Glass panel interiors)
+
+**`shadcn/tailwind.css` import removed** (`ide/src/styles/globals.css` line 3) — `shadcn` was removed from `package.json` in Phase I but the CSS import was left behind, causing a Vite 500 error on startup. All CSS variables are defined inline in `globals.css` via `@theme inline`; the import was redundant.
+
+**8 canvas panel content components redesigned** to match the V3 glass aesthetic. All panels now have transparent backgrounds (the `V3CanvasNode` glass card provides the backdrop); inner interactive elements use `rgba(255,255,255,0.05)` bg / `rgba(255,255,255,0.07)` border / `#c8c8d0` text. Specific changes per panel:
+
+- **NotePanel** — amber-glass tint (`radial-gradient` overlay) replaces yellow solid gradient; text `#e8dfc0`, caret `#d4a843`, folded corner glass-style.
+- **ToolPanel** — glass icon bubble (`rgba(91,141,239,0.10)` + `border rgba(91,141,239,0.22)`); label and hidden-canvas badge match V3 tokens.
+- **HeaderPanel** — transparent bg; title text glow (`textShadow ${color}40`); color picker dots use outline ring instead of Tailwind `ring-offset-[#0a0a0a]`.
+- **InputPanel** — kind tabs redesigned as glass pills; textarea/input use shared `G.input` token object; image drop zone glass hover effect; all backgrounds transparent.
+- **ChecklistPanel** — custom SVG checkbox (`#4db89a` stroke when done); glass hover rows; progress bar (blue → green at 100%); empty-state SVG icon; add-button hover turns accent blue.
+- **PipePanel** — glass prompt textarea; status dot with `boxShadow` glow; run button glass pill; output text `#a8c4e8` (blue-tinted for readability); all section dividers `rgba(255,255,255,0.05)`.
+- **GalleryPanel** — glass toolbar with truncated path; image cells `border rgba(255,255,255,0.06)` → `rgba(155,114,239,0.80)` when selected; empty-state SVG grid icon; count bar glass.
+- **FileBrowserPanel** — breadcrumb bar glass; sidebar hover states glass; file list rows glass hover; all solid `bg-[#0a0a0a]`/`bg-[#0d0d0d]` backgrounds removed; file size and separator text match V3 muted tokens.
+
+### Phase K notes (v0.11 — Mimari temizlik)
+
+**MCP konsolidasyonu:** `mcp/server.py` (HTTP transport variant) silindi. Tek MCP server: `tools/mcp_server.py` (stdio, zero-dep). `_enqueue()` atomic write'a geçirildi (`tempfile` → `os.replace`).
+
+**Event standardizasyonu:** Tüm cross-window iletişim `atlas:` prefix ile tek namespace'de:
+- `atlas:terminal-trigger` (CustomEvent) → `useCanvasStore.triggerTerminal(panelId, cmd)` (Zustand action, `meta._termTrigger`)
+- `v3:user-message` → `atlas:v3-message`
+- `v3:vault-message` → `atlas:v3-vault-message`
+- `v3:wire-data` → `atlas:wire-data`
+- Kural: cross-window → Tauri `emitTo/listen`; same-window → Zustand store.
+
+**AI transport genişlemesi:** `createContextAwareTransport` `Deps`'e `getCanvasSnapshot?()` eklendi — canvas state her agent session'ında system context'e inject edilebilir. `buildCanvasTools()` 6 yeni structured tool kazandı: `canvas_add_node`, `canvas_remove_node`, `canvas_update_node`, `canvas_connect`, `canvas_clear`, `canvas_send_to_terminal`. Artık tam ajanlar (Claude/GPT) canvas'ı doğrudan AI SDK tool'larıyla yönetebilir.
+
+**OrkestraStore optimizasyonu:** Alias map artık her `execTool()` çağrısında değil, sadece mesaj başında `buildSystem()` ile rebuild edilir. `add` tool call'u yeni node'u alias map'e incremental ekler.
+
+**Dead code:** `ide/src/archive/v2/` (AiMiniWindow, HitBitmapSync, LauncherScreen) silindi. `tsconfig.json`'dan `"exclude": ["src/archive"]` kaldırıldı.
+
+### Next (Phase L)
+
+Backlinks panel UX, mermaid editor preview, richer graph view interactions, voice-to-vault flow, remaining canvas panel glass rewrites (SketchPanel, PipelinePanel, AgentEditorPanel), drill-in canvas node, vault undo snackbar, blueprint/variable node sistemi (Phase K spec'ten).
