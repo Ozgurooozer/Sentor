@@ -487,6 +487,22 @@ What is deferred:
 
 **Dead code:** `ide/src/archive/v2/` (AiMiniWindow, HitBitmapSync, LauncherScreen) silindi. `tsconfig.json`'dan `"exclude": ["src/archive"]` kaldırıldı.
 
-### Next (Phase L)
+### Phase L notes (v0.12 — Blueprint/Variable Node Sistemi)
 
-Backlinks panel UX, mermaid editor preview, richer graph view interactions, voice-to-vault flow, remaining canvas panel glass rewrites (SketchPanel, PipelinePanel, AgentEditorPanel), drill-in canvas node, vault undo snackbar, blueprint/variable node sistemi (Phase K spec'ten).
+**Variable Store (`variableStore.ts`):** Global Zustand + LazyStore persist (`atlas-variables.json`). `setVariable(name, value)` / `getVariable(name)` / `listVariables()` / `hydrate()`. `scheduleFlush()` timeout içinde fresh state okur — race condition güvenli. `CanvasAppShell` mount'ta `hydrate()` çağırır.
+
+**Variable Panel (`type: "variable"`):** Gelen `set` wire'ı variableStore'a yazar + output wire ile broadcast eder. `meta.varName` ile değişken adı bağlanır. Wire yoksa `meta.initialValue` kullanılır.
+
+**If/Else Panel (`type: "if-else"`):** Saf dataflow. `condition` wire değerlendirilir (boş/"false"/"0"/"null"/"undefined" → false, diğerleri → true). `true_val` veya `false_val` wire'ı `result` output'una gönderilir.
+
+**For-Each Panel (`type: "for-each"`):** `items` input'unu JSON array veya newline-separated text olarak ayrıştırır. Output: `items_json` (JSON array string). UI'da item listesi ve sayı gösterir.
+
+**Orkestra tools:** `var_set`, `var_get`, `var_list` — küçük modeller JSON scanning ile değişkenlere erişebilir. `buildSystem()` mevcut değişken listesini system prompt'a ekler.
+
+**AI SDK tools:** `variable_set`, `variable_get`, `variable_list` — tam ajanlar (Claude/GPT) structured tool use ile değişkenlere erişir.
+
+**Node palette:** `variable`, `if-else`, `for-each` `V3NodePalette.tsx`'e eklendi.
+
+### Next (Phase M)
+
+Canvas-as-function (sub-canvas → callable blueprint), Voice Variable node, per-port output sistemi (çoklu output wire), değişken inspector panel, canvas run engine (for-each gerçek iterasyon).
