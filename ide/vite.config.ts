@@ -102,6 +102,12 @@ export default defineConfig(async ({ mode }) => ({
         changeOrigin: true,
         rewrite: (p) => p.replace(/^\/ollama-proxy/, ""),
       },
+      "/opencode-proxy": {
+        target: "https://opencode.ai",
+        changeOrigin: true,
+        secure: true,
+        rewrite: (p) => p.replace(/^\/opencode-proxy/, ""),
+      },
     },
   },
 }));

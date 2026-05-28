@@ -76,6 +76,15 @@ export type BuildModelOptions = {
   providers?: ProviderConfigs;
 };
 
+// In dev, route OpenCode Zen requests through the Vite proxy to avoid CORS.
+function toDevProxyURL(url: string): string {
+  if (!import.meta.env.DEV) return url;
+  const origin = window.location.origin;
+  if (/^https?:\/\/opencode\.ai/.test(url))
+    return url.replace(/^https?:\/\/opencode\.ai/, `${origin}/opencode-proxy`);
+  return url;
+}
+
 // Memoize built models — provider clients are not free to construct.
 const modelCache = new Map<string, LanguageModel>();
 
@@ -92,8 +101,9 @@ export async function buildLanguageModel(
   }
   const effectiveModelId =
     options.providers?.[provider]?.modelId || resolvedModelId;
-  const baseURL =
-    options.providers?.[provider]?.baseURL ?? OPENCODE_DEFAULT_BASE_URL;
+  const baseURL = toDevProxyURL(
+    options.providers?.[provider]?.baseURL ?? OPENCODE_DEFAULT_BASE_URL,
+  );
   const cacheKey = `${provider} ${effectiveModelId} ${baseURL}`;
   const hit = modelCache.get(cacheKey);
   if (hit) return hit;

@@ -707,7 +707,7 @@ export function V3OutputShell() {
                   {(helpers.error as Error | undefined)?.message ?? "AI sağlayıcısına bağlanılamadı."}
                 </p>
                 <p className="mt-1.5" style={{ color: "rgba(255,255,255,0.2)", fontSize: 10 }}>
-                  LM Studio veya Ollama çalışıyor mu? Settings → Models bölümünden kontrol et.
+                  OpenCode Zen API'sine bağlanılamadı. Settings → Models bölümünden API key'ini kontrol et.
                 </p>
               </div>
             </div>
