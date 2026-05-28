@@ -10,6 +10,7 @@ import { tool } from "ai";
 import { z } from "zod";
 import { useCanvasStore } from "@/modules/canvas/canvasStore";
 import { useAgentsStore, newAgentId } from "@/modules/ai/store/agentsStore";
+import { useVariableStore } from "@/modules/canvas/variableStore";
 import { invoke } from "@tauri-apps/api/core";
 import type { ToolContext } from "./context";
 import type { PanelType } from "@/modules/canvas/types";
@@ -353,6 +354,46 @@ export function buildCanvasTools(ctx: ToolContext) {
         } catch (e) {
           return { error: String(e), slug };
         }
+      },
+    }),
+
+    variable_set: tool({
+      description:
+        "Set a named variable in the canvas variable store. Available to all variable panels with matching name and to downstream agents via variable_get.",
+      inputSchema: z.object({
+        name: z.string().min(1).describe("Variable name, e.g. 'myVar'"),
+        value: z.string().describe("Value to store (as string)"),
+      }),
+      execute: async ({ name, value }) => {
+        useVariableStore.getState().setVariable(name, value);
+        const varPanel = useCanvasStore.getState().panels.find(
+          (p) => p.type === "variable" && p.meta?.varName === name,
+        );
+        if (varPanel) {
+          useCanvasStore.getState().setOutputData(varPanel.id, { kind: "text", value });
+        }
+        return { ok: true, name, value: value.slice(0, 120) };
+      },
+    }),
+
+    variable_get: tool({
+      description: "Get the current value of a named canvas variable.",
+      inputSchema: z.object({
+        name: z.string().min(1).describe("Variable name"),
+      }),
+      execute: async ({ name }) => {
+        const rec = useVariableStore.getState().getVariable(name);
+        if (!rec) return { found: false, name, value: null };
+        return { found: true, name, value: String(rec.value), updatedAt: rec.updatedAt };
+      },
+    }),
+
+    variable_list: tool({
+      description: "List all named variables in the canvas variable store with their current values.",
+      inputSchema: z.object({}),
+      execute: async () => {
+        const vars = useVariableStore.getState().listVariables();
+        return { variables: vars.map((v) => ({ name: v.name, value: String(v.value), dataType: v.dataType })) };
       },
     }),
   } as const;
