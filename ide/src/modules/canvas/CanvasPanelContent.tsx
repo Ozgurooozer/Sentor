@@ -38,6 +38,7 @@ import { PipePanel } from "./PipePanel";
 import { StickManPanel } from "./StickManPanel";
 import { LogsPanel } from "./LogsPanel";
 import { AudioPanel } from "./AudioPanel";
+import { VariablePanel } from "./VariablePanel";
 import { webLayerManager } from "./webLayer/WebLayerManager";
 import { useAgentsStore } from "@/modules/ai/store/agentsStore";
 import type { Agent } from "@/modules/ai/lib/agents";
@@ -149,6 +150,7 @@ const PANEL_REGISTRY: Partial<Record<PanelType, PanelRenderer>> = {
   logs:          LogsPanelWrapper,
   audio:         AudioPanel,
   "canvas-3d":   Canvas3dWrapper,
+  "variable":    ({ panel }) => <VariablePanel panelId={panel.id} />,
 };
 
 // ── Entry point ──────────────────────────────────────────────────────────────

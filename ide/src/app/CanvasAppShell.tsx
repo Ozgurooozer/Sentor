@@ -1,51 +1,68 @@
 import { useCallback, useEffect, useState } from "react";
-import {
-  AgentRunBridge,
-  AiMiniWindow,
-  hasAnyKey,
-  useChatStore,
-} from "@/modules/ai";
+import { listen } from "@tauri-apps/api/event";
+import { AgentRunBridge, useChatStore } from "@/modules/ai";
+import { getModel } from "@/modules/ai/config";
 import { AiComposerProvider } from "@/modules/ai/lib/composer";
-import { InfiniteCanvas, PinnedPanelsPortal, useCanvasStore } from "@/modules/canvas";
-import { CanvasTopBar } from "@/modules/canvas/CanvasTopBar";
+import { PinnedPanelsPortal, useCanvasStore } from "@/modules/canvas";
+import { useOrkestraStore } from "@/modules/canvas/orkestraStore";
+import { V3InfiniteCanvas, V3CanvasTopBar, V3SecondaryCanvas } from "@/modules/v3-canvas";
 import { CanvasSettingsOverlay } from "@/modules/canvas/CanvasSettingsOverlay";
 import { ThemeProvider } from "@/modules/theme";
-import { AgentSwitcherModal } from "@/modules/agents-office/AgentSwitcherModal";
-import { ShortcutsDialog } from "@/modules/shortcuts";
 import { UpdaterDialog } from "@/modules/updater";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { OnboardingWizard } from "@/modules/onboarding/OnboardingWizard";
 import { usePreferencesStore } from "@/modules/settings/preferences";
+import { useVariableStore } from "@/modules/canvas/variableStore";
 import { useApiKeys } from "./hooks/useApiKeys";
 import { useMcpBridge } from "./hooks/useMcpBridge";
 import { useVaultTrashCleanup } from "./hooks/useVaultTrashCleanup";
+import { setLogVaultRoot } from "@/modules/logs/logStore";
 import type { AiDiffStatus } from "@/modules/tabs";
 
 function CanvasAppShellInner() {
-  const [shortcutsOpen, setShortcutsOpen] = useState(false);
-  const [agentSwitcherOpen, setAgentSwitcherOpen] = useState(false);
-  const [miniOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
 
-  const apiKeys = useChatStore((s) => s.apiKeys);
   const setApiKeys = useChatStore((s) => s.setApiKeys);
-  const hasComposer = hasAnyKey(apiKeys);
 
-  const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot) ?? "";
-  const prefsHydrated = usePreferencesStore((s) => s.hydrated);
-  const onboarded = usePreferencesStore((s) => s.onboarded);
-
+  const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot) ?? "C:\\Atlas OS";
   const canvasHydrated = useCanvasStore((s) => s.hydrated);
   const addPanel = useCanvasStore((s) => s.addPanel);
   const updatePanel = useCanvasStore((s) => s.updatePanel);
+  const isSplit = useCanvasStore((s) => s.isSplit);
 
-  useEffect(() => {
-    if (prefsHydrated && !onboarded) setShowOnboarding(true);
-  }, [prefsHydrated, onboarded]);
+  const selectedModelId = useChatStore((s) => s.selectedModelId);
+  const ollamaBase  = usePreferencesStore((s) => s.ollamaBaseURL)       || "http://localhost:11434";
+  const lmBase      = usePreferencesStore((s) => s.lmstudioBaseURL)     || "http://localhost:1234";
+  const ollamaModel = usePreferencesStore((s) => s.ollamaChatModelId)   || "llama3.2";
+  const lmModel     = usePreferencesStore((s) => s.lmstudioChatModelId) || "local-model";
 
   useApiKeys(setApiKeys);
   useVaultTrashCleanup(workspaceRoot);
+
+  useEffect(() => {
+    void useVariableStore.getState().hydrate();
+  }, []);
+
+  useEffect(() => {
+    setLogVaultRoot(workspaceRoot || "C:\\Atlas OS");
+  }, [workspaceRoot]);
+
+  // ── V3 Input → Canvas bridge ─────────────────────────────────────────────
+  useEffect(() => {
+    const ork = useOrkestraStore.getState();
+    const promptP = listen<{ text: string }>("atlas:canvas-prompt", ({ payload }) => {
+      ork.setCollapsed(false);
+      ork.setV3InputActive(true);
+      const model = getModel(selectedModelId);
+      void ork.send(payload.text, model.provider, ollamaBase, lmBase, ollamaModel, lmModel);
+    });
+    const unlinkP = listen("atlas:canvas-unlink", () => {
+      useOrkestraStore.getState().setV3InputActive(false);
+    });
+    return () => {
+      void promptP.then((fn) => fn());
+      void unlinkP.then((fn) => fn());
+    };
+  }, [selectedModelId, ollamaBase, lmBase, ollamaModel, lmModel]);
 
   const openVaultTab = useCallback(
     (url: string) => {
@@ -74,13 +91,8 @@ function CanvasAppShellInner() {
   });
 
   const openAiDiffTab = useCallback(
-    (_input: {
-      path: string;
-      originalContent: string;
-      proposedContent: string;
-      approvalId: string;
-      isNewFile: boolean;
-    }) => null as number | null,
+    (_input: { path: string; originalContent: string; proposedContent: string; approvalId: string; isNewFile: boolean }) =>
+      null as number | null,
     [],
   );
 
@@ -90,40 +102,34 @@ function CanvasAppShellInner() {
   );
 
   return (
-    <div className="canvas-root relative h-screen overflow-hidden bg-[#050505] text-[#f5f5f5]">
-      <div className="relative h-full w-full overflow-hidden">
-        <InfiniteCanvas />
-      </div>
-
-      <CanvasTopBar onOpenSettings={() => setSettingsOpen(true)} />
+    <div className="canvas-root relative h-screen overflow-hidden" style={{ background: "#050507" }}>
+      {isSplit ? (
+        /* ── Split view: two canvases side-by-side ── */
+        <div className="flex h-full w-full">
+          {/* Primary canvas */}
+          <div className="relative flex-1 overflow-hidden" style={{ borderRight: "1px solid rgba(255,255,255,0.06)" }}>
+            <V3InfiniteCanvas />
+            <V3CanvasTopBar onOpenSettings={() => setSettingsOpen(true)} />
+          </div>
+          {/* Secondary canvas */}
+          <div className="relative flex-1 overflow-hidden">
+            <V3SecondaryCanvas />
+            <V3CanvasTopBar secondary onOpenSettings={() => setSettingsOpen(true)} />
+          </div>
+        </div>
+      ) : (
+        /* ── Single canvas ── */
+        <div className="relative h-full w-full overflow-hidden">
+          <V3InfiniteCanvas />
+          <V3CanvasTopBar onOpenSettings={() => setSettingsOpen(true)} />
+        </div>
+      )}
 
       <PinnedPanelsPortal />
 
-      {hasComposer && (
-        <AgentRunBridge
-          openAiDiffTab={openAiDiffTab}
-          setAiDiffStatus={setAiDiffStatus}
-        />
-      )}
+      <AgentRunBridge openAiDiffTab={openAiDiffTab} setAiDiffStatus={setAiDiffStatus} />
 
-      {miniOpen && hasComposer && (
-        <AiMiniWindow key="ai-mini" isFocused={false} onBoundsChange={undefined} />
-      )}
-
-      {settingsOpen && (
-        <CanvasSettingsOverlay onClose={() => setSettingsOpen(false)} />
-      )}
-
-      {showOnboarding && (
-        <OnboardingWizard onComplete={() => setShowOnboarding(false)} />
-      )}
-
-      <ShortcutsDialog open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
-
-      <AgentSwitcherModal
-        open={agentSwitcherOpen}
-        onClose={() => setAgentSwitcherOpen(false)}
-      />
+      {settingsOpen && <CanvasSettingsOverlay onClose={() => setSettingsOpen(false)} />}
 
       <UpdaterDialog />
     </div>
