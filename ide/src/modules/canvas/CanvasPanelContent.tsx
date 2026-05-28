@@ -40,6 +40,7 @@ import { LogsPanel } from "./LogsPanel";
 import { AudioPanel } from "./AudioPanel";
 import { VariablePanel } from "./VariablePanel";
 import { IfElsePanel } from "./IfElsePanel";
+import { ForEachPanel } from "./ForEachPanel";
 import { webLayerManager } from "./webLayer/WebLayerManager";
 import { useAgentsStore } from "@/modules/ai/store/agentsStore";
 import type { Agent } from "@/modules/ai/lib/agents";
@@ -153,6 +154,7 @@ const PANEL_REGISTRY: Partial<Record<PanelType, PanelRenderer>> = {
   "canvas-3d":   Canvas3dWrapper,
   "variable":    ({ panel }) => <VariablePanel panelId={panel.id} />,
   "if-else":     ({ panel }) => <IfElsePanel panelId={panel.id} />,
+  "for-each":    ({ panel }) => <ForEachPanel panelId={panel.id} />,
 };
 
 // ── Entry point ──────────────────────────────────────────────────────────────
