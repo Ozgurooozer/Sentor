@@ -2,24 +2,14 @@ import { invoke } from "@tauri-apps/api/core";
 import {
   getProvider,
   KEYRING_SERVICE,
-  PROVIDERS,
-  providerNeedsKey,
   type ProviderId,
 } from "../config";
 
-export type ProviderKeys = Record<ProviderId, string | null>;
+export type ProviderKeys = { opencode: string | null };
 
-export const EMPTY_PROVIDER_KEYS: ProviderKeys = {
-  lmstudio: null,
-  ollama: null,
-  openai: null,
-  anthropic: null,
-  groq: null,
-  custom: null,
-};
+export const EMPTY_PROVIDER_KEYS: ProviderKeys = { opencode: null };
 
 export async function getKey(provider: ProviderId): Promise<string | null> {
-  if (!providerNeedsKey(provider)) return null;
   try {
     const v = await invoke<string | null>("secrets_get", {
       service: KEYRING_SERVICE,
@@ -32,9 +22,6 @@ export async function getKey(provider: ProviderId): Promise<string | null> {
 }
 
 export async function setKey(provider: ProviderId, key: string): Promise<void> {
-  if (!providerNeedsKey(provider)) {
-    throw new Error(`${provider} does not use an API key`);
-  }
   const trimmed = key.trim();
   if (!trimmed) throw new Error("API key is empty");
   await invoke("secrets_set", {
@@ -45,7 +32,6 @@ export async function setKey(provider: ProviderId, key: string): Promise<void> {
 }
 
 export async function clearKey(provider: ProviderId): Promise<void> {
-  if (!providerNeedsKey(provider)) return;
   try {
     await invoke("secrets_delete", {
       service: KEYRING_SERVICE,
@@ -57,28 +43,10 @@ export async function clearKey(provider: ProviderId): Promise<void> {
 }
 
 export async function getAllKeys(): Promise<ProviderKeys> {
-  const out = { ...EMPTY_PROVIDER_KEYS };
-  const need = PROVIDERS.filter((p) => providerNeedsKey(p.id));
-  try {
-    const results = await invoke<(string | null)[]>("secrets_get_all", {
-      service: KEYRING_SERVICE,
-      accounts: need.map((p) => p.keyringAccount),
-    });
-    need.forEach((p, i) => {
-      const v = results[i];
-      out[p.id] = v && v.length > 0 ? v : null;
-    });
-    return out;
-  } catch {
-    const entries = await Promise.all(
-      need.map(async (p) => [p.id, await getKey(p.id)] as const),
-    );
-    for (const [id, v] of entries) out[id] = v;
-    return out;
-  }
+  const key = await getKey("opencode");
+  return { opencode: key };
 }
 
-export function hasAnyKey(_keys: ProviderKeys): boolean {
-  // All providers are local/keyless — always ready.
-  return PROVIDERS.some((p) => !providerNeedsKey(p.id));
+export function hasAnyKey(keys: ProviderKeys): boolean {
+  return keys.opencode !== null && (keys.opencode?.length ?? 0) > 0;
 }

@@ -11,14 +11,9 @@ import { fmtShortcut, MOD_KEY } from "@/lib/platform";
 import { cn } from "@/lib/utils";
 import {
   Add01Icon,
-  AiBrain01Icon,
-  AiScanIcon,
-  ApiIcon,
+  AiCloud01Icon,
   ArrowDown01Icon,
   ArrowUpIcon,
-  ChipIcon,
-  ComputerIcon,
-  CpuIcon,
   Message01Icon,
   Mic01Icon,
   StopCircleIcon,
@@ -37,13 +32,8 @@ import { ACCEPTED_FILES } from "../lib/composer";
 import { useComposer } from "../lib/useComposer";
 import { useChatStore } from "../store/chatStore";
 
-const PROVIDER_ICON: Record<ProviderId, typeof ComputerIcon> = {
-  lmstudio: ComputerIcon,
-  ollama: CpuIcon,
-  openai: AiScanIcon,
-  anthropic: AiBrain01Icon,
-  groq: ChipIcon,
-  custom: ApiIcon,
+const PROVIDER_ICON: Record<ProviderId, typeof AiCloud01Icon> = {
+  opencode: AiCloud01Icon,
 };
 
 export function AiOpenButton({ onOpen }: { onOpen: () => void }) {

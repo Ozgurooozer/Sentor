@@ -221,12 +221,7 @@ function makeChat(sessionId: string): Chat<UIMessage> {
     getProviders: () => {
       const p = usePreferencesStore.getState();
       return {
-        lmstudio: { baseURL: p.lmstudioBaseURL, modelId: p.lmstudioChatModelId || undefined },
-        ollama:   { baseURL: p.ollamaBaseURL,   modelId: p.ollamaChatModelId   || undefined },
-        openai:    { modelId: p.openaiChatModelId    || undefined },
-        anthropic: { modelId: p.anthropicChatModelId || undefined },
-        groq:      { modelId: p.groqChatModelId      || undefined },
-        custom:    { baseURL: p.customProviderBaseURL || undefined, modelId: p.customProviderModelId || undefined },
+        opencode: { modelId: p.opencodeChatModelId || undefined },
       };
     },
     getPlanMode: () => usePlanStore.getState().active,

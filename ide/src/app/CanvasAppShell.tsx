@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { AgentRunBridge, useChatStore } from "@/modules/ai";
-import { getModel } from "@/modules/ai/config";
+import { getModel, OPENCODE_DEFAULT_BASE_URL } from "@/modules/ai/config";
 import { AiComposerProvider } from "@/modules/ai/lib/composer";
 import { PinnedPanelsPortal, useCanvasStore } from "@/modules/canvas";
-import { CanvasOrkestraBar } from "@/modules/canvas/CanvasOrkestraBar";
+import { OnboardingWizard } from "@/modules/onboarding/OnboardingWizard";
+
 import { useOrkestraStore } from "@/modules/canvas/orkestraStore";
 import { V3InfiniteCanvas, V3CanvasTopBar, V3SecondaryCanvas } from "@/modules/v3-canvas";
 import { CanvasSettingsOverlay } from "@/modules/canvas/CanvasSettingsOverlay";
@@ -22,6 +23,9 @@ import type { AiDiffStatus } from "@/modules/tabs";
 function CanvasAppShellInner() {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
+  const prefsHydrated = usePreferencesStore((s) => s.hydrated);
+  const isOnboarded   = usePreferencesStore((s) => s.onboarded);
+
   const setApiKeys = useChatStore((s) => s.setApiKeys);
 
   const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot) ?? "C:\\Atlas OS";
@@ -31,10 +35,8 @@ function CanvasAppShellInner() {
   const isSplit = useCanvasStore((s) => s.isSplit);
 
   const selectedModelId = useChatStore((s) => s.selectedModelId);
-  const ollamaBase  = usePreferencesStore((s) => s.ollamaBaseURL)       || "http://localhost:11434";
-  const lmBase      = usePreferencesStore((s) => s.lmstudioBaseURL)     || "http://localhost:1234";
-  const ollamaModel = usePreferencesStore((s) => s.ollamaChatModelId)   || "llama3.2";
-  const lmModel     = usePreferencesStore((s) => s.lmstudioChatModelId) || "local-model";
+  const opencodeBase   = OPENCODE_DEFAULT_BASE_URL;
+  const opencodeModel  = usePreferencesStore((s) => s.opencodeChatModelId) || "deepseek/deepseek-v4-flash-free";
 
   useApiKeys(setApiKeys);
   useVaultTrashCleanup(workspaceRoot);
@@ -54,7 +56,8 @@ function CanvasAppShellInner() {
       ork.setCollapsed(false);
       ork.setV3InputActive(true);
       const model = getModel(selectedModelId);
-      void ork.send(payload.text, model.provider, ollamaBase, lmBase, ollamaModel, lmModel);
+      const keys = useChatStore.getState().apiKeys;
+      void ork.send(payload.text, model.provider, "", "", "", "", keys.opencode ?? "", opencodeBase, opencodeModel);
     });
     const unlinkP = listen("atlas:canvas-unlink", () => {
       useOrkestraStore.getState().setV3InputActive(false);
@@ -63,7 +66,7 @@ function CanvasAppShellInner() {
       void promptP.then((fn) => fn());
       void unlinkP.then((fn) => fn());
     };
-  }, [selectedModelId, ollamaBase, lmBase, ollamaModel, lmModel]);
+  }, [selectedModelId, opencodeBase, opencodeModel]);
 
   const openVaultTab = useCallback(
     (url: string) => {
@@ -102,6 +105,15 @@ function CanvasAppShellInner() {
     [],
   );
 
+  // Onboarding: prefs yüklendi ve henüz tamamlanmadıysa wizard göster
+  if (prefsHydrated && !isOnboarded) {
+    return (
+      <OnboardingWizard onComplete={() => {
+        // setOnboarded(true) wizard içinde çağrılıyor; preferences store event ile güncellenir
+      }} />
+    );
+  }
+
   return (
     <div className="canvas-root relative h-screen overflow-hidden" style={{ background: "#050507" }}>
       {isSplit ? (
@@ -128,10 +140,7 @@ function CanvasAppShellInner() {
 
       <PinnedPanelsPortal />
 
-      {/* Canvas Orkestra input — floating bottom bar for canvas AI commands */}
-      <CanvasOrkestraBar />
-
-      <AgentRunBridge openAiDiffTab={openAiDiffTab} setAiDiffStatus={setAiDiffStatus} />
+<AgentRunBridge openAiDiffTab={openAiDiffTab} setAiDiffStatus={setAiDiffStatus} />
 
       {settingsOpen && <CanvasSettingsOverlay onClose={() => setSettingsOpen(false)} />}
 

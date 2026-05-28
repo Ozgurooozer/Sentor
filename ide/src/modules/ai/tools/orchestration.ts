@@ -96,10 +96,7 @@ Auto-executes (no approval needed).`,
         const { Experimental_Agent: AgentClass, stepCountIs } = await import("ai");
 
         const provider = getModel(selectedModelId).provider;
-        const modelIdOverride =
-          provider === "lmstudio"
-            ? prefs.lmstudioChatModelId || undefined
-            : prefs.ollamaChatModelId || undefined;
+        const modelIdOverride = prefs.opencodeChatModelId || undefined;
 
         let model;
         try {
@@ -107,17 +104,7 @@ Auto-executes (no approval needed).`,
             provider,
             apiKeys,
             getModel(selectedModelId).id,
-            {
-              providers: {
-                [provider]: {
-                  baseURL:
-                    provider === "lmstudio"
-                      ? prefs.lmstudioBaseURL
-                      : prefs.ollamaBaseURL,
-                  modelId: modelIdOverride,
-                },
-              },
-            },
+            { providers: { opencode: { modelId: modelIdOverride } } },
           );
         } catch (e) {
           return { error: String(e), agent: target.name };

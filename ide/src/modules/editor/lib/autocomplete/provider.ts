@@ -4,8 +4,7 @@ import {
   OLLAMA_DEFAULT_BASE_URL,
   type AutocompleteProviderId,
 } from "@/modules/ai/config";
-import { buildLanguageModel } from "@/modules/ai/lib/agent";
-import { EMPTY_PROVIDER_KEYS } from "@/modules/ai/lib/keyring";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { generateText } from "ai";
 import {
   buildUserPrompt,
@@ -29,12 +28,13 @@ export async function requestCompletion(
 ): Promise<string> {
   const modelId =
     deps.modelId.trim() || DEFAULT_AUTOCOMPLETE_MODEL[deps.provider];
-  const model = await buildLanguageModel(deps.provider, EMPTY_PROVIDER_KEYS, modelId, {
-    providers: {
-      lmstudio: { baseURL: deps.lmstudioBaseURL || LMSTUDIO_DEFAULT_BASE_URL },
-      ollama: { baseURL: deps.ollamaBaseURL || OLLAMA_DEFAULT_BASE_URL },
-    },
-  });
+  const baseURL =
+    deps.provider === "lmstudio"
+      ? deps.lmstudioBaseURL || LMSTUDIO_DEFAULT_BASE_URL
+      : deps.ollamaBaseURL || OLLAMA_DEFAULT_BASE_URL;
+
+  const client = createOpenAICompatible({ name: deps.provider, baseURL });
+  const model = client(modelId);
 
   const { text } = await generateText({
     model,

@@ -54,40 +54,20 @@ export type Preferences = {
   autocompleteModelId: string;
   lmstudioBaseURL: string;
   ollamaBaseURL: string;
-  lmstudioChatModelId: string;
-  ollamaChatModelId: string;
   vimMode: boolean;
   shortcuts: Record<ShortcutId, KeyBinding[]>;
-  /** Explicitly pinned workspace root folder; null = derive from terminal cwd. */
   workspaceRoot: string | null;
-  /** SearXNG instance URL for web_search. */
   searxngUrl: string;
-  /** Which embedding backend to use for semantic vault search. */
   embeddingBackend: EmbeddingBackend;
-  /** Ollama model name for embeddings (used when embeddingBackend = "ollama"). */
   embeddingOllamaModel: string;
-  /** UI layout mode: classic tabbed IDE or focused chat-centric layout. */
   layoutMode: LayoutMode;
-  /** Absolute path to the Sentor (Flowise) directory. */
   sentorPath: string;
-  /** Set to true after the user completes (or skips) the first-run wizard. */
   onboarded: boolean;
-  /** Focused-mode bottom bar collapsed (canvas-only view) — persists across reloads. */
   barCollapsed: boolean;
-  /** Focused-mode collapsible top header (tab bar) open state. */
   focusedTopOpen: boolean;
-  /** Focused-mode collapsible left panel (file explorer) open state. */
   focusedLeftOpen: boolean;
-  /** OpenAI chat model identifier (e.g. "gpt-4o"). Empty = use default. */
-  openaiChatModelId: string;
-  /** Anthropic chat model identifier (e.g. "claude-sonnet-4-6"). Empty = use default. */
-  anthropicChatModelId: string;
-  /** Groq chat model identifier (e.g. "llama-3.3-70b-versatile"). Empty = use default. */
-  groqChatModelId: string;
-  /** Base URL for the custom OpenAI-compatible provider. */
-  customProviderBaseURL: string;
-  /** Model identifier for the custom provider. */
-  customProviderModelId: string;
+  /** OpenCode Zen model identifier (e.g. "deepseek/deepseek-v4-flash-free"). Empty = use provider default. */
+  opencodeChatModelId: string;
 };
 
 const STORE_PATH = "atlas-settings.json";
@@ -102,8 +82,6 @@ const KEY_AUTOCOMPLETE_PROVIDER = "autocompleteProvider";
 const KEY_AUTOCOMPLETE_MODEL = "autocompleteModelId";
 const KEY_LMSTUDIO_BASE_URL = "lmstudioBaseURL";
 const KEY_OLLAMA_BASE_URL = "ollamaBaseURL";
-const KEY_LMSTUDIO_CHAT_MODEL = "lmstudioChatModelId";
-const KEY_OLLAMA_CHAT_MODEL = "ollamaChatModelId";
 const KEY_VIM_MODE = "vimMode";
 const KEY_SHORTCUTS = "shortcuts";
 const KEY_WORKSPACE_ROOT = "workspaceRoot";
@@ -115,11 +93,7 @@ const KEY_SENTOR_PATH = "sentorPath";
 const KEY_BAR_COLLAPSED = "barCollapsed";
 const KEY_FOCUSED_TOP_OPEN = "focusedTopOpen";
 const KEY_FOCUSED_LEFT_OPEN = "focusedLeftOpen";
-const KEY_OPENAI_CHAT_MODEL = "openaiChatModelId";
-const KEY_ANTHROPIC_CHAT_MODEL = "anthropicChatModelId";
-const KEY_GROQ_CHAT_MODEL = "groqChatModelId";
-const KEY_CUSTOM_PROVIDER_BASE_URL = "customProviderBaseURL";
-const KEY_CUSTOM_PROVIDER_MODEL = "customProviderModelId";
+const KEY_OPENCODE_CHAT_MODEL = "opencodeChatModelId";
 const KEY_ONBOARDED = "onboarded";
 
 export const DEFAULT_PREFERENCES: Preferences = {
@@ -134,8 +108,6 @@ export const DEFAULT_PREFERENCES: Preferences = {
   autocompleteModelId: DEFAULT_AUTOCOMPLETE_MODEL.lmstudio,
   lmstudioBaseURL: LMSTUDIO_DEFAULT_BASE_URL,
   ollamaBaseURL: OLLAMA_DEFAULT_BASE_URL,
-  lmstudioChatModelId: "",
-  ollamaChatModelId: "",
   vimMode: false,
   shortcuts: {} as Record<ShortcutId, KeyBinding[]>,
   workspaceRoot: null,
@@ -147,20 +119,12 @@ export const DEFAULT_PREFERENCES: Preferences = {
   barCollapsed: false,
   focusedTopOpen: true,
   focusedLeftOpen: false,
-  openaiChatModelId: "",
-  anthropicChatModelId: "",
-  groqChatModelId: "",
-  customProviderBaseURL: "",
-  customProviderModelId: "",
+  opencodeChatModelId: "deepseek/deepseek-v4-flash-free",
   onboarded: false,
 };
 
 const store = new LazyStore(STORE_PATH, { defaults: {}, autoSave: 200 });
 
-// LazyStore.onChange only fires within the writing process. The settings
-// page lives in a separate webview, so writes there never reach the main
-// window's subscribers. Mirror every setter through a Tauri event so any
-// window can listen.
 const PREFS_CHANGED_EVENT = "atlas://prefs-changed";
 
 async function writePref<T>(key: string, value: T): Promise<void> {
@@ -170,15 +134,17 @@ async function writePref<T>(key: string, value: T): Promise<void> {
 }
 
 export async function loadPreferences(): Promise<Preferences> {
-  // Single IPC roundtrip — fetching keys individually fans out to one
-  // `plugin:store|get` per setting and is the dominant boot cost.
   const entries = await store.entries();
   const map = new Map<string, unknown>(entries);
   const get = <T>(k: string): T | undefined => map.get(k) as T | undefined;
   return {
     theme: get<ThemePref>(KEY_THEME) ?? DEFAULT_PREFERENCES.theme,
-    defaultModelId:
-      get<ModelId>(KEY_DEFAULT_MODEL) ?? DEFAULT_PREFERENCES.defaultModelId,
+    defaultModelId: (() => {
+      const saved = get<ModelId>(KEY_DEFAULT_MODEL);
+      // Always use opencode-chat — only provider
+      if (!saved || saved !== "opencode-chat") return "opencode-chat";
+      return saved;
+    })(),
     editorTheme:
       get<EditorThemeId>(KEY_EDITOR_THEME) ?? DEFAULT_PREFERENCES.editorTheme,
     customInstructions:
@@ -201,10 +167,6 @@ export async function loadPreferences(): Promise<Preferences> {
       get<string>(KEY_LMSTUDIO_BASE_URL) ?? DEFAULT_PREFERENCES.lmstudioBaseURL,
     ollamaBaseURL:
       get<string>(KEY_OLLAMA_BASE_URL) ?? DEFAULT_PREFERENCES.ollamaBaseURL,
-    lmstudioChatModelId:
-      get<string>(KEY_LMSTUDIO_CHAT_MODEL) ?? DEFAULT_PREFERENCES.lmstudioChatModelId,
-    ollamaChatModelId:
-      get<string>(KEY_OLLAMA_CHAT_MODEL) ?? DEFAULT_PREFERENCES.ollamaChatModelId,
     vimMode: get<boolean>(KEY_VIM_MODE) ?? DEFAULT_PREFERENCES.vimMode,
     shortcuts:
       get<Record<ShortcutId, KeyBinding[]>>(KEY_SHORTCUTS) ??
@@ -220,16 +182,8 @@ export async function loadPreferences(): Promise<Preferences> {
       get<string>(KEY_SENTOR_PATH) ?? DEFAULT_PREFERENCES.sentorPath,
     barCollapsed:
       get<boolean>(KEY_BAR_COLLAPSED) ?? DEFAULT_PREFERENCES.barCollapsed,
-    openaiChatModelId:
-      get<string>(KEY_OPENAI_CHAT_MODEL) ?? DEFAULT_PREFERENCES.openaiChatModelId,
-    anthropicChatModelId:
-      get<string>(KEY_ANTHROPIC_CHAT_MODEL) ?? DEFAULT_PREFERENCES.anthropicChatModelId,
-    groqChatModelId:
-      get<string>(KEY_GROQ_CHAT_MODEL) ?? DEFAULT_PREFERENCES.groqChatModelId,
-    customProviderBaseURL:
-      get<string>(KEY_CUSTOM_PROVIDER_BASE_URL) ?? DEFAULT_PREFERENCES.customProviderBaseURL,
-    customProviderModelId:
-      get<string>(KEY_CUSTOM_PROVIDER_MODEL) ?? DEFAULT_PREFERENCES.customProviderModelId,
+    opencodeChatModelId:
+      get<string>(KEY_OPENCODE_CHAT_MODEL) ?? DEFAULT_PREFERENCES.opencodeChatModelId,
     onboarded: get<boolean>(KEY_ONBOARDED) ?? DEFAULT_PREFERENCES.onboarded,
     focusedTopOpen: get<boolean>(KEY_FOCUSED_TOP_OPEN) ?? DEFAULT_PREFERENCES.focusedTopOpen,
     focusedLeftOpen: get<boolean>(KEY_FOCUSED_LEFT_OPEN) ?? DEFAULT_PREFERENCES.focusedLeftOpen,
@@ -265,7 +219,7 @@ export async function setAutocompleteEnabled(value: boolean): Promise<void> {
 }
 
 export async function setAutocompleteProvider(
-  value: AutocompleteProviderId
+  value: AutocompleteProviderId,
 ): Promise<void> {
   await writePref(KEY_AUTOCOMPLETE_PROVIDER, value);
 }
@@ -280,14 +234,6 @@ export async function setLmstudioBaseURL(value: string): Promise<void> {
 
 export async function setOllamaBaseURL(value: string): Promise<void> {
   await writePref(KEY_OLLAMA_BASE_URL, value);
-}
-
-export async function setLmstudioChatModelId(value: string): Promise<void> {
-  await writePref(KEY_LMSTUDIO_CHAT_MODEL, value);
-}
-
-export async function setOllamaChatModelId(value: string): Promise<void> {
-  await writePref(KEY_OLLAMA_CHAT_MODEL, value);
 }
 
 export async function setVimMode(value: boolean): Promise<void> {
@@ -322,24 +268,8 @@ export async function setBarCollapsed(value: boolean): Promise<void> {
   await writePref(KEY_BAR_COLLAPSED, value);
 }
 
-export async function setOpenaiChatModelId(value: string): Promise<void> {
-  await writePref(KEY_OPENAI_CHAT_MODEL, value);
-}
-
-export async function setAnthropicChatModelId(value: string): Promise<void> {
-  await writePref(KEY_ANTHROPIC_CHAT_MODEL, value);
-}
-
-export async function setGroqChatModelId(value: string): Promise<void> {
-  await writePref(KEY_GROQ_CHAT_MODEL, value);
-}
-
-export async function setCustomProviderBaseURL(value: string): Promise<void> {
-  await writePref(KEY_CUSTOM_PROVIDER_BASE_URL, value);
-}
-
-export async function setCustomProviderModelId(value: string): Promise<void> {
-  await writePref(KEY_CUSTOM_PROVIDER_MODEL, value);
+export async function setOpencodeChatModelId(value: string): Promise<void> {
+  await writePref(KEY_OPENCODE_CHAT_MODEL, value);
 }
 
 export async function setFocusedTopOpen(value: boolean): Promise<void> {
@@ -355,7 +285,7 @@ export async function setOnboarded(value: boolean): Promise<void> {
 }
 
 export async function setShortcuts(
-  value: Record<ShortcutId, KeyBinding[]> | {}
+  value: Record<ShortcutId, KeyBinding[]> | {},
 ): Promise<void> {
   await store.set(KEY_SHORTCUTS, value);
   await store.save();
@@ -384,8 +314,6 @@ export async function onPreferencesChange(
     [KEY_AUTOCOMPLETE_MODEL]: "autocompleteModelId",
     [KEY_LMSTUDIO_BASE_URL]: "lmstudioBaseURL",
     [KEY_OLLAMA_BASE_URL]: "ollamaBaseURL",
-    [KEY_LMSTUDIO_CHAT_MODEL]: "lmstudioChatModelId",
-    [KEY_OLLAMA_CHAT_MODEL]: "ollamaChatModelId",
     [KEY_VIM_MODE]: "vimMode",
     [KEY_SHORTCUTS]: "shortcuts",
     [KEY_WORKSPACE_ROOT]: "workspaceRoot",
@@ -395,14 +323,8 @@ export async function onPreferencesChange(
     [KEY_LAYOUT_MODE]: "layoutMode",
     [KEY_SENTOR_PATH]: "sentorPath",
     [KEY_BAR_COLLAPSED]: "barCollapsed",
-    [KEY_OPENAI_CHAT_MODEL]: "openaiChatModelId",
-    [KEY_ANTHROPIC_CHAT_MODEL]: "anthropicChatModelId",
-    [KEY_GROQ_CHAT_MODEL]: "groqChatModelId",
-    [KEY_CUSTOM_PROVIDER_BASE_URL]: "customProviderBaseURL",
-    [KEY_CUSTOM_PROVIDER_MODEL]: "customProviderModelId",
+    [KEY_OPENCODE_CHAT_MODEL]: "opencodeChatModelId",
   };
-  // Same-process writes still fire onChange immediately; cross-window writes
-  // arrive via the Tauri event emitted by writePref().
   const unsubLocal = await store.onChange<unknown>((key, value) => {
     const mapped = map[key];
     if (mapped) cb(mapped, value);
@@ -420,8 +342,6 @@ export async function onPreferencesChange(
   };
 }
 
-// API key changes are stored in OS keychain (not the prefs store),
-// so we broadcast via a Tauri event for cross-window listeners.
 const KEYS_CHANGED_EVENT = "atlas://ai-keys-changed";
 
 export async function emitKeysChanged(): Promise<void> {

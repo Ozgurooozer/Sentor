@@ -1,12 +1,6 @@
 export const KEYRING_SERVICE = "atlas-ai";
 
-export type ProviderId =
-  | "lmstudio"
-  | "ollama"
-  | "openai"
-  | "anthropic"
-  | "groq"
-  | "custom";
+export type ProviderId = "opencode";
 
 export type ProviderInfo = {
   id: ProviderId;
@@ -18,46 +12,11 @@ export type ProviderInfo = {
 
 export const PROVIDERS: readonly ProviderInfo[] = [
   {
-    id: "lmstudio",
-    label: "LM Studio",
-    keyringAccount: "",
+    id: "opencode",
+    label: "OpenCode Zen",
+    keyringAccount: "opencode",
     keyPrefix: null,
-    consoleUrl: "https://lmstudio.ai/docs/basics/server",
-  },
-  {
-    id: "ollama",
-    label: "Ollama",
-    keyringAccount: "",
-    keyPrefix: null,
-    consoleUrl: "https://ollama.com",
-  },
-  {
-    id: "openai",
-    label: "OpenAI",
-    keyringAccount: "openai",
-    keyPrefix: "sk-",
-    consoleUrl: "https://platform.openai.com/api-keys",
-  },
-  {
-    id: "anthropic",
-    label: "Anthropic",
-    keyringAccount: "anthropic",
-    keyPrefix: "sk-ant-",
-    consoleUrl: "https://console.anthropic.com/settings/keys",
-  },
-  {
-    id: "groq",
-    label: "Groq",
-    keyringAccount: "groq",
-    keyPrefix: "gsk_",
-    consoleUrl: "https://console.groq.com/keys",
-  },
-  {
-    id: "custom",
-    label: "Custom",
-    keyringAccount: "custom",
-    keyPrefix: null,
-    consoleUrl: "",
+    consoleUrl: "https://opencode.ai/auth",
   },
 ] as const;
 
@@ -76,40 +35,10 @@ export type ModelInfo = {
 
 export const MODELS = [
   {
-    id: "lmstudio-local",
-    provider: "lmstudio",
-    label: "LM Studio",
-    hint: "Local model",
-  },
-  {
-    id: "ollama-local",
-    provider: "ollama",
-    label: "Ollama",
-    hint: "Local model",
-  },
-  {
-    id: "openai-chat",
-    provider: "openai",
-    label: "OpenAI",
-    hint: "GPT-4o, o1, …",
-  },
-  {
-    id: "anthropic-chat",
-    provider: "anthropic",
-    label: "Anthropic",
-    hint: "Claude Sonnet, Opus, …",
-  },
-  {
-    id: "groq-chat",
-    provider: "groq",
-    label: "Groq",
-    hint: "Llama 3, Mixtral",
-  },
-  {
-    id: "custom-chat",
-    provider: "custom",
-    label: "Custom",
-    hint: "OpenAI-compatible",
+    id: "opencode-chat",
+    provider: "opencode",
+    label: "OpenCode Zen",
+    hint: "Zen API",
   },
 ] as const satisfies readonly ModelInfo[];
 
@@ -121,15 +50,10 @@ export function getModel(id: ModelId): ModelInfo {
   return m;
 }
 
-export const DEFAULT_MODEL_ID: ModelId = "lmstudio-local";
+export const DEFAULT_MODEL_ID: ModelId = "opencode-chat";
 
 export const MODEL_CONTEXT_LIMITS: Record<string, number> = {
-  "lmstudio-local": 32_000,
-  "ollama-local": 32_000,
-  "openai-chat": 128_000,
-  "anthropic-chat": 200_000,
-  "groq-chat": 128_000,
-  "custom-chat": 32_000,
+  "opencode-chat": 200_000,
 };
 
 export function getModelContextLimit(modelId: string | undefined): number {
@@ -137,15 +61,11 @@ export function getModelContextLimit(modelId: string | undefined): number {
   return MODEL_CONTEXT_LIMITS[modelId] ?? 32_000;
 }
 
-/** Providers that don't require an API key. Custom is keyless but accepts one. */
-export const KEYLESS_PROVIDERS: readonly ProviderId[] = [
-  "lmstudio",
-  "ollama",
-  "custom",
-] as const;
+/** opencode always requires an API key. */
+export const KEYLESS_PROVIDERS: readonly ProviderId[] = [] as const;
 
-export function providerNeedsKey(id: ProviderId): boolean {
-  return !KEYLESS_PROVIDERS.includes(id);
+export function providerNeedsKey(_id: ProviderId): boolean {
+  return true;
 }
 
 export type AutocompleteProviderId = "lmstudio" | "ollama";
@@ -162,10 +82,7 @@ export const DEFAULT_AUTOCOMPLETE_MODEL: Record<AutocompleteProviderId, string> 
 
 export const LMSTUDIO_DEFAULT_BASE_URL = "http://localhost:1234/v1";
 export const OLLAMA_DEFAULT_BASE_URL = "http://localhost:11434/v1";
-export const OPENAI_DEFAULT_CHAT_MODEL = "gpt-4o";
-export const ANTHROPIC_DEFAULT_CHAT_MODEL = "claude-sonnet-4-6";
-export const GROQ_DEFAULT_CHAT_MODEL = "llama-3.3-70b-versatile";
-export const CUSTOM_DEFAULT_BASE_URL = "http://localhost:8080/v1";
+export const OPENCODE_DEFAULT_BASE_URL = "https://opencode.ai/zen/v1";
 export const MAX_AGENT_STEPS = 24;
 export const TERMINAL_BUFFER_LINES = 300;
 
