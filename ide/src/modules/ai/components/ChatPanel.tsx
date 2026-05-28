@@ -67,19 +67,26 @@ export function ChatPanel({ savedSessionId, onSessionCreated, panelId }: Props) 
   }, [sessionId, terminalToolActive, linkedTerminalPanel]);
 
   const buildContextPrefix = useCallback((): string => {
-    const included = wireBlocks.filter(
-      (b) => b.connectionKind === "context" || applyToAll,
-    );
-    const blocks = included
-      .filter((b): b is WireBlock & { data: { kind: "text"; value: string } } =>
-        b.data?.kind === "text" && typeof b.data.value === "string" && b.data.value.length > 0
-      )
-      .map(
-        (b) =>
-          `[${PANEL_ICONS[b.panelType] ?? "◉"} ${b.panelTitle} · ${b.panelType}]\n${b.data.value}`,
-      )
-      .join("\n\n---\n\n");
-    return blocks ? `<connected-context>\n${blocks}\n</connected-context>\n\n` : "";
+    const textBlocks = (subset: WireBlock[]) =>
+      subset
+        .filter((b): b is WireBlock & { data: { kind: "text"; value: string } } =>
+          b.data?.kind === "text" && typeof b.data.value === "string" && b.data.value.length > 0,
+        )
+        .map((b) => `[${PANEL_ICONS[b.panelType] ?? "◉"} ${b.panelTitle}]\n${b.data.value}`)
+        .join("\n\n---\n\n");
+
+    // context wires → silent system block (always included)
+    const contextWires = wireBlocks.filter((b) => b.connectionKind === "context");
+    // data wires → explicit data block (included when applyToAll or when data wire is connected)
+    const dataWires = wireBlocks.filter((b) => b.connectionKind === "data");
+
+    const contextBlock = textBlocks(contextWires);
+    const dataBlock    = applyToAll ? textBlocks(dataWires) : textBlocks(dataWires);
+
+    const parts: string[] = [];
+    if (contextBlock) parts.push(`<connected-context>\n${contextBlock}\n</connected-context>`);
+    if (dataBlock)    parts.push(`<wire-data>\n${dataBlock}\n</wire-data>`);
+    return parts.length ? parts.join("\n") + "\n\n" : "";
   }, [wireBlocks, applyToAll]);
 
   const dispatchTriggers = useCallback(
@@ -133,6 +140,7 @@ export function ChatPanel({ savedSessionId, onSessionCreated, panelId }: Props) 
     >
       <ChatBody
         sessionId={sessionId}
+        panelId={panelId ?? null}
         wireBlocks={wireBlocks}
         applyToAll={applyToAll}
         onToggleApplyToAll={() => setApplyToAll((v) => !v)}
@@ -227,6 +235,7 @@ function HistoryMenu({
 // ── chat body ─────────────────────────────────────────────────────────────────
 function ChatBody({
   sessionId,
+  panelId,
   wireBlocks,
   applyToAll,
   onToggleApplyToAll,
@@ -236,6 +245,7 @@ function ChatBody({
   onSwitchSession,
 }: {
   sessionId: string;
+  panelId: string | null;
   wireBlocks: WireBlock[];
   applyToAll: boolean;
   onToggleApplyToAll: () => void;
@@ -247,6 +257,19 @@ function ChatBody({
   const chat    = useMemo(() => getOrCreateChat(sessionId), [sessionId]);
   const helpers = useChat<UIMessage>({ chat });
   const { attachImageDataUrl } = useComposer();
+  const setOutputData = useCanvasStore((s) => s.setOutputData);
+
+  // Write last complete assistant response to output wire so downstream nodes receive it
+  useEffect(() => {
+    if (!panelId || helpers.status === "streaming" || helpers.status === "submitted") return;
+    const last = [...helpers.messages].reverse().find((m) => m.role === "assistant");
+    if (!last) return;
+    const text = last.parts
+      ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
+      .map((p) => p.text)
+      .join("") ?? "";
+    if (text) setOutputData(panelId, { kind: "text", value: text });
+  }, [helpers.messages, helpers.status, panelId, setOutputData]);
 
   const [showHistory, setShowHistory] = useState(false);
 

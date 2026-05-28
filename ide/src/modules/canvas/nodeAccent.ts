@@ -3,7 +3,7 @@ import type { CanvasPanelNode, PanelType } from "./types";
 /**
  * Per-PanelType accent color used for node borders + faint glow on the
  * infinite canvas. Matches the Blueprint-style visual language described in
- * NODE_SYSTEM_PLAN.md §1.5.1.
+ * See docs/planning/CANVAS_NODES.md §1.5.1.
  *
  * Header nodes pick their own colour and store it in `panel.meta.headerColor`
  * (see HeaderPanel.tsx). `accentFor()` honours that override.
@@ -23,6 +23,19 @@ export const NODE_ACCENT: Partial<Record<PanelType, string>> = {
   preview:      "#666666",
   canvas:       "#444444",
   instance:     "#444444",
+  "canvas-3d":  "#5b8def",
+  logs:         "#4db89a",
+  // Phase L — logic & variable nodes
+  "variable":   "#d4a843", // gold — stores data
+  "if-else":    "#4db89a", // green — control flow
+  "for-each":   "#9b72ef", // purple — iteration
+  // Previously missing
+  note:         "#d4a843", // amber — content
+  sketch:       "#888888",
+  pipe:         "#e07b54", // orange — transform
+  audio:        "#4db89a", // green — media
+  filebrowser:  "#666666",
+  tool:         "#5b8def",
 };
 
 export const DEFAULT_ACCENT = "#2a2a2a";
