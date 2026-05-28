@@ -22,7 +22,10 @@ export type PanelType =
   | "stickman"
   | "canvas-3d"
   | "logs"
-  | "audio";
+  | "audio"
+  | "variable"
+  | "if-else"
+  | "for-each";
 
 export interface CanvasPanelNode {
   id: string;
