@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { listen } from "@tauri-apps/api/event";
+import { listen, emitTo } from "@tauri-apps/api/event";
 import { AgentRunBridge, useChatStore } from "@/modules/ai";
 import { getModel, OPENCODE_DEFAULT_BASE_URL } from "@/modules/ai/config";
 import { AiComposerProvider } from "@/modules/ai/lib/composer";
@@ -36,7 +36,7 @@ function CanvasAppShellInner() {
 
   const selectedModelId = useChatStore((s) => s.selectedModelId);
   const opencodeBase   = OPENCODE_DEFAULT_BASE_URL;
-  const opencodeModel  = usePreferencesStore((s) => s.opencodeChatModelId) || "deepseek/deepseek-v4-flash-free";
+  const opencodeModel  = usePreferencesStore((s) => s.opencodeChatModelId) || "deepseek-v4-flash-free";
 
   useApiKeys(setApiKeys);
   useVaultTrashCleanup(workspaceRoot);
@@ -74,6 +74,23 @@ function CanvasAppShellInner() {
       void unlinkP.then((fn) => fn());
     };
   }, [selectedModelId, opencodeBase, opencodeModel]);
+
+  // ── Canvas IPC for V3InputShell (separate Tauri window) ─────────────────
+  useEffect(() => {
+    const reqP = listen("atlas:request-canvases", async () => {
+      const { canvases, activeCanvasId } = useCanvasStore.getState();
+      await emitTo("v3-input", "atlas:canvas-list", { canvases, activeCanvasId }).catch(() => {});
+    });
+    const switchP = listen<{ id: string }>("atlas:canvas-switch", async ({ payload }) => {
+      await useCanvasStore.getState().switchCanvas(payload.id);
+      const { canvases, activeCanvasId } = useCanvasStore.getState();
+      await emitTo("v3-input", "atlas:canvas-list", { canvases, activeCanvasId }).catch(() => {});
+    });
+    return () => {
+      void reqP.then(fn => fn());
+      void switchP.then(fn => fn());
+    };
+  }, []);
 
   const openVaultTab = useCallback(
     (url: string) => {
