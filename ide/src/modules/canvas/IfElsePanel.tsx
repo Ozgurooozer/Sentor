@@ -11,7 +11,7 @@ function evalCondition(val: unknown): boolean {
 }
 
 export function IfElsePanel({ panelId }: Props) {
-  const setOutput  = useCanvasStore((s) => s.setOutputData);
+  const setPortOutput = useCanvasStore((s) => s.setPortOutputData);
   const wireBlocks = useAllIncomingWireData(panelId);
 
   const condWire  = wireBlocks.find((b) => b.toPort === "condition");
@@ -24,15 +24,18 @@ export function IfElsePanel({ panelId }: Props) {
 
   useEffect(() => {
     if (condVal === undefined) return;
-    const result = evalCondition(condVal) ? trueVal : falseVal;
-    setOutput(panelId, { kind: "text", value: String(result ?? "") });
-  }, [condVal, trueVal, falseVal, panelId, setOutput]);
+    const branch = evalCondition(condVal);
+    // Route to separate then_out / else_out ports
+    setPortOutput(panelId, "then_out", branch ? { kind: "text", value: String(trueVal ?? "") } : null);
+    setPortOutput(panelId, "else_out", !branch ? { kind: "text", value: String(falseVal ?? "") } : null);
+  }, [condVal, trueVal, falseVal, panelId, setPortOutput]);
 
   const isTrue  = condVal !== undefined && evalCondition(condVal);
   const isFalse = condVal !== undefined && !evalCondition(condVal);
-  const resultVal = condVal !== undefined
-    ? String(evalCondition(condVal) ? (trueVal ?? "") : (falseVal ?? ""))
+  const activeVal = condVal !== undefined
+    ? String(isTrue ? (trueVal ?? "") : (falseVal ?? ""))
     : null;
+  const resultVal = activeVal;
 
   const accent = "#5b8def";
   const green  = "#4db89a";

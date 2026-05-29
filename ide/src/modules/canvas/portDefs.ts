@@ -48,7 +48,7 @@ export const PORT_DEFS: Partial<Record<PanelType, PanelPorts>> = {
   variable:              { inputs: [any("set", "Set")],                          outputs: [any("value", "Value")]                     },
   "variable-inspector":  { inputs: [],                                                   outputs: []                                           },
   "voice-variable":      { inputs: [],                                                   outputs: [text("transcript", "Transcript", "data")]    },
-  "if-else":   { inputs: [text("condition", "Condition", "data"), any("true_val", "True"), any("false_val", "False")], outputs: [any("result", "Result")] },
+  "if-else":   { inputs: [text("condition", "Condition", "data"), any("true_val", "True"), any("false_val", "False")], outputs: [any("then_out", "Then"), any("else_out", "Else")] },
   "for-each":  { inputs: [any("items", "Items")],                      outputs: [json("items_json", "Items JSON"), text("item_count", "Count", "data")] },
   "gate":      { inputs: [any("signal", "Signal"), text("condition", "Condition", "data")], outputs: [any("pass", "Pass"), any("rejected", "Rejected")] },
 };

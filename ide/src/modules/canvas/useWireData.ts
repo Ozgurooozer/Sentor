@@ -33,8 +33,13 @@ export function useAllIncomingWireData(panelId: string): WireBlock[] {
           // serve that instead of the live outputData so downstream chats
           // see a stable view even when the upstream keeps churning.
           const snap = src?.meta?.snapshotData as WireData | undefined;
+          // Per-port output: if a fromPort is specified and portOutputData exists,
+          // use that in preference to the panel-wide outputData.
+          const portOutputData = src?.meta?.portOutputData as Record<string, WireData> | undefined;
+          const portSpecific = c.fromPort && portOutputData ? portOutputData[c.fromPort] : undefined;
           const raw =
             (snap ??
+              portSpecific ??
               (src?.meta?.outputData as WireData | undefined)) ??
             undefined;
           const limit = c.charLimit ?? DEFAULT_CHAR_LIMIT;

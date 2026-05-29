@@ -133,6 +133,12 @@ interface CanvasActions {
     id: string,
     data: { kind: "text" | "image" | "json"; value: unknown } | null,
   ): void;
+  /** Set output data for a specific named output port. Stored in meta.portOutputData[portId]. */
+  setPortOutputData(
+    id: string,
+    portId: string,
+    data: { kind: "text" | "image" | "json"; value: unknown } | null,
+  ): void;
   loadBlueprint(blueprint: { panels: CanvasPanelNode[]; connections: Connection[]; offsetX?: number; offsetY?: number }): void;
   setSubViewport(parentId: string, patch: Partial<Viewport>): void;
   addChildPanel(parentId: string, type: PanelType, at?: { x: number; y: number }): string;
@@ -401,6 +407,21 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
       const payload = typeof data.value === "string" ? data.value : JSON.stringify(data.value ?? "");
       void emitTo(panel.windowLabel, "atlas:wire-data", { panelId: id, data: payload });
     }
+  },
+
+  setPortOutputData(id, portId, data) {
+    set((s) => ({
+      panels: s.panels.map((p) => {
+        if (p.id !== id) return p;
+        const portOutputData = { ...(p.meta?.portOutputData as Record<string, unknown> ?? {}) };
+        if (data === null) {
+          delete portOutputData[portId];
+        } else {
+          portOutputData[portId] = data;
+        }
+        return { ...p, meta: { ...p.meta, portOutputData } };
+      }),
+    }));
   },
 
   loadBlueprint({ panels: bpPanels, connections: bpConns, offsetX = 60, offsetY = 60 }) {
