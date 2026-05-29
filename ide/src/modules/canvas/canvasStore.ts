@@ -110,6 +110,20 @@ interface CanvasActions {
   selectPanel(id: string, addToSelection?: boolean): void;
   deselectAll(): void;
   deleteSelected(): void;
+  /** Tüm canvas panellerini seç (pinned/minimized hariç). */
+  selectAll(): void;
+  /** Verilen ID listesini seçili yap (mevcut seçimi ezer). */
+  selectMany(ids: string[]): void;
+  /**
+   * Seçili panelleri (excludeId hariç) dx/dy kadar kaydır.
+   * Multi-drag sırasında diğer seçili panelleri senkronize eder.
+   */
+  moveSelectedExcept(excludeId: string, dx: number, dy: number): void;
+  /**
+   * Kopyalanan panelleri viewport merkezine yapıştırır.
+   * Her panel yeni UUID alır; paste sonrası seçili hale gelir.
+   */
+  pasteFromClipboard(nodes: CanvasPanelNode[]): void;
   addConnection(fromPanel: string, fromSide: PortSide, toPanel: string, toSide: PortSide, fromPort?: string, toPort?: string, kind?: "data" | "context" | "trigger"): string;
   removeConnection(id: string): void;
   updateConnectionKind(id: string, kind: "data" | "context" | "trigger"): void;
@@ -157,6 +171,7 @@ const PANEL_DEFAULTS: Record<PanelType, { width: number; height: number; title: 
   variable:    { width: 220, height: 120, title: "Variable" },
   "if-else":   { width: 260, height: 160, title: "If / Else" },
   "for-each":  { width: 260, height: 160, title: "For Each" },
+  "gate":      { width: 240, height: 180, title: "Gate" },
 };
 
 const DEFAULT_CANVAS_ID = "main";
@@ -223,6 +238,59 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
       connections: s.connections.filter((c) => !ids.includes(c.fromPanel) && !ids.includes(c.toPanel)),
       selectedPanelIds: [],
     }));
+  },
+
+  selectAll() {
+    set((s) => ({ selectedPanelIds: s.panels.filter((p) => !p.pinned && !p.minimized).map((p) => p.id) }));
+  },
+
+  selectMany(ids) {
+    set({ selectedPanelIds: ids });
+  },
+
+  moveSelectedExcept(excludeId, dx, dy) {
+    const { selectedPanelIds } = get();
+    if (selectedPanelIds.length <= 1) return;
+    set((s) => ({
+      panels: s.panels.map((p) =>
+        s.selectedPanelIds.includes(p.id) && p.id !== excludeId && !p.pinned
+          ? { ...p, x: p.x + dx, y: p.y + dy }
+          : p,
+      ),
+    }));
+    const cur = get();
+    schedulePersist({ panels: cur.panels, connections: cur.connections, viewport: cur.viewport, nextZ: cur.nextZ });
+  },
+
+  pasteFromClipboard(nodes) {
+    if (nodes.length === 0) return;
+    const { nextZ, viewport } = get();
+    const cx = (window.innerWidth  / 2 - viewport.x) / viewport.scale;
+    const cy = (window.innerHeight / 2 - viewport.y) / viewport.scale;
+    const minX = Math.min(...nodes.map((n) => n.x));
+    const minY = Math.min(...nodes.map((n) => n.y));
+    const maxX = Math.max(...nodes.map((n) => n.x + n.width));
+    const maxY = Math.max(...nodes.map((n) => n.y + n.height));
+    const clipCX = (minX + maxX) / 2;
+    const clipCY = (minY + maxY) / 2;
+    const offX = cx - clipCX + 40;
+    const offY = cy - clipCY + 40;
+    let z = nextZ;
+    const newPanels: CanvasPanelNode[] = nodes.map((n) => ({
+      ...n,
+      id: crypto.randomUUID(),
+      x: n.x + offX,
+      y: n.y + offY,
+      zIndex: z++,
+      meta: { ...(n.meta ?? {}) },
+    }));
+    set((s) => ({
+      panels: [...s.panels, ...newPanels],
+      nextZ: z,
+      selectedPanelIds: newPanels.map((p) => p.id),
+    }));
+    const cur = get();
+    schedulePersist({ panels: cur.panels, connections: cur.connections, viewport: cur.viewport, nextZ: cur.nextZ });
   },
 
   removePanel(id) {
