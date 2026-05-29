@@ -6,61 +6,44 @@ const MAP_H = 96;
 const PAD   = 120;
 
 export function V3MiniMap() {
-  // Select the stable array reference, then filter with useMemo.
-  // Selecting with inline .filter() creates a new array on every Zustand
-  // subscription check, causing an infinite re-render loop.
-  const allPanels  = useCanvasStore((s) => s.panels);
-  const viewport   = useCanvasStore((s) => s.viewport);
+  // ── All hooks must run unconditionally (Rules of Hooks) ──────────────────
+  const allPanels   = useCanvasStore((s) => s.panels);
+  const viewport    = useCanvasStore((s) => s.viewport);
   const setViewport = useCanvasStore((s) => s.setViewport);
-  const dragRef    = useRef(false);
+  const dragRef     = useRef(false);
 
   const panels = useMemo(
     () => allPanels.filter((p) => !p.pinned && !p.minimized),
     [allPanels],
   );
 
-  if (panels.length === 0) return null;
-
-  // Bounding box of all panels (canvas space), padded
-  const minX = Math.min(...panels.map((p) => p.x)) - PAD;
-  const minY = Math.min(...panels.map((p) => p.y)) - PAD;
-  const maxX = Math.max(...panels.map((p) => p.x + p.width))  + PAD;
-  const maxY = Math.max(...panels.map((p) => p.y + p.height)) + PAD;
-  const bw   = maxX - minX;
-  const bh   = maxY - minY;
-
-  // Scale to fit MAP_W x MAP_H
-  const s = Math.min(MAP_W / bw, MAP_H / bh);
-  const mapW = bw * s;
-  const mapH = bh * s;
-  const offX = (MAP_W - mapW) / 2;
-  const offY = (MAP_H - mapH) / 2;
-
-  const toMap = (cx: number, cy: number) => ({
-    x: (cx - minX) * s + offX,
-    y: (cy - minY) * s + offY,
-  });
-
-  // Viewport visible area in canvas space
-  const vpCX = -viewport.x / viewport.scale;
-  const vpCY = -viewport.y / viewport.scale;
-  const vpCW = window.innerWidth  / viewport.scale;
-  const vpCH = window.innerHeight / viewport.scale;
-
-  const vpMap  = toMap(vpCX, vpCY);
-  const vpMapW = vpCW * s;
-  const vpMapH = vpCH * s;
+  // Bounds null when no panels — checked below after all hooks
+  const bounds = useMemo(() => {
+    if (panels.length === 0) return null;
+    const minX = Math.min(...panels.map((p) => p.x)) - PAD;
+    const minY = Math.min(...panels.map((p) => p.y)) - PAD;
+    const maxX = Math.max(...panels.map((p) => p.x + p.width))  + PAD;
+    const maxY = Math.max(...panels.map((p) => p.y + p.height)) + PAD;
+    const bw   = maxX - minX;
+    const bh   = maxY - minY;
+    const s    = Math.min(MAP_W / bw, MAP_H / bh);
+    const mapW = bw * s;
+    const mapH = bh * s;
+    const offX = (MAP_W - mapW) / 2;
+    const offY = (MAP_H - mapH) / 2;
+    return { minX, minY, s, offX, offY };
+  }, [panels]);
 
   const moveToMapPoint = useCallback((mx: number, my: number) => {
+    if (!bounds) return;
+    const { offX, offY, s, minX, minY } = bounds;
     const canvasX = (mx - offX) / s + minX;
     const canvasY = (my - offY) / s + minY;
     setViewport({
       x: window.innerWidth  / 2 - canvasX * viewport.scale,
       y: window.innerHeight / 2 - canvasY * viewport.scale,
     });
-  // deps: offX, offY, s, minX, minY are computed values (not reactive state); viewport.scale IS reactive
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewport.scale, setViewport]);
+  }, [bounds, viewport.scale, setViewport]);
 
   const onPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     dragRef.current = true;
@@ -79,6 +62,23 @@ export function V3MiniMap() {
     dragRef.current = false;
     (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
   }, []);
+
+  // ── Conditional return AFTER all hooks ───────────────────────────────────
+  if (!bounds) return null;
+
+  const { minX, minY, s, offX, offY } = bounds;
+  const toMap = (cx: number, cy: number) => ({
+    x: (cx - minX) * s + offX,
+    y: (cy - minY) * s + offY,
+  });
+
+  const vpCX  = -viewport.x / viewport.scale;
+  const vpCY  = -viewport.y / viewport.scale;
+  const vpCW  = window.innerWidth  / viewport.scale;
+  const vpCH  = window.innerHeight / viewport.scale;
+  const vpMap = toMap(vpCX, vpCY);
+  const vpMapW = vpCW * s;
+  const vpMapH = vpCH * s;
 
   return (
     <div
@@ -127,7 +127,7 @@ export function V3MiniMap() {
         }}
       />
 
-      {/* "map" label */}
+      {/* label */}
       <div
         className="pointer-events-none absolute bottom-1 left-1.5 font-mono text-[8px] uppercase tracking-widest"
         style={{ color: "rgba(255,255,255,0.16)" }}
