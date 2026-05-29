@@ -26,9 +26,11 @@ export const NODE_ACCENT: Partial<Record<PanelType, string>> = {
   "canvas-3d":  "#5b8def",
   logs:         "#4db89a",
   // Phase L — logic & variable nodes
-  "variable":   "#d4a843", // gold — stores data
-  "if-else":    "#4db89a", // green — control flow
-  "for-each":   "#9b72ef", // purple — iteration
+  "gate":                "#e07b54", // orange — circuit gate
+  "variable":            "#d4a843", // gold — stores data
+  "variable-inspector":  "#d4a843", // gold — inspector reads the store
+  "if-else":             "#4db89a", // green — control flow
+  "for-each":            "#9b72ef", // purple — iteration
   // Previously missing
   note:         "#d4a843", // amber — content
   sketch:       "#888888",

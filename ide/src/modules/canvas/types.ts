@@ -24,8 +24,10 @@ export type PanelType =
   | "logs"
   | "audio"
   | "variable"
+  | "variable-inspector"
   | "if-else"
-  | "for-each";
+  | "for-each"
+  | "gate";
 
 export interface CanvasPanelNode {
   id: string;

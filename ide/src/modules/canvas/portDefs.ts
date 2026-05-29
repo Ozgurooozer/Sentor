@@ -45,9 +45,11 @@ export const PORT_DEFS: Partial<Record<PanelType, PanelPorts>> = {
   tool:        { inputs: [any("input",   "input")],                   outputs: [any("output",   "output")]   },
   pipe:        { inputs: [text("in",     "in", "data")],              outputs: [text("out",     "out", "data")] },
   audio:       { inputs: [trig("trigger", "start")],                  outputs: [text("transcript", "transcript", "data")] },
-  variable:    { inputs: [any("set", "Set")],                          outputs: [any("value", "Value")]                     },
+  variable:              { inputs: [any("set", "Set")],                          outputs: [any("value", "Value")]                     },
+  "variable-inspector":  { inputs: [],                                           outputs: []                                          },
   "if-else":   { inputs: [text("condition", "Condition", "data"), any("true_val", "True"), any("false_val", "False")], outputs: [any("result", "Result")] },
   "for-each":  { inputs: [any("items", "Items")],                      outputs: [json("items_json", "Items JSON"), text("item_count", "Count", "data")] },
+  "gate":      { inputs: [any("signal", "Signal"), text("condition", "Condition", "data")], outputs: [any("pass", "Pass"), any("rejected", "Rejected")] },
 };
 
 const HEADER_H = 32;
