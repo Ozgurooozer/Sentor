@@ -733,6 +733,12 @@ function CanvasEditor({ panel }: { panel: CanvasPanelNode }) {
   return <EditorPane path={path} onSaved={debouncedReread} />;
 }
 
+const IMAGE_EXTS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp", "ico", "avif"]);
+
+function isImagePath(p: string): boolean {
+  return IMAGE_EXTS.has(p.split(".").pop()?.toLowerCase() ?? "");
+}
+
 function CanvasPreview({ panel }: { panel: CanvasPanelNode }) {
   const updatePanel = useCanvasStore((s) => s.updatePanel);
   const setOutputData = useCanvasStore((s) => s.setOutputData);
@@ -750,8 +756,24 @@ function CanvasPreview({ panel }: { panel: CanvasPanelNode }) {
               updatePanel(panel.id, { meta: { ...panel.meta, path: input.trim() } });
             }
           }}
-          placeholder="Absolute path to .html file..."
+          placeholder="Absolute path to file (html, png, jpg…)"
           className="h-6 w-full max-w-xs rounded bg-[#1a1a1a] px-2 text-[10px] text-[#f5f5f5] outline-none focus:bg-[#222]"
+        />
+      </div>
+    );
+  }
+  // Image preview
+  if (isImagePath(path)) {
+    return (
+      <div
+        className="flex h-full w-full items-center justify-center overflow-hidden"
+        style={{ background: "#080808" }}
+      >
+        <img
+          src={localToAsset(path.replace(/\\/g, "/"))}
+          alt={path.split(/[\\/]/).pop() ?? "image"}
+          draggable={false}
+          style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
         />
       </div>
     );
