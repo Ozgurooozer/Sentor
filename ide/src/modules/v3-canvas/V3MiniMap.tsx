@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { useCanvasStore } from "@/modules/canvas/canvasStore";
 
 const MAP_W = 160;
@@ -6,10 +6,18 @@ const MAP_H = 96;
 const PAD   = 120;
 
 export function V3MiniMap() {
-  const panels     = useCanvasStore((s) => s.panels.filter((p) => !p.pinned && !p.minimized));
+  // Select the stable array reference, then filter with useMemo.
+  // Selecting with inline .filter() creates a new array on every Zustand
+  // subscription check, causing an infinite re-render loop.
+  const allPanels  = useCanvasStore((s) => s.panels);
   const viewport   = useCanvasStore((s) => s.viewport);
   const setViewport = useCanvasStore((s) => s.setViewport);
   const dragRef    = useRef(false);
+
+  const panels = useMemo(
+    () => allPanels.filter((p) => !p.pinned && !p.minimized),
+    [allPanels],
+  );
 
   if (panels.length === 0) return null;
 
