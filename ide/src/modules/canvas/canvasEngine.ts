@@ -131,6 +131,9 @@ function devProxy(url: string): string {
 
 async function callModel(prompt: string, opts: RunOptions): Promise<string> {
   if (opts.modelProvider === "opencode") {
+    if (!opts.opencodeKey) {
+      return "Error: OpenCode API key not configured. Set it in Settings → Models.";
+    }
     const base = (opts.opencodeBase ?? "https://opencode.ai/zen/v1").replace(/\/v1\/?$/, "");
     const res = await fetch(`${base}/v1/chat/completions`, {
       method: "POST",

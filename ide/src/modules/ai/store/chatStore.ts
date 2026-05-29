@@ -30,6 +30,7 @@ import {
 } from "../lib/sessions";
 import { createContextAwareTransport } from "../lib/transport";
 import type { ToolContext } from "../tools/tools";
+import { closeSessionShell } from "../tools/shell";
 
 type Live = {
   getCwd: () => string | null;
@@ -389,6 +390,7 @@ export const useChatStore = create<StoreState>((set, get) => ({
     const remaining = get().sessions.filter((s) => s.id !== id);
     chats.get(id)?.stop();
     chats.delete(id);
+    void closeSessionShell(id);
     seedMessages.delete(id);
     const pend = pendingPersist.get(id);
     if (pend) {

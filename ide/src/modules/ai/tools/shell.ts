@@ -16,6 +16,18 @@ function mirrorToTerminal(panelId: string, command: string): void {
  */
 const sessionShells = new Map<string, Promise<number>>();
 
+export async function closeSessionShell(sessionId: string): Promise<void> {
+  const p = sessionShells.get(sessionId);
+  if (!p) return;
+  sessionShells.delete(sessionId);
+  try {
+    const shellId = await p;
+    await native.shellSessionClose(shellId);
+  } catch {
+    // already closed
+  }
+}
+
 async function getSessionShell(
   sessionId: string,
   cwd: string | null,

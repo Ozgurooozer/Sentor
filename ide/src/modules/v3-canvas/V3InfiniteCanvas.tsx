@@ -172,6 +172,12 @@ export function V3InfiniteCanvas() {
     [setViewport],
   );
 
+  const onCanvasPointerCancel = useCallback(() => {
+    panState.current.active = false;
+    marqueeActiveRef.current = false;
+    setMarqueeScreen(null);
+  }, []);
+
   const onCanvasPointerUp = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (marqueeActiveRef.current) {
@@ -234,6 +240,7 @@ export function V3InfiniteCanvas() {
       onPointerDown={onCanvasPointerDown}
       onPointerMove={onCanvasPointerMove}
       onPointerUp={onCanvasPointerUp}
+      onPointerCancel={onCanvasPointerCancel}
     >
       <V3CanvasBgAmbient />
 
