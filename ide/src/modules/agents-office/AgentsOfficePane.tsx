@@ -1,11 +1,11 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAgentsStore } from "@/modules/ai/store/agentsStore";
 import { AGENT_ICONS } from "@/modules/ai/components/AgentSwitcher";
 import { SparklesIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import type { Agent } from "@/modules/ai/lib/agents";
+import { BUILTIN_AGENTS, type Agent } from "@/modules/ai/lib/agents";
 
 interface Snapshot {
   agent: string;
@@ -19,7 +19,8 @@ interface AgentsOfficePaneProps {
 }
 
 export function AgentsOfficePane({ agentSlug }: AgentsOfficePaneProps) {
-  const agents = useAgentsStore((s) => s.all());
+  const customAgents = useAgentsStore((s) => s.customAgents);
+  const agents = useMemo(() => [...BUILTIN_AGENTS, ...customAgents], [customAgents]);
   const activeId = useAgentsStore((s) => s.activeId);
   const slug = agentSlug || deriveSlug(agents.find((a) => a.id === activeId));
 
