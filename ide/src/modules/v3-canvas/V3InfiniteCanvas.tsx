@@ -1,0 +1,221 @@
+import { useRef, useCallback, useEffect, useState, useMemo } from "react";
+import { CANVAS_MAX_SCALE, CANVAS_MIN_SCALE, CANVAS_ZOOM_STEP } from "@/lib/constants";
+import { ErrorBoundary } from "@/app/ErrorBoundary";
+import { useCanvasStore } from "@/modules/canvas/canvasStore";
+import { PORT_DEFS, namedPortPoint } from "@/modules/canvas/portDefs";
+import type { PortDataType } from "@/modules/canvas/portDefs";
+import { V3CanvasBg } from "./V3CanvasBg";
+import { V3CanvasNode } from "./V3CanvasNode";
+import { V3WireLayer, type PendingConn } from "./V3WireLayer";
+import { V3NodePalette } from "./V3NodePalette";
+
+/** Inward-facing semicircle port handle on the canvas edge. */
+function CanvasPort({ side, label, color }: { side: "left" | "right"; label: string; color: string }) {
+  const [hovered, setHovered] = useState(false);
+  const isLeft = side === "left";
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        position: "absolute",
+        [side]: 0,
+        top: "50%",
+        transform: "translateY(-50%)",
+        width: hovered ? 22 : 14,
+        height: 44,
+        background: hovered ? `${color}22` : `${color}0f`,
+        border: `1px solid ${hovered ? color + "55" : color + "28"}`,
+        [isLeft ? "borderLeft" : "borderRight"]: "none",
+        borderRadius: isLeft ? "0 50% 50% 0" : "50% 0 0 50%",
+        cursor: "pointer",
+        transition: "width 150ms ease-out, background 150ms ease-out, border-color 150ms ease-out",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: isLeft ? "flex-end" : "flex-start",
+        justifyContent: "center",
+        [isLeft ? "paddingRight" : "paddingLeft"]: 3,
+        gap: 3,
+        zIndex: 30,
+      }}
+      title={isLeft ? "Canvas output — data leaves this canvas" : "Canvas input — data enters this canvas"}
+    >
+      <div style={{ width: 5, height: 5, borderRadius: "50%", background: hovered ? color : `${color}88`, flexShrink: 0 }} />
+      {hovered && (
+        <span style={{ fontFamily: "monospace", fontSize: 7, color, letterSpacing: "0.05em", writingMode: "vertical-rl", textOrientation: "mixed", transform: isLeft ? "rotate(180deg)" : "none", lineHeight: 1 }}>
+          {label}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function isEditingTarget(e: KeyboardEvent): boolean {
+  const t = e.target as HTMLElement;
+  return t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable;
+}
+
+export function V3InfiniteCanvas() {
+  const panels      = useCanvasStore((s) => s.panels);
+  const connections = useCanvasStore((s) => s.connections);
+  const viewport    = useCanvasStore((s) => s.viewport);
+  const setViewport = useCanvasStore((s) => s.setViewport);
+  const deselectAll = useCanvasStore((s) => s.deselectAll);
+  const deleteSelected = useCanvasStore((s) => s.deleteSelected);
+
+  const [panelDragging, setPanelDragging] = useState(false);
+  const [pendingConn, setPendingConn]     = useState<PendingConn | null>(null);
+  const [hoveredPanelId, setHoveredPanelId] = useState<string | null>(null);
+  const [showAddPanel, setShowAddPanel]   = useState(false);
+
+  // Ctrl+K / canvas:open-add-panel → palette; Delete/Backspace → delete selected
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setShowAddPanel(true);
+        return;
+      }
+      if ((e.key === "Delete" || e.key === "Backspace") && !isEditingTarget(e)) {
+        const { selectedPanelIds } = useCanvasStore.getState();
+        if (selectedPanelIds.length > 0) {
+          e.preventDefault();
+          deleteSelected();
+        }
+      }
+    };
+    const onOpen = () => setShowAddPanel(true);
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("canvas:open-add-panel", onOpen);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("canvas:open-add-panel", onOpen);
+    };
+  }, [deleteSelected]);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const panState = useRef<{ active: boolean; startX: number; startY: number; origVX: number; origVY: number }>({
+    active: false, startX: 0, startY: 0, origVX: 0, origVY: 0,
+  });
+
+  const onCanvasPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.button !== 0 || panelDragging) return;
+      // Only pan on empty canvas space — never activate panning inside a panel
+      if ((e.target as HTMLElement).closest("[data-canvas-panel]")) return;
+      deselectAll();
+      panState.current = { active: true, startX: e.clientX, startY: e.clientY, origVX: viewport.x, origVY: viewport.y };
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    },
+    [viewport.x, viewport.y, panelDragging, deselectAll],
+  );
+
+  const onCanvasPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!panState.current.active) return;
+      setViewport({ x: panState.current.origVX + (e.clientX - panState.current.startX), y: panState.current.origVY + (e.clientY - panState.current.startY) });
+    },
+    [setViewport],
+  );
+
+  const onCanvasPointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    panState.current.active = false;
+    (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+  }, []);
+
+  // Pinch/wheel zoom
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const handler = (e: WheelEvent) => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? CANVAS_ZOOM_STEP : 1 / CANVAS_ZOOM_STEP;
+      const { scale, x, y } = useCanvasStore.getState().viewport;
+      const next = Math.min(CANVAS_MAX_SCALE, Math.max(CANVAS_MIN_SCALE, scale * factor));
+      const rect = el.getBoundingClientRect();
+      const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+      useCanvasStore.getState().setViewport({ scale: next, x: cx - (cx - x) * (next / scale), y: cy - (cy - y) * (next / scale) });
+    };
+    el.addEventListener("wheel", handler, { passive: false });
+    return () => el.removeEventListener("wheel", handler);
+  }, []);
+
+  const canvasPanels = useMemo(() => panels.filter((p) => !p.pinned && !p.minimized), [panels]);
+
+  const [canvasRect, setCanvasRect] = useState<DOMRect | null>(null);
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setCanvasRect(el.getBoundingClientRect()));
+    ro.observe(el);
+    setCanvasRect(el.getBoundingClientRect());
+    return () => ro.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative h-full w-full select-none overflow-hidden"
+      style={{ background: "#050507" }}
+      onPointerDown={onCanvasPointerDown}
+      onPointerMove={onCanvasPointerMove}
+      onPointerUp={onCanvasPointerUp}
+    >
+      <V3CanvasBg />
+
+      {/* Canvas-space transform layer */}
+      <div
+        className="absolute inset-0"
+        style={{ transform: `translate(${viewport.x}px,${viewport.y}px) scale(${viewport.scale})`, transformOrigin: "0 0" }}
+      >
+        {canvasPanels.map((panel) => (
+          <ErrorBoundary key={panel.id} name={`node:${panel.type}:${panel.id.slice(0, 6)}`}>
+            <V3CanvasNode
+              panel={panel}
+              viewportScale={viewport.scale}
+              onDragStart={() => setPanelDragging(true)}
+              onDragEnd={() => setPanelDragging(false)}
+              onHover={() => setHoveredPanelId(panel.id)}
+              onHoverEnd={() => setHoveredPanelId((cur) => (cur === panel.id ? null : cur))}
+              onStartConnect={() => {
+                const defs = PORT_DEFS[panel.type];
+                const firstOut = defs?.outputs[0];
+                const pt = firstOut
+                  ? namedPortPoint(panel, "right", 0, defs!.outputs.length)
+                  : { x: panel.x + panel.width, y: panel.y + panel.height / 2 };
+                setPendingConn({ fromPanel: panel.id, fromSide: "right", fromPort: firstOut?.id, fromDataType: firstOut?.dataType as PortDataType | undefined, cursorX: pt.x, cursorY: pt.y });
+              }}
+            />
+          </ErrorBoundary>
+        ))}
+
+        <V3WireLayer
+          panels={panels}
+          connections={connections}
+          viewport={viewport}
+          canvasRect={canvasRect}
+          pending={pendingConn}
+          onPendingChange={setPendingConn}
+          hoveredPanelId={hoveredPanelId}
+        />
+      </div>
+
+      {/* Empty state */}
+      {panels.length === 0 && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <span className="font-mono text-[12px] tracking-wide" style={{ color: "rgba(255,255,255,0.10)" }}>
+            Ctrl+K — add a node
+          </span>
+        </div>
+      )}
+
+      {/* OUTPUT port — left edge, inward-facing semicircle */}
+      <CanvasPort side="left" label="OUT" color="#4db89a" />
+      {/* INPUT port — right edge, inward-facing semicircle */}
+      <CanvasPort side="right" label="IN" color="#5b8def" />
+
+      {showAddPanel && <V3NodePalette onClose={() => setShowAddPanel(false)} />}
+    </div>
+  );
+}

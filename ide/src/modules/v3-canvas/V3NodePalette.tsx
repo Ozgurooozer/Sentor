@@ -30,6 +30,7 @@ const NODES_2D: NodeDef[] = [
   { type: "variable",   label: "Variable",    desc: "Named variable — store & share values across canvas", accent: "#e07b54", icon: IC("M4 4h3l1 4-1 4H4M12 4h-3l-1 4 1 4h3") },
   { type: "if-else",    label: "If / Else",   desc: "Conditional routing — outputs true or false branch",  accent: "#d4a843", icon: IC("M8 2v5M5 7H3l-1 4 1 4h2M11 7h2l1 4-1 4h-2M8 11v3") },
   { type: "for-each",   label: "For Each",    desc: "Iterate over a list of items",                        accent: "#9b72ef", icon: IC("M3 8h10M10 5l3 3-3 3M6 3v10") },
+  { type: "gate",       label: "Gate",        desc: "Circuit gate — block or pass signal based on condition", accent: "#e07b54", icon: IC("M2 8h3M11 8h3M5 5h6v6H5zM8 5v6") },
 ];
 
 const NODES_3D: NodeDef[] = [
@@ -83,14 +84,41 @@ export function V3NodePalette({ onClose, onAddPanel }: Props) {
     <div className="fixed inset-0 z-[65]" onPointerDown={onClose}>
       <div
         className="absolute flex flex-col overflow-hidden"
-        style={{ left: 62, top: 44, width: 480, maxHeight: "70vh", ...glass }}
+        style={{ right: 12, top: 48, width: 300, maxHeight: "76vh", ...glass }}
         onPointerDown={(e) => e.stopPropagation()}
       >
-        {/* Header: 2D / 3D toggle + search */}
-        <div className="flex items-center gap-2 px-3 pt-3 pb-2.5 shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-          {/* Toggle pill */}
+        {/* Header: search + 2D/3D pill + esc */}
+        <div
+          className="flex items-center gap-2 px-2.5 py-2 shrink-0"
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+        >
+          {/* Search */}
+          <div className="relative flex-1">
+            <svg
+              className="absolute left-2.5 top-1/2 -translate-y-1/2"
+              width="11" height="11" viewBox="0 0 16 16" fill="none"
+              stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeLinecap="round"
+            >
+              <circle cx="7" cy="7" r="4"/><path d="M10.5 10.5l3 3"/>
+            </svg>
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search nodes…"
+              className="w-full rounded-[7px] border pl-7 pr-3 py-1.5 text-[11.5px] outline-none"
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                borderColor: query ? "rgba(91,141,239,0.3)" : "rgba(255,255,255,0.06)",
+                color: "#f5f5f5",
+                fontFamily: "system-ui",
+              }}
+            />
+          </div>
+
+          {/* 2D / 3D pill */}
           <div
-            className="flex items-center rounded-[8px] p-0.5 shrink-0"
+            className="flex items-center rounded-[7px] p-0.5 shrink-0"
             style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.06)" }}
           >
             {(["2d", "3d"] as const).map((t) => (
@@ -98,11 +126,11 @@ export function V3NodePalette({ onClose, onAddPanel }: Props) {
                 key={t}
                 type="button"
                 onClick={() => { setTab(t); setQuery(""); }}
-                className="rounded-[6px] px-3 py-1 font-mono text-[11px] font-medium uppercase tracking-widest transition-all duration-150 ease-out"
+                className="rounded-[5px] px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-widest transition-all duration-150 ease-out"
                 style={{
-                  background: tab === t ? "rgba(91,141,239,0.18)" : "transparent",
-                  color: tab === t ? "#5b8def" : "rgba(255,255,255,0.25)",
-                  border: tab === t ? "1px solid rgba(91,141,239,0.30)" : "1px solid transparent",
+                  background: tab === t ? "rgba(91,141,239,0.20)" : "transparent",
+                  color: tab === t ? "#5b8def" : "rgba(255,255,255,0.22)",
+                  border: tab === t ? "1px solid rgba(91,141,239,0.28)" : "1px solid transparent",
                 }}
               >
                 {t}
@@ -110,53 +138,51 @@ export function V3NodePalette({ onClose, onAddPanel }: Props) {
             ))}
           </div>
 
-          {/* Search */}
-          <div className="relative flex-1">
-            <svg className="absolute left-2.5 top-1/2 -translate-y-1/2" width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeLinecap="round">
-              <circle cx="7" cy="7" r="4"/><path d="M10.5 10.5l3 3"/>
-            </svg>
-            <input
-              ref={inputRef}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search…"
-              className="w-full rounded-[7px] border pl-7 pr-3 py-1.5 text-[12px] outline-none"
-              style={{ background: "rgba(255,255,255,0.04)", borderColor: query ? "rgba(91,141,239,0.3)" : "rgba(255,255,255,0.06)", color: "#f5f5f5", fontFamily: "system-ui" }}
-            />
-          </div>
-
-          <kbd className="rounded border px-1.5 py-0.5 font-mono text-[9px] shrink-0" style={{ borderColor: "rgba(255,255,255,0.07)", background: "rgba(0,0,0,0.3)", color: "rgba(255,255,255,0.2)" }}>
+          <kbd
+            className="rounded border px-1.5 py-0.5 font-mono text-[9px] shrink-0"
+            style={{ borderColor: "rgba(255,255,255,0.07)", background: "rgba(0,0,0,0.3)", color: "rgba(255,255,255,0.18)" }}
+          >
             esc
           </kbd>
         </div>
 
-        {/* Node list */}
-        <div className="flex-1 overflow-y-auto px-3 pb-3 pt-2 no-scrollbar">
+        {/* Node list — single column, compact rows */}
+        <div className="flex-1 overflow-y-auto px-2 py-2 no-scrollbar">
           {filtered.length === 0 ? (
-            <div className="flex items-center justify-center py-10">
-              <span className="font-mono text-[11px] uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.15)" }}>No nodes found</span>
+            <div className="flex items-center justify-center py-8">
+              <span className="font-mono text-[10.5px] uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.15)" }}>
+                No nodes found
+              </span>
             </div>
           ) : (
-            <div className="grid gap-1.5" style={{ gridTemplateColumns: tab === "3d" ? "1fr" : "1fr 1fr" }}>
+            <div className="flex flex-col gap-0.5">
               {filtered.map((n) => (
                 <button
                   key={n.type}
                   type="button"
                   onClick={() => add(n.type)}
-                  className="flex items-center gap-3 rounded-[10px] p-3 text-left transition-all duration-150 ease-out"
-                  style={{ background: "rgba(255,255,255,0.03)", border: `1px solid rgba(255,255,255,0.05)`, borderTop: `1.5px solid ${n.accent}2a` }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.07)"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.03)"; }}
+                  className="flex items-center gap-2.5 rounded-[8px] px-2.5 py-2 text-left transition-all duration-150 ease-out"
+                  style={{ background: "rgba(255,255,255,0.02)", border: "1px solid transparent" }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.06)";
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = `${n.accent}28`;
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.02)";
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = "transparent";
+                  }}
                 >
                   <div
-                    className="flex items-center justify-center rounded-[8px] shrink-0"
-                    style={{ width: 32, height: 32, background: `${n.accent}14`, color: n.accent, border: `1px solid ${n.accent}28` }}
+                    className="flex shrink-0 items-center justify-center rounded-[6px]"
+                    style={{ width: 26, height: 26, background: `${n.accent}14`, color: n.accent, border: `1px solid ${n.accent}22` }}
                   >
                     {n.icon}
                   </div>
-                  <div className="flex flex-col gap-0.5 min-w-0">
-                    <span style={{ font: "500 12px/1.2 system-ui", color: "#e8e8e8" }}>{n.label}</span>
-                    <span className="truncate text-[11px]" style={{ color: "rgba(255,255,255,0.28)", fontFamily: "system-ui" }}>{n.desc}</span>
+                  <div className="flex min-w-0 flex-col gap-0">
+                    <span style={{ font: "500 12px/1.3 system-ui", color: "#e0e0e8" }}>{n.label}</span>
+                    <span className="truncate text-[10px]" style={{ color: "rgba(255,255,255,0.25)", fontFamily: "system-ui" }}>
+                      {n.desc}
+                    </span>
                   </div>
                 </button>
               ))}
