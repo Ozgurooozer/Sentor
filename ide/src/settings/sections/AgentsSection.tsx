@@ -13,6 +13,7 @@ import { AGENT_ICONS } from "@/modules/ai/components/AgentSwitcher";
 import {
   BUILTIN_AGENTS,
   type Agent,
+  type AgentConfig,
   type AgentIconId,
 } from "@/modules/ai/lib/agents";
 import {
@@ -32,6 +33,7 @@ import {
   CheckmarkCircle02Icon,
   Delete02Icon,
   Edit02Icon,
+  Settings01Icon,
   SparklesIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -55,6 +57,8 @@ export function AgentsSection() {
   const upsertAgent = useAgentsStore((s) => s.upsert);
   const removeAgent = useAgentsStore((s) => s.remove);
   const hydrateAgents = useAgentsStore((s) => s.hydrate);
+  const agentConfigs = useAgentsStore((s) => s.agentConfigs);
+  const setAgentConfig = useAgentsStore((s) => s.setAgentConfig);
 
   const snippets = useSnippetsStore((s) => s.snippets);
   const upsertSnippet = useSnippetsStore((s) => s.upsert);
@@ -68,6 +72,7 @@ export function AgentsSection() {
 
   const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
   const [editingSnippet, setEditingSnippet] = useState<Snippet | null>(null);
+  const [configuringAgentId, setConfiguringAgentId] = useState<string | null>(null);
 
   return (
     <div className="flex flex-col gap-7">
@@ -106,9 +111,11 @@ export function AgentsSection() {
               key={a.id}
               agent={a}
               active={a.id === activeAgentId}
+              config={agentConfigs[a.id]}
               onActivate={() => setActiveAgentId(a.id)}
               onEdit={a.builtIn ? null : () => setEditingAgent(a)}
               onDelete={a.builtIn ? null : () => removeAgent(a.id)}
+              onConfigure={() => setConfiguringAgentId(a.id)}
             />
           ))}
         </div>
@@ -211,6 +218,20 @@ export function AgentsSection() {
           setEditingAgent(null);
         }}
       />
+      <AgentModelConfigDialog
+        agentId={configuringAgentId}
+        agentName={
+          [...BUILTIN_AGENTS, ...customAgents].find(
+            (a) => a.id === configuringAgentId,
+          )?.name ?? ""
+        }
+        config={configuringAgentId ? (agentConfigs[configuringAgentId] ?? {}) : {}}
+        onClose={() => setConfiguringAgentId(null)}
+        onSave={(cfg) => {
+          if (configuringAgentId) setAgentConfig(configuringAgentId, cfg);
+          setConfiguringAgentId(null);
+        }}
+      />
       <SnippetEditorDialog
         snippet={editingSnippet}
         existing={snippets}
@@ -227,17 +248,22 @@ export function AgentsSection() {
 function AgentCard({
   agent,
   active,
+  config,
   onActivate,
   onEdit,
   onDelete,
+  onConfigure,
 }: {
   agent: Agent;
   active: boolean;
+  config?: AgentConfig;
   onActivate: () => void;
   onEdit: (() => void) | null;
   onDelete: (() => void) | null;
+  onConfigure: () => void;
 }) {
   const Icon = AGENT_ICONS[agent.icon] ?? SparklesIcon;
+  const hasOverride = !!(config?.model || config?.thinking);
   return (
     <div
       className={cn(
@@ -259,10 +285,23 @@ function AgentCard({
                 Built-in
               </span>
             ) : null}
+            {hasOverride ? (
+              <span className="rounded bg-accent/20 px-1 py-0.5 text-[9px] tracking-wide text-accent uppercase">
+                Custom
+              </span>
+            ) : null}
           </span>
           <span className="line-clamp-2 text-[10.5px] leading-relaxed text-muted-foreground">
             {agent.description}
           </span>
+          {config?.model ? (
+            <span className="mt-0.5 truncate font-mono text-[9.5px] text-muted-foreground/70">
+              {config.model}
+              {config.thinking ? " · thinking" : ""}
+            </span>
+          ) : config?.thinking ? (
+            <span className="mt-0.5 text-[9.5px] text-muted-foreground/70">thinking on</span>
+          ) : null}
         </div>
       </div>
       <div className="mt-0.5 flex items-center justify-between gap-1">
@@ -286,6 +325,15 @@ function AgentCard({
           )}
         </Button>
         <div className="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+          <Button
+            size="icon"
+            variant="ghost"
+            className={cn("size-6", hasOverride && "opacity-100 text-accent")}
+            onClick={onConfigure}
+            title="Configure model"
+          >
+            <HugeiconsIcon icon={Settings01Icon} size={11} strokeWidth={1.75} />
+          </Button>
           {onEdit ? (
             <Button
               size="icon"
@@ -409,6 +457,92 @@ function AgentEditorDialog({
             disabled={!canSave}
             onClick={() => onSave({ ...draft, builtIn: false })}
           >
+            Save
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function AgentModelConfigDialog({
+  agentId,
+  agentName,
+  config,
+  onClose,
+  onSave,
+}: {
+  agentId: string | null;
+  agentName: string;
+  config: AgentConfig;
+  onClose: () => void;
+  onSave: (cfg: AgentConfig) => void;
+}) {
+  const globalModel = usePreferencesStore((s) => s.opencodeChatModelId);
+  const [draft, setDraft] = useState<AgentConfig>(config);
+  useEffect(() => setDraft(config), [config]);
+
+  return (
+    <Dialog open={!!agentId} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-[14px]">
+            Model config — {agentName}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <Label>Model override</Label>
+            <Input
+              value={draft.model ?? ""}
+              onChange={(e) => setDraft({ ...draft, model: e.target.value.trim() || undefined })}
+              className="h-8 font-mono text-[11.5px]"
+              placeholder={`Global: ${globalModel || "deepseek-v4-flash-free"}`}
+            />
+            <span className="text-[10px] text-muted-foreground">
+              Leave empty to use the global model. Example: claude-sonnet-4-6
+            </span>
+          </div>
+          <div className="flex items-center justify-between rounded-lg border border-border/60 bg-card/40 px-3 py-2.5">
+            <div className="flex flex-col">
+              <span className="text-[12px] font-medium">Extended thinking</span>
+              <span className="text-[10.5px] text-muted-foreground">
+                Enable reasoning mode for this agent (requires a thinking-capable model)
+              </span>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={draft.thinking ?? false}
+              onClick={() => setDraft({ ...draft, thinking: !draft.thinking })}
+              className={cn(
+                "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
+                draft.thinking ? "bg-accent" : "bg-muted",
+              )}
+            >
+              <span
+                className={cn(
+                  "pointer-events-none inline-block size-4 rounded-full bg-white shadow-sm transition-transform",
+                  draft.thinking ? "translate-x-4" : "translate-x-0",
+                )}
+              />
+            </button>
+          </div>
+          {(draft.model || draft.thinking) && (
+            <button
+              type="button"
+              className="self-start text-[10.5px] text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+              onClick={() => setDraft({})}
+            >
+              Reset to global defaults
+            </button>
+          )}
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button size="sm" onClick={() => onSave(draft)}>
             Save
           </Button>
         </DialogFooter>

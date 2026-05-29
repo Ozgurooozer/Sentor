@@ -225,6 +225,11 @@ function makeChat(sessionId: string): Chat<UIMessage> {
         opencode: { modelId: p.opencodeChatModelId || undefined },
       };
     },
+    getAgentModelOverride: () => {
+      const { activeId } = useAgentsStore.getState();
+      const cfg = useAgentsStore.getState().getAgentConfig(activeId);
+      return cfg.model || undefined;
+    },
     getPlanMode: () => usePlanStore.getState().active,
     onStep: (step) => {
       useChatStore.getState().patchAgentMeta({ step });

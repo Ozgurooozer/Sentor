@@ -37,6 +37,8 @@ export type AgentDeps = {
   projectMemory?: string | null;
   agentSelfContext?: string | null;
   toolset?: string[];
+  /** Per-agent model override — bypasses provider config and uses this model ID directly. */
+  agentModelOverride?: string;
 };
 
 const TOOL_LABELS: Record<string, (input: Record<string, unknown>) => string> = {
@@ -142,6 +144,7 @@ export async function createAtlasAgent({
   projectMemory,
   agentSelfContext,
   toolset,
+  agentModelOverride,
 }: AgentDeps) {
   const trimmedCustom = customInstructions?.trim();
   const personaBlock = agentPersona?.instructions.trim()
@@ -162,7 +165,9 @@ export async function createAtlasAgent({
     ? `\n\n## PLAN MODE — ACTIVE\nMutating tools (write_file, edit, multi_edit, create_directory) will queue their changes for the user to review as a single diff. Do NOT execute bash_run or bash_background while plan mode is active — restrict yourself to reads (read_file, grep, glob, list_directory) and the queued mutations. After queueing the full set of edits, stop and return a brief summary; do not continue acting until the user has accepted/rejected.`
     : "";
   const instructions = `${SYSTEM_PROMPT}${memoryBlock}${selfContextBlock}${personaBlock}${customBlock}${planBlock}`;
-  const model = await buildModel(modelId, keys, providers);
+  const model = agentModelOverride
+    ? await buildLanguageModel("opencode", keys, agentModelOverride, { providers })
+    : await buildModel(modelId, keys, providers);
   const allTools = buildTools(toolContext);
   const tools =
     toolset && toolset.length > 0

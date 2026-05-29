@@ -6,7 +6,7 @@ import type { ProviderKeys } from "./keyring";
 import { native } from "./native";
 import type { ToolContext } from "../tools/tools";
 
-const ATLAS_MD_MAX_BYTES = 32 * 1024;
+const ATLAS_MD_MAX_BYTES = 6 * 1024;
 type MemoryCacheEntry = { content: string | null; mtime: number };
 const projectMemoryCache = new Map<string, MemoryCacheEntry>();
 
@@ -96,6 +96,8 @@ type Deps = {
   getAgentToolset?: () => string[] | undefined;
   /** When set, the canvas node/wire snapshot is injected into the system context block. */
   getCanvasSnapshot?: () => string | null;
+  /** Per-agent model override — bypasses the global opencodeChatModelId for this agent. */
+  getAgentModelOverride?: () => string | undefined;
 };
 
 export function createContextAwareTransport(deps: Deps) {
@@ -121,9 +123,10 @@ export function createContextAwareTransport(deps: Deps) {
         projectMemory,
         agentSelfContext,
         toolset: deps.getAgentToolset?.(),
+        agentModelOverride: deps.getAgentModelOverride?.(),
       });
       const base = new DirectChatTransport({ agent });
-      const augmented = injectContext(options.messages, deps.getLive(), deps.getCanvasSnapshot?.() ?? null);
+      const augmented = injectContext(stripEmptyAssistantMessages(options.messages), deps.getLive(), deps.getCanvasSnapshot?.() ?? null);
       return base.sendMessages({
         ...options,
         messages: augmented,
@@ -147,12 +150,24 @@ export function createContextAwareTransport(deps: Deps) {
         projectMemory,
         agentSelfContext,
         toolset: deps.getAgentToolset?.(),
+        agentModelOverride: deps.getAgentModelOverride?.(),
       });
       const base = new DirectChatTransport({ agent });
       type ReconnectArg = Parameters<typeof base.reconnectToStream>[0];
       return base.reconnectToStream(options as ReconnectArg);
     },
   };
+}
+
+function stripEmptyAssistantMessages(messages: UIMessage[]): UIMessage[] {
+  return messages.filter((m) => {
+    if (m.role !== "assistant") return true;
+    const hasText = m.parts?.some(
+      (p): p is { type: "text"; text: string } => p.type === "text" && (p as { type: "text"; text: string }).text.trim().length > 0,
+    );
+    const hasTool = m.parts?.some((p) => p.type === "tool-invocation");
+    return !!(hasText || hasTool);
+  });
 }
 
 function injectContext(messages: UIMessage[], live: LiveSnapshot, canvasSnapshot: string | null): UIMessage[] {

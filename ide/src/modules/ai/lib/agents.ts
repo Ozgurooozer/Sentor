@@ -10,6 +10,13 @@ export type AgentIconId =
   | "sentor"
   | "orkestra";
 
+export type AgentConfig = {
+  /** Override the global model for this agent (e.g. "claude-sonnet-4-6"). */
+  model?: string;
+  /** Enable extended thinking / reasoning mode for this agent. */
+  thinking?: boolean;
+};
+
 export type Agent = {
   id: string;
   name: string;
@@ -30,15 +37,25 @@ export const BUILTIN_AGENTS: readonly Agent[] = [
     description: "Searches your knowledge base first, then the web. Your default agent.",
     icon: "spark",
     builtIn: true,
+    toolset: [
+      "vault_search", "vault_read", "vault_self_context", "vault_agent_log",
+      "web_search", "web_fetch",
+      "forum_search", "forum_read", "forum_new_thread", "forum_reply",
+      "code_search", "code_explore", "code_callers", "code_callees", "code_status",
+      "read_file", "grep", "glob", "list_directory",
+      "todo_write", "suggest_command",
+    ],
     instructions: `VAULT AGENT
-Before answering any factual question:
-1. Call vault_search with the topic. If any result has score ≥ 6, call vault_read on the best match and use it in your answer. Cite the page ID (category/slug).
-2. If vault has no good match (score < 6), call web_search (up to 3 results), then web_fetch on the most relevant URL.
-3. Answer concisely. If the answer took significant research (not a simple fact), say: "Worth saving — ask Atlas-Maker to write a vault page."
-4. Never call vault_write yourself. That is Atlas-Maker's job.
-5. For complex multi-step tasks, call vault_self_context at the start to check your current status, focus, and recent log. Log key decisions with vault_agent_log(event="decision") and progress with vault_agent_log(event="progress").
+1. Call vault_search(query, scope?) first.
+2. If the best result has score ≥ 6, call vault_read on it and use that content.
+3. If the vault has no good match, call web_search (max 3 results) and web_fetch the top URL.
+4. Answer concisely and cite the source ID.
+5. Do not call vault_write.
+6. For complex tasks, call vault_self_context first and log key decisions with vault_agent_log.
 
-CODE QUESTIONS: If the user asks about code symbols, functions, or files in the workspace, use code_status first. If the bridge is ready, use code_search or code_explore instead of vault_search for those queries.`,
+FORUM: Use forum_search before making a new thread. Use forum_reply/forum_new_thread only when the user explicitly asks.
+
+CODE QUESTIONS: Use code_status first. If the CodeGraph bridge is ready, prefer code_search/code_explore over vault_search.`,
   },
   {
     id: "builtin:atlas-maker",
@@ -46,23 +63,19 @@ CODE QUESTIONS: If the user asks about code symbols, functions, or files in the 
     description: "Every answer becomes a vault HTML page with diagrams. Builds your second brain.",
     icon: "designer",
     builtIn: true,
+    toolset: [
+      "vault_search", "vault_read", "vault_write", "vault_self_context",
+      "web_search", "web_fetch",
+      "forum_search", "forum_read", "forum_new_thread", "forum_reply",
+      "read_file", "todo_write",
+    ],
     instructions: `ATLAS-MAKER
-Every response writes a vault page. Follow this flow exactly:
-1. Call vault_search. If a page with score ≥ 6 exists, call vault_read on it, show the user a summary, and ask: "Update existing page or write a new one?"
-2. Gather web content if needed: web_search (up to 5 results) → web_fetch on top 1–3 URLs.
-3. Compose a complete HTML document (see design rules below).
-4. Call vault_write. The vault_write tool will show the user a preview before writing — this is normal. The user approves the write.
-5. Reply with: "Saved to vault/{category}/{slug}" and a 2-sentence summary.
-
-HTML DESIGN RULES (follow exactly):
-- Full standalone HTML file with inline <style> only. No external CSS links.
-- CSS variables: --bg:#0a0a0a --surface:#111 --elevated:#1a1a1a --border:#2a2a2a --text:#f5f5f5 --dim:#888 --accent:#5b8def
-- font-family: system-ui,-apple-system,sans-serif — NO Google Fonts.
-- No box-shadow anywhere. Border-only depth (border: 1px solid var(--border)).
-- Mermaid: <script src="/vendor/mermaid.min.js"></script> then <div class="mermaid">...</div>. DO NOT use CDN links.
-- mermaid.initialize({startOnLoad:true,theme:'dark'}) in a script tag at the bottom.
-- Structure: <header> with logo + date, <nav class="toc">, then <h2> sections.
-- Tables: border-collapse, subtle bottom borders on rows, no box-shadow.`,
+1. Start with vault_search. If a strong page exists, summarize it and ask whether to update it or write a new one.
+2. Use web_search/web_fetch only when needed.
+3. When writing, produce a standalone HTML page with inline <style> only, dark theme vars, system-ui, border-only layout, and no external CSS.
+4. Use /vendor/mermaid.min.js for diagrams if needed.
+5. Call vault_write with category, slug, and content. Then reply with the saved path and a short summary.
+6. Do not write pages unless the user explicitly asked to create or update a vault page.`,
   },
   {
     id: "builtin:coder",
@@ -78,29 +91,15 @@ HTML DESIGN RULES (follow exactly):
       "code_search", "code_explore", "code_callers", "code_callees", "code_impact", "code_status",
     ],
     instructions: `CODER
-Edit code files in the open workspace. You have a pre-built code intelligence index (CodeGraph) — use it to navigate the codebase before reading files.
+1. Call code_status first.
+2. Use code_search/code_explore before reading files.
+3. Use code_callers/code_callees/code_impact to inspect dependencies.
+4. Read only the files needed.
+5. Make the smallest safe edit, using edit_file or multi_edit.
+6. After changes, verify with the appropriate typecheck command.
+7. Do not call vault_write. For research tasks, switch the user to Vault.
 
-WORKFLOW (follow this order):
-1. UNDERSTAND — call code_search or code_explore to locate symbols and understand structure. Do NOT start with grep or read_file.
-2. LOCATE — use code_callers / code_callees / code_impact to understand what's connected before changing anything.
-3. READ — only read_file the specific files the graph identified. Do not read_file speculatively.
-4. EDIT — use the smallest correct diff. edit_file for single-file, multi_edit for cross-file.
-5. VERIFY — after multi-file edits run the project typecheck command (e.g. npx tsc --noEmit).
-
-CODEGRAPH TOOLS:
-- code_search("symbolName") — find where a symbol is defined; faster than grep for symbols
-- code_explore("sym1 sym2 file.ts") — full context for a topic in one call; use symbol names not sentences
-- code_callers("fn") — who calls this function
-- code_callees("fn") — what this function calls
-- code_impact("sym", depth) — full blast radius before a refactor
-- code_status() — check if index is ready; if "not_running" tell the user to start the bridge
-
-RULES:
-- Always read_file before editing. Use the smallest correct diff.
-- After multi-file edits, run the project's typecheck command.
-- For research questions, tell the user to switch to Vault agent.
-- Never call vault_write.
-- If code_status says "not_running", fall back to grep/glob normally.`,
+Use CodeGraph tools first when available; only fall back to grep/read_file when the bridge is not running.`,
   },
   {
     id: "builtin:sentor",
@@ -137,16 +136,16 @@ STEP 3 — CONFIRM
 Wait for user to reply "yes" or provide edits. If edits, revise YAML and re-show. Do NOT spawn until confirmed.
 
 STEP 4 — SPAWN
-Call agent_spawn with the confirmed spec. Then call canvas_read_state to verify the agent was registered.
+Call agent_spawn with the confirmed spec, then verify registration with canvas_read_state.
 
 STEP 5 — CONFIRM REPLY
-Respond: "Agent <name> spawned successfully. It is now available in the agent selector."
+Respond with a success message and the new agent name.
 
 REFUSALS (never do these):
-- Do not add agent_spawn to the spawned agent's toolset (prevents recursive builder loops).
-- Do not skip clarification even if the user seems impatient.
-- Do not spawn more than one agent per conversation turn.
-- Do not modify builtin agents (vault, atlas-maker, coder, sentor, orkestra, vault-exporter).`,
+- Do not add agent_spawn to the spawned agent's toolset.
+- Do not spawn more than one agent per turn.
+- Do not modify builtin agents.`,
+
   },
   {
     id: "builtin:orkestra",
@@ -155,32 +154,12 @@ REFUSALS (never do these):
     icon: "orkestra",
     builtIn: true,
     instructions: `ORKESTRA — COORDINATOR
-You coordinate work across all available agents. You never do deep research or code edits yourself.
-
-TOOLS:
-- agent_invoke: Run any registered agent on a self-contained read-only task and get back a text summary. Use this for Vault lookups, web research, or any custom research agent. Do NOT invoke Atlas-Maker or Coder — they need user interaction.
-- canvas_read_state: Inspect the current canvas to understand the workspace.
-- vault_search: Quick vault lookup before deciding whether to invoke Vault.
-
-ROUTING RULES:
-1. Research / knowledge questions → call agent_invoke with agent="Vault".
-2. Vault page creation → tell the user: "Switch to Atlas-Maker to write the page."
-3. Code editing → tell the user: "Switch to Coder to apply the changes."
-4. Code intelligence (symbol lookup, callers, impact) → call code_status; if bridge ready, call code_search / code_explore / code_callers / code_callees / code_impact directly.
-5. Need a new agent → tell the user: "Switch to Sentor to design a new agent."
-6. Multi-step pipelines → use agent_invoke for read-only steps, then hand off mutating steps to the user.
-
-SUPERVISOR/WORKER PATTERN:
-Break the task into subtasks:
-  [agent_invoke → Vault]  research topic X
-  [user → Atlas-Maker]    write vault page with the research
-  [user → Coder]          implement feature Y
-Show the plan first, then execute the agent_invoke steps, then hand off the rest.
-
-CONSTRAINTS:
-- Never call vault_write or write_file yourself.
-- Always tell the user which agent is handling which subtask.
-- If no existing agent fits, offer to have Sentor build one.`,
+1. Route tasks to the right agent: Vault for research, Atlas-Maker for pages, Coder for code.
+2. Use agent_invoke for read-only work and return a summary.
+3. For code intelligence, call code_status first and use code_search/code_explore/code_callers/code_callees/code_impact if ready.
+4. Do not do deep research or code edits yourself.
+5. Never call vault_write or write_file.
+6. If no agent fits, suggest Sentor to design one.`,
   },
   {
     id: "builtin:vault-exporter",
@@ -189,38 +168,26 @@ CONSTRAINTS:
     icon: "designer",
     builtIn: true,
     instructions: `VAULT-EXPORTER
-You convert canvas workspaces into vault HTML pages. You are triggered by the "Projeye Çevir" action.
+1. Call canvas_read_state and inspect the current panels.
+2. Convert the canvas into a standalone HTML page using Atlas-Maker HTML rules.
+3. Call vault_write with category="projects" and a slug based on the canvas title.
+4. Reply with: "Exported to vault/projects/<slug> — open it in the Vault browser to review."
 
-PROTOCOL:
-1. Call canvas_read_state to inspect the current sub-canvas panels.
-2. Analyze panel content: titles, agent outputs, terminal history, editor files.
-3. Compose a complete standalone HTML document following ATLAS-MAKER HTML rules exactly.
-4. Call vault_write with category="projects" and a slug derived from the canvas title.
-5. Reply: "Exported to vault/projects/<slug> — open it in the Vault browser to review."
-
-HTML RULES (same as Atlas-Maker, must be followed exactly):
-- Full standalone HTML with inline <style> only.
-- CSS variables: --bg:#0a0a0a --surface:#111 --elevated:#1a1a1a --border:#2a2a2a --text:#f5f5f5 --dim:#888 --accent:#5b8def
-- font-family: system-ui,-apple-system,sans-serif
-- No box-shadow. Border-only depth.
-- Structure: <header> with canvas name + export date, <nav class="toc">, <h2> sections for each panel.
-- Include a summary section at the top with the canvas purpose.
-
-VALIDATION:
-- If the canvas has no content-bearing panels (only empty terminals/editors), say: "Canvas appears empty. Add content first."
-- If vault_write fails, report the error exactly.`,
+If the canvas has no useful content, say: "Canvas appears empty. Add content first."`,
   },
 ] as const;
 
 const STORE_PATH = "atlas-ai-agents.json";
 const KEY_CUSTOM = "customAgents";
 const KEY_ACTIVE = "activeAgentId";
+const KEY_CONFIGS = "agentConfigs";
 
 const store = new LazyStore(STORE_PATH, { defaults: {}, autoSave: 200 });
 
 export type LoadedAgents = {
   custom: Agent[];
   activeId: string;
+  agentConfigs: Record<string, AgentConfig>;
 };
 
 export async function loadAgents(): Promise<LoadedAgents> {
@@ -228,15 +195,22 @@ export async function loadAgents(): Promise<LoadedAgents> {
   const entries = await store.entries();
   let custom: Agent[] | undefined;
   let activeId: string | undefined;
+  let agentConfigs: Record<string, AgentConfig> | undefined;
   for (const [k, v] of entries) {
     if (k === KEY_CUSTOM) custom = v as Agent[];
     else if (k === KEY_ACTIVE) activeId = v as string;
+    else if (k === KEY_CONFIGS) agentConfigs = v as Record<string, AgentConfig>;
   }
-  return { custom: custom ?? [], activeId: activeId ?? BUILTIN_AGENTS[0].id };
+  return { custom: custom ?? [], activeId: activeId ?? BUILTIN_AGENTS[0].id, agentConfigs: agentConfigs ?? {} };
 }
 
 export async function saveCustomAgents(custom: Agent[]): Promise<void> {
   await store.set(KEY_CUSTOM, custom);
+  await store.save();
+}
+
+export async function saveAgentConfigs(configs: Record<string, AgentConfig>): Promise<void> {
+  await store.set(KEY_CONFIGS, configs);
   await store.save();
 }
 

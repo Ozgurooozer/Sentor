@@ -5,8 +5,10 @@ import {
   loadAgents,
   newAgentId,
   saveActiveAgentId,
+  saveAgentConfigs,
   saveCustomAgents,
   type Agent,
+  type AgentConfig,
 } from "../lib/agents";
 
 const CHANGED_EVENT = "atlas://ai-agents-changed";
@@ -15,12 +17,15 @@ type AgentsState = {
   hydrated: boolean;
   customAgents: Agent[];
   activeId: string;
+  agentConfigs: Record<string, AgentConfig>;
   /** All agents, builtin first. */
   all: () => Agent[];
   hydrate: () => Promise<void>;
   setActiveId: (id: string) => void;
   upsert: (agent: Agent) => void;
   remove: (id: string) => void;
+  setAgentConfig: (agentId: string, config: AgentConfig) => void;
+  getAgentConfig: (agentId: string) => AgentConfig;
 };
 
 let initialized = false;
@@ -33,16 +38,17 @@ export const useAgentsStore = create<AgentsState>((set, get) => ({
   hydrated: false,
   customAgents: [],
   activeId: BUILTIN_AGENTS[0].id,
+  agentConfigs: {},
   all: () => [...BUILTIN_AGENTS, ...get().customAgents],
   hydrate: async () => {
     if (initialized) return;
     initialized = true;
-    const { custom, activeId } = await loadAgents();
-    set({ customAgents: custom, activeId, hydrated: true });
+    const { custom, activeId, agentConfigs } = await loadAgents();
+    set({ customAgents: custom, activeId, agentConfigs, hydrated: true });
 
     void listen(CHANGED_EVENT, async () => {
       const fresh = await loadAgents();
-      set({ customAgents: fresh.custom, activeId: fresh.activeId });
+      set({ customAgents: fresh.custom, activeId: fresh.activeId, agentConfigs: fresh.agentConfigs });
     });
   },
   setActiveId: (id) => {
@@ -69,6 +75,14 @@ export const useAgentsStore = create<AgentsState>((set, get) => ({
     }
     void saveCustomAgents(list).then(broadcast);
   },
+  setAgentConfig: (agentId, config) => {
+    const next = { ...get().agentConfigs, [agentId]: config };
+    // Remove entry entirely if both fields are empty.
+    if (!config.model && !config.thinking) delete next[agentId];
+    set({ agentConfigs: next });
+    void saveAgentConfigs(next).then(broadcast);
+  },
+  getAgentConfig: (agentId) => get().agentConfigs[agentId] ?? {},
 }));
 
 export { newAgentId };
