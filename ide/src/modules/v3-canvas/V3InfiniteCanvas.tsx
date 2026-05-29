@@ -4,10 +4,14 @@ import { ErrorBoundary } from "@/app/ErrorBoundary";
 import { useCanvasStore } from "@/modules/canvas/canvasStore";
 import { PORT_DEFS, namedPortPoint } from "@/modules/canvas/portDefs";
 import type { PortDataType } from "@/modules/canvas/portDefs";
+import type { CanvasPanelNode } from "@/modules/canvas/types";
 import { V3CanvasBgAmbient } from "./V3CanvasBgAmbient";
 import { V3CanvasNode } from "./V3CanvasNode";
 import { V3WireLayer, type PendingConn } from "./V3WireLayer";
 import { V3NodePalette } from "./V3NodePalette";
+
+// Module-level clipboard — tab-isolated, no persistence needed
+let _clipboard: CanvasPanelNode[] = [];
 
 /** Inward-facing semicircle port handle on the canvas edge. */
 function CanvasPort({ side, label, color }: { side: "left" | "right"; label: string; color: string }) {
@@ -62,6 +66,8 @@ export function V3InfiniteCanvas() {
   const setViewport = useCanvasStore((s) => s.setViewport);
   const deselectAll = useCanvasStore((s) => s.deselectAll);
   const deleteSelected = useCanvasStore((s) => s.deleteSelected);
+  const selectAll  = useCanvasStore((s) => s.selectAll);
+  const selectMany = useCanvasStore((s) => s.selectMany);
 
   const [panelDragging, setPanelDragging] = useState(false);
   const [pendingConn, setPendingConn]     = useState<PendingConn | null>(null);
@@ -71,6 +77,22 @@ export function V3InfiniteCanvas() {
   // Ctrl+K / canvas:open-add-panel → palette; Delete/Backspace → delete selected
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "a") {
+        e.preventDefault();
+        selectAll();
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "c") {
+        const { selectedPanelIds, panels } = useCanvasStore.getState();
+        _clipboard = panels.filter((p) => selectedPanelIds.includes(p.id));
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "v") {
+        if (_clipboard.length > 0) {
+          useCanvasStore.getState().pasteFromClipboard(_clipboard);
+        }
+        return;
+      }
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
         setShowAddPanel(true);
@@ -91,7 +113,7 @@ export function V3InfiniteCanvas() {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("canvas:open-add-panel", onOpen);
     };
-  }, [deleteSelected]);
+  }, [deleteSelected, selectAll]);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -99,30 +121,80 @@ export function V3InfiniteCanvas() {
     active: false, startX: 0, startY: 0, origVX: 0, origVY: 0,
   });
 
+  // Marquee (rubber-band) selection
+  const marqueeActiveRef     = useRef(false);
+  const marqueeStartScreen   = useRef({ x: 0, y: 0 });
+  const marqueeCurrentRef    = useRef({ x1: 0, y1: 0, x2: 0, y2: 0 });
+  const [marqueeScreen, setMarqueeScreen] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
+
   const onCanvasPointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (e.button !== 0 || panelDragging) return;
-      // Only pan on empty canvas space — never activate panning inside a panel
       if ((e.target as HTMLElement).closest("[data-canvas-panel]")) return;
       deselectAll();
-      panState.current = { active: true, startX: e.clientX, startY: e.clientY, origVX: viewport.x, origVY: viewport.y };
-      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      if (e.shiftKey) {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (!rect) return;
+        const x1 = e.clientX - rect.left;
+        const y1 = e.clientY - rect.top;
+        marqueeActiveRef.current = true;
+        marqueeStartScreen.current = { x: x1, y: y1 };
+        marqueeCurrentRef.current = { x1, y1, x2: x1, y2: y1 };
+        setMarqueeScreen({ x1, y1, x2: x1, y2: y1 });
+        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      } else {
+        panState.current = { active: true, startX: e.clientX, startY: e.clientY, origVX: viewport.x, origVY: viewport.y };
+        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      }
     },
     [viewport.x, viewport.y, panelDragging, deselectAll],
   );
 
   const onCanvasPointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
+      if (marqueeActiveRef.current) {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (!rect) return;
+        const x2 = e.clientX - rect.left;
+        const y2 = e.clientY - rect.top;
+        const next = { x1: marqueeStartScreen.current.x, y1: marqueeStartScreen.current.y, x2, y2 };
+        marqueeCurrentRef.current = next;
+        setMarqueeScreen(next);
+        return;
+      }
       if (!panState.current.active) return;
-      setViewport({ x: panState.current.origVX + (e.clientX - panState.current.startX), y: panState.current.origVY + (e.clientY - panState.current.startY) });
+      setViewport({
+        x: panState.current.origVX + (e.clientX - panState.current.startX),
+        y: panState.current.origVY + (e.clientY - panState.current.startY),
+      });
     },
     [setViewport],
   );
 
-  const onCanvasPointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    panState.current.active = false;
-    (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-  }, []);
+  const onCanvasPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (marqueeActiveRef.current) {
+        marqueeActiveRef.current = false;
+        const r = marqueeCurrentRef.current;
+        const vp = useCanvasStore.getState().viewport;
+        const minCX = (Math.min(r.x1, r.x2) - vp.x) / vp.scale;
+        const maxCX = (Math.max(r.x1, r.x2) - vp.x) / vp.scale;
+        const minCY = (Math.min(r.y1, r.y2) - vp.y) / vp.scale;
+        const maxCY = (Math.max(r.y1, r.y2) - vp.y) / vp.scale;
+        const ids = useCanvasStore.getState().panels
+          .filter((p) => !p.pinned && !p.minimized)
+          .filter((p) => p.x < maxCX && p.x + p.width > minCX && p.y < maxCY && p.y + p.height > minCY)
+          .map((p) => p.id);
+        if (ids.length > 0) selectMany(ids);
+        setMarqueeScreen(null);
+        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+        return;
+      }
+      panState.current.active = false;
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    },
+    [selectMany],
+  );
 
   // Pinch/wheel zoom
   useEffect(() => {
@@ -214,6 +286,22 @@ export function V3InfiniteCanvas() {
       <CanvasPort side="left" label="OUT" color="#4db89a" />
       {/* INPUT port — right edge, inward-facing semicircle */}
       <CanvasPort side="right" label="IN" color="#5b8def" />
+
+      {/* Rubber-band marquee selection overlay */}
+      {marqueeScreen && (
+        <div
+          className="pointer-events-none absolute"
+          style={{
+            left:   Math.min(marqueeScreen.x1, marqueeScreen.x2),
+            top:    Math.min(marqueeScreen.y1, marqueeScreen.y2),
+            width:  Math.abs(marqueeScreen.x2 - marqueeScreen.x1),
+            height: Math.abs(marqueeScreen.y2 - marqueeScreen.y1),
+            border: "1px solid rgba(91,141,239,0.55)",
+            background: "rgba(91,141,239,0.06)",
+            zIndex: 55,
+          }}
+        />
+      )}
 
       {showAddPanel && <V3NodePalette onClose={() => setShowAddPanel(false)} />}
     </div>
