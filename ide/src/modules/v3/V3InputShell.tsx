@@ -274,16 +274,20 @@ export function V3InputShell() {
     if (panelOpen) return;
     const opening = !historyOpen;
     setHistoryOpen(opening);
-    await resizeTo(BASE_H + (opening ? HISTORY_H : 0) + (pickerOpen ? PICKER_H : 0));
+    if (opening) setPickerOpen(false);
+    await resizeTo(BASE_H + (opening ? HISTORY_H : 0));
     if (!opening) inputRef.current?.focus();
-  }, [historyOpen, panelOpen, pickerOpen, resizeTo]);
+  }, [historyOpen, panelOpen, resizeTo]);
 
   const togglePicker = useCallback(async () => {
     const opening = !pickerOpen;
     setPickerOpen(opening);
-    if (opening) void emit("atlas:request-canvases", {}).catch(() => {});
-    await resizeTo(BASE_H + (opening ? PICKER_H : 0) + (historyOpen ? HISTORY_H : 0));
-  }, [pickerOpen, historyOpen, resizeTo]);
+    if (opening) {
+      setHistoryOpen(false);
+      void emit("atlas:request-canvases", {}).catch(() => {});
+    }
+    await resizeTo(BASE_H + (opening ? PICKER_H : 0));
+  }, [pickerOpen, resizeTo]);
 
   const handleSelectCanvas = useCallback(async (id: string) => {
     setLinkedCanvasId(id);
