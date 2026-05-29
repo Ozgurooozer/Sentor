@@ -211,6 +211,7 @@ def cmd_chat(model_name: str | None) -> None:
         print('\n  ollama library not found. Install it first:\n'
               '    pip install ollama\n')
         sys.exit(1)
+    _client = _ollama.Client(timeout=120)
 
     tools_file  = ROOT / 'tools' / 'ollama-tools.json'
     system_file = ROOT / 'tools' / 'ollama-system.md'
@@ -300,7 +301,7 @@ def cmd_chat(model_name: str | None) -> None:
         # Agentic loop — keep going until no more tool calls
         while True:
             try:
-                resp = _ollama.chat(model=model, messages=messages, tools=tools)
+                resp = _client.chat(model=model, messages=messages, tools=tools)
             except Exception as e:
                 print(f'  {_dim(f"[error] {e}")}\n')
                 messages.pop()   # remove the user message that failed

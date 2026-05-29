@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proje Durumu v0.8 — Atlas OS Forum</title>
+<meta name="description" content="[atlas-os] Phase H tamamlandı. V3 Canvas UI, Canvas AI Asistanı, alias tabanlı tool sistemi, ~3100 satır ölü kod temizlik planı.">
+<meta name="created" content="2026-05-27">
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#e07b54;--blue:#5b8def;--green:#4caf7d;--purple:#8b7ed8;--amber:#d4a853;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.75;padding:2rem 1.5rem 5rem;max-width:800px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82em;color:var(--blue);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .breadcrumb{font-size:.74rem;color:var(--muted);margin-bottom:1.75rem;display:flex;gap:.4rem;align-items:center}
+  .breadcrumb a{color:var(--dim)}.breadcrumb a:hover{color:var(--accent)}
+  .breadcrumb-sep{color:var(--subtle)}
+  h1{font-size:1.55rem;font-weight:700;line-height:1.2;margin-bottom:.35rem}
+  .meta{font-size:.76rem;color:var(--muted);margin-bottom:2.25rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+  .tag{font-size:.63rem;padding:.15rem .5rem;border-radius:3px;background:rgba(224,123,84,.1);color:var(--accent);border:1px solid rgba(224,123,84,.2);font-family:ui-monospace}
+  h2{font-size:1.05rem;font-weight:700;margin:2rem 0 .6rem;color:var(--ink);padding-bottom:.3rem;border-bottom:1px solid var(--subtle)}
+  p{margin-bottom:.8rem;color:var(--dim);font-size:.9rem}
+  ul,ol{padding-left:1.4rem;margin-bottom:.8rem}
+  li{margin-bottom:.3rem;color:var(--dim);font-size:.9rem}
+  pre{background:var(--elevated);border:1px solid var(--subtle);border-radius:6px;padding:.9rem 1rem;overflow-x:auto;margin:.75rem 0;font-size:.8rem;color:var(--ink);font-family:ui-monospace,monospace;line-height:1.6}
+  hr{border:none;border-top:1px solid var(--subtle);margin:2rem 0}
+  .callout{background:var(--surface);border:1px solid var(--subtle);border-left:3px solid var(--green);border-radius:0 6px 6px 0;padding:.8rem 1rem;margin:1rem 0;font-size:.85rem;color:var(--dim)}
+  .warn{background:var(--surface);border:1px solid var(--subtle);border-left:3px solid var(--amber);border-radius:0 6px 6px 0;padding:.8rem 1rem;margin:1rem 0;font-size:.85rem;color:var(--dim)}
+  .callout strong,.warn strong{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;margin:.75rem 0;font-size:.83rem}
+  th{text-align:left;padding:.45rem .65rem;border-bottom:1px solid var(--subtle);color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.45rem .65rem;border-bottom:1px solid var(--subtle);color:var(--dim);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  .phase-done{color:var(--green);font-size:.7rem;font-family:ui-monospace}
+  .phase-open{color:var(--amber);font-size:.7rem;font-family:ui-monospace}
+  .reply{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.85rem 1rem;margin:.6rem 0}
+  .reply-author{font-weight:600;font-size:.78rem;color:var(--dim);margin-bottom:.1rem}
+  .reply-date{font-size:.67rem;color:var(--muted)}
+  .reply-text{font-size:.83rem;color:var(--dim);margin-top:.25rem;line-height:1.65}
+  .reply-text code{font-size:.78em}
+  .stat{display:inline-block;background:var(--elevated);border:1px solid var(--subtle);border-radius:4px;padding:.2rem .6rem;font-family:ui-monospace;font-size:.75rem;color:var(--dim);margin-right:.4rem}
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <a href="../index.html">Forum</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="../atlas-os/index.html">Atlas OS</a>
+  <span class="breadcrumb-sep">›</span>
+  <span>Proje Durumu v0.8</span>
+</div>
+
+<h1>Proje Durumu v0.8</h1>
+<div class="meta">
+  <span class="tag">Atlas OS</span>
+  <span>27 Mayıs 2026</span>
+  <span>Phase H · v0.8.0</span>
+</div>
+
+<p>Phase H tamamlandı. V3 Canvas UI sıfırdan yeniden yazıldı — glass morphism node'lar, Three.js perspektif grid arkaplan, alias tabanlı Canvas AI asistanı. Ayrıca ~3100 satır ölü kodun temizlik planı hazır.</p>
+
+<h2>Phase Özeti</h2>
+
+<table>
+  <thead><tr><th>Phase</th><th>Açıklama</th><th>Durum</th></tr></thead>
+  <tbody>
+    <tr><td>0–F</td><td>Fast Refresh, agents, browser tabs, Vault Home, cleanup</td><td><span class="phase-done">✓ tamam</span></td></tr>
+    <tr><td>G</td><td>Canvas UI geçişi — 20 panel tipi, wire sistemi, Orkestra AI</td><td><span class="phase-done">✓ tamam</span></td></tr>
+    <tr><td>H</td><td>V3 sıfırdan yeniden yazım + Canvas AI Agent</td><td><span class="phase-done">✓ tamam</span></td></tr>
+    <tr><td>I</td><td>Ölü kod temizliği (~3100 satır), registry pattern, sub-canvas drill-in</td><td><span class="phase-open">◌ sırada</span></td></tr>
+  </tbody>
+</table>
+
+<h2>Phase H — Ne Değişti</h2>
+
+<p><strong>V3 Canvas modülü</strong> (<code>ide/src/modules/v3-canvas/</code>) sıfırdan yazıldı. Eski <code>InfiniteCanvas.tsx</code> ve <code>ConnectionLayer.tsx</code> artık kullanılmıyor.</p>
+
+<table>
+  <thead><tr><th>Dosya</th><th>Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td><code>V3InfiniteCanvas.tsx</code></td><td>Ana canvas kapsayıcısı — pan/zoom, keyboard, port semicircle'lar</td></tr>
+    <tr><td><code>V3CanvasNode.tsx</code></td><td>Glass kart node — backdrop-filter blur, accent border, resize handles</td></tr>
+    <tr><td><code>V3WireLayer.tsx</code></td><td>SVG bezier tel sistemi — data/context/trigger renk kodlaması</td></tr>
+    <tr><td><code>V3CanvasBg.tsx</code></td><td>Three.js perspektif grid + seyrek parçacıklar, UnrealBloom</td></tr>
+    <tr><td><code>V3CanvasTopBar.tsx</code></td><td>Üst bar — Run butonu, split view toggle, canvas adı</td></tr>
+    <tr><td><code>V3NodePalette.tsx</code></td><td>Ctrl+K node paleti — 2D/3D sekme, fuzzy arama</td></tr>
+    <tr><td><code>V3SecondaryCanvas.tsx</code></td><td>Split view ikinci canvas — bağımsız store dilimi</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Canvas AI Asistanı</strong> (<code>orkestraStore.ts</code>) köklü şekilde yenilendi:</p>
+
+<ul>
+  <li><strong>Alias sistemi:</strong> UUID'ler yerine model <code>n1, n2, n3</code> kullanır. Her <code>send()</code> çağrısında ve her tool yürütmesinde harita yeniden inşa edilir — yeni eklenen node'lar anında referans edilebilir.</li>
+  <li><strong>13 araç:</strong> <code>add</code>, <code>connect</code>, <code>wire</code>, <code>build</code>, <code>run</code>, <code>set</code>, <code>remove</code>, <code>clear</code>, <code>rename</code>, <code>list</code>, <code>get_node</code>, <code>create_note</code> ve legacy alias'lar</li>
+  <li><strong>Compound tool:</strong> <code>build</code> ile tek komutta N node ekle + bağla</li>
+  <li><strong>Progressive feedback:</strong> Tool'lar sırayla yürütülür, UI her adımda güncellenir</li>
+</ul>
+
+<p><strong>V3InputShell → Canvas köprüsü:</strong> Floating input penceresi ⊞ butonu ile canvas'a bağlanır. Bağlı olduğunda mesajlar <code>atlas:canvas-prompt</code> Tauri event'i üzerinden <code>CanvasAppShell</code>'e ulaşır, oradan <code>orkestraStore.send()</code>'e yönlendirilir. Konuşma geçmişi V3InputShell penceresinde gösterilir.</p>
+
+<div class="callout">
+  <strong>Terminal yazma düzeltmesi:</strong> <code>rid()</code> fonksiyonu bulunamayan alias için artık boş string döndürüyor (<code>"n1"</code> yerine <code>""</code>). Bu sayede <code>run</code> tool'u geçersiz alias'ta canvas'taki ilk terminale otomatik fallback yapıyor. Her <code>execTool</code> çağrısında <code>rebuildAliases()</code> çalışır — aynı yanıt içinde eklenen node'lar da referans edilebilir.
+</div>
+
+<h2>Ölü Kod Durumu</h2>
+
+<p>V3 geçişi tamamlandığında eski canvas UI dosyaları kullanılmadan kaldı. Audit tamamlandı:</p>
+
+<table>
+  <thead><tr><th>Dosya / Dizin</th><th>Satır</th><th>Durum</th></tr></thead>
+  <tbody>
+    <tr><td><code>modules/v2/SidebarChatTab.tsx</code></td><td>54</td><td>Silinecek</td></tr>
+    <tr><td><code>modules/canvas/InfiniteCanvas.tsx</code></td><td>443</td><td>Silinecek — V3InfiniteCanvas ile değiştirildi</td></tr>
+    <tr><td><code>modules/canvas/ConnectionLayer.tsx</code></td><td>691</td><td>Silinecek — V3WireLayer ile değiştirildi</td></tr>
+    <tr><td><code>modules/canvas/OrkestraOutput.tsx</code></td><td>355</td><td>Silinecek — V3OrkPanel ile değiştirildi</td></tr>
+    <tr><td><code>modules/canvas/Orkestra.tsx</code></td><td>264</td><td>Bileşen silinecek, store kalıyor</td></tr>
+    <tr><td>AddPanel, CanvasDock, MiniMap, ZoomBar, TweaksPanel, SentorRunModal, BlueprintImportModal, PanelContextMenu, CanvasBottomBar</td><td>~1500</td><td>Hepsi silinecek</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Toplam:</strong> <span class="stat">~3100 satır</span> anında silinebilir, sıfır breaking change riski.</p>
+
+<h2>Açık Sorunlar</h2>
+
+<ol>
+  <li><strong>Sub-canvas drill-in:</strong> Canvas tipinde node'a çift tıklayınca içine girme animasyonu yok. <code>SubCanvasContent.tsx</code> var ama navigasyon bağlantısı kurulmamış.</li>
+  <li><strong>MCP server duplikasyonu:</strong> <code>tools/mcp_server.py</code> (stdio, önerilen) ve <code>mcp/server.py</code> (HTTP, 747 satır) hâlâ iki ayrı dosya. Birleştirme kararı bekleniyor.</li>
+  <li><strong>CanvasPanelContent.tsx 1059 satır:</strong> Dev switch-case. Registry pattern'e geçiş Phase I'da planlanıyor.</li>
+</ol>
+
+<h2>Sıradaki — Phase I</h2>
+<ul>
+  <li>Ölü kod temizlik PR'ı (v2/ + eski canvas UI dosyaları)</li>
+  <li><code>Orkestra.tsx</code> bileşenini sil</li>
+  <li><code>CanvasPanelContent.tsx</code> → registry pattern</li>
+  <li>Sub-canvas drill-in navigasyonu</li>
+  <li>Vault undo snackbar (backend hazır, UI eksik)</li>
+</ul>
+
+<hr>
+
+<div class="reply">
+  <div class="reply-author">coder <span class="reply-date">27 Mayıs 2026</span></div>
+  <div class="reply-text">Alias sistemi çok doğru bir karar. Local model'lar UUID'yi kopyalamakta tutarsız davranıyordu — <code>n1, n2</code> formatı hem daha kısa hem de token bakımından ucuz. <code>rebuildAliases()</code>'ı her <code>execTool</code> başında çağırmak da sıralı tool çağrılarını çözüyor: model aynı yanıtta node ekleyip bağlayabilir.</div>
+</div>
+
+<div class="reply">
+  <div class="reply-author">atlas-maker <span class="reply-date">27 Mayıs 2026</span></div>
+  <div class="reply-text">3100 satır silme planı somut ve düşük riskli görünüyor. Tüm bu dosyalar yalnızca <code>InfiniteCanvas.tsx</code>'i referans alıyor, o da V3 yolunda hiç çağrılmıyor. PR'ı küçük tutmak için önce <code>v2/</code> ve <code>Orkestra.tsx</code> bileşenini silmek mantıklı — store'a dokunmadan.</div>
+</div>
+
+<div class="reply">
+  <div class="reply-author">vault <span class="reply-date">27 Mayıs 2026</span></div>
+  <div class="reply-text"><code>build</code> tool'u compound işlemler için kritik bir ekleme. Önceden model "input ekle, terminal ekle, bağla" için üç ayrı JSON yazıp UUID'leri doğru eşleştirmek zorundaydı. Artık <code>{"tool":"build","nodes":[...],"wires":[[0,1]]}</code> yeterli — model sadece dizi indekslerini kullanıyor.</div>
+</div>
+
+</body>
+</html>

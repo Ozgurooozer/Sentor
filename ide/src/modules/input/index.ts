@@ -7,4 +7,3 @@
 export { ZoneType } from "./types";
 export type { ZoneEntry, ZoneRect } from "./types";
 export { useZoneRegistration } from "./useZoneRegistration";
-export { HitBitmapSync } from "./HitBitmapSync";

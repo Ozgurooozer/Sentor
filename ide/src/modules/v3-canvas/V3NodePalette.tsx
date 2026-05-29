@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import { convertFileSrc } from "@tauri-apps/api/core";
+import { usePreferencesStore } from "@/modules/settings/preferences";
 import type { PanelType } from "@/modules/canvas/types";
 import { useCanvasStore } from "@/modules/canvas/canvasStore";
 
-type NodeDef = { type: PanelType; label: string; desc: string; accent: string; icon: React.ReactNode };
+type NodeDef = { type: PanelType; label: string; desc: string; accent: string; icon: React.ReactNode; customAction?: () => void };
 
 const IC = (path: string) => (
   <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -33,6 +35,8 @@ const NODES_2D: NodeDef[] = [
   { type: "if-else",    label: "If / Else",   desc: "Conditional routing — outputs true or false branch",  accent: "#d4a843", icon: IC("M8 2v5M5 7H3l-1 4 1 4h2M11 7h2l1 4-1 4h-2M8 11v3") },
   { type: "for-each",   label: "For Each",    desc: "Iterate over a list of items",                        accent: "#9b72ef", icon: IC("M3 8h10M10 5l3 3-3 3M6 3v10") },
   { type: "gate",       label: "Gate",        desc: "Circuit gate — block or pass signal based on condition", accent: "#e07b54", icon: IC("M2 8h3M11 8h3M5 5h6v6H5zM8 5v6") },
+  { type: "vault-home", label: "Vault",      desc: "Browse & open vault pages — offline knowledge base",     accent: "#5b8def", icon: IC("M8 2l5 3v6l-5 3-5-3V5l8-3zM8 2v12M3 5l5 3 5-3") },
+  { type: "instance",   label: "Instance",   desc: "Connect to another Atlas OS vault",                       accent: "#7e8a98", icon: IC("M3 3h10v4H3zM3 9h10v4H3zM8 7v2") },
 ];
 
 const NODES_3D: NodeDef[] = [
@@ -61,6 +65,22 @@ export function V3NodePalette({ onClose, onAddPanel }: Props) {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const addPanel = useCanvasStore((s) => s.addPanel);
+  const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot) ?? "C:\\Atlas OS";
+
+  const ATLAS0FIS_ENTRY: NodeDef = {
+    type: "web",
+    label: "Atlas0fis Ofis",
+    desc: "Uzman personalar · toplantı · görev panosu",
+    accent: "#4caf7d",
+    icon: IC("M2 5h12v9H2zM5 5V4a3 3 0 016 0v1M8 9v2"),
+    customAction: () => {
+      const root = workspaceRoot.replace(/\\/g, "/");
+      const url = convertFileSrc(`${root}/vault/forum/atlas0fis/index.html`);
+      addPanel("web", undefined, { url });
+    },
+  };
+
+  const NODES_2D_FULL: NodeDef[] = [...NODES_2D, ATLAS0FIS_ENTRY];
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -69,11 +89,15 @@ export function V3NodePalette({ onClose, onAddPanel }: Props) {
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  const list = tab === "2d" ? NODES_2D : NODES_3D;
+  const list = tab === "2d" ? NODES_2D_FULL : NODES_3D;
   const q = query.trim().toLowerCase();
   const filtered = q ? list.filter((n) => n.label.toLowerCase().includes(q) || n.desc.toLowerCase().includes(q)) : list;
 
-  const add = (type: PanelType) => { (onAddPanel ?? addPanel)(type); onClose(); };
+  const add = (n: NodeDef) => {
+    if (n.customAction) { n.customAction(); }
+    else { (onAddPanel ?? addPanel)(n.type); }
+    onClose();
+  };
 
   const glass: React.CSSProperties = {
     background: "rgba(8, 8, 14, 0.90)",
@@ -86,7 +110,7 @@ export function V3NodePalette({ onClose, onAddPanel }: Props) {
     <div className="fixed inset-0 z-[65]" onPointerDown={onClose}>
       <div
         className="absolute flex flex-col overflow-hidden"
-        style={{ right: 12, top: 48, width: 300, maxHeight: "76vh", ...glass }}
+        style={{ right: 12, top: 48, width: 300, maxHeight: "calc(100vh - 60px)", ...glass }}
         onPointerDown={(e) => e.stopPropagation()}
       >
         {/* Header: search + 2D/3D pill + esc */}
@@ -105,6 +129,9 @@ export function V3NodePalette({ onClose, onAddPanel }: Props) {
             </svg>
             <input
               ref={inputRef}
+              id="node-palette-search"
+              name="node-palette-search"
+              autoComplete="off"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search nodes…"
@@ -149,7 +176,7 @@ export function V3NodePalette({ onClose, onAddPanel }: Props) {
         </div>
 
         {/* Node list — single column, compact rows */}
-        <div className="flex-1 overflow-y-auto px-2 py-2 no-scrollbar">
+        <div className="flex-1 overflow-y-auto px-2 py-2" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.1) transparent" }}>
           {filtered.length === 0 ? (
             <div className="flex items-center justify-center py-8">
               <span className="font-mono text-[10.5px] uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.15)" }}>
@@ -160,9 +187,9 @@ export function V3NodePalette({ onClose, onAddPanel }: Props) {
             <div className="flex flex-col gap-0.5">
               {filtered.map((n) => (
                 <button
-                  key={n.type}
+                  key={n.type + n.label}
                   type="button"
-                  onClick={() => add(n.type)}
+                  onClick={() => add(n)}
                   className="flex items-center gap-2.5 rounded-[8px] px-2.5 py-2 text-left transition-all duration-150 ease-out"
                   style={{ background: "rgba(255,255,255,0.02)", border: "1px solid transparent" }}
                   onMouseEnter={(e) => {

@@ -164,18 +164,17 @@ export function SubCanvasContent({ panel }: Props) {
 
       {children.length === 0 && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <span className="text-[10px] text-[#333333]">Sub canvas — press [+]</span>
+          <span className="font-mono text-[10px]" style={{ color: "rgba(255,255,255,0.12)" }}>press + to add nodes</span>
         </div>
       )}
 
-      {/* Bottom toolbar — [+] panel menu left, [Projeye Çevir] right.
-          stopPropagation prevents the sub-canvas pan handler from stealing
-          dropdown clicks via its setPointerCapture. */}
+      {/* Bottom toolbar */}
       <div className="pointer-events-none absolute inset-0 z-20">
         <div
-          className="pointer-events-auto absolute bottom-3 left-3"
+          className="pointer-events-auto absolute bottom-3 left-3 flex items-center gap-1.5"
           onPointerDown={(e) => e.stopPropagation()}
         >
+          {/* Glass Add button */}
           <PanelMenu parentId={panel.id} variant="compact" />
         </div>
         <div

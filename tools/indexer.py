@@ -404,9 +404,11 @@ def _discover_files() -> list[tuple[Path, list[str]]]:
 
 def _resolve_backlinks(pages: list[dict]) -> None:
     id_map = {p["id"]: p for p in pages}
+    seen = {p["id"]: set() for p in pages}
     for page in pages:
         for target in page.get("links", []):
-            if target in id_map and page["id"] not in id_map[target]["backlinks"]:
+            if target in id_map and page["id"] not in seen[target]:
+                seen[target].add(page["id"])
                 id_map[target]["backlinks"].append(page["id"])
 
 

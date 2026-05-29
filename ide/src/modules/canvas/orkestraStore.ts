@@ -37,7 +37,7 @@ interface OrkState {
   setLoading(v: boolean): void;
   setCollapsed(v: boolean): void;
   setV3InputActive(v: boolean): void;
-  send(text: string, modelProvider: string, ollamaBase: string, lmBase: string, ollamaModel: string, lmModel: string): Promise<void>;
+  send(text: string, modelProvider: string, ollamaBase: string, lmBase: string, ollamaModel: string, lmModel: string, opencodeKey?: string, opencodeBase?: string, opencodeModel?: string): Promise<void>;
 }
 
 let nextId = 0;
@@ -52,6 +52,8 @@ function devProxy(url: string): string {
     return url.replace(/^https?:\/\/(localhost|127\.0\.0\.1):1234/, `${o}/lmstudio-proxy`);
   if (/^https?:\/\/(localhost|127\.0\.0\.1):11434/.test(url))
     return url.replace(/^https?:\/\/(localhost|127\.0\.0\.1):11434/, `${o}/ollama-proxy`);
+  if (/^https?:\/\/opencode\.ai/.test(url))
+    return url.replace(/^https?:\/\/opencode\.ai/, `${o}/opencode-proxy`);
   return url;
 }
 
@@ -306,44 +308,32 @@ function buildSystem(): string {
   const visible = panels.filter((p) => !p.pinned);
   visible.forEach((p, i) => { _aliasToId[`n${i + 1}`] = p.id; });
 
-  const nodeLines = visible.map((p, i) => {
-    const defs = PORT_DEFS[p.type];
-    const ins  = defs?.inputs.map((pt) => `${pt.id}`).join(", ")  || "none";
-    const outs = defs?.outputs.map((pt) => `${pt.id}`).join(", ") || "none";
-    return `n${i + 1} | ${p.type.padEnd(12)} | "${p.title}" | in:[${ins}] | out:[${outs}]`;
-  }).join("\n") || "  (empty)";
+  // Compact node list: n1:terminal("T") — no port details, cap at 30
+  const nodeList = visible.slice(0, 30).map((p, i) =>
+    `n${i + 1}:${p.type}("${p.title}")`
+  ).join(" ") || "(empty)";
+  const nodeOverflow = visible.length > 30 ? ` +${visible.length - 30} more` : "";
 
-  const wireLines = connections.map((c) => {
+  // Compact wire list: n1→n2 n2→n3
+  const wireList = connections.slice(0, 20).map((c) => {
     const fi = visible.findIndex((p) => p.id === c.fromPanel);
     const ti = visible.findIndex((p) => p.id === c.toPanel);
-    const fa = fi >= 0 ? `n${fi + 1}` : c.fromPanel.slice(0, 8);
-    const ta = ti >= 0 ? `n${ti + 1}` : c.toPanel.slice(0, 8);
-    return `  ${fa}[${c.fromPort ?? "out"}] →(${c.kind ?? "data"})→ ${ta}[${c.toPort ?? "in"}]`;
-  }).join("\n") || "  (none)";
+    const fa = fi >= 0 ? `n${fi + 1}` : "?";
+    const ta = ti >= 0 ? `n${ti + 1}` : "?";
+    return `${fa}→${ta}`;
+  }).join(" ") || "none";
 
   const vars = useVariableStore.getState().listVariables();
   const varSection = vars.length > 0
-    ? `\nVARIABLES:\n${vars.map((v) => `$${v.name}=${String(v.value).slice(0, 40)}`).join(" | ")}`
+    ? ` VARS:${vars.map((v) => `$${v.name}=${String(v.value).slice(0, 20)}`).join(",")}`
     : "";
 
-  return `Atlas canvas AI. Node editor control. Reply in user's language. Be concise.
-WS:${workspaceRoot}
-NODES:
-${nodeLines}
-WIRES:${wireLines}
-TOOLS (embed JSON):
-add: {"tool":"add","type":"terminal","title":"T","x":100,"y":200}
-types: terminal|input|chat|note|editor|agent|web|sketch|checklist|gallery|filebrowser|pipe
-wire: {"tool":"wire","from":"n1","to":"n2"}
-connect: {"tool":"connect","from":"n1","out":"value","to":"n2","in":"cmd","kind":"data"}
-build: {"tool":"build","nodes":[{"type":"input","title":"A"},{"type":"terminal","title":"B"}],"wires":[[0,1]]}
-run: {"tool":"run","id":"n1","cmd":"ls"}
-set: {"tool":"set","id":"n1","value":"text"}
-rename: {"tool":"rename","id":"n1","title":"Name"}
-remove: {"tool":"remove","id":"n1"}
-clear: {"tool":"clear"}
-PORTS: input→value | terminal in:cmd,trigger out:stdout | chat in:context,data out:response | note→text | vars: var_set/var_get/var_list
-RULES: use n1,n2 aliases; emit all tools at once; prefer build for pipelines${varSection}`;
+  return `Canvas AI. Reply in user's language. Be concise. WS:${workspaceRoot}
+NODES: ${nodeList}${nodeOverflow}
+WIRES: ${wireList}${varSection}
+TOOLS(JSON in reply): add(type,title,x?,y?) wire(from,to) connect(from,out,to,in,kind?) run(id,cmd) set(id,val) rename(id,title) remove(id) clear build(nodes[{type,title}],wires[[0,1]])
+TYPES:terminal|input|chat|note|editor|agent|web|pipe|sketch|variable|gate|if-else|for-each
+ALIASES:n1,n2… Emit all tools at once. Prefer build for pipelines.`;
 }
 
 // ── Store ─────────────────────────────────────────────────────────────────────
@@ -369,7 +359,7 @@ export const useOrkestraStore = create<OrkState>((set, get) => ({
   setCollapsed(v) { set({ collapsed: v }); },
   setV3InputActive(v) { set({ v3InputActive: v }); },
 
-  async send(text, modelProvider, ollamaBase, lmBase, ollamaModel, lmModel) {
+  async send(text, modelProvider, ollamaBase, lmBase, ollamaModel, lmModel, opencodeKey = "", opencodeBase = "https://opencode.ai/zen/v1", opencodeModel = "deepseek-v4-flash-free") {
     const { addMessage, updateMessage, setLoading } = get();
     addMessage({ role: "user", content: text });
     setLoading(true);
@@ -386,7 +376,26 @@ export const useOrkestraStore = create<OrkState>((set, get) => ({
 
       let fullText = "";
 
-      if (modelProvider === "ollama") {
+      if (modelProvider === "opencode") {
+        const base = opencodeBase.replace(/\/v1\/?$/, "");
+        const url = devProxy(`${base}/v1/chat/completions`);
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${opencodeKey}`,
+          },
+          body: JSON.stringify({
+            model: opencodeModel || "deepseek-v4-flash-free",
+            messages: [{ role: "system", content: systemPrompt }, ...history],
+            stream: false,
+          }),
+        });
+        if (!res.ok) console.error(`[CANVAS:AI] OpenCode HTTP ${res.status} for model "${opencodeModel}"`);
+        const data = await res.json() as { choices?: { message?: { content?: string } }[] };
+        fullText = data.choices?.[0]?.message?.content ?? "";
+        updateMessage(asstId, { content: fullText });
+      } else if (modelProvider === "ollama") {
         const url = devProxy(`${ollamaBase}/api/chat`);
         const res = await fetch(url, {
           method: "POST",

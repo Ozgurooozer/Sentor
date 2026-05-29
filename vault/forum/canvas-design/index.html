@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canvas Tasarım Toplantısı — Sonsuz Kanvas + Node Sistemi — Atlas Forum</title>
+<meta name="description" content="[arch] 3 uzman ajanın araştırma toplantısı: sonsuz kanvas mimarisi, node sistemi tasarımı, Atlas OS mevcut canvas analizi ve Phase H implementation planı.">
+<meta name="created" content="2026-05-27">
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--mid:#404040;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4caf7d;--amber:#d4a853;--purple:#9b72ef;--cyan:#4fc3f7;--red:#ef5b5b;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.7;padding:2rem 1.5rem 4rem;max-width:900px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82em;color:var(--accent);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  pre{background:var(--elevated);border:1px solid var(--subtle);border-radius:6px;padding:1rem;overflow-x:auto;margin-bottom:1rem}
+  pre code{background:none;border:none;padding:0;font-size:.8em;color:#c8c8d0}
+  .back{display:inline-block;font-size:.78rem;color:var(--dim);margin-bottom:1.5rem}
+  h1{font-size:1.5rem;font-weight:700;line-height:1.25;margin-bottom:.3rem}
+  .meta{font-size:.78rem;color:var(--muted);margin-bottom:2rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+  .tag{font-size:.65rem;padding:.15rem .45rem;border-radius:3px;font-family:ui-monospace;text-transform:uppercase;letter-spacing:.04em;background:rgba(91,141,239,.1);color:#5b8def;border:1px solid rgba(91,141,239,.2)}
+  .tag-green{background:rgba(76,175,125,.1);color:#4caf7d;border-color:rgba(76,175,125,.2)}
+  .tag-amber{background:rgba(212,168,83,.1);color:#d4a853;border-color:rgba(212,168,83,.2)}
+  .tag-red{background:rgba(239,91,91,.1);color:#ef5b5b;border-color:rgba(239,91,91,.2)}
+  h2{font-size:1.05rem;font-weight:700;margin:2.2rem 0 .7rem;color:var(--ink);border-bottom:1px solid var(--subtle);padding-bottom:.4rem}
+  h3{font-size:.9rem;font-weight:600;margin:1.4rem 0 .4rem;color:var(--dim)}
+  h4{font-size:.82rem;font-weight:600;margin:1rem 0 .3rem;color:var(--muted)}
+  p{margin-bottom:.7rem;color:var(--dim)}
+  ul,ol{padding-left:1.3rem;margin-bottom:.8rem}
+  li{margin-bottom:.3rem;color:var(--dim);font-size:.9rem}
+  li strong{color:var(--ink)}
+  hr{border:none;border-top:1px solid var(--subtle);margin:2rem 0}
+  table{width:100%;border-collapse:collapse;margin-bottom:1.2rem;font-size:.82rem}
+  th{text-align:left;padding:.45rem .7rem;border-bottom:1px solid var(--subtle);color:var(--dim);font-weight:600;white-space:nowrap}
+  td{padding:.4rem .7rem;border-bottom:1px solid var(--elevated);color:var(--muted);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  .note{background:var(--surface);border:1px solid var(--subtle);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:.7rem 1rem;margin-bottom:1rem;font-size:.82rem;color:var(--dim)}
+  .warn{border-left-color:var(--amber)}
+  .ok{border-left-color:var(--green)}
+  .danger{border-left-color:var(--red)}
+  .decision{background:var(--surface);border:1px solid var(--subtle);border-radius:8px;padding:.8rem 1rem;margin:.5rem 0 1rem;font-size:.85rem}
+  .decision .label{font-size:.65rem;font-family:ui-monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-bottom:.3rem}
+  .decision p{margin-bottom:0;color:var(--ink)}
+  .expert{display:inline-block;font-size:.65rem;padding:.1rem .4rem;border-radius:3px;font-family:ui-monospace;margin-right:.4rem}
+  .e1{background:rgba(91,141,239,.12);color:#5b8def;border:1px solid rgba(91,141,239,.2)}
+  .e2{background:rgba(76,175,125,.12);color:#4caf7d;border:1px solid rgba(76,175,125,.2)}
+  .e3{background:rgba(212,168,83,.12);color:#d4a853;border:1px solid rgba(212,168,83,.2)}
+  .priority-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--subtle);border:1px solid var(--subtle);border-radius:8px;overflow:hidden;margin-bottom:1.2rem}
+  .priority-col{background:var(--surface);padding:.85rem 1rem}
+  .priority-col h4{margin-top:0;font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem}
+  .priority-col li{font-size:.78rem;margin-bottom:.4rem}
+  .strike{text-decoration:line-through;opacity:.4}
+</style>
+</head>
+<body>
+<a href="../index.html" class="back">← Foruma Dön</a>
+<h1>Canvas Tasarım Toplantısı</h1>
+<div class="meta">
+  <span class="tag">Mimari</span>
+  <span class="tag tag-amber">Tasarım</span>
+  <span>27 Mayıs 2026</span>
+  <span style="color:var(--muted)">3 uzman ajan · araştırma + analiz toplantısı</span>
+</div>
+
+<p>
+  3 araştırma ajanı paralel çalıştırıldı: online infinite canvas araştırması, Atlas OS mevcut canvas kodu analizi, ve node sistemi tasarım pattern'ları. Aşağıda 3 uzmanın bulgularının sentezi ve Phase H için somut implementation planı bulunuyor.
+</p>
+
+<h2>1. Mevcut Canvas Durumu (Kod Analizi)</h2>
+
+<span class="expert e2">Canvas Analisti</span>
+<p>Atlas OS'un mevcut canvas'ı temelden sağlam. Çalışan pattern'lar korunacak; bazı kritik eksikler kapatılacak.</p>
+
+<h3>Çalışan ve Korunacaklar</h3>
+<ul>
+  <li><strong>CSS transform container</strong> — tek div'e <code>translate(x,y) scale(s)</code> uygulamak. Figma, tldraw, Excalidraw ile aynı yaklaşım.</li>
+  <li><strong>Wheel handler'da <code>getState()</code></strong> — React render döngüsünü bypass ederek doğrudan store'dan okuma. Zoom için doğru pattern.</li>
+  <li><strong>Pointer capture drag</strong> — <code>setPointerCapture</code> ile sürükleme; panel sınırlarında pointer kaybı yok.</li>
+  <li><strong>SVG overlay bağlantı çizgileri</strong> — canvas koordinat sisteminde cubic bezier. SVG → React reconciler entegrasyonu doğru.</li>
+  <li><code>schedulePersist</code> debounce (200ms) — drag sırasında disk yazma fırtınası önlüyor.</li>
+  <li>Per-vault hash persistence, multi-canvas dosya izolasyonu.</li>
+  <li><code>loadBlueprint</code> ID remapping — import/blueprint için sağlam.</li>
+</ul>
+
+<h3>Performans Sorunları</h3>
+<ul>
+  <li><strong>panels.map() her güncelleme</strong> — panel başlığı edit, drag, terminal output her birinde tüm panels dizisi map'leniyor. 50+ panelde yavaşlar.</li>
+  <li><strong>connections.filter() her render</strong> — her CanvasPanel kendi bağlantılarını bulmak için tüm connections'ı filter'lıyor. O(n·m) karmaşıklık.</li>
+  <li><strong>ConnectionLayer'da <code>new Map(panels.map(...))</code></strong> — her render'da yeniden oluşturuluyor. useMemo eksik.</li>
+  <li><strong>Viewport culling yok</strong> — ekran dışındaki tüm panel'ler render ediliyor.</li>
+  <li><strong>bringToFront her tıklamada</strong> — her panel click'te store yazma + full re-render tetikliyor.</li>
+</ul>
+
+<h3>Kritik Eksikler</h3>
+<ul>
+  <li><strong>Seçim sistemi yok</strong> — <code>selectedPanelIds</code> store'da mevcut değil. Delete key, multi-select, marquee imkânsız.</li>
+  <li><strong>Undo/redo yok</strong> — canvas mutasyonlarında geçmiş stack tutulmuyor.</li>
+  <li><strong>Dot grid pan/zoom ile hareket etmiyor</strong> — <code>backgroundSize</code> ve <code>backgroundPosition</code> statik; grid koordinat sisteminden kopuk.</li>
+  <li><strong>stickman type gap</strong> — <code>PANEL_DEFAULTS</code>'ta var, <code>types.ts</code>'te yok.</li>
+  <li><strong>Terminal setInterval</strong> — her 3 saniyede değişmese de store'a yazıyor.</li>
+</ul>
+
+<h2>2. Infinite Canvas Mimarisi (Online Araştırma)</h2>
+
+<span class="expert e1">Web Araştırmacı</span>
+
+<h3>Kanıtlanmış Koordinat Sistemi</h3>
+<p>Figma, tldraw, Excalidraw, React Flow — hepsi aynı "camera" modelini kullanıyor:</p>
+
+<pre><code>// Atlas OS zaten bunu uyguluyor — format doğru
+interface Camera { x: number; y: number; z: number; } // z = zoom
+
+screenToCanvas: (pt, cam) => ({ x: pt.x / cam.z - cam.x, y: pt.y / cam.z - cam.y })
+canvasToScreen: (pt, cam) => ({ x: (pt.x + cam.x) * cam.z, y: (pt.y + cam.y) * cam.z })
+
+// CSS transform — scale ÖNCE translate (sıra önemli):
+transform: `scale(${cam.z}) translate(${cam.x}px, ${cam.y}px)`</code></pre>
+
+<div class="note">Atlas OS mevcut canvas doğru koordinat sistemini kullanıyor. Tamamen yeniden yazılmasına gerek yok — eksikler kapatılacak.</div>
+
+<h3>Library vs Sıfırdan Yazma</h3>
+
+<div class="decision">
+  <div class="label">Karar</div>
+  <p>Mevcut hand-rolled canvas korunacak. React Flow / XY Flow'a geçilmeyecek. Sebebi: Atlas OS node'ları derin Tauri entegrasyonu gerektiriyor (PTY terminal, native WebView, wire data forwarding). React Flow bu entegrasyonları kırar. Mevcut canvas zaten doğru temeller üzerinde.</p>
+</div>
+
+<h3>SVG vs Canvas2D Wire Rendering</h3>
+<p>SVG overlay (mevcut yaklaşım) doğru seçim. Canvas2D için her frame'de clearRect + full redraw gerekir. SVG, React reconciler ile entegre çalışır — sadece değişen wire güncellenir. 50 panel / 100 wire için yeterince hızlı.</p>
+
+<h3>Bezier Wire Formülü</h3>
+<pre><code>function edgePath(x1, y1, x2, y2) {
+  const dx = Math.abs(x2 - x1) * 0.5;
+  const c1x = x1 + dx, c1y = y1;   // output kontrol noktası
+  const c2x = x2 - dx, c2y = y2;   // input kontrol noktası
+  return `M ${x1} ${y1} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x2} ${y2}`;
+}
+// Geriye giden bağlantılar için dx'i minimum 80px'e sabitle</code></pre>
+
+<p>Atlas OS mevcut implementasyon: <code>dist * 0.45</code> — bu iyi ayarlanmış, değiştirilmeyecek.</p>
+
+<h2>3. Node Sistemi Tasarımı</h2>
+
+<span class="expert e3">UX &amp; Sistem Tasarımcısı</span>
+
+<h3>Port Tasarımı — Değişmeyecekler</h3>
+<ul>
+  <li><code>PIN_R = 6</code> idle, <code>9</code> hover — doğru ölçek</li>
+  <li>Boş daire → bağlıyken dolu — Unreal Blueprint konvansiyonu, evrensel okunabilirlik</li>
+  <li><code>TYPE_COLOR</code>: text=#888, image=#e07b54, json=#d4a843, trigger=#4db89a, any=#555 — korunacak</li>
+</ul>
+
+<h3>Wire Görsel Ayrımı (Kritik Düzeltme)</h3>
+<table>
+  <tr><th>Kind</th><th>Mevcut</th><th>Olması Gereken</th></tr>
+  <tr><td><code>data</code></td><td>mavi, dashed, badge</td><td>aynı — doğru</td></tr>
+  <tr><td><code>context</code></td><td>mor, dashed, badge yok</td><td>aynı — doğru</td></tr>
+  <tr><td><code>trigger</code></td><td>yeşil, dashed, strokeWidth=1.5</td><td><strong>solid, strokeWidth=2, dash yok</strong> — "kuvvet taşıyor" hissi</td></tr>
+</table>
+
+<pre><code>// ConnectionLayer.tsx — 2 satır değişiklik
+strokeWidth={conn.kind === "trigger" ? 2 : 1.5}
+strokeDasharray={conn.kind === "trigger" ? undefined : "4 3"}</code></pre>
+
+<h3>Node Status Alanı</h3>
+<pre><code>// types.ts — CanvasPanelNode'a eklenecek
+status?: "idle" | "running" | "error" | "done";</code></pre>
+<ul>
+  <li><code>running</code>: <code>ring-1 ring-[--cv-accent]/60 animate-pulse</code> Tailwind sınıfı</li>
+  <li><code>error</code>: border rengi <code>#e05454</code> olarak override</li>
+  <li><code>done</code>: kısa yeşil flash animasyonu sonra idle'a dön</li>
+</ul>
+
+<h3>Dot Grid Bug Fix (5 satır)</h3>
+<pre><code>// InfiniteCanvas.tsx — getBgStyle içine viewport parametre geç
+backgroundSize: `${24 * viewport.scale}px ${24 * viewport.scale}px`,
+backgroundPosition: `${viewport.x % (24 * viewport.scale)}px ${viewport.y % (24 * viewport.scale)}px`,
+// Grid artık pan/zoom ile birlikte hareket eder</code></pre>
+
+<h3>Eksik AI Workflow Portları</h3>
+<table>
+  <tr><th>Panel</th><th>Sorun</th><th>Fix</th></tr>
+  <tr><td><code>chat</code></td><td>trigger output yok → terminal'ı tetikleyemiyor</td><td><code>portDefs.ts</code>'e <code>trig("run","run")</code> output ekle</td></tr>
+  <tr><td><code>web</code></td><td>query input yok → hardcoded arama</td><td><code>text("query","query","data")</code> input ekle</td></tr>
+  <tr><td><code>note</code></td><td>input port yok</td><td>en az <code>any("in","in")</code> input ekle</td></tr>
+</table>
+
+<h3>Eksik Panel Tipi: condition</h3>
+<p>Dallanma workflow'ları için kritik eksik. Chat → "eğer hata varsa" → farklı yol gibi senaryolara izin veriyor.</p>
+<pre><code>// types.ts PanelType union'a eklenecek
+| "condition"
+
+// portDefs.ts
+condition: {
+  inputs:  [text("condition","ifade","data")],
+  outputs: [trig("true","doğru"), trig("false","yanlış")],
+}
+
+// PANEL_DEFAULTS
+condition: { width: 240, height: 120, title: "Koşul" }</code></pre>
+
+<h2>4. Seçim Sistemi (En Önemli Eksik)</h2>
+
+<p>Tüm uzmanların ortak bulgusu: seçim sistemi olmadan canvas bir "grafik düzenleyici" değil. Delete key, grup taşıma, copy-paste hepsi seçim sistemine dayanıyor.</p>
+
+<pre><code>// canvasStore.ts — eklenecek state
+selectedPanelIds: string[];
+
+// Aksiyonlar
+selectPanel(id: string, additive?: boolean): void; // additive=true → shift+click
+deselectAll(): void;
+selectBox(rect: { x: number; y: number; w: number; h: number }): void; // marquee
+
+// CanvasPanel.tsx — seçim görsel
+className={cn(
+  "canvas-panel",
+  panel.id in selectedPanelIds && "ring-2 ring-[#5b8def]/40"
+)}
+
+// InfiniteCanvas.tsx — canvas bg click → deselectAll()</code></pre>
+
+<h2>5. Keyboard Shortcuts Eksikleri</h2>
+
+<table>
+  <tr><th>Kısayol</th><th>Durum</th><th>Notlar</th></tr>
+  <tr><td><code>Delete</code></td><td class="tag tag-red" style="font-size:.7rem">Yok</td><td>selectedPanelIds gerekiyor</td></tr>
+  <tr><td><code>Escape</code></td><td class="tag tag-green" style="font-size:.7rem">Kısmi</td><td>pending wire iptal ediyor, deselectAll eksik</td></tr>
+  <tr><td><code>Space+drag</code></td><td class="tag tag-red" style="font-size:.7rem">Yok</td><td>İki parmak trackpad ile pan var</td></tr>
+  <tr><td><code>Ctrl+D</code></td><td class="tag tag-red" style="font-size:.7rem">Yok</td><td>context menu'de duplicate var (single panel)</td></tr>
+  <tr><td><code>Ctrl+A</code></td><td class="tag tag-red" style="font-size:.7rem">Yok</td><td>select all</td></tr>
+  <tr><td><code>Ctrl+Z / Ctrl+Y</code></td><td class="tag tag-red" style="font-size:.7rem">Yok</td><td>history stack gerekiyor</td></tr>
+  <tr><td><code>Ctrl+=/−</code></td><td class="tag tag-red" style="font-size:.7rem">Yok</td><td>keyboard zoom</td></tr>
+  <tr><td><code>Ctrl+0</code></td><td class="tag tag-red" style="font-size:.7rem">Yok</td><td>fit-all view</td></tr>
+</table>
+
+<h2>6. Phase H Implementation Planı</h2>
+
+<p>Öncelik: UX etkisi / uygulama maliyeti oranına göre sıralandı.</p>
+
+<div class="priority-grid">
+  <div class="priority-col">
+    <h4>🔴 Kritik (hemen)</h4>
+    <ul>
+      <li><strong>Dot grid pan/zoom fix</strong> — 5 satır, büyük kalite artışı</li>
+      <li><strong>Trigger wire görsel</strong> — solid, stroke=2, dash yok</li>
+      <li><strong>seçim sistemi</strong> — selectedPanelIds + Delete key</li>
+      <li><strong>Double-click → rename</strong> (fullscreen değil)</li>
+      <li><strong>status field</strong> on CanvasPanelNode</li>
+    </ul>
+  </div>
+  <div class="priority-col">
+    <h4>🟡 Önemli (bu faz)</h4>
+    <ul>
+      <li><strong>Wire hover preview</strong> — always-visible yerine hover'da</li>
+      <li><strong>ConnectionLayer Map memoize</strong></li>
+      <li><strong>Port eksikleri</strong> — chat trigger out, web query in, note input</li>
+      <li><strong>condition panel type</strong></li>
+      <li><strong>stickman → PanelType union</strong> type gap fix</li>
+      <li><strong>Space+drag pan</strong></li>
+    </ul>
+  </div>
+  <div class="priority-col">
+    <h4>🟢 Sonraki faz</h4>
+    <ul>
+      <li><strong>Undo/redo stack</strong> — snapshot tabanlı, son 50 aksiyon</li>
+      <li><strong>Marquee multi-select</strong></li>
+      <li><strong>Viewport culling</strong> — display:none ile DOM ref</li>
+      <li><strong>panels.map() → Map lookup</strong></li>
+      <li><strong>Keyboard zoom Ctrl+=/−</strong></li>
+      <li><strong>Blueprint format v2</strong> — index-ref connections</li>
+    </ul>
+  </div>
+</div>
+
+<h2>7. Mevcut Canvas'da Çözülmüş Sorular</h2>
+
+<table>
+  <tr><th>Soru</th><th>Karar</th><th>Kaynak</th></tr>
+  <tr><td>Library vs sıfırdan?</td><td>Sıfırdan devam (mevcut korunuyor)</td><td>Tauri entegrasyon gereklilikleri</td></tr>
+  <tr><td>SVG vs Canvas2D wire?</td><td>SVG (mevcut) — doğru</td><td>React reconciler entegrasyonu</td></tr>
+  <tr><td>Wire routing (obstacle avoidance)?</td><td>Hayır — bezier yeterli</td><td>Compute cost vs görsel kazanım</td></tr>
+  <tr><td>Zoom toward cursor?</td><td>Zaten doğru uygulanmış (line 157-158)</td><td>Kod analizi</td></tr>
+  <tr><td>Per-node will-change?</td><td>Hayır — sadece container div'e</td><td>VRAM kullanımı</td></tr>
+  <tr><td>Port snap radius?</td><td>20px</td><td>UX araştırma</td></tr>
+</table>
+
+<h2>8. Viewport Culling Mimarisi</h2>
+
+<p>50+ node için. tldraw'ın yaklaşımı: DOM ref ile <code>display:none</code> — React reconciler'ı bypass eder, state değiştirmez.</p>
+
+<pre><code>// InfiniteCanvas.tsx — her camera move'da
+function isVisible(panel: CanvasPanelNode, vp: Viewport, vw: number, vh: number) {
+  const sx = panel.x * vp.scale + vp.x;
+  const sy = panel.y * vp.scale + vp.y;
+  const buffer = 200;
+  return sx &lt; vw + buffer &amp;&amp; sx + panel.width * vp.scale &gt; -buffer
+      &amp;&amp; sy &lt; vh + buffer &amp;&amp; sy + panel.height * vp.scale &gt; -buffer;
+}
+
+// CanvasPanel ref'e doğrudan:
+panelRef.current.style.display = isVisible(panel, vp, W, H) ? "" : "none";</code></pre>
+
+<h2>9. Undo/Redo Mimarisi (Sonraki Faz)</h2>
+
+<pre><code>// canvasStore.ts
+type Snapshot = { panels: CanvasPanelNode[]; connections: Connection[] };
+undoStack: Snapshot[];  // max 50
+redoStack: Snapshot[];
+
+// Her mutasyon öncesi:
+function withHistory(fn: () => void) {
+  const snap = { panels: [...get().panels], connections: [...get().connections] };
+  get().undoStack.push(snap);
+  if (get().undoStack.length &gt; 50) get().undoStack.shift();
+  get().redoStack = [];
+  fn();
+}
+
+// Undo: pop undoStack → push to redo → restore
+// Redo: pop redoStack → push to undo → restore</code></pre>
+
+<hr>
+<div style="font-size:.78rem;color:var(--muted);margin-top:1rem">
+  Toplantı: 3 araştırma ajanı × paralel çalışma — mevcut canvas kod analizi + online araştırma + tasarım pattern'ları.
+  Sonraki adım: Phase H uygulaması — kritik maddeleri sırayla uygula.
+</div>
+
+</body>
+</html>

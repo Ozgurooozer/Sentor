@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 export type BgStyle = "dot" | "grid" | "solid" | "radial" | "noise";
+export type BgTone = "warm" | "neutral" | "cool";
 export type WireAnim = "off" | "pulse" | "flow";
 export type WireStyle = "bezier" | "orthogonal";
 export type DensityMode = "compact" | "comfy" | "spacious";
@@ -9,6 +10,7 @@ export type HeaderStyle = "stripe" | "fill" | "none";
 
 export interface CanvasTweaks {
   bgStyle: BgStyle;
+  bgTone: BgTone;
   showMinimap: boolean;
   showGuides: boolean;
   wireAnim: WireAnim;
@@ -20,10 +22,12 @@ export interface CanvasTweaks {
   qualityMode: QualityMode;
   glowAmount: number;
   ambientGlow: boolean;
+  backdropBlur: boolean;
 }
 
 export const TWEAK_DEFAULTS: CanvasTweaks = {
   bgStyle: "dot",
+  bgTone: "neutral",
   showMinimap: true,
   showGuides: true,
   wireAnim: "flow",
@@ -35,6 +39,7 @@ export const TWEAK_DEFAULTS: CanvasTweaks = {
   qualityMode: "performance",
   glowAmount: 0,
   ambientGlow: false,
+  backdropBlur: false,
 };
 
 interface TweaksState extends CanvasTweaks {

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlas0fis — Görev Panosu</title>
+<meta name="description" content="[atlas0fis] Merkezi görev panosu: rol-bazlı görevler, durum, öncelik, sahip persona. config'den render.">
+<script src="../config.js"></script>
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--mid:#404040;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4caf7d;--amber:#d4a853;--purple:#8b7ed8;--red:#e05a5a;--font:system-ui,-apple-system,sans-serif;--mono:ui-monospace,"Cascadia Code",monospace;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.6;padding:2rem 1.5rem 4rem;max-width:880px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .back{display:inline-block;font-size:.76rem;color:var(--dim);margin-bottom:1.3rem}.back:hover{color:var(--accent)}
+  h1{font-size:1.4rem;font-weight:700;margin-bottom:.25rem}
+  .sub{font-size:.82rem;color:var(--dim);margin-bottom:1.4rem}
+  .legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.72rem;color:var(--muted);margin-bottom:.8rem}
+  table{width:100%;border-collapse:collapse;font-size:.82rem;border:1px solid var(--subtle);border-radius:8px;overflow:hidden;margin-bottom:1.4rem}
+  th,td{text-align:left;padding:.55rem .75rem;border-bottom:1px solid var(--subtle);vertical-align:top}
+  th{background:var(--elevated);color:var(--muted);font-weight:600;font-size:.69rem;text-transform:uppercase;letter-spacing:.05em}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:var(--surface)}
+  .id{font-family:var(--mono);font-size:.76rem;color:var(--accent)}
+  .owner{font-size:.74rem;color:var(--dim)}
+  .pri{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+  .note{font-size:.72rem;color:var(--muted)}
+  .st{font-size:.72rem;font-weight:600;white-space:nowrap}
+  .st-Yapılacak{color:var(--amber)}.st-DevamEdiyor{color:var(--accent)}.st-Engellendi{color:var(--red)}.st-Tamamlandı{color:var(--green)}
+  .empty{color:var(--muted);font-style:italic;font-size:.82rem;padding:1rem;text-align:center}
+  .grp{font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:.4rem 0 .5rem}
+</style>
+</head>
+<body>
+<a href="../index.html" class="back">← Ofise Dön</a>
+<h1>Görev Panosu</h1>
+<p class="sub" id="sub">Rol-bazlı görevler. Sahip persona her toplantıdan sonra güncellenir.</p>
+<div class="legend" id="legend"></div>
+<div id="root"><div class="empty">Yükleniyor…</div></div>
+<script>
+(function(){
+  function esc(s){var d=document.createElement('div');d.textContent=(s==null?'':String(s));return d.innerHTML;}
+  var ORDER=['DevamEdiyor','Yapılacak','Engellendi','Tamamlandı'];
+  function init(){
+    var cfg=window.ATLAS0FIS_CONFIG, root=document.getElementById('root');
+    if(!cfg){root.innerHTML='<div class="empty">config.js bulunamadı.</div>';return;}
+    var names={}; (cfg.personas||[]).forEach(function(p){names[p.slug]=p.ad;});
+    var board=cfg.board||[];
+    document.getElementById('sub').textContent=cfg.project&&cfg.project.name?cfg.project.name+' — rol-bazlı görev panosu':'Rol-bazlı görev panosu';
+    var counts={}; board.forEach(function(b){var k=(b.durum||'').replace(/\s/g,'');counts[k]=(counts[k]||0)+1;});
+    document.getElementById('legend').innerHTML=ORDER.filter(function(k){return counts[k];}).map(function(k){
+      return '<span class="st st-'+k+'">'+esc(k)+': '+counts[k]+'</span>';
+    }).join('');
+    if(!board.length){root.innerHTML='<div class="empty">Pano boş.</div>';return;}
+    // group by status in ORDER
+    var html='';
+    ORDER.forEach(function(statusKey){
+      var rows=board.filter(function(b){return (b.durum||'').replace(/\s/g,'')===statusKey;});
+      if(!rows.length)return;
+      html+='<div class="grp">'+esc(rows[0].durum)+'</div><table><thead><tr><th>ID</th><th>Görev</th><th>Sahip</th><th>Öncelik</th><th>Not</th></tr></thead><tbody>';
+      html+=rows.map(function(t){
+        return '<tr><td class="id">'+esc(t.id)+'</td><td>'+esc(t.gorev)+'</td>'
+          +'<td class="owner">'+esc(names[t.owner]||t.owner||'—')+'</td>'
+          +'<td class="pri">'+esc(t.oncelik||'')+'</td>'
+          +'<td class="note">'+esc(t.not||'')+'</td></tr>';
+      }).join('');
+      html+='</tbody></table>';
+    });
+    root.innerHTML=html;
+  }
+  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init):init();
+})();
+</script>
+</body>
+</html>

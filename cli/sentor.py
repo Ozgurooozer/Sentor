@@ -37,24 +37,10 @@ TASKS_DIR.mkdir(parents=True, exist_ok=True)
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 
-# ── ANSI (atlas.py ile uyumlu) ───────────────────────────────────────────────
+# ── ANSI helpers ──────────────────────────────────────────────────────────────
 
-_COLOR  = sys.stdout.isatty()
-_ACCENT = '\033[38;2;91;141;239m'
-_DIM    = '\033[2m'
-_OK     = '\033[38;2;29;158;117m'
-_ERR    = '\033[38;2;221;82;82m'
-_RESET  = '\033[0m'
-
-
-def _c(s, code):
-    return f'{code}{s}{_RESET}' if _COLOR else s
-
-
-def accent(s):  return _c(s, _ACCENT)
-def dim(s):     return _c(s, _DIM)
-def ok(s):      return _c(s, _OK)
-def err(s):     return _c(s, _ERR)
+sys.path.insert(0, str(ROOT / 'tools'))
+from colors import accent, dim, ok, err  # noqa: E402, F401
 
 
 # ── Provider probe ───────────────────────────────────────────────────────────
@@ -143,8 +129,7 @@ def _slugify(s):
 def _load_task(task_id):
     p = _task_path(task_id)
     if not p.exists():
-        print(f'\n  {err(f"task not found: {task_id}")}\n')
-        sys.exit(1)
+        raise FileNotFoundError(f"task not found: {task_id}")
     return json.loads(p.read_text(encoding='utf-8'))
 
 
@@ -244,7 +229,11 @@ def list_tasks():
 
 
 def show_task(task_id):
-    t = _load_task(task_id)
+    try:
+        t = _load_task(task_id)
+    except FileNotFoundError as e:
+        print(f'\n  {err(str(e))}\n')
+        return
     print()
     print(json.dumps(t, indent=2, ensure_ascii=False))
     print()
@@ -330,7 +319,11 @@ def _run_log_path(task_id):
 
 
 def run_task(task_id, wait=False, extra_input=None):
-    task = _load_task(task_id)
+    try:
+        task = _load_task(task_id)
+    except FileNotFoundError as e:
+        print(f'\n  {err(str(e))}\n')
+        return 1
     provider = task.get('provider', 'local-ollama')
 
     print()

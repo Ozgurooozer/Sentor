@@ -114,7 +114,7 @@ export function AiComposerProvider({
     window.addEventListener("atlas:ai-attach-file", onAttach);
     return () => window.removeEventListener("atlas:ai-attach-file", onAttach);
     // attachFileByPath is stable for our purposes (closes over setFiles only)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   useEffect(() => {

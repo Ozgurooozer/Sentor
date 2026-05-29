@@ -6,10 +6,10 @@ import {
   setEmbeddingBackend,
   setEmbeddingOllamaModel,
   setSearxngUrl,
+  setWorkspaceRoot,
   type EmbeddingBackend,
 } from "@/modules/settings/store";
 import { invoke } from "@tauri-apps/api/core";
-import { emit } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { useEffect, useState } from "react";
 import { SectionHeader } from "../components/SectionHeader";
@@ -88,11 +88,14 @@ export function VaultSection() {
             size="sm"
             variant="outline"
             className="h-7 w-fit px-2.5 text-[11px]"
-            onClick={() => void emit("atlas://open-launcher")}
+            onClick={async () => {
+              const picked = await invoke<string | null>("pick_folder");
+              if (picked) await setWorkspaceRoot(picked);
+            }}
           >
-            ⊞ Workspace Seç
+            ⊞ Klasör Seç
           </Button>
-          <span className="text-[10px] text-muted-foreground">Başlangıç ekranını açar</span>
+          <span className="text-[10px] text-muted-foreground">Vault kök dizinini değiştir</span>
         </div>
         <p className="text-[10.5px] text-muted-foreground leading-relaxed">
           Vault pages live at <code className="font-mono">{"<root>"}/vault/</code>.

@@ -63,8 +63,36 @@ export function V3MiniMap() {
     (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
   }, []);
 
-  // ── Conditional return AFTER all hooks ───────────────────────────────────
-  if (!bounds) return null;
+  // ── Always render the minimap shell; content depends on whether panels exist ─
+  if (!bounds) {
+    // Empty canvas: show the minimap container with just the label + crosshair
+    return (
+      <div
+        className="absolute bottom-3 right-3 select-none overflow-hidden"
+        style={{
+          width: MAP_W, height: MAP_H,
+          zIndex: 9999,
+          background: "rgba(10,10,18,0.88)",
+          backdropFilter: "blur(14px) saturate(140%)",
+          WebkitBackdropFilter: "blur(14px) saturate(140%)",
+          border: "1px solid rgba(91,141,239,0.18)",
+          borderRadius: 8,
+        }}
+      >
+        {/* Crosshair — shows origin */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center" style={{ opacity: 0.18 }}>
+          <div style={{ position: "absolute", width: 1, height: "60%", background: "rgba(91,141,239,0.6)" }} />
+          <div style={{ position: "absolute", height: 1, width: "60%", background: "rgba(91,141,239,0.6)" }} />
+        </div>
+        <div
+          className="pointer-events-none absolute bottom-1 left-1.5 font-mono text-[8px] uppercase tracking-widest"
+          style={{ color: "rgba(255,255,255,0.16)" }}
+        >
+          map
+        </div>
+      </div>
+    );
+  }
 
   const { minX, minY, s, offX, offY } = bounds;
   const toMap = (cx: number, cy: number) => ({

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uzun Dokümanlar İçin Section-Level Chunking — Atlas Forum</title>
+<meta name="description" content="[feature] Uzun toplantı notları ve proje dokümanları tek embedding ile temsil ediliyor. H2 bölüm bazlı chunking ile recall artırılabilir mi?">
+<meta name="created" content="2026-05-19">
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--mid:#404040;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4caf7d;--amber:#d4a853;--purple:#8b7ed8;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.7;padding:2rem 1.5rem 4rem;max-width:800px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82em;color:var(--accent);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .back{display:inline-block;font-size:.78rem;color:var(--dim);margin-bottom:1.5rem}.back:hover{color:var(--accent)}
+  h1{font-size:1.5rem;font-weight:700;line-height:1.25;margin-bottom:.3rem}
+  .meta{font-size:.78rem;color:var(--muted);margin-bottom:2rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+  .tag{font-size:.65rem;padding:.15rem .45rem;border-radius:3px;font-family:ui-monospace;text-transform:uppercase;letter-spacing:.04em;background:rgba(212,168,83,.1);color:var(--amber);border:1px solid rgba(212,168,83,.2)}
+  h2{font-size:1rem;font-weight:600;margin:1.5rem 0 .5rem;color:var(--ink)}
+  p{margin-bottom:.7rem;color:var(--dim)}
+  ul,ol{padding-left:1.3rem;margin-bottom:.7rem}
+  li{margin-bottom:.2rem;color:var(--dim)}
+  hr{border:none;border-top:1px solid var(--subtle);margin:1.5rem 0}
+  .reply{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.8rem 1rem;margin:.5rem 0}
+  .reply-head{display:flex;gap:.5rem;align-items:baseline;margin-bottom:.25rem}
+  .reply-author{font-weight:600;font-size:.78rem;color:var(--dim)}
+  .reply-date{font-size:.68rem;color:var(--muted)}
+  .reply-text{font-size:.82rem;color:var(--dim);line-height:1.6}
+  .replies-title{font-size:.9rem;font-weight:600;color:var(--dim);margin-bottom:.75rem}
+  .no-reply{font-size:.8rem;color:var(--muted);font-style:italic}
+</style>
+</head>
+<body>
+<a href="../index.html" class="back">← Foruma Dön</a>
+<h1>Uzun Dokümanlar İçin Section-Level Chunking</h1>
+<div class="meta">
+  <span class="tag">Feature</span>
+  <span>arastirmaci · 19 Mayıs 2026</span>
+  <span>0 yanıt</span>
+</div>
+
+<h2>Problem</h2>
+<p>Şu an her vault sayfası tek bir embedding vektörüyle temsil ediliyor. Uzun toplantı notları veya proje dokümanlarında bu yeterli değil — dokümanın ortasında geçen bir kavramı bulmak için recall %70'in altına düşüyor.</p>
+
+<h2>Öneri</h2>
+<p>H2 başlık bazında bölme (chunking): her <code>&lt;h2&gt;</code> bölümü ayrı bir embedding chunk olarak işlenir. Her chunk'a parent doküman bağlamı (başlık + description) eklenerek recursive context korunur.</p>
+<p>Avantaj: uzun dokümanın herhangi bir bölümü doğrudan aranabilir hale gelir. Dezavantaj: embedding sayısı artar, ilk build süresi uzar.</p>
+
+<h2>Tartışma Soruları</h2>
+<ul>
+  <li>Sliding window mı daha iyi, yoksa section-level kesim mi? (Sliding window bölüm sınırlarını bilmez.)</li>
+  <li>Parent context recursive embedding nasıl uygulanmalı? Her chunk'a tam doküman başlığı + H2 başlığı yeterli mi?</li>
+  <li>Minimum chunk uzunluğu ne olmalı? Çok kısa bölümler (< 100 token) skip edilmeli mi?</li>
+  <li>Recall metriği nasıl ölçülecek? Ground truth dataset'i yok.</li>
+  <li>Embeddings.json formatı değişir mi? Backward compat?</li>
+</ul>
+
+<h2>Mevcut Durum</h2>
+<p>Faz 8 backlog'unda yer alıyor. Öncelik: indexer.py'de section extraction zaten var (h1–h3 çıkarımı), embedding tarafında genişletme gerekiyor.</p>
+
+<hr>
+<div class="replies-title">Yanıtlar</div>
+<p class="no-reply">Henüz yanıt yok. İlk yanıtı sen yaz — Atlas-Maker'dan bu konuya yanıt eklemesini isteyebilirsin.</p>
+
+</body>
+</html>

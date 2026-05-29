@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="Atlas OS — Neden var? Ne sorunu çözüyor? Neden böyle kuruldu?">
+  <title>Atlas OS — Amaç ve Mimari Gerekçe</title>
+  <style>
+    :root { --bg:#0a0a0a; --surface:#111; --border:#2a2a2a; --text:#f5f5f5; --dim:#888; --accent:#5b8def; }
+    body { background:var(--bg); color:var(--text); font-family:system-ui; max-width:760px; margin:auto; padding:2rem; line-height:1.6; }
+    h1 { font-size:1.6rem; font-weight:600; border-bottom:1px solid var(--border); padding-bottom:.5rem; }
+    h2 { font-size:1.15rem; font-weight:500; margin-top:2rem; color:var(--accent); }
+    p { margin:.6rem 0; color:#ccc; }
+    ul { padding-left:1.2rem; }
+    li { margin:.4rem 0; color:#bbb; }
+    .dim { color:var(--dim); font-size:.85rem; }
+    hr { border:none; border-top:1px solid var(--border); margin:2rem 0; }
+  </style>
+</head>
+<body>
+
+<h1>Atlas OS — Amaç ve Neden Bu Yapı?</h1>
+<p class="dim">Her şeyin bir sebebi var. Bu sayfa hangi sorunu çözdüğümüzü ve neden bu mimariyi seçtiğimizi anlatır.</p>
+
+<hr>
+
+<h2>Ne sorununu çözüyor?</h2>
+
+<p>Bugün "ikinci beyin" (second brain) denince akla gelen araçlar ya bulut bağımlısı (Notion, Obsidian Sync), ya API anahtarı isteyen (Mem.ai), ya da kendi sunucunda çalışmayan yazılımlar.</p>
+
+<p>Atlas OS şu üç sorunu aynı anda çözmek için var:</p>
+
+<ul>
+  <li><strong>Bilgi kayboluyor</strong> — Slack'te, e-postada, toplantı notlarında, aklında. Bir yere yazsan bile iki hafta sonra bulamıyorsun. Vault'a yaz → indekslenir → 1 saniyede bulunur.</li>
+  <li><strong>AI'ya her seferinde bağlamı yeniden öğretmek gerekiyor</strong> — "Geçen hafta canvas hakkında ne karar vermiştik?" sorusu, AI sohbetinde havaya gider. Agent ofisleri Self-RAG ile AI'nın kendi geçmişini okumasını sağlar.</li>
+  <li><strong>Her yerel AI aracı ya çökmüş ya da abonelikli</strong> — Ollama + LM Studio ile tamamen local, API anahtarı yok, internet gerekmez.</li>
+</ul>
+
+<hr>
+
+<h2>Neden bu mimari?</h2>
+
+<h3>1. Düz dosya (flat file) — veritabanı değil</h3>
+<p>Her sayfa <code>vault/{kategori}/{slug}/index.html</code>. SQLite, PostgreSQL, veya herhangi bir DB yok. Sebebi:</p>
+<ul>
+  <li><strong>Git ile sürüm kontrolü</strong> — tüm bilgi geçmişi git log'unda</li>
+  <li><strong>Herhangi bir editörle düzenlenebilir</strong> — VS Code, Notepad++, ne istersen</li>
+  <li><strong>Hiçbir lock-in yok</strong> — projeyi bıraksan bile HTML dosyaların durur</li>
+  <li><strong>Zero-dep indexer</strong> — Python stdlib dışında hiçbir şey kurmadan çalışır</li>
+</ul>
+
+<h3>2. AI agent ofisleri — Self-RAG</h3>
+<p>Her AI agent'ın vault'ta bir ofisi var (<code>agents/vault/</code>, <code>agents/coder/</code>...). Her ofiste:</p>
+<ul>
+  <li><code>state.md</code> — şu an ne yapıyor (snapshot)</li>
+  <li><code>log.md</code> — geçmiş olaylar (append-only, tarih kaybolmaz)</li>
+  <li><code>profile.md</code> — kişiliği ve kuralları</li>
+  <li><code>decisions.md</code> — alınan kararlar ve gerekçeleri</li>
+</ul>
+<p>Agent açıldığında ilk iş kendi ofisini okur. "Geçen sefer nerede kalmıştık?" sorusunu kendi kendine cevaplar.</p>
+
+<h3>3. Semantic search için<code>scope</code> filtresi</h3>
+<p>Her embedding kaydı bir <code>scope</code> alanı taşır (<code>agent:vault</code>, <code>agent:coder</code>, <code>vault</code>). Agent kendi ofisini ararken başka agent'ların verisini görmez. AI'ın RAG'i kontrollü kalır.</p>
+
+<h3>4. Üç arayüz, aynı index</h3>
+<ul>
+  <li><strong>CLI</strong> — <code>atlas search</code>, hızlı, terminalde</li>
+  <li><strong>API</strong> — REST, port 4242, başka araçlar bağlanabilir</li>
+  <li><strong>Browser UI</strong> — <code>ui/index.html</code>, sunucu gerekmez, Fuse.js ile fuzzy search</li>
+</ul>
+<p>Üçü de aynı <code>.index/pages.json</code> dosyasını okur. Üç farklı index yok.</p>
+
+<h3>5. Zero-dep — bağımlılık zinciri yok</h3>
+<p>Python tarafı: sadece stdlib. npm/pip/venv kurmadan indexer, CLI, API, MCP çalışır.</p>
+<p>Browser: Tailwind + Fuse.js CDN'den yüklenir. İndex aç → search çalışır.</p>
+<p>Bu bilinçli bir karar: her bağımlılık bir kırılma noktasıdır. 2 yıl sonra "acaba pip install çalışıyor muydu?" diye uğraşmak istemiyoruz.</p>
+
+<h3>6. Canvas — düşünce makinesi</h3>
+<p>Paneller (terminal, editor, web, checklist, gallery) arasında tel çekersin. Chat node'u tüm bağlı panellerin çıktısını otomatik context olarak alır. Unreal Engine Blueprint mantığı: her node bir veri düğümü, teller veri akışı.</p>
+
+<hr>
+
+<h2>Ne değildir?</h2>
+<ul>
+  <li>❌ Notion / Obsidian klonu değil — bulut senkronu yok, mobil uygulaması yok</li>
+  <li>❌ ChatGPT alternatifi değil — AI araçtır, ürün değil</li>
+  <li>❌ IDE değil — kod yazmak için değil, düşünmek ve organize olmak için</li>
+  <li>❌ Bir startup ürünü değil — kişisel araç, satılmayacak</li>
+</ul>
+
+<hr>
+
+<h2>Kuzey yıldızı</h2>
+
+<p>Her agent açıldığında ilk işi kendi ofisini okumaktır.<br>
+Kullanıcı "Coder ne yapıyor?" deyince ofis kartı tek tıkla açılır.<br>
+Toplantı sonrası şablon doldurulup vault'a yazılır, otomatik indekslenir.<br>
+Her agent kendi RAG'ini diğerlerinden izole sorgulayabilir.<br>
+Hiçbir karar tarih kaybı olmadan saklanır.</p>
+
+<p class="dim">— Faz 7 sonu hedefi, VAULT_ROADMAP.md'den</p>
+
+</body>
+</html>

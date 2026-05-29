@@ -1,0 +1,3890 @@
+[
+  {
+    "id": 1,
+    "ts": 1779840844849,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779841134050,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 3,
+    "ts": 1779841134050,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 1,
+    "ts": 1779841729975,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779842097689,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 3,
+    "ts": 1779842097689,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 4,
+    "ts": 1779842102771,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1779842102771,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 6,
+    "ts": 1779842106238,
+    "level": "error",
+    "message": "[vite] Failed to reload /src/modules/v3/V3InputShell.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)"
+  },
+  {
+    "id": 7,
+    "ts": 1779842106361,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1779842106361,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 1,
+    "ts": 1779844072322,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779844429628,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779844507723,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779844526471,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 3,
+    "ts": 1779844526471,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 4,
+    "ts": 1779844536289,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1779844536289,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 6,
+    "ts": 1779844541892,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 7,
+    "ts": 1779844541892,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3ProjectPanel.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1779846242905,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779846952408,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779847049681,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779847051667,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1779847051667,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1779847055484,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 5,
+    "ts": 1779847055485,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1779847063459,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 7,
+    "ts": 1779847063459,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AddPanel.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1779847086750,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 9,
+    "ts": 1779847086750,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 10,
+    "ts": 1779847086751,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PanelMenu.tsx"
+  },
+  {
+    "id": 11,
+    "ts": 1779847086751,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasBreadcrumb.tsx"
+  },
+  {
+    "id": 12,
+    "ts": 1779847086751,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PinnedPanelsPortal.tsx"
+  },
+  {
+    "id": 13,
+    "ts": 1779847086751,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InfiniteCanvas.tsx"
+  },
+  {
+    "id": 14,
+    "ts": 1779847086751,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanel.tsx"
+  },
+  {
+    "id": 15,
+    "ts": 1779847086751,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/BlueprintImportModal.tsx"
+  },
+  {
+    "id": 16,
+    "ts": 1779847086751,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasFab.tsx"
+  },
+  {
+    "id": 17,
+    "ts": 1779847086751,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/MiniMap.tsx"
+  },
+  {
+    "id": 18,
+    "ts": 1779847086751,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasDock.tsx"
+  },
+  {
+    "id": 19,
+    "ts": 1779847086751,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AddPanel.tsx"
+  },
+  {
+    "id": 20,
+    "ts": 1779847086751,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ZoomBar.tsx"
+  },
+  {
+    "id": 21,
+    "ts": 1779847086751,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 22,
+    "ts": 1779847086751,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 23,
+    "ts": 1779847086752,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/canvas/ConnectionLayer.tsx: Could not Fast Refresh (\"TYPE_COLOR\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 24,
+    "ts": 1779847086752,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ConnectionLayer.tsx"
+  },
+  {
+    "id": 25,
+    "ts": 1779847086752,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 26,
+    "ts": 1779847086752,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 27,
+    "ts": 1779847086752,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 28,
+    "ts": 1779847086752,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasBottomBar.tsx"
+  },
+  {
+    "id": 29,
+    "ts": 1779847086752,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 30,
+    "ts": 1779847086752,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 31,
+    "ts": 1779847086752,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasTopBar.tsx"
+  },
+  {
+    "id": 32,
+    "ts": 1779847086752,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 33,
+    "ts": 1779847086752,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiMiniWindow.tsx"
+  },
+  {
+    "id": 34,
+    "ts": 1779847086752,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 35,
+    "ts": 1779847086752,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 36,
+    "ts": 1779847086753,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 37,
+    "ts": 1779847086753,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/editor/EditorPane.tsx"
+  },
+  {
+    "id": 38,
+    "ts": 1779847086753,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/GalleryPanel.tsx"
+  },
+  {
+    "id": 39,
+    "ts": 1779847086753,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AgentEditorPanel.tsx"
+  },
+  {
+    "id": 40,
+    "ts": 1779847086753,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/HeaderPanel.tsx"
+  },
+  {
+    "id": 41,
+    "ts": 1779847086753,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CodeGraphPanel.tsx"
+  },
+  {
+    "id": 42,
+    "ts": 1779847086753,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/NotePanel.tsx"
+  },
+  {
+    "id": 43,
+    "ts": 1779847086753,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InputPanel.tsx"
+  },
+  {
+    "id": 44,
+    "ts": 1779847086753,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipelinePanel.tsx"
+  },
+  {
+    "id": 45,
+    "ts": 1779847086753,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/FileBrowserPanel.tsx"
+  },
+  {
+    "id": 46,
+    "ts": 1779847086753,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ChecklistPanel.tsx"
+  },
+  {
+    "id": 47,
+    "ts": 1779847086753,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/StickManPanel.tsx"
+  },
+  {
+    "id": 48,
+    "ts": 1779847086897,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InfiniteCanvas.tsx"
+  },
+  {
+    "id": 49,
+    "ts": 1779847086952,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 50,
+    "ts": 1779847086952,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasBottomBar.tsx"
+  },
+  {
+    "id": 51,
+    "ts": 1779847086952,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 52,
+    "ts": 1779847086952,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 53,
+    "ts": 1779847096486,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 54,
+    "ts": 1779847096486,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/StickManPanel.tsx"
+  },
+  {
+    "id": 55,
+    "ts": 1779847118197,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3LauncherShell.tsx"
+  },
+  {
+    "id": 56,
+    "ts": 1779847118197,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 57,
+    "ts": 1779847124466,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 58,
+    "ts": 1779847124466,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 59,
+    "ts": 1779847140032,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 60,
+    "ts": 1779847140032,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 61,
+    "ts": 1779847146559,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3LauncherShell.tsx"
+  },
+  {
+    "id": 62,
+    "ts": 1779847146559,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 1,
+    "ts": 1779847286036,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779847910855,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779848223186,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779849143801,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779860986918,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779862218758,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779863099422,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779863370749,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779863400246,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1779863400247,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1779863504815,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779863522550,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779863629640,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779867087113,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779867286035,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1779867286035,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1779867302535,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 5,
+    "ts": 1779867302535,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1779867321299,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 7,
+    "ts": 1779867321299,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 1,
+    "ts": 1779867423062,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779867425931,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1779867425931,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasNode.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1779867425932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanel.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1779867425932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/MiniMap.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1779867432649,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 7,
+    "ts": 1779867432649,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InfiniteCanvas.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1779867432649,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/v3-canvas/V3WireLayer.tsx: Could not Fast Refresh (\"TYPE_COLOR\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 9,
+    "ts": 1779867432649,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3WireLayer.tsx"
+  },
+  {
+    "id": 10,
+    "ts": 1779867432649,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 11,
+    "ts": 1779867432649,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/canvas/ConnectionLayer.tsx: Could not Fast Refresh (\"TYPE_COLOR\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 12,
+    "ts": 1779867432649,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ConnectionLayer.tsx"
+  },
+  {
+    "id": 13,
+    "ts": 1779867432721,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 14,
+    "ts": 1779867432721,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 15,
+    "ts": 1779867432725,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InfiniteCanvas.tsx"
+  },
+  {
+    "id": 16,
+    "ts": 1779867439853,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 17,
+    "ts": 1779867439853,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasNode.tsx"
+  },
+  {
+    "id": 18,
+    "ts": 1779867443111,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 19,
+    "ts": 1779867443111,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasNode.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1779867741616,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779867829397,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1779867829397,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1779867829422,
+    "level": "error",
+    "message": "%o\n\n%s\n\n%s\n {} The above error occurred in the <Canvas3dContent> component. React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary."
+  },
+  {
+    "id": 5,
+    "ts": 1779867829422,
+    "level": "error",
+    "message": "[ErrorBoundary:app] {} \n    at Canvas3dContent (http://localhost:1420/src/modules/canvas/CanvasPanelContent.tsx?t=1779867828972:255:193)\n    at CanvasPanelContent (http://localhost:1420/src/modules/canvas/CanvasPanelContent.tsx?t=1779867828972:61:38)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at V3CanvasNode (http://localhost:1420/src/modules/v3-canvas/V3CanvasNode.tsx:77:3)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at V3InfiniteCanvas (http://localhost:1420/src/modules/v3-canvas/V3InfiniteCanvas.tsx:32:18)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at CanvasAppShellInner (http://localhost:1420/src/app/CanvasAppShell.tsx:34:43)\n    at AiComposerProvider (http://localhost:1420/src/modules/ai/lib/composer.tsx:34:3)\n    at Provider4 (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=5d7bee02:316:15)\n    at TooltipProvider (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=5d7bee02:15088:5)\n    at TooltipProvider (http://localhost:1420/src/components/ui/tooltip.tsx:21:3)\n    at ThemeProvider (http://localhost:1420/src/modules/theme/ThemeProvider.tsx:44:3)\n    at CanvasAppShell (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)\n    at App (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)"
+  },
+  {
+    "id": 1,
+    "ts": 1779867863391,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779867867106,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1779867867106,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1779868645976,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779869610264,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1779869610264,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1779869610265,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PanelMenu.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1779869610265,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PinnedPanelsPortal.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1779869610265,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 7,
+    "ts": 1779869610265,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasNode.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1779869610265,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 9,
+    "ts": 1779869610265,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/v3-canvas/V3WireLayer.tsx: Could not Fast Refresh (\"TYPE_COLOR\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 10,
+    "ts": 1779869610265,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3WireLayer.tsx"
+  },
+  {
+    "id": 11,
+    "ts": 1779869610265,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanel.tsx"
+  },
+  {
+    "id": 12,
+    "ts": 1779869610265,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InfiniteCanvas.tsx"
+  },
+  {
+    "id": 13,
+    "ts": 1779869610265,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasFab.tsx"
+  },
+  {
+    "id": 14,
+    "ts": 1779869610265,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/BlueprintImportModal.tsx"
+  },
+  {
+    "id": 15,
+    "ts": 1779869610265,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/MiniMap.tsx"
+  },
+  {
+    "id": 16,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ZoomBar.tsx"
+  },
+  {
+    "id": 17,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasDock.tsx"
+  },
+  {
+    "id": 18,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 19,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AddPanel.tsx"
+  },
+  {
+    "id": 20,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 21,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/canvas/ConnectionLayer.tsx: Could not Fast Refresh (\"TYPE_COLOR\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 22,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ConnectionLayer.tsx"
+  },
+  {
+    "id": 23,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 24,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/NotePanel.tsx"
+  },
+  {
+    "id": 25,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InputPanel.tsx"
+  },
+  {
+    "id": 26,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/HeaderPanel.tsx"
+  },
+  {
+    "id": 27,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/StickManPanel.tsx"
+  },
+  {
+    "id": 28,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 29,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 30,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 31,
+    "ts": 1779869610266,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 32,
+    "ts": 1779869610267,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 33,
+    "ts": 1779869610267,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiMiniWindow.tsx"
+  },
+  {
+    "id": 34,
+    "ts": 1779869610267,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 35,
+    "ts": 1779869610267,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 36,
+    "ts": 1779869610267,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 37,
+    "ts": 1779869610267,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/editor/EditorPane.tsx"
+  },
+  {
+    "id": 38,
+    "ts": 1779869610267,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AgentEditorPanel.tsx"
+  },
+  {
+    "id": 39,
+    "ts": 1779869610267,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ChecklistPanel.tsx"
+  },
+  {
+    "id": 40,
+    "ts": 1779869610267,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/GalleryPanel.tsx"
+  },
+  {
+    "id": 41,
+    "ts": 1779869610267,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipelinePanel.tsx"
+  },
+  {
+    "id": 42,
+    "ts": 1779869610267,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/FileBrowserPanel.tsx"
+  },
+  {
+    "id": 43,
+    "ts": 1779869610267,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CodeGraphPanel.tsx"
+  },
+  {
+    "id": 44,
+    "ts": 1779869610283,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 45,
+    "ts": 1779869610283,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 46,
+    "ts": 1779869610622,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InfiniteCanvas.tsx"
+  },
+  {
+    "id": 47,
+    "ts": 1779869610628,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 48,
+    "ts": 1779869610628,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 49,
+    "ts": 1779869610628,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 50,
+    "ts": 1779869615349,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 51,
+    "ts": 1779869615349,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 52,
+    "ts": 1779869615349,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PanelMenu.tsx"
+  },
+  {
+    "id": 53,
+    "ts": 1779869615349,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PinnedPanelsPortal.tsx"
+  },
+  {
+    "id": 54,
+    "ts": 1779869615349,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 55,
+    "ts": 1779869615349,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasNode.tsx"
+  },
+  {
+    "id": 56,
+    "ts": 1779869615349,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 57,
+    "ts": 1779869615349,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/v3-canvas/V3WireLayer.tsx: Could not Fast Refresh (\"TYPE_COLOR\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 58,
+    "ts": 1779869615349,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3WireLayer.tsx"
+  },
+  {
+    "id": 59,
+    "ts": 1779869615349,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanel.tsx"
+  },
+  {
+    "id": 60,
+    "ts": 1779869615349,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InfiniteCanvas.tsx"
+  },
+  {
+    "id": 61,
+    "ts": 1779869615349,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasFab.tsx"
+  },
+  {
+    "id": 62,
+    "ts": 1779869615349,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/BlueprintImportModal.tsx"
+  },
+  {
+    "id": 63,
+    "ts": 1779869615349,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/MiniMap.tsx"
+  },
+  {
+    "id": 64,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ZoomBar.tsx"
+  },
+  {
+    "id": 65,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasDock.tsx"
+  },
+  {
+    "id": 66,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 67,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AddPanel.tsx"
+  },
+  {
+    "id": 68,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 69,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/canvas/ConnectionLayer.tsx: Could not Fast Refresh (\"TYPE_COLOR\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 70,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ConnectionLayer.tsx"
+  },
+  {
+    "id": 71,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 72,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/NotePanel.tsx"
+  },
+  {
+    "id": 73,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InputPanel.tsx"
+  },
+  {
+    "id": 74,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/HeaderPanel.tsx"
+  },
+  {
+    "id": 75,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/StickManPanel.tsx"
+  },
+  {
+    "id": 76,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 77,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 78,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 79,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 80,
+    "ts": 1779869615350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 81,
+    "ts": 1779869615351,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiMiniWindow.tsx"
+  },
+  {
+    "id": 82,
+    "ts": 1779869615351,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 83,
+    "ts": 1779869615351,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 84,
+    "ts": 1779869615351,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 85,
+    "ts": 1779869615351,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/editor/EditorPane.tsx"
+  },
+  {
+    "id": 86,
+    "ts": 1779869615351,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AgentEditorPanel.tsx"
+  },
+  {
+    "id": 87,
+    "ts": 1779869615351,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ChecklistPanel.tsx"
+  },
+  {
+    "id": 88,
+    "ts": 1779869615351,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/GalleryPanel.tsx"
+  },
+  {
+    "id": 89,
+    "ts": 1779869615351,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipelinePanel.tsx"
+  },
+  {
+    "id": 90,
+    "ts": 1779869615351,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/FileBrowserPanel.tsx"
+  },
+  {
+    "id": 91,
+    "ts": 1779869615351,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CodeGraphPanel.tsx"
+  },
+  {
+    "id": 92,
+    "ts": 1779869615679,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 93,
+    "ts": 1779869615679,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 94,
+    "ts": 1779869615690,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InfiniteCanvas.tsx"
+  },
+  {
+    "id": 95,
+    "ts": 1779869615693,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 96,
+    "ts": 1779869615693,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 97,
+    "ts": 1779869615693,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 98,
+    "ts": 1779869627622,
+    "level": "error",
+    "message": "The number of tokens to keep from the initial prompt is greater than the context length (n_keep: 7094>= n_ctx: 4096). Try to load the model with a larger context length, or provide a shorter input."
+  },
+  {
+    "id": 99,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 100,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 101,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PanelMenu.tsx"
+  },
+  {
+    "id": 102,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PinnedPanelsPortal.tsx"
+  },
+  {
+    "id": 103,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 104,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasNode.tsx"
+  },
+  {
+    "id": 105,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 106,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/v3-canvas/V3WireLayer.tsx: Could not Fast Refresh (\"TYPE_COLOR\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 107,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3WireLayer.tsx"
+  },
+  {
+    "id": 108,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanel.tsx"
+  },
+  {
+    "id": 109,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InfiniteCanvas.tsx"
+  },
+  {
+    "id": 110,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasFab.tsx"
+  },
+  {
+    "id": 111,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/BlueprintImportModal.tsx"
+  },
+  {
+    "id": 112,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/MiniMap.tsx"
+  },
+  {
+    "id": 113,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ZoomBar.tsx"
+  },
+  {
+    "id": 114,
+    "ts": 1779869630635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasDock.tsx"
+  },
+  {
+    "id": 115,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 116,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AddPanel.tsx"
+  },
+  {
+    "id": 117,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 118,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/canvas/ConnectionLayer.tsx: Could not Fast Refresh (\"TYPE_COLOR\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 119,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ConnectionLayer.tsx"
+  },
+  {
+    "id": 120,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 121,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/NotePanel.tsx"
+  },
+  {
+    "id": 122,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InputPanel.tsx"
+  },
+  {
+    "id": 123,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/HeaderPanel.tsx"
+  },
+  {
+    "id": 124,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/StickManPanel.tsx"
+  },
+  {
+    "id": 125,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 126,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 127,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 128,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 129,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 130,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiMiniWindow.tsx"
+  },
+  {
+    "id": 131,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 132,
+    "ts": 1779869630636,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 133,
+    "ts": 1779869630637,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 134,
+    "ts": 1779869630637,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/editor/EditorPane.tsx"
+  },
+  {
+    "id": 135,
+    "ts": 1779869630637,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AgentEditorPanel.tsx"
+  },
+  {
+    "id": 136,
+    "ts": 1779869630637,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ChecklistPanel.tsx"
+  },
+  {
+    "id": 137,
+    "ts": 1779869630637,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/GalleryPanel.tsx"
+  },
+  {
+    "id": 138,
+    "ts": 1779869630637,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipelinePanel.tsx"
+  },
+  {
+    "id": 139,
+    "ts": 1779869630637,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/FileBrowserPanel.tsx"
+  },
+  {
+    "id": 140,
+    "ts": 1779869630637,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CodeGraphPanel.tsx"
+  },
+  {
+    "id": 141,
+    "ts": 1779869630792,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 142,
+    "ts": 1779869630792,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 143,
+    "ts": 1779869630802,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InfiniteCanvas.tsx"
+  },
+  {
+    "id": 144,
+    "ts": 1779869630805,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 145,
+    "ts": 1779869630805,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 146,
+    "ts": 1779869630805,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 147,
+    "ts": 1779869660247,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 148,
+    "ts": 1779869660247,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 152,
+    "ts": 1779869668598,
+    "level": "error",
+    "message": "[ErrorBoundary:app] {} \n    at V3InfiniteCanvas (http://localhost:1420/src/modules/v3-canvas/V3InfiniteCanvas.tsx?t=1779869668390:32:18)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at CanvasAppShellInner (http://localhost:1420/src/app/CanvasAppShell.tsx?t=1779869630268:34:43)\n    at AiComposerProvider (http://localhost:1420/src/modules/ai/lib/composer.tsx?t=1779869630268:34:3)\n    at Provider4 (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=5d7bee02:316:15)\n    at TooltipProvider (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=5d7bee02:15088:5)\n    at TooltipProvider (http://localhost:1420/src/components/ui/tooltip.tsx:21:3)\n    at ThemeProvider (http://localhost:1420/src/modules/theme/ThemeProvider.tsx:44:3)\n    at CanvasAppShell (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)\n    at App (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)"
+  },
+  {
+    "id": 154,
+    "ts": 1779869672660,
+    "level": "error",
+    "message": "[ErrorBoundary:app] {} \n    at V3InfiniteCanvas (http://localhost:1420/src/modules/v3-canvas/V3InfiniteCanvas.tsx?t=1779869668390:32:18)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at CanvasAppShellInner (http://localhost:1420/src/app/CanvasAppShell.tsx?t=1779869630268:34:43)\n    at AiComposerProvider (http://localhost:1420/src/modules/ai/lib/composer.tsx?t=1779869630268:34:3)\n    at Provider4 (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=5d7bee02:316:15)\n    at TooltipProvider (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=5d7bee02:15088:5)\n    at TooltipProvider (http://localhost:1420/src/components/ui/tooltip.tsx:21:3)\n    at ThemeProvider (http://localhost:1420/src/modules/theme/ThemeProvider.tsx:44:3)\n    at CanvasAppShell (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)\n    at App (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)"
+  },
+  {
+    "id": 1,
+    "ts": 1779877139789,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779877280627,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 3,
+    "ts": 1779877280642,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 4,
+    "ts": 1779877280880,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 6,
+    "ts": 1779877280961,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 7,
+    "ts": 1779877280975,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 8,
+    "ts": 1779877281053,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 9,
+    "ts": 1779877281627,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 10,
+    "ts": 1779877282173,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 12,
+    "ts": 1779877282947,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 14,
+    "ts": 1779877283534,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 15,
+    "ts": 1779877284227,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 16,
+    "ts": 1779877284921,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 17,
+    "ts": 1779877284996,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 18,
+    "ts": 1779877285294,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 19,
+    "ts": 1779877285454,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 20,
+    "ts": 1779877286095,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 21,
+    "ts": 1779877286842,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 22,
+    "ts": 1779877287522,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 24,
+    "ts": 1779877287549,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 25,
+    "ts": 1779877288376,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 26,
+    "ts": 1779877289456,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 27,
+    "ts": 1779877289976,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 28,
+    "ts": 1779877463653,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 29,
+    "ts": 1779877463854,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 30,
+    "ts": 1779877464040,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 31,
+    "ts": 1779877465066,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 32,
+    "ts": 1779877467547,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 33,
+    "ts": 1779877467562,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 34,
+    "ts": 1779877467761,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 35,
+    "ts": 1779877468215,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 36,
+    "ts": 1779877469668,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 37,
+    "ts": 1779877470989,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 38,
+    "ts": 1779877471656,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 39,
+    "ts": 1779877471869,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 40,
+    "ts": 1779877473603,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 41,
+    "ts": 1779877473630,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 42,
+    "ts": 1779877473643,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 43,
+    "ts": 1779877475204,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 44,
+    "ts": 1779877476164,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 45,
+    "ts": 1779877476178,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 46,
+    "ts": 1779877476338,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 47,
+    "ts": 1779877476364,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 48,
+    "ts": 1779877481019,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 49,
+    "ts": 1779877481459,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 50,
+    "ts": 1779877485008,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 51,
+    "ts": 1779877485888,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 52,
+    "ts": 1779877490836,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 53,
+    "ts": 1779877490864,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 54,
+    "ts": 1779877490917,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 56,
+    "ts": 1779877491316,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 57,
+    "ts": 1779877491516,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 1,
+    "ts": 1779878281320,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779878311183,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1779878311183,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1779878322756,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 5,
+    "ts": 1779878322756,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1779878334390,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 7,
+    "ts": 1779878334391,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1779878510098,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 9,
+    "ts": 1779878510098,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 10,
+    "ts": 1779879333645,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 11,
+    "ts": 1779879333645,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 12,
+    "ts": 1779879333645,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 13,
+    "ts": 1779879333645,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 14,
+    "ts": 1779879333645,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 15,
+    "ts": 1779879333645,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 16,
+    "ts": 1779879333645,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 17,
+    "ts": 1779879333645,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiMiniWindow.tsx"
+  },
+  {
+    "id": 18,
+    "ts": 1779879333645,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 19,
+    "ts": 1779879333645,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/editor/EditorPane.tsx"
+  },
+  {
+    "id": 20,
+    "ts": 1779879333646,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 21,
+    "ts": 1779879333646,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 22,
+    "ts": 1779879333646,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 23,
+    "ts": 1779879333646,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 24,
+    "ts": 1779879333646,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiChat.tsx"
+  },
+  {
+    "id": 25,
+    "ts": 1779879333646,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/AgentsSection.tsx"
+  },
+  {
+    "id": 26,
+    "ts": 1779879333646,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/components/AgentSwitcher.tsx: Could not Fast Refresh (\"AGENT_ICONS\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 27,
+    "ts": 1779879333646,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentSwitcher.tsx"
+  },
+  {
+    "id": 28,
+    "ts": 1779879333646,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 29,
+    "ts": 1779879333646,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AgentEditorPanel.tsx"
+  },
+  {
+    "id": 30,
+    "ts": 1779879333646,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/vault-home/VaultHomePane.tsx"
+  },
+  {
+    "id": 31,
+    "ts": 1779879333863,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 32,
+    "ts": 1779879333863,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 33,
+    "ts": 1779879333863,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 34,
+    "ts": 1779879333869,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 35,
+    "ts": 1779879333869,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiMiniWindow.tsx"
+  },
+  {
+    "id": 36,
+    "ts": 1779879333869,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/AgentsSection.tsx"
+  },
+  {
+    "id": 37,
+    "ts": 1779879333869,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 38,
+    "ts": 1779879464794,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 39,
+    "ts": 1779879464794,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 40,
+    "ts": 1779879476758,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 41,
+    "ts": 1779879476758,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 42,
+    "ts": 1779879486698,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 43,
+    "ts": 1779879486698,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 44,
+    "ts": 1779879504386,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 45,
+    "ts": 1779879504387,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 46,
+    "ts": 1779879511479,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 47,
+    "ts": 1779879511479,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 48,
+    "ts": 1779879527920,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 49,
+    "ts": 1779879527920,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1779881857634,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779881947816,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 3,
+    "ts": 1779881947844,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 4,
+    "ts": 1779881948990,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 5,
+    "ts": 1779881949510,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 6,
+    "ts": 1779881952166,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 7,
+    "ts": 1779881952871,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 8,
+    "ts": 1779882042878,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 9,
+    "ts": 1779882042950,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 10,
+    "ts": 1779882134759,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 11,
+    "ts": 1779882134759,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 12,
+    "ts": 1779882134759,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1779882147815,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779882152167,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1779882152167,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1779882152167,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3SecondaryCanvas.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1779882152167,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InfiniteCanvas.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1779882152167,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/v3-canvas/V3WireLayer.tsx: Could not Fast Refresh (\"TYPE_COLOR\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 7,
+    "ts": 1779882152167,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3WireLayer.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1779882152168,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/canvas/ConnectionLayer.tsx: Could not Fast Refresh (\"TYPE_COLOR\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 9,
+    "ts": 1779882152168,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ConnectionLayer.tsx"
+  },
+  {
+    "id": 10,
+    "ts": 1779882152317,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 11,
+    "ts": 1779882152317,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 12,
+    "ts": 1779882152317,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3SecondaryCanvas.tsx"
+  },
+  {
+    "id": 13,
+    "ts": 1779882152322,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InfiniteCanvas.tsx"
+  },
+  {
+    "id": 17,
+    "ts": 1779882156579,
+    "level": "error",
+    "message": "[ErrorBoundary:app] {} \n    at V3TerminalPanel (http://localhost:1420/src/modules/canvas/CanvasPanelContent.tsx?t=1779882156282:474:28)\n    at CanvasPanelContent (http://localhost:1420/src/modules/canvas/CanvasPanelContent.tsx?t=1779882156282:63:38)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at V3CanvasNode (http://localhost:1420/src/modules/v3-canvas/V3CanvasNode.tsx?t=1779882134315:79:3)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at V3InfiniteCanvas (http://localhost:1420/src/modules/v3-canvas/V3InfiniteCanvas.tsx?t=1779882151968:88:18)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at CanvasAppShellInner (http://localhost:1420/src/app/CanvasAppShell.tsx?t=1779882151968:34:43)\n    at AiComposerProvider (http://localhost:1420/src/modules/ai/lib/composer.tsx:34:3)\n    at Provider4 (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=5d7bee02:316:15)\n    at TooltipProvider (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=5d7bee02:15088:5)\n    at TooltipProvider (http://localhost:1420/src/components/ui/tooltip.tsx:21:3)\n    at ThemeProvider (http://localhost:1420/src/modules/theme/ThemeProvider.tsx:44:3)\n    at CanvasAppShell (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)\n    at App (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)"
+  },
+  {
+    "id": 21,
+    "ts": 1779882164179,
+    "level": "error",
+    "message": "[ErrorBoundary:app] {} \n    at V3TerminalPanel (http://localhost:1420/src/modules/canvas/CanvasPanelContent.tsx?t=1779882163850:474:28)\n    at CanvasPanelContent (http://localhost:1420/src/modules/canvas/CanvasPanelContent.tsx?t=1779882163850:63:38)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at V3CanvasNode (http://localhost:1420/src/modules/v3-canvas/V3CanvasNode.tsx?t=1779882134315:79:3)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at V3InfiniteCanvas (http://localhost:1420/src/modules/v3-canvas/V3InfiniteCanvas.tsx?t=1779882151968:88:18)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at CanvasAppShellInner (http://localhost:1420/src/app/CanvasAppShell.tsx?t=1779882151968:34:43)\n    at AiComposerProvider (http://localhost:1420/src/modules/ai/lib/composer.tsx:34:3)\n    at Provider4 (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=5d7bee02:316:15)\n    at TooltipProvider (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=5d7bee02:15088:5)\n    at TooltipProvider (http://localhost:1420/src/components/ui/tooltip.tsx:21:3)\n    at ThemeProvider (http://localhost:1420/src/modules/theme/ThemeProvider.tsx:44:3)\n    at CanvasAppShell (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)\n    at App (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)"
+  },
+  {
+    "id": 22,
+    "ts": 1779882171255,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 23,
+    "ts": 1779882171255,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 24,
+    "ts": 1779882176014,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 25,
+    "ts": 1779882176014,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 26,
+    "ts": 1779882192661,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 27,
+    "ts": 1779882192661,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1779883843829,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779884067838,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 3,
+    "ts": 1779884068306,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 4,
+    "ts": 1779884069305,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 5,
+    "ts": 1779884070172,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 6,
+    "ts": 1779884568530,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 7,
+    "ts": 1779884568530,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1779884568530,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 9,
+    "ts": 1779884572046,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 10,
+    "ts": 1779884572046,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 11,
+    "ts": 1779884572046,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 12,
+    "ts": 1779884576024,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 13,
+    "ts": 1779884576024,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 14,
+    "ts": 1779884576024,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 15,
+    "ts": 1779884588529,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 16,
+    "ts": 1779884588529,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 17,
+    "ts": 1779884598012,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 18,
+    "ts": 1779884598012,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 19,
+    "ts": 1779884603759,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 20,
+    "ts": 1779884603760,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 21,
+    "ts": 1779884608378,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 22,
+    "ts": 1779884608886,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 23,
+    "ts": 1779884609753,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 24,
+    "ts": 1779884609900,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 25,
+    "ts": 1779884610134,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 26,
+    "ts": 1779884610134,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1779884987706,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779885376313,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1779885376313,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1779885384873,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 5,
+    "ts": 1779885384874,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1779885401755,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 7,
+    "ts": 1779885401756,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1779885401756,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 9,
+    "ts": 1779885401756,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 10,
+    "ts": 1779885423755,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 11,
+    "ts": 1779885423755,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 12,
+    "ts": 1779885423755,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 13,
+    "ts": 1779885423756,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 14,
+    "ts": 1779885446807,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 15,
+    "ts": 1779885446808,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1779885796232,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779885927971,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779886195084,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779886339276,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1779886339276,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AudioPanel.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1779886582574,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 5,
+    "ts": 1779886582574,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1779886582574,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3OrkPanel.tsx"
+  },
+  {
+    "id": 7,
+    "ts": 1779886582574,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1779886582575,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 9,
+    "ts": 1779886749177,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 10,
+    "ts": 1779886749199,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 11,
+    "ts": 1779886749537,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 12,
+    "ts": 1779886749977,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 13,
+    "ts": 1779886750457,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 14,
+    "ts": 1779886750924,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderRight"
+  },
+  {
+    "id": 15,
+    "ts": 1779886772998,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 16,
+    "ts": 1779886773113,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 17,
+    "ts": 1779886773345,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 18,
+    "ts": 1779886773760,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 19,
+    "ts": 1779886775079,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 20,
+    "ts": 1779886775507,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 21,
+    "ts": 1779886776587,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 22,
+    "ts": 1779886777749,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 1,
+    "ts": 1779886907020,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 5,
+    "ts": 1779887693608,
+    "level": "error",
+    "message": "[ErrorBoundary:app] {} \n    at V3InfiniteCanvas (http://localhost:1420/src/modules/v3-canvas/V3InfiniteCanvas.tsx?t=1779887693038:88:18)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at CanvasAppShellInner (http://localhost:1420/src/app/CanvasAppShell.tsx:37:43)\n    at AiComposerProvider (http://localhost:1420/src/modules/ai/lib/composer.tsx:34:3)\n    at Provider4 (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=5d7bee02:316:15)\n    at TooltipProvider (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=5d7bee02:15088:5)\n    at TooltipProvider (http://localhost:1420/src/components/ui/tooltip.tsx:21:3)\n    at ThemeProvider (http://localhost:1420/src/modules/theme/ThemeProvider.tsx:44:3)\n    at CanvasAppShell (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)\n    at App (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)"
+  },
+  {
+    "id": 6,
+    "ts": 1779887697644,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 7,
+    "ts": 1779887697645,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1779887706635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 9,
+    "ts": 1779887706635,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 10,
+    "ts": 1779887711056,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 11,
+    "ts": 1779887711056,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 12,
+    "ts": 1779887719067,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 13,
+    "ts": 1779887719067,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 14,
+    "ts": 1779887725350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 15,
+    "ts": 1779887725350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 16,
+    "ts": 1779887731898,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 17,
+    "ts": 1779887731898,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 18,
+    "ts": 1779887751309,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 19,
+    "ts": 1779887751309,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 20,
+    "ts": 1779887765642,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 21,
+    "ts": 1779887765642,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 22,
+    "ts": 1779887781432,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 23,
+    "ts": 1779887781432,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 24,
+    "ts": 1779887791049,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 25,
+    "ts": 1779887791049,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 26,
+    "ts": 1779887808437,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 27,
+    "ts": 1779887808437,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 28,
+    "ts": 1779887815226,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 29,
+    "ts": 1779887815226,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 30,
+    "ts": 1779887836818,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 31,
+    "ts": 1779887836818,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3OrkPanel.tsx"
+  },
+  {
+    "id": 32,
+    "ts": 1779887849747,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 33,
+    "ts": 1779887849747,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3OrkPanel.tsx"
+  },
+  {
+    "id": 34,
+    "ts": 1779887863401,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 35,
+    "ts": 1779887863401,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3OrkPanel.tsx"
+  },
+  {
+    "id": 36,
+    "ts": 1779888107665,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 37,
+    "ts": 1779888107665,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 38,
+    "ts": 1779888107665,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3OrkPanel.tsx"
+  },
+  {
+    "id": 39,
+    "ts": 1779888107665,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 40,
+    "ts": 1779888107665,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 41,
+    "ts": 1779888107665,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1779888200717,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779888429050,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1779888429051,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1779888438477,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 5,
+    "ts": 1779888438477,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1779888451479,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 7,
+    "ts": 1779888451480,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1779888482541,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 9,
+    "ts": 1779888482541,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 10,
+    "ts": 1779888482541,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 11,
+    "ts": 1779888482541,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 12,
+    "ts": 1779888482541,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 13,
+    "ts": 1779888491657,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 14,
+    "ts": 1779888491657,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 15,
+    "ts": 1779888491657,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 16,
+    "ts": 1779888491657,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 17,
+    "ts": 1779888491658,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 18,
+    "ts": 1779888502250,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 19,
+    "ts": 1779888502250,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 20,
+    "ts": 1779888502250,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 21,
+    "ts": 1779888502250,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 22,
+    "ts": 1779888502250,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 23,
+    "ts": 1779888511123,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 24,
+    "ts": 1779888511123,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 25,
+    "ts": 1779888512791,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 26,
+    "ts": 1779888512791,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 27,
+    "ts": 1779888512792,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 28,
+    "ts": 1779888512792,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 29,
+    "ts": 1779888512792,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 30,
+    "ts": 1779888521804,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 31,
+    "ts": 1779888521804,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 32,
+    "ts": 1779888521804,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 33,
+    "ts": 1779888521804,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/Orkestra.tsx"
+  },
+  {
+    "id": 34,
+    "ts": 1779888521804,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1779888634256,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779890545824,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 3,
+    "ts": 1779890545825,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 4,
+    "ts": 1779890555153,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1779890555153,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 6,
+    "ts": 1779890565668,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 7,
+    "ts": 1779890565668,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 8,
+    "ts": 1779890591870,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 9,
+    "ts": 1779890591870,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 10,
+    "ts": 1779890596547,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 11,
+    "ts": 1779890596547,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 12,
+    "ts": 1779891002028,
+    "level": "error",
+    "message": "[vite] Failed to reload /src/modules/canvas/InfiniteCanvas.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)"
+  },
+  {
+    "id": 13,
+    "ts": 1779891002178,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 14,
+    "ts": 1779891002178,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InfiniteCanvas.tsx"
+  },
+  {
+    "id": 15,
+    "ts": 1779891002183,
+    "level": "error",
+    "message": "[vite] Failed to reload /src/modules/canvas/ConnectionLayer.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)"
+  },
+  {
+    "id": 19,
+    "ts": 1779891002202,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 20,
+    "ts": 1779891002202,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/OrkestraOutput.tsx"
+  },
+  {
+    "id": 21,
+    "ts": 1779891002208,
+    "level": "error",
+    "message": "[vite] Failed to reload /src/modules/canvas/Orkestra.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)"
+  },
+  {
+    "id": 25,
+    "ts": 1779891002225,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 26,
+    "ts": 1779891002225,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasDock.tsx"
+  },
+  {
+    "id": 27,
+    "ts": 1779891002237,
+    "level": "error",
+    "message": "[vite] Failed to reload /src/modules/canvas/MiniMap.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)"
+  },
+  {
+    "id": 40,
+    "ts": 1779891002276,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 41,
+    "ts": 1779891002276,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/BlueprintImportModal.tsx"
+  },
+  {
+    "id": 42,
+    "ts": 1779891002281,
+    "level": "error",
+    "message": "[vite] Failed to reload /src/modules/canvas/SentorRunModal.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)"
+  },
+  {
+    "id": 47,
+    "ts": 1779891002307,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 48,
+    "ts": 1779891002307,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasContextMenu.tsx"
+  },
+  {
+    "id": 49,
+    "ts": 1779891002315,
+    "level": "error",
+    "message": "[vite] Failed to reload /src/modules/canvas/PanelContextMenu.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)"
+  },
+  {
+    "id": 50,
+    "ts": 1779891002316,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 51,
+    "ts": 1779891002316,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PanelContextMenu.tsx"
+  },
+  {
+    "id": 52,
+    "ts": 1779891002320,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 53,
+    "ts": 1779891009762,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 54,
+    "ts": 1779891009762,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 55,
+    "ts": 1779891108448,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 56,
+    "ts": 1779891108448,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 57,
+    "ts": 1779891120487,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 58,
+    "ts": 1779891120487,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 59,
+    "ts": 1779891124040,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 60,
+    "ts": 1779891124040,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 61,
+    "ts": 1779891128735,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 62,
+    "ts": 1779891128735,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 63,
+    "ts": 1779891173967,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 64,
+    "ts": 1779891173967,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 65,
+    "ts": 1779891173967,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 66,
+    "ts": 1779891177865,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 67,
+    "ts": 1779891177865,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 68,
+    "ts": 1779891177865,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 69,
+    "ts": 1779891183831,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 70,
+    "ts": 1779891183831,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 71,
+    "ts": 1779891183831,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 72,
+    "ts": 1779891187957,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 73,
+    "ts": 1779891187957,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 74,
+    "ts": 1779891187957,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 75,
+    "ts": 1779891194807,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 76,
+    "ts": 1779891194807,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 77,
+    "ts": 1779891194808,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 78,
+    "ts": 1779891203041,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 79,
+    "ts": 1779891203041,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 80,
+    "ts": 1779891203041,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 81,
+    "ts": 1779891217966,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 82,
+    "ts": 1779891217966,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 83,
+    "ts": 1779891245155,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 84,
+    "ts": 1779891245155,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 85,
+    "ts": 1779891256264,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 86,
+    "ts": 1779891256264,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1779901628937,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779901853430,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 3,
+    "ts": 1779901853430,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 1,
+    "ts": 1779904388986,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779904554692,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1779904554692,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1779904554692,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1779905266414,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779906017999,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779906326117,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 3,
+    "ts": 1779906326117,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 4,
+    "ts": 1779906334577,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1779906334577,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 6,
+    "ts": 1779906342791,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 7,
+    "ts": 1779906342791,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 8,
+    "ts": 1779906347193,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 9,
+    "ts": 1779906347193,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 1,
+    "ts": 1779906516801,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779906577073,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779906598143,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779906798261,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779906951117,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779906965350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 3,
+    "ts": 1779906965350,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 4,
+    "ts": 1779906979010,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1779906979010,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 6,
+    "ts": 1779906987740,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 7,
+    "ts": 1779906987740,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 8,
+    "ts": 1779906996676,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 9,
+    "ts": 1779906996676,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 1,
+    "ts": 1779907888226,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779912496067,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  }
+]

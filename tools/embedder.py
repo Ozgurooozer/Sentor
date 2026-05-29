@@ -17,8 +17,8 @@ Usage:
 """
 
 import argparse
+import hashlib
 import json
-import math
 import sys
 import urllib.request
 import urllib.error
@@ -41,6 +41,9 @@ INSTALL_HINT = (
     "  Semantic search disabled — keyword search remains active."
 )
 
+sys.path.insert(0, str(ROOT / "tools"))
+from scoring import cosine  # noqa: E402
+
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
@@ -56,20 +59,14 @@ def _load_config() -> tuple[str, str]:
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-def _page_text(page: dict) -> str:
+def _page_text(page: dict, max_chars: int = 600) -> str:
     parts = [
         page.get("title", ""),
         page.get("description", ""),
-        page.get("text", "")[:1000],
+        page.get("text", ""),
     ]
-    return ". ".join(p for p in parts if p).strip()
-
-
-def cosine(a: list[float], b: list[float]) -> float:
-    dot = sum(x * y for x, y in zip(a, b))
-    na  = math.sqrt(sum(x * x for x in a))
-    nb  = math.sqrt(sum(y * y for y in b))
-    return dot / (na * nb) if na and nb else 0.0
+    joined = ". ".join(p for p in parts if p).strip()
+    return joined[:max_chars]
 
 
 # ── Ollama backend ────────────────────────────────────────────────────────────
@@ -79,9 +76,9 @@ class OllamaUnavailable(RuntimeError):
 
 
 def _ollama_embed(text: str, url: str, model: str) -> list[float]:
-    payload = json.dumps({"model": model, "prompt": text}).encode()
+    payload = json.dumps({"model": model, "input": text}).encode()
     req = urllib.request.Request(
-        f"{url.rstrip('/')}/api/embeddings",
+        f"{url.rstrip('/')}/api/embed",
         data=payload,
         headers={"Content-Type": "application/json"},
         method="POST",
@@ -89,9 +86,10 @@ def _ollama_embed(text: str, url: str, model: str) -> list[float]:
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read())
-            if "embedding" not in data:
+            vecs = data.get("embeddings", [])
+            if not vecs:
                 raise OllamaUnavailable(f"Ollama returned no embedding (model {model} not pulled?)")
-            return data["embedding"]
+            return vecs[0]
     except urllib.error.URLError as e:
         raise OllamaUnavailable(f"Ollama not reachable at {url}: {e}")
 
@@ -155,12 +153,12 @@ def build(force: bool = False) -> None:
 
     existing = {} if force else _load_existing()
     kept: list[dict] = []
-    to_embed: list[tuple[dict, str]] = []
+    to_embed: list[tuple[dict, str, str]] = []
 
     for page in embeddable:
         text = _page_text(page)
         # content_hash already on the page record; if missing fall back to text hash
-        h = page.get("content_hash") or str(hash(text))
+        h = page.get("content_hash") or hashlib.sha1(text.encode()).hexdigest()
         prev = existing.get(page["id"])
         if prev and prev.get("hash") == h and "embedding" in prev:
             kept.append({
@@ -171,15 +169,15 @@ def build(force: bool = False) -> None:
                 "embedding": prev["embedding"],
             })
         else:
-            to_embed.append((page, h))
+            to_embed.append((page, h, text))
 
     print(f"  Backend : ollama  ({model} @ {url})")
     print(f"  Cached  : {len(kept)}  Re-embed: {len(to_embed)}")
 
-    for i, (page, h) in enumerate(to_embed, 1):
+    for i, (page, h, text) in enumerate(to_embed, 1):
         print(f"  [{i}/{len(to_embed)}] {page['id']}", end="\r")
         try:
-            vec = _ollama_embed(_page_text(page), url, model)
+            vec = _ollama_embed(text, url, model)
         except OllamaUnavailable as e:
             print(f"\n  {e}")
             print(INSTALL_HINT)
@@ -210,7 +208,8 @@ def search(
     if not EMBED_FILE.exists():
         return []
     exclude_types = exclude_types or {"template", "agent-log"}
-    records = json.loads(EMBED_FILE.read_text(encoding="utf-8"))
+    data = json.loads(EMBED_FILE.read_text(encoding="utf-8"))
+    records = data.get("records", data) if isinstance(data, dict) else data
     filtered = [
         r for r in records
         if r.get("type") not in exclude_types

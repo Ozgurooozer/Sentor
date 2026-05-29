@@ -255,19 +255,31 @@ export const EditorPane = forwardRef<EditorPaneHandle, Props>(
       <div className="flex h-full min-h-0 flex-col">
         {/* Mermaid toggle — only for .md/.mmd files */}
         {canPreview && (
-          <div className="flex shrink-0 items-center justify-end border-b border-[#1a1a1a] px-2 py-0.5">
+          <div
+            className="flex shrink-0 items-center justify-end px-2 py-1"
+            style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+          >
             <button
               type="button"
               onClick={() => setPreviewOpen((v) => !v)}
               title={previewOpen ? "Hide diagram preview" : "Show diagram preview"}
-              className={`rounded px-2 py-0.5 text-[10px] transition-colors ${
-                previewOpen
-                  ? "bg-[#1a1a1a] text-[#5b8def]"
-                  : hasBlocks
-                    ? "text-[#555] hover:bg-[#1a1a1a] hover:text-[#888]"
-                    : "text-[#333] cursor-default"
-              }`}
               disabled={!hasBlocks}
+              className="rounded-[5px] px-2 py-0.5 text-[9px] font-medium uppercase tracking-widest transition-all duration-150 disabled:opacity-30"
+              style={previewOpen ? {
+                background: "rgba(91,141,239,0.12)",
+                color: "#5b8def",
+                border: "1px solid rgba(91,141,239,0.25)",
+              } : {
+                background: "transparent",
+                color: "rgba(255,255,255,0.28)",
+                border: "1px solid rgba(255,255,255,0.07)",
+              }}
+              onMouseEnter={(e) => {
+                if (!previewOpen && hasBlocks) (e.currentTarget as HTMLButtonElement).style.color = "#c8c8d0";
+              }}
+              onMouseLeave={(e) => {
+                if (!previewOpen) (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.28)";
+              }}
             >
               {isMmd ? "Diagram" : "Mermaid"} {previewOpen ? "▸" : "◂"}
             </button>

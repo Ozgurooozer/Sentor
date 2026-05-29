@@ -1,16 +1,16 @@
 import { useCallback, useRef, useState } from "react";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const getSR = (): (new () => any) | null =>
   typeof window === "undefined"
     ? null
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     : (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition ?? null;
 
 export function useSpeechRecognition({ onResult }: { onResult: (text: string) => void }) {
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const recRef = useRef<any>(null);
   const onResultRef = useRef(onResult);
   onResultRef.current = onResult;
@@ -27,7 +27,7 @@ export function useSpeechRecognition({ onResult }: { onResult: (text: string) =>
     rec.interimResults = false;
     rec.lang = navigator.language || "";
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     rec.onresult = (e: any) => {
       const parts: string[] = [];
       for (let i = e.resultIndex; i < e.results.length; i++) {

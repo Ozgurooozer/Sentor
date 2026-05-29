@@ -3,7 +3,8 @@
     "allow": [
       "Bash(*)",
       "PowerShell(*)",
-      "Skill(*)"
+      "Skill(*)",
+      "WebFetch(domain:claude.ai)"
     ]
   }
 }

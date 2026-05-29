@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 import { openSettingsWindow } from "@/modules/settings/openSettingsWindow";
 import {
   AbsoluteIcon,
-  AiMagicIcon,
   ArrowDown01Icon,
   CodeIcon,
   CpuIcon,
@@ -32,7 +31,6 @@ const ICONS: Record<AgentIconId, typeof CodeIcon> = {
   security: ShieldUserIcon,
   designer: PaintBrush04Icon,
   spark: SparklesIcon,
-  sentor: AiMagicIcon,
   orkestra: CpuIcon,
 };
 

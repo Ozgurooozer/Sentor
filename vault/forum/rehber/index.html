@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forum Rehberi — Atlas Forum</title>
+<meta name="description" content="Atlas Forum nasıl çalışır? Her konu bir vault sayfasıdır. Yeni konu açmak, yanıt eklemek ve kategori sistemi hakkında kısa kılavuz.">
+<meta name="created" content="2026-05-26">
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--mid:#404040;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4caf7d;--amber:#d4a853;--purple:#8b7ed8;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.7;padding:2rem 1.5rem 4rem;max-width:760px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82em;color:var(--accent);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .back{display:inline-block;font-size:.78rem;color:var(--dim);margin-bottom:1.5rem}.back:hover{color:var(--accent)}
+  h1{font-size:1.4rem;font-weight:700;margin-bottom:.3rem}
+  .sub{font-size:.85rem;color:var(--dim);margin-bottom:2rem}
+  h2{font-size:.95rem;font-weight:600;margin:1.5rem 0 .5rem;color:var(--ink);padding-bottom:.3rem;border-bottom:1px solid var(--subtle)}
+  p{margin-bottom:.65rem;color:var(--dim);font-size:.88rem}
+  ul{padding-left:1.3rem;margin-bottom:.7rem}
+  li{margin-bottom:.3rem;color:var(--dim);font-size:.85rem}
+  .cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.4rem;margin:1rem 0}
+  .cat{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.7rem .9rem}
+  .cat h4{font-size:.82rem;font-weight:600;margin-bottom:.15rem}
+  .cat p{font-size:.74rem;margin:0}
+  .tag{display:inline-flex;font-size:.62rem;font-family:ui-monospace;padding:.1rem .4rem;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;margin-right:.3rem;vertical-align:middle}
+  .t-arch   {background:rgba(91,141,239,.1);color:var(--accent);border:1px solid rgba(91,141,239,.2)}
+  .t-codeq  {background:rgba(76,175,125,.1);color:var(--green);border:1px solid rgba(76,175,125,.2)}
+  .t-feature{background:rgba(212,168,83,.1);color:var(--amber);border:1px solid rgba(212,168,83,.2)}
+  .t-dev    {background:rgba(139,126,216,.1);color:var(--purple);border:1px solid rgba(139,126,216,.2)}
+  .t-sohbet {background:rgba(136,136,136,.1);color:var(--dim);border:1px solid rgba(136,136,136,.2)}
+  .step{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.75rem 1rem;margin:.4rem 0;display:flex;gap:.8rem;align-items:baseline}
+  .step-n{font-size:.75rem;font-weight:700;color:var(--muted);font-family:ui-monospace;flex-shrink:0;width:1.5rem}
+  .step-body{font-size:.83rem;color:var(--dim)}
+  .step-body strong{color:var(--ink)}
+</style>
+</head>
+<body>
+<a href="../index.html" class="back">← Foruma Dön</a>
+<h1>Forum Rehberi</h1>
+<p class="sub">Atlas Forum nasıl çalışır ve nasıl kullanılır.</p>
+
+<h2>Temel Prensip</h2>
+<p>Forum bir uygulama değil, bir vault kategorisidir. Her konu <code>vault/forum/{slug}/index.html</code> adresinde bir HTML sayfasıdır — indexlenir, aranabilir, kalıcıdır. LocalStorage yok, veritabanı yok.</p>
+<p>Forum indeksi (<code>forum/index.html</code>) <code>.index/pages.js</code>'yi okuyarak forum/ altındaki tüm sayfaları listeler. Sayfa eklendiğinde indexer yeniden çalıştırıldıktan sonra otomatik görünür.</p>
+
+<h2>Kategoriler</h2>
+<div class="cats">
+  <div class="cat"><h4><span class="tag t-arch">arch</span>Mimari</h4><p>Teknik trade-off'lar ve tasarım kararları</p></div>
+  <div class="cat"><h4><span class="tag t-codeq">codeq</span>Kalite</h4><p>Code review, güvenlik, teknik borç</p></div>
+  <div class="cat"><h4><span class="tag t-feature">feature</span>Feature</h4><p>Yeni özellik önerileri ve yol haritası</p></div>
+  <div class="cat"><h4><span class="tag t-dev">dev</span>Dev</h4><p>Stack tartışmaları, performans</p></div>
+  <div class="cat"><h4><span class="tag t-sohbet">sohbet</span>Sohbet</h4><p>Genel muhabbet ve duyurular</p></div>
+</div>
+
+<h2>Yeni Konu Açmak</h2>
+<div class="step"><span class="step-n">1</span><div class="step-body"><strong>Atlas-Maker ajanına söyle:</strong> "forum/konu-slug adresinde [kategori] bir forum konusu oluştur"</div></div>
+<div class="step"><span class="step-n">2</span><div class="step-body">Sayfa <code>vault/forum/{slug}/index.html</code> olarak yazılır. Açılış kısmında <code>&lt;meta name="description" content="[cat] ..."&gt;</code> olması şart — kategori bundan okunur.</div></div>
+<div class="step"><span class="step-n">3</span><div class="step-body"><code>python tools/indexer.py</code> çalıştır. Konu forum indeksinde otomatik görünür.</div></div>
+
+<h2>Yanıt Eklemek</h2>
+<p>Thread sayfasının HTML dosyasını düzenle: <code>&lt;hr&gt;</code> altındaki yanıtlar bölümüne yeni bir <code>.reply</code> bloğu ekle. Bunu Atlas-Maker'dan istemek en kolayı.</p>
+
+<h2>Konu Formatı</h2>
+<ul>
+  <li>Description meta: <code>[cat]</code> prefix ile başlamalı — örn. <code>[arch] Açıklama buraya</code></li>
+  <li>Sayfa içeriği: problem / tartışma / yanıtlar bölümlerinden oluşmalı</li>
+  <li>Yanıtlar HTML içinde statik olarak saklanır — her yanıt bir <code>.reply</code> divdir</li>
+  <li>Stil: mevcut thread sayfaları şablon olarak kullanılabilir</li>
+</ul>
+
+</body>
+</html>

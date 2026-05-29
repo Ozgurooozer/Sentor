@@ -22,8 +22,8 @@ export function V3CanvasBgAmbient() {
             transformOrigin: "50% 100%",
             transform: "rotateX(72deg)",
             backgroundImage: [
-              "linear-gradient(rgba(91,141,239,0.22) 1px, transparent 1px)",
-              "linear-gradient(90deg, rgba(91,141,239,0.22) 1px, transparent 1px)",
+              "linear-gradient(rgba(91,141,239,0.32) 1px, transparent 1px)",
+              "linear-gradient(90deg, rgba(91,141,239,0.32) 1px, transparent 1px)",
             ].join(", "),
             backgroundSize: "80px 80px",
             animation: "atlas-grid-scroll 10s linear infinite",
@@ -37,7 +37,7 @@ export function V3CanvasBgAmbient() {
           position: "absolute",
           inset: 0,
           background: [
-            "radial-gradient(ellipse 100% 55% at 50% 100%, transparent 40%, #050507 100%)",
+            "radial-gradient(ellipse 100% 55% at 50% 100%, transparent 62%, #050507 100%)",
             "radial-gradient(ellipse 60% 40% at 50% 0%, #050507 0%, transparent 100%)",
             "linear-gradient(to right, #050507 0%, transparent 15%, transparent 85%, #050507 100%)",
           ].join(", "),

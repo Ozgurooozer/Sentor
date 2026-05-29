@@ -50,7 +50,7 @@ export function V3OrkPanel() {
 
   const selectedModelId = useChatStore((s) => s.selectedModelId);
   const apiKeys     = useChatStore((s) => s.apiKeys);
-  const opencodeModel = usePreferencesStore((s) => s.opencodeChatModelId) || "deepseek/deepseek-v4-flash-free";
+  const opencodeModel = usePreferencesStore((s) => s.opencodeChatModelId) || "deepseek-v4-flash-free";
 
   const [input, setInput] = useState("");
   const [micState, setMicState] = useState<"idle" | "recording" | "transcribing">("idle");

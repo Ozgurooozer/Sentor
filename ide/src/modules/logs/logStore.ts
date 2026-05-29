@@ -40,6 +40,7 @@ let _vaultRoot: string | null = null;
 
 export function setLogVaultRoot(root: string) {
   _vaultRoot = root;
+  if (_flushBuffer.length > 0) void doFlush();
 }
 
 let _flushBuffer: LogEntry[] = [];
@@ -47,6 +48,12 @@ let _flushTimer: ReturnType<typeof setTimeout> | null = null;
 
 function scheduleFlush(entry: LogEntry) {
   _flushBuffer.push(entry);
+  // Flush errors immediately; batch everything else at 3s
+  if (entry.level === "error") {
+    if (_flushTimer) { clearTimeout(_flushTimer); _flushTimer = null; }
+    void doFlush();
+    return;
+  }
   if (_flushTimer) return;
   _flushTimer = setTimeout(() => {
     _flushTimer = null;

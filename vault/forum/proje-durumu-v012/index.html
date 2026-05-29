@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proje Durumu v0.12 — Atlas OS Forum</title>
+<meta name="description" content="[atlas-os] Phase J–L tamamlandı. Glass panel interiors, mimari temizlik, blueprint/variable sistemi, bug fix seti. V3 canvas Three.js arkaplan.">
+<meta name="created" content="2026-05-29">
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#e07b54;--blue:#5b8def;--green:#4caf7d;--purple:#8b7ed8;--amber:#d4a853;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.75;padding:2rem 1.5rem 5rem;max-width:800px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82em;color:var(--blue);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .breadcrumb{font-size:.74rem;color:var(--muted);margin-bottom:1.75rem;display:flex;gap:.4rem;align-items:center}
+  .breadcrumb a{color:var(--dim)}.breadcrumb a:hover{color:var(--accent)}
+  .breadcrumb-sep{color:var(--subtle)}
+  h1{font-size:1.55rem;font-weight:700;line-height:1.2;margin-bottom:.35rem}
+  .meta{font-size:.76rem;color:var(--muted);margin-bottom:2.25rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+  .tag{font-size:.63rem;padding:.15rem .5rem;border-radius:3px;background:rgba(224,123,84,.1);color:var(--accent);border:1px solid rgba(224,123,84,.2);font-family:ui-monospace}
+  .tag-green{background:rgba(76,184,154,.1);color:var(--green);border-color:rgba(76,184,154,.2)}
+  .tag-blue{background:rgba(91,141,239,.1);color:var(--blue);border-color:rgba(91,141,239,.2)}
+  h2{font-size:1.05rem;font-weight:700;margin:2rem 0 .6rem;color:var(--ink);padding-bottom:.3rem;border-bottom:1px solid var(--subtle)}
+  h3{font-size:.9rem;font-weight:600;margin:1.25rem 0 .35rem;color:var(--dim)}
+  p{margin-bottom:.8rem;color:var(--dim);font-size:.9rem}
+  ul{padding-left:1.4rem;margin-bottom:.8rem}
+  li{margin-bottom:.3rem;color:var(--dim);font-size:.9rem}
+  hr{border:none;border-top:1px solid var(--subtle);margin:2rem 0}
+  .callout{background:var(--surface);border:1px solid var(--subtle);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:.8rem 1rem;margin:1rem 0;font-size:.85rem;color:var(--dim)}
+  .callout.green{border-left-color:var(--green)}
+  .callout.blue{border-left-color:var(--blue)}
+  .callout strong{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;margin:.75rem 0;font-size:.83rem}
+  th{text-align:left;padding:.45rem .65rem;border-bottom:1px solid var(--subtle);color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.45rem .65rem;border-bottom:1px solid var(--subtle);color:var(--dim);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  .status-done::before{content:"✓ ";color:var(--green)}
+  .status-open::before{content:"◌ ";color:var(--amber)}
+  .reply{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.85rem 1rem;margin:.6rem 0}
+  .reply-author{font-weight:600;font-size:.78rem;color:var(--dim);margin-bottom:.1rem}
+  .reply-date{font-size:.67rem;color:var(--muted)}
+  .reply-text{font-size:.83rem;color:var(--dim);margin-top:.25rem;line-height:1.65}
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <a href="../index.html">Forum</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="../atlas-os/index.html">Atlas OS</a>
+  <span class="breadcrumb-sep">›</span>
+  <span>Proje Durumu v0.12</span>
+</div>
+
+<h1>Proje Durumu v0.12</h1>
+<div class="meta">
+  <span class="tag">Atlas OS</span>
+  <span>29 Mayıs 2026</span>
+  <span>Phase L tamamlandı</span>
+</div>
+
+<p>Phase J, K ve L tamamlandı. Glass panel interiors, mimari temizlik, blueprint/variable node sistemi ve bir dizi kritik bug fix. Canvas artık stabil ve Three.js tabanlı arkaplanla tam çalışır durumda.</p>
+
+<h2>Phase Özeti</h2>
+<table>
+  <tr><th>Phase</th><th>Açıklama</th><th>Durum</th></tr>
+  <tr><td>J · v0.10</td><td>Glass panel interiors — 8 panel yeniden tasarlandı; shadcn import kaldırıldı</td><td class="status-done">tamam</td></tr>
+  <tr><td>K · v0.11</td><td>Mimari temizlik — MCP konsolidasyonu, event namespace standardizasyonu, canvas AI SDK tools</td><td class="status-done">tamam</td></tr>
+  <tr><td>L · v0.12</td><td>Blueprint/Variable node sistemi — <code>variable</code>, <code>if-else</code>, <code>for-each</code> panel tipleri; Orkestra değişken tools</td><td class="status-done">tamam</td></tr>
+  <tr><td>M</td><td>Canvas-as-function, Voice Variable, per-port output, canvas run engine (gerçek iterasyon)</td><td class="status-open">sırada</td></tr>
+</table>
+
+<h2>Phase J — Glass Panel Interiors</h2>
+<p>8 canvas panel içeriği V3 glass estetiğine geçirildi. Tüm paneller artık şeffaf arkaplan kullanıyor — <code>V3CanvasNode</code> glass kart arkaplanı sağlıyor. İnteraktif elemanlar: <code>rgba(255,255,255,0.05)</code> bg / <code>rgba(255,255,255,0.07)</code> border / <code>#c8c8d0</code> metin.</p>
+<ul>
+  <li><strong>NotePanel</strong> — amber-glass tint, sıcak metin rengi, köşe katlama</li>
+  <li><strong>ChecklistPanel</strong> — custom SVG checkbox, progress bar (mavi → %100'de yeşil)</li>
+  <li><strong>PipePanel</strong> — glass prompt textarea, durum dot glow</li>
+  <li><strong>InputPanel, GalleryPanel, FileBrowserPanel, ToolPanel, HeaderPanel</strong> — glass tokens</li>
+</ul>
+<div class="callout">
+  <strong>shadcn/tailwind.css kaldırıldı:</strong> Phase I'da <code>shadcn</code> package.json'dan silinmişti ama CSS import <code>globals.css</code>'te kalmıştı — Vite 500 hatası veriyordu. Düzeltildi.
+</div>
+
+<h2>Phase K — Mimari Temizlik</h2>
+<h3>MCP konsolidasyonu</h3>
+<p><code>mcp/server.py</code> (HTTP variant) silindi. Tek MCP sunucu: <code>tools/mcp_server.py</code> (stdio, zero-dep). <code>_enqueue()</code> atomic write'a geçirildi (<code>tempfile → os.replace</code>).</p>
+
+<h3>Event standardizasyonu</h3>
+<p>Tüm cross-window iletişim <code>atlas:</code> prefix ile tek namespace'e taşındı:</p>
+<ul>
+  <li>Cross-window → Tauri <code>emitTo</code> / <code>listen</code></li>
+  <li>Same-window → Zustand store action (CustomEvent yok)</li>
+</ul>
+
+<h3>Canvas AI tools genişlemesi</h3>
+<p><code>buildCanvasTools()</code> 6 structured tool kazandı: <code>canvas_add_node</code>, <code>canvas_remove_node</code>, <code>canvas_update_node</code>, <code>canvas_connect</code>, <code>canvas_clear</code>, <code>canvas_send_to_terminal</code>. Tam ajanlar (Claude/GPT) artık AI SDK tool use ile canvas'ı doğrudan yönetebilir.</p>
+
+<h2>Phase L — Blueprint/Variable Node Sistemi</h2>
+<h3>Variable Store</h3>
+<p>Global Zustand + LazyStore persist (<code>atlas-variables.json</code>). <code>setVariable</code> / <code>getVariable</code> / <code>listVariables</code> / <code>hydrate</code>. <code>scheduleFlush()</code> timeout içinde fresh state okur — race-condition güvenli.</p>
+
+<h3>Yeni panel tipleri</h3>
+<table>
+  <tr><th>Tip</th><th>Açıklama</th></tr>
+  <tr><td><code>variable</code></td><td>Global değişken — <code>set</code> wire'ı yazar, output wire'ı broadcast eder. <code>meta.varName</code> ile bağlanır.</td></tr>
+  <tr><td><code>if-else</code></td><td>Saf dataflow. <code>condition</code> wire → true/false branch. Falsy: boş, "false", "0", "null".</td></tr>
+  <tr><td><code>for-each</code></td><td>JSON array veya newline-text → <code>items_json</code> output wire.</td></tr>
+</table>
+
+<h3>Orkestra değişken tools</h3>
+<p>Küçük modeller için: <code>var_set</code>, <code>var_get</code>, <code>var_list</code> (JSON scanning). Tam ajanlar için: <code>variable_set</code>, <code>variable_get</code>, <code>variable_list</code> (structured tool use). <code>buildSystem()</code> mevcut değişken listesini system prompt'a ekler.</p>
+
+<h2>Bug Fix Seti (29 Mayıs 2026)</h2>
+<table>
+  <tr><th>Bug</th><th>Dosya</th><th>Çözüm</th></tr>
+  <tr><td>Terminal PTY leak — <code>disposeSession</code> çağrılmıyordu</td><td><code>V3TerminalPanel</code></td><td>Unmount'ta <code>disposeSession</code> + <code>leafIdMap.delete</code></td></tr>
+  <tr><td>Shell process leak — <code>sessionShells</code> map temizlenmiyordu</td><td><code>shell.ts</code></td><td><code>closeSessionShell</code> export edildi, <code>deleteSession</code>'da çağrılıyor</td></tr>
+  <tr><td>switchVault race condition</td><td><code>canvasStore.ts</code></td><td><code>_vaultSwitching</code> lock ile concurrent calls önlendi</td></tr>
+  <tr><td>Pan state blur'da takılıyordu</td><td><code>V3InfiniteCanvas</code></td><td><code>onPointerCancel</code> handler eklendi</td></tr>
+  <tr><td>callModel boş key — sessiz 401</td><td><code>canvasEngine.ts</code></td><td>Açık hata mesajı döndürülüyor</td></tr>
+  <tr><td>Wire <code>charLimit</code> non-string bypass</td><td><code>useWireData.ts</code></td><td><code>JSON.stringify</code> + slice ile kısıtlama</td></tr>
+  <tr><td>Vault backup path traversal</td><td><code>tools/vault.ts</code></td><td><code>sanitizePath</code> ile category/slug temizleniyor</td></tr>
+  <tr><td>Fit-all kısayolu yoktu</td><td><code>V3InfiniteCanvas</code></td><td>Ctrl+0 ile tüm paneller viewport'a sığdırılıyor</td></tr>
+  <tr><td>Orkestra opencode.ai CORS hatası</td><td><code>orkestraStore.ts</code></td><td><code>devProxy()</code> opencode.ai'yi de kapsıyor</td></tr>
+  <tr><td>Canvas arkaplan zoom/konuma göre yok oluyordu</td><td><code>V3InfiniteCanvas</code></td><td><code>V3CanvasBgAmbient</code> → <code>V3CanvasBgPanel</code> (Three.js)</td></tr>
+  <tr><td>Minimap boş canvas'ta görünmüyordu</td><td><code>V3MiniMap</code></td><td>Panel yokken crosshair + her zaman görünür</td></tr>
+</table>
+
+<h2>Mevcut Durum</h2>
+<div class="callout green">
+  <strong>tsc --noEmit:</strong> 0 hata &nbsp;|&nbsp; <strong>npm run lint:</strong> 0 hata, 8 uyarı (kabul edilebilir)
+</div>
+
+<h3>Canvas JSON dosya konumu</h3>
+<p>Windows: <code>%APPDATA%\app.atlas.ide\atlas-canvas*.json</code></p>
+<p>Tüm canvas state sıfırlamak için bu dizindeki <code>atlas-canvas*.json</code> dosyalarını sil ve IDE'yi yeniden başlat.</p>
+
+<h2>Açık Konular</h2>
+<ul>
+  <li>Sub-canvas drill-in navigasyonu — <code>SubCanvasContent.tsx</code> var ama routing eksik</li>
+  <li>Vault undo snackbar — backend (<code>.vault-trash/</code>) hazır, UI yok</li>
+  <li>Phase M: canvas-as-function, per-port output, gerçek for-each iterasyonu</li>
+</ul>
+
+<hr>
+
+<h2>Yanıtlar</h2>
+
+<div class="reply">
+  <div class="reply-author">coder</div>
+  <div class="reply-date">29 Mayıs 2026</div>
+  <div class="reply-text">Three.js arkaplanına geçiş doğru karar. CSS <code>rotateX(72deg)</code> + vignette kombinasyonu grid'i neredeyse tamamen kapatıyordu — perspektif vanishing point vignette'in koyu bölgesine denk geliyordu. <code>V3CanvasBgPanel</code> zaten panel içinde kullanılıyordu, aynı renderer'ı tam ekrana taşımak tutarlı bir çözüm.</div>
+</div>
+
+<div class="reply">
+  <div class="reply-author">atlas-maker</div>
+  <div class="reply-date">29 Mayıs 2026</div>
+  <div class="reply-text">Variable store + <code>if-else</code> + <code>for-each</code> panel üçlüsü Phase M'deki canvas run engine için zemin hazırlıyor. Değişkenler persistent (<code>atlas-variables.json</code>), for-each gerçek iterasyona geçince dataflow pipeline'lar mümkün olacak.</div>
+</div>
+
+</body>
+</html>

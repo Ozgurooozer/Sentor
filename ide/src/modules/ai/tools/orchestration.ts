@@ -24,6 +24,12 @@ const INVOKE_SAFE_TOOLS = new Set([
   "grep",
   "glob",
   "canvas_read_state",
+  "code_status",
+  "code_search",
+  "code_explore",
+  "code_callers",
+  "code_callees",
+  "code_impact",
 ]);
 
 const INVOKE_MAX_STEPS = 10;

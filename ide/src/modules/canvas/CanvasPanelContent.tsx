@@ -786,7 +786,7 @@ function CanvasPreview({ panel }: { panel: CanvasPanelNode }) {
     <iframe
       src={localToAsset(path)}
       className="h-full w-full border-0 bg-white"
-      sandbox="allow-scripts allow-same-origin"
+      sandbox="allow-scripts allow-same-origin allow-forms"
       title="Preview"
       onLoad={(e) => {
         try {

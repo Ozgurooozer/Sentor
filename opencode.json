@@ -1,0 +1,13 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "atlas": {
+      "type": "local",
+      "command": ["python", "C:/Atlas OS/tools/mcp_server.py"],
+      "enabled": true,
+      "env": {
+        "ATLAS_VAULT_ROOT": "C:/Atlas OS"
+      }
+    }
+  }
+}

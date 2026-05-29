@@ -7,7 +7,6 @@ export type AgentIconId =
   | "security"
   | "designer"
   | "spark"
-  | "sentor"
   | "orkestra";
 
 export type AgentConfig = {
@@ -102,52 +101,6 @@ CODE QUESTIONS: Use code_status first. If the CodeGraph bridge is ready, prefer 
 Use CodeGraph tools first when available; only fall back to grep/read_file when the bridge is not running.`,
   },
   {
-    id: "builtin:sentor",
-    name: "Sentor",
-    description: "Agent builder. Analyzes a canvas, designs new agents, and spawns them via a strict 5-step protocol.",
-    icon: "sentor",
-    builtIn: true,
-    instructions: `SENTOR — AGENT BUILDER
-You design and spawn new agents for Atlas OS. You have a dedicated canvas workspace. Follow this protocol exactly, never skip steps.
-
-STEP 1 — CLARIFY
-Ask targeted questions until you have:
-  • agent name (kebab-case)
-  • one-sentence task description
-  • list of tools needed
-  • memory mode (session | ephemeral)
-  • base agent (none | vault | atlas-maker | coder | or existing custom)
-Do NOT proceed until you have all five.
-
-STEP 2 — SPEC (YAML)
-Output a YAML block:
-\`\`\`yaml
-name: <agent-name>
-task: <one sentence>
-tools: [tool1, tool2, ...]
-memory: session | ephemeral
-base: none | builtin:<id> | <custom-id>
-system_prompt: |
-  <full system prompt you will give the agent>
-\`\`\`
-Ask: "Does this spec look correct? (yes/edit)"
-
-STEP 3 — CONFIRM
-Wait for user to reply "yes" or provide edits. If edits, revise YAML and re-show. Do NOT spawn until confirmed.
-
-STEP 4 — SPAWN
-Call agent_spawn with the confirmed spec, then verify registration with canvas_read_state.
-
-STEP 5 — CONFIRM REPLY
-Respond with a success message and the new agent name.
-
-REFUSALS (never do these):
-- Do not add agent_spawn to the spawned agent's toolset.
-- Do not spawn more than one agent per turn.
-- Do not modify builtin agents.`,
-
-  },
-  {
     id: "builtin:orkestra",
     name: "Orkestra",
     description: "Coordinator agent. Routes tasks to the right agent, triggers Sentor for new agents, supports Supervisor/Worker patterns.",
@@ -158,8 +111,7 @@ REFUSALS (never do these):
 2. Use agent_invoke for read-only work and return a summary.
 3. For code intelligence, call code_status first and use code_search/code_explore/code_callers/code_callees/code_impact if ready.
 4. Do not do deep research or code edits yourself.
-5. Never call vault_write or write_file.
-6. If no agent fits, suggest Sentor to design one.`,
+5. Never call vault_write or write_file.`,
   },
   {
     id: "builtin:vault-exporter",

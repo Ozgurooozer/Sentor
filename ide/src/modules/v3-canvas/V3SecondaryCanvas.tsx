@@ -3,7 +3,7 @@ import { CANVAS_MAX_SCALE, CANVAS_MIN_SCALE, CANVAS_ZOOM_STEP } from "@/lib/cons
 import { useCanvasStore } from "@/modules/canvas/canvasStore";
 import { PORT_DEFS, namedPortPoint } from "@/modules/canvas/portDefs";
 import type { PortDataType } from "@/modules/canvas/portDefs";
-import { V3CanvasBgAmbient } from "./V3CanvasBgAmbient";
+import { V3CanvasBgPanel } from "./V3CanvasBgPanel";
 import { V3CanvasNode } from "./V3CanvasNode";
 import { V3WireLayer, type PendingConn } from "./V3WireLayer";
 import { V3NodePalette } from "./V3NodePalette";
@@ -160,7 +160,7 @@ export function V3SecondaryCanvas() {
       onPointerMove={onCanvasPointerMove}
       onPointerUp={onCanvasPointerUp}
     >
-      <V3CanvasBgAmbient />
+      <V3CanvasBgPanel />
 
       <div
         className="absolute inset-0"

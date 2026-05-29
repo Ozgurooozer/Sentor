@@ -26,19 +26,8 @@ PIPELINES_DIR = ROOT / 'vault' / 'agents' / 'sentor' / 'pipelines'
 TASKS_DIR     = ROOT / 'vault' / 'agents' / 'sentor' / 'tasks'
 DAEMON_LOG    = ROOT / 'vault' / 'agents' / 'sentor' / 'daemon.log'
 
-_COLOR  = sys.stdout.isatty()
-_ACCENT = '\033[38;2;91;141;239m'
-_DIM    = '\033[2m'
-_OK     = '\033[38;2;29;158;117m'
-_ERR    = '\033[38;2;221;82;82m'
-_RESET  = '\033[0m'
-
-
-def _c(s, code): return f'{code}{s}{_RESET}' if _COLOR else s
-def accent(s):   return _c(s, _ACCENT)
-def dim(s):      return _c(s, _DIM)
-def ok(s):       return _c(s, _OK)
-def err(s):      return _c(s, _ERR)
+sys.path.insert(0, str(ROOT / 'tools'))
+from colors import accent, dim, ok, err  # noqa: E402
 
 
 def _log(msg, level='INFO'):
@@ -68,8 +57,11 @@ def _parse_cron(expr):
             return ('interval', int(rest[:-1]))
     if expr.startswith('daily '):
         t = expr[6:].strip()
-        hh, mm = t.split(':')
-        return ('daily', int(hh), int(mm))
+        try:
+            hh, mm = t.split(':')
+            return ('daily', int(hh), int(mm))
+        except (ValueError, TypeError):
+            return None
     return None
 
 
@@ -84,7 +76,7 @@ def _next_run_in(parsed_cron, last_run):
         return max(0, interval - elapsed)
     if parsed_cron[0] == 'daily':
         _, hh, mm = parsed_cron
-        dt = datetime.now()
+        dt = datetime.now(timezone.utc)
         target = dt.replace(hour=hh, minute=mm, second=0, microsecond=0)
         diff = (target - dt).total_seconds()
         if diff < 0:
@@ -135,13 +127,28 @@ class FileWatcher:
 
 # ── Runner thread ─────────────────────────────────────────────────────────────
 
+_running_lock = threading.Lock()
+_running: set = set()
+
+
 def _fire(pipeline_id, ctx=None):
-    """Run a pipeline in a background thread so the daemon loop continues."""
+    """Run a pipeline in a background thread — skips if already running."""
+    with _running_lock:
+        if pipeline_id in _running:
+            _log(f'pipeline [{pipeline_id}] already running, skipping', 'INFO')
+            return
+        _running.add(pipeline_id)
+
     def _go():
-        sys.path.insert(0, str(ROOT / 'cli'))
-        from pipeline import run_pipeline  # noqa: PLC0415
-        _log(f'firing pipeline [{pipeline_id}]', 'OK')
-        run_pipeline(pipeline_id, ctx)
+        try:
+            sys.path.insert(0, str(ROOT / 'cli'))
+            from pipeline import run_pipeline  # noqa: PLC0415
+            _log(f'firing pipeline [{pipeline_id}]', 'OK')
+            run_pipeline(pipeline_id, ctx)
+        finally:
+            with _running_lock:
+                _running.discard(pipeline_id)
+
     t = threading.Thread(target=_go, daemon=True)
     t.start()
 

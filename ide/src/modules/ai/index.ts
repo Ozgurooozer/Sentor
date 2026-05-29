@@ -1,7 +1,6 @@
 export { AgentRunBridge } from "./components/AgentRunBridge";
 export { AgentStatusPill } from "./components/AgentStatusPill";
 export { AiInputBar } from "./components/AiInputBar";
-export { AiMiniWindow } from "./components/AiMiniWindow";
 export { SelectionAskAi } from "./components/SelectionAskAi";
 export {
   EMPTY_PROVIDER_KEYS,

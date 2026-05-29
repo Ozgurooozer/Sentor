@@ -364,7 +364,7 @@ export function useTabs() {
       return [...curr, { id, kind: "vault-home", title: "Vault" } satisfies VaultHomeTab];
     });
     if (existingId !== null) setActiveId(existingId);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+     
     return existingId!;
   }, []);
 
@@ -381,7 +381,7 @@ export function useTabs() {
       return [...curr, { id, kind: "graph", title: "Graph" } satisfies GraphTab];
     });
     if (existingId !== null) setActiveId(existingId);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+     
     return existingId!;
   }, []);
 
@@ -404,7 +404,7 @@ export function useTabs() {
       ];
     });
     if (existingId !== null) setActiveId(existingId);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+     
     return existingId!;
   }, []);
 

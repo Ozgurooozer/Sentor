@@ -10,10 +10,10 @@
 
 import { createServer } from 'http';
 import { join, resolve } from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const CODEGRAPH_DIST = resolve(__dirname, '../modules/codegraph-0.7.10/dist/index.js');
+const CODEGRAPH_DIST = pathToFileURL(resolve(__dirname, '../modules/codegraph-0.7.10/dist/index.js')).href;
 
 // ── Args ────────────────────────────────────────────────────────────────────
 
@@ -38,27 +38,21 @@ let cgStatus = 'initializing'; // initializing | indexing | ready | error
 async function initCodeGraph() {
   try {
     const mod = await import(CODEGRAPH_DIST);
-    const CodeGraph = mod.default ?? mod.CodeGraph;
-    const { isInitialized, findNearestCodeGraphRoot } = mod;
+    const CodeGraph = mod.CodeGraph;
+    const isInitialized = mod.isInitialized;
 
     const initialized = await isInitialized(workspaceRoot);
-    if (!initialized) {
-      cgStatus = 'indexing';
-      log(`No .codegraph/ found — indexing ${workspaceRoot} ...`);
-    } else {
-      cgStatus = 'indexing';
-      log(`Opening existing index at ${workspaceRoot}`);
-    }
-
-    cg = new CodeGraph({ rootPath: workspaceRoot });
-    await cg.init();
+    cgStatus = 'indexing';
 
     if (!initialized) {
+      log(`No .codegraph/ found — initializing ${workspaceRoot} ...`);
+      cg = await CodeGraph.init(workspaceRoot);
       log('Indexing files (first run — this may take a moment)...');
       await cg.indexAll();
       log('Index complete.');
     } else {
-      // Quick sync to catch recent changes
+      log(`Opening existing index at ${workspaceRoot}`);
+      cg = await CodeGraph.open(workspaceRoot);
       await cg.sync();
     }
 

@@ -58,4 +58,4 @@ jobs:
         with:
           python-version: "3.12"
       - name: Run API tests
-        run: python tools/test_api.py
+        run: python tests/test_api.py

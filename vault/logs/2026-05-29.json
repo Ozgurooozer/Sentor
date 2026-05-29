@@ -1,0 +1,3356 @@
+[
+  {
+    "id": 1,
+    "ts": 1780014724886,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780014787332,
+    "level": "error",
+    "message": "[CANVAS:AI] send failed: {}"
+  },
+  {
+    "id": 3,
+    "ts": 1780015048043,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 4,
+    "ts": 1780015048043,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1780015088166,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 6,
+    "ts": 1780015088167,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1780015479927,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780015724730,
+    "level": "error",
+    "message": "[CANVAS:AI] send failed: {}"
+  },
+  {
+    "id": 4,
+    "ts": 1780021188754,
+    "level": "error",
+    "message": "[ErrorBoundary:app] {} \n    at V3MiniMap (http://localhost:1420/src/modules/v3-canvas/V3MiniMap.tsx:25:18)\n    at div (<anonymous>)\n    at V3InfiniteCanvas (http://localhost:1420/src/modules/v3-canvas/V3InfiniteCanvas.tsx:91:18)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at CanvasAppShellInner (http://localhost:1420/src/app/CanvasAppShell.tsx:39:43)\n    at AiComposerProvider (http://localhost:1420/src/modules/ai/lib/composer.tsx:34:3)\n    at Provider4 (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=0750c251:316:15)\n    at TooltipProvider (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=0750c251:15088:5)\n    at TooltipProvider (http://localhost:1420/src/components/ui/tooltip.tsx:21:3)\n    at ThemeProvider (http://localhost:1420/src/modules/theme/ThemeProvider.tsx:44:3)\n    at CanvasAppShell (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)\n    at App (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)"
+  },
+  {
+    "id": 6,
+    "ts": 1780021301722,
+    "level": "error",
+    "message": "[ErrorBoundary:app] {} \n    at V3MiniMap (http://localhost:1420/src/modules/v3-canvas/V3MiniMap.tsx:25:18)\n    at div (<anonymous>)\n    at V3InfiniteCanvas (http://localhost:1420/src/modules/v3-canvas/V3InfiniteCanvas.tsx:91:18)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at CanvasAppShellInner (http://localhost:1420/src/app/CanvasAppShell.tsx:39:43)\n    at AiComposerProvider (http://localhost:1420/src/modules/ai/lib/composer.tsx:34:3)\n    at Provider4 (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=0750c251:316:15)\n    at TooltipProvider (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=0750c251:15088:5)\n    at TooltipProvider (http://localhost:1420/src/components/ui/tooltip.tsx:21:3)\n    at ThemeProvider (http://localhost:1420/src/modules/theme/ThemeProvider.tsx:44:3)\n    at CanvasAppShell (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)\n    at App (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)"
+  },
+  {
+    "id": 7,
+    "ts": 1780021356093,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 8,
+    "ts": 1780021356093,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3MiniMap.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1780021810141,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 4,
+    "ts": 1780021810280,
+    "level": "error",
+    "message": "[ErrorBoundary:app] {} \n    at V3MiniMap (http://localhost:1420/src/modules/v3-canvas/V3MiniMap.tsx:25:21)\n    at div (<anonymous>)\n    at V3InfiniteCanvas (http://localhost:1420/src/modules/v3-canvas/V3InfiniteCanvas.tsx:91:18)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at CanvasAppShellInner (http://localhost:1420/src/app/CanvasAppShell.tsx:39:43)\n    at AiComposerProvider (http://localhost:1420/src/modules/ai/lib/composer.tsx:34:3)\n    at Provider4 (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=0750c251:316:15)\n    at TooltipProvider (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=0750c251:15088:5)\n    at TooltipProvider (http://localhost:1420/src/components/ui/tooltip.tsx:21:3)\n    at ThemeProvider (http://localhost:1420/src/modules/theme/ThemeProvider.tsx:44:3)\n    at CanvasAppShell (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)\n    at App (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)"
+  },
+  {
+    "id": 5,
+    "ts": 1780021898554,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 6,
+    "ts": 1780021898554,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3MiniMap.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1780035045423,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 3,
+    "ts": 1780035055350,
+    "level": "error",
+    "message": "[global:unhandledrejection] window.set_always_on_top not allowed. Permissions associated with this command: core:window:allow-set-always-on-top"
+  },
+  {
+    "id": 1,
+    "ts": 1780035186211,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780035470976,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1780035507914,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 4,
+    "ts": 1780035507914,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasBgAmbient.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1780035517039,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1780035517039,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 7,
+    "ts": 1780035550054,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 8,
+    "ts": 1780035550054,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3MiniMap.tsx"
+  },
+  {
+    "id": 9,
+    "ts": 1780036367765,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 10,
+    "ts": 1780036367765,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 11,
+    "ts": 1780036374435,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 12,
+    "ts": 1780036374435,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 13,
+    "ts": 1780036374436,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 14,
+    "ts": 1780036374436,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 15,
+    "ts": 1780036374436,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 16,
+    "ts": 1780036374436,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 17,
+    "ts": 1780036374436,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 18,
+    "ts": 1780036374436,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 19,
+    "ts": 1780036374436,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 20,
+    "ts": 1780036374436,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 21,
+    "ts": 1780036374436,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 22,
+    "ts": 1780036374602,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 23,
+    "ts": 1780036374602,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 24,
+    "ts": 1780036374603,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 25,
+    "ts": 1780036376034,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 26,
+    "ts": 1780036376034,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 27,
+    "ts": 1780036378336,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 28,
+    "ts": 1780036378336,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 29,
+    "ts": 1780036378336,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 30,
+    "ts": 1780036378336,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 31,
+    "ts": 1780036378336,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 32,
+    "ts": 1780036378336,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 33,
+    "ts": 1780036378336,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 34,
+    "ts": 1780036378336,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 35,
+    "ts": 1780036378337,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 36,
+    "ts": 1780036378337,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 37,
+    "ts": 1780036378337,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 38,
+    "ts": 1780036378551,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 39,
+    "ts": 1780036378551,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 40,
+    "ts": 1780036378551,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 41,
+    "ts": 1780036379352,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 42,
+    "ts": 1780036379353,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 43,
+    "ts": 1780036379353,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 44,
+    "ts": 1780036379353,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PanelMenu.tsx"
+  },
+  {
+    "id": 45,
+    "ts": 1780036379353,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PinnedPanelsPortal.tsx"
+  },
+  {
+    "id": 46,
+    "ts": 1780036379353,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3MiniMap.tsx"
+  },
+  {
+    "id": 47,
+    "ts": 1780036379353,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3SecondaryCanvas.tsx"
+  },
+  {
+    "id": 48,
+    "ts": 1780036379353,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 49,
+    "ts": 1780036379353,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanel.tsx"
+  },
+  {
+    "id": 50,
+    "ts": 1780036379353,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/v3-canvas/V3WireLayer.tsx: Could not Fast Refresh (\"TYPE_COLOR\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 51,
+    "ts": 1780036379353,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3WireLayer.tsx"
+  },
+  {
+    "id": 52,
+    "ts": 1780036379353,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 53,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 54,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasNode.tsx"
+  },
+  {
+    "id": 55,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 56,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipelinePanel.tsx"
+  },
+  {
+    "id": 57,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/StickManPanel.tsx"
+  },
+  {
+    "id": 58,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/VariablePanel.tsx"
+  },
+  {
+    "id": 59,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/IfElsePanel.tsx"
+  },
+  {
+    "id": 60,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/GatePanel.tsx"
+  },
+  {
+    "id": 61,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ForEachPanel.tsx"
+  },
+  {
+    "id": 62,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 63,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 64,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 65,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 66,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 67,
+    "ts": 1780036379354,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 68,
+    "ts": 1780036379355,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 69,
+    "ts": 1780036379355,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 70,
+    "ts": 1780036379355,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/NotePanel.tsx"
+  },
+  {
+    "id": 71,
+    "ts": 1780036379355,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ChecklistPanel.tsx"
+  },
+  {
+    "id": 72,
+    "ts": 1780036379355,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InputPanel.tsx"
+  },
+  {
+    "id": 73,
+    "ts": 1780036379355,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AgentEditorPanel.tsx"
+  },
+  {
+    "id": 74,
+    "ts": 1780036379355,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AudioPanel.tsx"
+  },
+  {
+    "id": 75,
+    "ts": 1780036379355,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/GalleryPanel.tsx"
+  },
+  {
+    "id": 76,
+    "ts": 1780036379355,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/HeaderPanel.tsx"
+  },
+  {
+    "id": 77,
+    "ts": 1780036379355,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CodeGraphPanel.tsx"
+  },
+  {
+    "id": 78,
+    "ts": 1780036379355,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/FileBrowserPanel.tsx"
+  },
+  {
+    "id": 79,
+    "ts": 1780036379596,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 80,
+    "ts": 1780036379596,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3SecondaryCanvas.tsx"
+  },
+  {
+    "id": 81,
+    "ts": 1780036379596,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 82,
+    "ts": 1780036379613,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 83,
+    "ts": 1780036379613,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 84,
+    "ts": 1780036379613,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 85,
+    "ts": 1780036381960,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 86,
+    "ts": 1780036381960,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 87,
+    "ts": 1780036381960,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 88,
+    "ts": 1780036381960,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 89,
+    "ts": 1780036381960,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 90,
+    "ts": 1780036381960,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 91,
+    "ts": 1780036381961,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 92,
+    "ts": 1780036381961,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 93,
+    "ts": 1780036381961,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 94,
+    "ts": 1780036381961,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 95,
+    "ts": 1780036381961,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 96,
+    "ts": 1780036382222,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 97,
+    "ts": 1780036382222,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 98,
+    "ts": 1780036382222,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 99,
+    "ts": 1780036388920,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 100,
+    "ts": 1780036388920,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 101,
+    "ts": 1780036390451,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 102,
+    "ts": 1780036390451,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 103,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 104,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PanelMenu.tsx"
+  },
+  {
+    "id": 105,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PinnedPanelsPortal.tsx"
+  },
+  {
+    "id": 106,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3MiniMap.tsx"
+  },
+  {
+    "id": 107,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3SecondaryCanvas.tsx"
+  },
+  {
+    "id": 108,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 109,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanel.tsx"
+  },
+  {
+    "id": 110,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/v3-canvas/V3WireLayer.tsx: Could not Fast Refresh (\"TYPE_COLOR\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 111,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3WireLayer.tsx"
+  },
+  {
+    "id": 112,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 113,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 114,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasNode.tsx"
+  },
+  {
+    "id": 115,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 116,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipelinePanel.tsx"
+  },
+  {
+    "id": 117,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/StickManPanel.tsx"
+  },
+  {
+    "id": 118,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/VariablePanel.tsx"
+  },
+  {
+    "id": 119,
+    "ts": 1780036390452,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/IfElsePanel.tsx"
+  },
+  {
+    "id": 120,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/GatePanel.tsx"
+  },
+  {
+    "id": 121,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ForEachPanel.tsx"
+  },
+  {
+    "id": 122,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 123,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 124,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 125,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 126,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 127,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 128,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 129,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 130,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/NotePanel.tsx"
+  },
+  {
+    "id": 131,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ChecklistPanel.tsx"
+  },
+  {
+    "id": 132,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/InputPanel.tsx"
+  },
+  {
+    "id": 133,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AgentEditorPanel.tsx"
+  },
+  {
+    "id": 134,
+    "ts": 1780036390453,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AudioPanel.tsx"
+  },
+  {
+    "id": 135,
+    "ts": 1780036390454,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/GalleryPanel.tsx"
+  },
+  {
+    "id": 136,
+    "ts": 1780036390454,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/HeaderPanel.tsx"
+  },
+  {
+    "id": 137,
+    "ts": 1780036390454,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CodeGraphPanel.tsx"
+  },
+  {
+    "id": 138,
+    "ts": 1780036390454,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/FileBrowserPanel.tsx"
+  },
+  {
+    "id": 139,
+    "ts": 1780036390733,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 140,
+    "ts": 1780036390733,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3SecondaryCanvas.tsx"
+  },
+  {
+    "id": 141,
+    "ts": 1780036390733,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 142,
+    "ts": 1780036390760,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 143,
+    "ts": 1780036390760,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 144,
+    "ts": 1780036390760,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 145,
+    "ts": 1780036392477,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 146,
+    "ts": 1780036392477,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 147,
+    "ts": 1780036395942,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 148,
+    "ts": 1780036395942,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 149,
+    "ts": 1780036395942,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/VariablePanel.tsx"
+  },
+  {
+    "id": 150,
+    "ts": 1780036395942,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/IfElsePanel.tsx"
+  },
+  {
+    "id": 151,
+    "ts": 1780036395942,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/GatePanel.tsx"
+  },
+  {
+    "id": 152,
+    "ts": 1780036395942,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/ForEachPanel.tsx"
+  },
+  {
+    "id": 153,
+    "ts": 1780036395942,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 154,
+    "ts": 1780036398041,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 155,
+    "ts": 1780036398041,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 156,
+    "ts": 1780036400932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 157,
+    "ts": 1780036400932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 158,
+    "ts": 1780036400932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 159,
+    "ts": 1780036400932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 160,
+    "ts": 1780036400932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 161,
+    "ts": 1780036400932,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 162,
+    "ts": 1780036400932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 163,
+    "ts": 1780036400932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 164,
+    "ts": 1780036400933,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 165,
+    "ts": 1780036400933,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 166,
+    "ts": 1780036400933,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 167,
+    "ts": 1780036400933,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/vault-home/VaultHomePane.tsx"
+  },
+  {
+    "id": 168,
+    "ts": 1780036401270,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 169,
+    "ts": 1780036401270,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 170,
+    "ts": 1780036401270,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 171,
+    "ts": 1780036417900,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 172,
+    "ts": 1780036417901,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 173,
+    "ts": 1780036421225,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 174,
+    "ts": 1780036421225,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 175,
+    "ts": 1780036435174,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 176,
+    "ts": 1780036435174,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 177,
+    "ts": 1780036499667,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 178,
+    "ts": 1780036499668,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 179,
+    "ts": 1780036499668,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 180,
+    "ts": 1780036499668,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 181,
+    "ts": 1780036499668,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 182,
+    "ts": 1780036499668,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 183,
+    "ts": 1780036499668,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 184,
+    "ts": 1780036499668,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 185,
+    "ts": 1780036499668,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 186,
+    "ts": 1780036499668,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 187,
+    "ts": 1780036499668,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 188,
+    "ts": 1780036499668,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/vault-home/VaultHomePane.tsx"
+  },
+  {
+    "id": 189,
+    "ts": 1780036500026,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 190,
+    "ts": 1780036500026,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 191,
+    "ts": 1780036500026,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1780041701212,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 3,
+    "ts": 1780041715253,
+    "level": "error",
+    "message": "[global:unhandledrejection] window.set_always_on_top not allowed. Permissions associated with this command: core:window:allow-set-always-on-top"
+  },
+  {
+    "id": 1,
+    "ts": 1780042784630,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 5,
+    "ts": 1780043027713,
+    "level": "error",
+    "message": "[ErrorBoundary:app] {} \n    at V3InfiniteCanvas (http://localhost:1420/src/modules/v3-canvas/V3InfiniteCanvas.tsx?t=1780043027288:90:18)\n    at div (<anonymous>)\n    at div (<anonymous>)\n    at CanvasAppShellInner (http://localhost:1420/src/app/CanvasAppShell.tsx:39:43)\n    at AiComposerProvider (http://localhost:1420/src/modules/ai/lib/composer.tsx:34:3)\n    at Provider4 (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=faba2837:316:15)\n    at TooltipProvider (http://localhost:1420/node_modules/.vite/deps/radix-ui.js?v=faba2837:15088:5)\n    at TooltipProvider (http://localhost:1420/src/components/ui/tooltip.tsx:21:3)\n    at ThemeProvider (http://localhost:1420/src/modules/theme/ThemeProvider.tsx:44:3)\n    at CanvasAppShell (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)\n    at App (<anonymous>)\n    at ErrorBoundary (http://localhost:1420/src/app/ErrorBoundary.tsx:5:8)"
+  },
+  {
+    "id": 6,
+    "ts": 1780043031069,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 7,
+    "ts": 1780043031070,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3InfiniteCanvas.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1780043038329,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 9,
+    "ts": 1780043038330,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3SecondaryCanvas.tsx"
+  },
+  {
+    "id": 10,
+    "ts": 1780043044549,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 11,
+    "ts": 1780043044549,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3SecondaryCanvas.tsx"
+  },
+  {
+    "id": 12,
+    "ts": 1780043051392,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 13,
+    "ts": 1780043051393,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasBgPanel.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1780043496173,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780043525201,
+    "level": "error",
+    "message": "[CANVAS:AI] send failed: {}"
+  },
+  {
+    "id": 3,
+    "ts": 1780043629833,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 4,
+    "ts": 1780043629834,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1780043629834,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1780043636286,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 7,
+    "ts": 1780043636286,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1780043636286,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 9,
+    "ts": 1780044792425,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 10,
+    "ts": 1780044792425,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 11,
+    "ts": 1780044792425,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3LauncherShell.tsx"
+  },
+  {
+    "id": 12,
+    "ts": 1780044792425,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 13,
+    "ts": 1780044792425,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 14,
+    "ts": 1780044792426,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3ProjectPanel.tsx"
+  },
+  {
+    "id": 15,
+    "ts": 1780044792426,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasSettingsOverlay.tsx"
+  },
+  {
+    "id": 16,
+    "ts": 1780044792426,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 17,
+    "ts": 1780044792427,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 18,
+    "ts": 1780044792427,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 19,
+    "ts": 1780044792427,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 20,
+    "ts": 1780044792427,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 21,
+    "ts": 1780044792427,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 22,
+    "ts": 1780044792427,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 23,
+    "ts": 1780044792427,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 24,
+    "ts": 1780044792428,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/onboarding/OnboardingWizard.tsx"
+  },
+  {
+    "id": 25,
+    "ts": 1780044792428,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/ShortcutsSection.tsx"
+  },
+  {
+    "id": 26,
+    "ts": 1780044792428,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/FeaturesSection.tsx"
+  },
+  {
+    "id": 27,
+    "ts": 1780044792428,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/VaultSection.tsx"
+  },
+  {
+    "id": 28,
+    "ts": 1780044792428,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/GeneralSection.tsx"
+  },
+  {
+    "id": 29,
+    "ts": 1780044792428,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/ModelsSection.tsx"
+  },
+  {
+    "id": 30,
+    "ts": 1780044792428,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/AgentsSection.tsx"
+  },
+  {
+    "id": 31,
+    "ts": 1780044792428,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 32,
+    "ts": 1780044792428,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/editor/EditorPane.tsx"
+  },
+  {
+    "id": 33,
+    "ts": 1780044792428,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/vault-home/VaultHomePane.tsx"
+  },
+  {
+    "id": 34,
+    "ts": 1780044792428,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/FileBrowserPanel.tsx"
+  },
+  {
+    "id": 35,
+    "ts": 1780044792429,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/theme/ThemeProvider.tsx: Could not Fast Refresh (\"ThemeProviderContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 36,
+    "ts": 1780044792429,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/theme/ThemeProvider.tsx"
+  },
+  {
+    "id": 37,
+    "ts": 1780044792444,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 38,
+    "ts": 1780044792444,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 39,
+    "ts": 1780044792444,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 40,
+    "ts": 1780044792562,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2727898047. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 41,
+    "ts": 1780044792562,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2727898047. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 42,
+    "ts": 1780044792562,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2374764266. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 43,
+    "ts": 1780044792562,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2374764266. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 44,
+    "ts": 1780044792562,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2727898047. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 45,
+    "ts": 1780044792563,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2374764266. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 46,
+    "ts": 1780044792572,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 47,
+    "ts": 1780044792572,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/GeneralSection.tsx"
+  },
+  {
+    "id": 48,
+    "ts": 1780044792572,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/terminal/TerminalPane.tsx"
+  },
+  {
+    "id": 49,
+    "ts": 1780044796932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 50,
+    "ts": 1780044796932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 51,
+    "ts": 1780044796932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3LauncherShell.tsx"
+  },
+  {
+    "id": 52,
+    "ts": 1780044796932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 53,
+    "ts": 1780044796932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 54,
+    "ts": 1780044796932,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3ProjectPanel.tsx"
+  },
+  {
+    "id": 55,
+    "ts": 1780044796933,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasSettingsOverlay.tsx"
+  },
+  {
+    "id": 56,
+    "ts": 1780044796933,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 57,
+    "ts": 1780044796933,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 58,
+    "ts": 1780044796933,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 59,
+    "ts": 1780044796934,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 60,
+    "ts": 1780044796934,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 61,
+    "ts": 1780044796934,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 62,
+    "ts": 1780044796934,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 63,
+    "ts": 1780044796934,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 64,
+    "ts": 1780044796934,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/onboarding/OnboardingWizard.tsx"
+  },
+  {
+    "id": 65,
+    "ts": 1780044796934,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/ShortcutsSection.tsx"
+  },
+  {
+    "id": 66,
+    "ts": 1780044796935,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/FeaturesSection.tsx"
+  },
+  {
+    "id": 67,
+    "ts": 1780044796935,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/VaultSection.tsx"
+  },
+  {
+    "id": 68,
+    "ts": 1780044796935,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/GeneralSection.tsx"
+  },
+  {
+    "id": 69,
+    "ts": 1780044796935,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/ModelsSection.tsx"
+  },
+  {
+    "id": 70,
+    "ts": 1780044796935,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/AgentsSection.tsx"
+  },
+  {
+    "id": 71,
+    "ts": 1780044796935,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 72,
+    "ts": 1780044796935,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/editor/EditorPane.tsx"
+  },
+  {
+    "id": 73,
+    "ts": 1780044796935,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/vault-home/VaultHomePane.tsx"
+  },
+  {
+    "id": 74,
+    "ts": 1780044796935,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/FileBrowserPanel.tsx"
+  },
+  {
+    "id": 75,
+    "ts": 1780044796936,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/theme/ThemeProvider.tsx: Could not Fast Refresh (\"ThemeProviderContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 76,
+    "ts": 1780044796936,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/theme/ThemeProvider.tsx"
+  },
+  {
+    "id": 77,
+    "ts": 1780044796950,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 78,
+    "ts": 1780044796950,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 79,
+    "ts": 1780044796950,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 80,
+    "ts": 1780044797040,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2609682806. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 81,
+    "ts": 1780044797040,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2609682806. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 82,
+    "ts": 1780044797040,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2265019349. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 83,
+    "ts": 1780044797040,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2265019349. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 84,
+    "ts": 1780044797057,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 85,
+    "ts": 1780044797057,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/GeneralSection.tsx"
+  },
+  {
+    "id": 86,
+    "ts": 1780044797057,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/terminal/TerminalPane.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1780044903658,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780045595663,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1780045595663,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1780045595663,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1780045595663,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1780045595664,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 7,
+    "ts": 1780045595664,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1780045595664,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 9,
+    "ts": 1780045595664,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 10,
+    "ts": 1780045595664,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 11,
+    "ts": 1780045595664,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 12,
+    "ts": 1780045595664,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 13,
+    "ts": 1780045595675,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 14,
+    "ts": 1780045595675,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 15,
+    "ts": 1780045595675,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 16,
+    "ts": 1780045600737,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 17,
+    "ts": 1780045600737,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 18,
+    "ts": 1780045600737,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 19,
+    "ts": 1780045600737,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 20,
+    "ts": 1780045600737,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 21,
+    "ts": 1780045600737,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 22,
+    "ts": 1780045600737,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 23,
+    "ts": 1780045600737,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 24,
+    "ts": 1780045600738,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 25,
+    "ts": 1780045600738,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 26,
+    "ts": 1780045600738,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 27,
+    "ts": 1780045600752,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 28,
+    "ts": 1780045600752,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 29,
+    "ts": 1780045600752,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1780045746453,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780045766532,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1780045766532,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1780045769763,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 5,
+    "ts": 1780045769763,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1780045769763,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 7,
+    "ts": 1780045786381,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 8,
+    "ts": 1780045786381,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 9,
+    "ts": 1780045790216,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 10,
+    "ts": 1780045790216,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1780045798441,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780045798444,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 3,
+    "ts": 1780045798444,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 4,
+    "ts": 1780045798556,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 5,
+    "ts": 1780045798556,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 6,
+    "ts": 1780045798568,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 7,
+    "ts": 1780045798568,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 8,
+    "ts": 1780045798608,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 9,
+    "ts": 1780045798608,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 10,
+    "ts": 1780045798673,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 11,
+    "ts": 1780045798673,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 12,
+    "ts": 1780045798752,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 13,
+    "ts": 1780045798752,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 14,
+    "ts": 1780045798788,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 15,
+    "ts": 1780045798788,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 16,
+    "ts": 1780045807276,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 17,
+    "ts": 1780045807276,
+    "level": "warn",
+    "message": "[TAURI] Couldn't find callback id 2204282325. This might happen when the app is reloaded while Rust is running an asynchronous operation."
+  },
+  {
+    "id": 1,
+    "ts": 1780046418813,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780046773936,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1780046773936,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1780046773936,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1780046773936,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1780046773936,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 7,
+    "ts": 1780046773937,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 8,
+    "ts": 1780046773937,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 9,
+    "ts": 1780046773937,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 10,
+    "ts": 1780046773937,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 11,
+    "ts": 1780046773937,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 12,
+    "ts": 1780046773937,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 13,
+    "ts": 1780046773948,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 14,
+    "ts": 1780046773948,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 15,
+    "ts": 1780046773948,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 16,
+    "ts": 1780046781606,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 17,
+    "ts": 1780046781606,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 18,
+    "ts": 1780046781606,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 19,
+    "ts": 1780046781606,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 20,
+    "ts": 1780046781606,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 21,
+    "ts": 1780046781606,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 22,
+    "ts": 1780046781606,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 23,
+    "ts": 1780046781606,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 24,
+    "ts": 1780046781607,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 25,
+    "ts": 1780046781607,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 26,
+    "ts": 1780046781607,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 27,
+    "ts": 1780046781618,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 28,
+    "ts": 1780046781619,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 29,
+    "ts": 1780046781619,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 30,
+    "ts": 1780046786546,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 31,
+    "ts": 1780046786546,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 32,
+    "ts": 1780046786546,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 33,
+    "ts": 1780046786546,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 34,
+    "ts": 1780046786546,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 35,
+    "ts": 1780046786546,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 36,
+    "ts": 1780046786546,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 37,
+    "ts": 1780046786546,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 38,
+    "ts": 1780046786546,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 39,
+    "ts": 1780046786546,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 40,
+    "ts": 1780046786546,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 41,
+    "ts": 1780046786560,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 42,
+    "ts": 1780046786560,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 43,
+    "ts": 1780046786560,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1780047020901,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780053266583,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780062025884,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 3,
+    "ts": 1780067621472,
+    "level": "error",
+    "message": "[global:unhandledrejection] window.set_always_on_top not allowed. Permissions associated with this command: core:window:allow-set-always-on-top"
+  },
+  {
+    "id": 5,
+    "ts": 1780067622056,
+    "level": "error",
+    "message": "[global:unhandledrejection] window.set_always_on_top not allowed. Permissions associated with this command: core:window:allow-set-always-on-top"
+  },
+  {
+    "id": 7,
+    "ts": 1780067622750,
+    "level": "error",
+    "message": "[global:unhandledrejection] window.set_always_on_top not allowed. Permissions associated with this command: core:window:allow-set-always-on-top"
+  },
+  {
+    "id": 1,
+    "ts": 1780068153673,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 3,
+    "ts": 1780068179245,
+    "level": "error",
+    "message": "[global:unhandledrejection] window.set_always_on_top not allowed. Permissions associated with this command: core:window:allow-set-always-on-top"
+  },
+  {
+    "id": 1,
+    "ts": 1780068527170,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780068862390,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780068891865,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1780068891865,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1780068891865,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1780068891865,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1780068891865,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 7,
+    "ts": 1780068891866,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 8,
+    "ts": 1780068891866,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 9,
+    "ts": 1780068891866,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 10,
+    "ts": 1780068891866,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 11,
+    "ts": 1780068891866,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 12,
+    "ts": 1780068891866,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 13,
+    "ts": 1780068891881,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 14,
+    "ts": 1780068891881,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 15,
+    "ts": 1780068891881,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 16,
+    "ts": 1780068897824,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 17,
+    "ts": 1780068897824,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 18,
+    "ts": 1780068897824,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 19,
+    "ts": 1780068897824,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 20,
+    "ts": 1780068897824,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 21,
+    "ts": 1780068897824,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 22,
+    "ts": 1780068897824,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 23,
+    "ts": 1780068897824,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 24,
+    "ts": 1780068897824,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 25,
+    "ts": 1780068897824,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 26,
+    "ts": 1780068897824,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 27,
+    "ts": 1780068897835,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 28,
+    "ts": 1780068897835,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 29,
+    "ts": 1780068897835,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 30,
+    "ts": 1780068904980,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 31,
+    "ts": 1780068904980,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 32,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 33,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 34,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 35,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 36,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 37,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 38,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 39,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 40,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 41,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 42,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiChat.tsx"
+  },
+  {
+    "id": 43,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/AgentsSection.tsx"
+  },
+  {
+    "id": 44,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/components/AgentSwitcher.tsx: Could not Fast Refresh (\"AGENT_ICONS\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 45,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentSwitcher.tsx"
+  },
+  {
+    "id": 46,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 47,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AgentEditorPanel.tsx"
+  },
+  {
+    "id": 48,
+    "ts": 1780068904981,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/vault-home/VaultHomePane.tsx"
+  },
+  {
+    "id": 49,
+    "ts": 1780068904997,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 50,
+    "ts": 1780068904997,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 51,
+    "ts": 1780068904997,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 52,
+    "ts": 1780068905067,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 53,
+    "ts": 1780068905067,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/AgentsSection.tsx"
+  },
+  {
+    "id": 54,
+    "ts": 1780068905067,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 55,
+    "ts": 1780068919083,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 56,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 57,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 58,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 59,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 60,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 61,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 62,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 63,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 64,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 65,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 66,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 67,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiChat.tsx"
+  },
+  {
+    "id": 68,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/AgentsSection.tsx"
+  },
+  {
+    "id": 69,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/components/AgentSwitcher.tsx: Could not Fast Refresh (\"AGENT_ICONS\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 70,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentSwitcher.tsx"
+  },
+  {
+    "id": 71,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 72,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AgentEditorPanel.tsx"
+  },
+  {
+    "id": 73,
+    "ts": 1780068919084,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/vault-home/VaultHomePane.tsx"
+  },
+  {
+    "id": 74,
+    "ts": 1780068919097,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 75,
+    "ts": 1780068919097,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 76,
+    "ts": 1780068919097,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 77,
+    "ts": 1780068919098,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 78,
+    "ts": 1780068919098,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/AgentsSection.tsx"
+  },
+  {
+    "id": 79,
+    "ts": 1780068919098,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 80,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 81,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 82,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 83,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3CanvasTopBar.tsx"
+  },
+  {
+    "id": 84,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/lib/composer.tsx: Could not Fast Refresh (\"ComposerContext\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 85,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/lib/composer.tsx"
+  },
+  {
+    "id": 86,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentStatusPill.tsx"
+  },
+  {
+    "id": 87,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentRunBridge.tsx"
+  },
+  {
+    "id": 88,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/SubCanvasContent.tsx"
+  },
+  {
+    "id": 89,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 90,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/PipePanel.tsx"
+  },
+  {
+    "id": 91,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 92,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiChat.tsx"
+  },
+  {
+    "id": 93,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/AgentsSection.tsx"
+  },
+  {
+    "id": 94,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/components/AgentSwitcher.tsx: Could not Fast Refresh (\"AGENT_ICONS\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 95,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentSwitcher.tsx"
+  },
+  {
+    "id": 96,
+    "ts": 1780068923005,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/CanvasPanelContent.tsx"
+  },
+  {
+    "id": 97,
+    "ts": 1780068923006,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/canvas/AgentEditorPanel.tsx"
+  },
+  {
+    "id": 98,
+    "ts": 1780068923006,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/vault-home/VaultHomePane.tsx"
+  },
+  {
+    "id": 99,
+    "ts": 1780068923017,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/app/CanvasAppShell.tsx"
+  },
+  {
+    "id": 100,
+    "ts": 1780068923017,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 101,
+    "ts": 1780068923017,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 102,
+    "ts": 1780068923019,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 103,
+    "ts": 1780068923019,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/AgentsSection.tsx"
+  },
+  {
+    "id": 104,
+    "ts": 1780068923019,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 105,
+    "ts": 1780068929121,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 106,
+    "ts": 1780068929121,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/components/AgentSwitcher.tsx: Could not Fast Refresh (\"AGENT_ICONS\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 107,
+    "ts": 1780068929121,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentSwitcher.tsx"
+  },
+  {
+    "id": 108,
+    "ts": 1780068929184,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 109,
+    "ts": 1780068929184,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/AgentsSection.tsx"
+  },
+  {
+    "id": 110,
+    "ts": 1780068929184,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 111,
+    "ts": 1780068938470,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 112,
+    "ts": 1780068938470,
+    "level": "debug",
+    "message": "[vite] invalidate /src/modules/ai/components/AgentSwitcher.tsx: Could not Fast Refresh (\"AGENT_ICONS\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports"
+  },
+  {
+    "id": 113,
+    "ts": 1780068938470,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AgentSwitcher.tsx"
+  },
+  {
+    "id": 114,
+    "ts": 1780068938534,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/AiInputBar.tsx"
+  },
+  {
+    "id": 115,
+    "ts": 1780068938534,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/settings/sections/AgentsSection.tsx"
+  },
+  {
+    "id": 116,
+    "ts": 1780068938534,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/ai/components/ChatPanel.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1780068949250,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780068952488,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780068955779,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780068962200,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780068967833,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780068973614,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780069489759,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780069593271,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1780069593271,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1780069602964,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 5,
+    "ts": 1780069602965,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1780069607801,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 7,
+    "ts": 1780069607801,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 8,
+    "ts": 1780069607819,
+    "level": "error",
+    "message": "Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. web"
+  },
+  {
+    "id": 9,
+    "ts": 1780069611237,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 10,
+    "ts": 1780069611237,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1780069664577,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780069725271,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1780069725271,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1780069728967,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 5,
+    "ts": 1780069728967,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1780069820996,
+    "level": "error",
+    "message": "[WebLayer] web_navigate failed: webview 'web-panel-2f80862e-fa4a-4f35-b617-ffb0f805a218' not found"
+  },
+  {
+    "id": 1,
+    "ts": 1780070146845,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780070150694,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1780070150694,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 4,
+    "ts": 1780070190914,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 5,
+    "ts": 1780070190914,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 6,
+    "ts": 1780070424713,
+    "level": "error",
+    "message": "[WebLayer] web_navigate failed: webview 'web-panel-b05fe46a-6fb0-4fa5-b0ee-56b564619670' not found"
+  }
+]

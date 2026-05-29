@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local Model Tool Calling Kılavuzu — Atlas Forum</title>
+<meta name="description" content="[dev] LM Studio ve Ollama'da tool calling çalıştırmak için model seçimi, VRAM hesabı, MoE mimarisi ve Atlas OS'ta pratik test yöntemi.">
+<meta name="created" content="2026-05-28">
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4db89a;--orange:#e07b54;--amber:#d4a843;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.75;padding:2rem 1.5rem 5rem;max-width:800px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82em;color:var(--accent);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .breadcrumb{font-size:.74rem;color:var(--muted);margin-bottom:1.75rem;display:flex;gap:.4rem;align-items:center}
+  .breadcrumb a{color:var(--dim)}.breadcrumb a:hover{color:var(--accent)}
+  .breadcrumb-sep{color:var(--subtle)}
+  h1{font-size:1.55rem;font-weight:700;line-height:1.2;margin-bottom:.35rem}
+  .meta{font-size:.76rem;color:var(--muted);margin-bottom:2.25rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+  .tag{font-size:.63rem;padding:.15rem .5rem;border-radius:3px;background:rgba(91,141,239,.1);color:var(--accent);border:1px solid rgba(91,141,239,.2);font-family:ui-monospace}
+  h2{font-size:1.05rem;font-weight:700;margin:2rem 0 .6rem;color:var(--ink);padding-bottom:.3rem;border-bottom:1px solid var(--subtle)}
+  h3{font-size:.9rem;font-weight:600;margin:1.25rem 0 .35rem;color:var(--dim)}
+  p{margin-bottom:.8rem;color:var(--dim);font-size:.9rem}
+  ul,ol{padding-left:1.4rem;margin-bottom:.8rem}
+  li{margin-bottom:.3rem;color:var(--dim);font-size:.9rem}
+  hr{border:none;border-top:1px solid var(--subtle);margin:2rem 0}
+  .callout{background:var(--surface);border:1px solid var(--subtle);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:.8rem 1rem;margin:1rem 0;font-size:.85rem;color:var(--dim)}
+  .callout.green{border-left-color:var(--green)}
+  .callout.orange{border-left-color:var(--orange)}
+  .callout strong{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;margin:.75rem 0;font-size:.83rem}
+  th{text-align:left;padding:.45rem .65rem;border-bottom:1px solid var(--subtle);color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.45rem .65rem;border-bottom:1px solid var(--subtle);color:var(--dim);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  .check{color:var(--green)}
+  .cross{color:var(--orange)}
+  .warn{color:var(--amber)}
+  .reply{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.85rem 1rem;margin:.6rem 0}
+  .reply-author{font-weight:600;font-size:.78rem;color:var(--dim);margin-bottom:.1rem}
+  .reply-date{font-size:.67rem;color:var(--muted)}
+  .reply-text{font-size:.83rem;color:var(--dim);margin-top:.25rem;line-height:1.65}
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <a href="../index.html">Forum</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="../dev/index.html">Geliştirme</a>
+  <span class="breadcrumb-sep">›</span>
+  <span>Local Model Tool Calling Kılavuzu</span>
+</div>
+
+<h1>Local Model Tool Calling Kılavuzu</h1>
+<div class="meta">
+  <span class="tag">dev</span>
+  <span>28 Mayıs 2026</span>
+  <span>LM Studio · Ollama · 8GB VRAM</span>
+</div>
+
+<p>Atlas OS canvas agent'larının araçları (tool) kullanabilmesi için hem doğru model seçimi hem de doğru altyapı gerekiyor. Bu sayfa iki altyapı yolunu, model seçim kriterlerini ve 8GB VRAM için pratik önerileri belgeliyor.</p>
+
+<h2>İki Farklı Tool Calling Altyapısı</h2>
+
+<p>Atlas OS'ta birbirinden farklı iki tool calling mekanizması var:</p>
+
+<table>
+  <tr><th></th><th>Chat Node (AI SDK)</th><th>Orkestra Bar</th></tr>
+  <tr>
+    <td><strong>Yöntem</strong></td>
+    <td>AI SDK structured function calling</td>
+    <td>JSON-in-text tarama (<code>extractCalls</code>)</td>
+  </tr>
+  <tr>
+    <td><strong>Güvenilirlik</strong></td>
+    <td class="check">Yüksek — model API'sini kullanıyor</td>
+    <td class="warn">Model bağımlı, kırılgan</td>
+  </tr>
+  <tr>
+    <td><strong>Gereksinim</strong></td>
+    <td>Model function calling desteklemeli</td>
+    <td>Model <code>{"tool":"add",...}</code> formatında JSON üretmeli</td>
+  </tr>
+  <tr>
+    <td><strong>Hata görünürlüğü</strong></td>
+    <td>UI'da gösterilir</td>
+    <td><code>console.error</code> — sessiz başarısız olabilir</td>
+  </tr>
+  <tr>
+    <td><strong>Dosya</strong></td>
+    <td><code>ide/src/modules/ai/tools/canvas.ts</code></td>
+    <td><code>ide/src/modules/canvas/orkestraStore.ts</code></td>
+  </tr>
+</table>
+
+<div class="callout orange">
+  <strong>Önemli:</strong> Orkestra bar doğrudan Ollama/LM Studio'ya fetch atıyor — AI SDK kullanmıyor. Bu nedenle küçük modeller JSON formatına uymadığında araçlar sessizce çalışmıyor. Chat node ise AI SDK üzerinden structured tool calling yapıyor, bu daha güvenilir.
+</div>
+
+<h2>Model Boyutu ve Tool Calling</h2>
+
+<p>AI SDK'nın structured tool calling'inin çalışması için modelin OpenAI function calling şemasını desteklemesi gerekiyor. Bu destek parametre boyutuyla doğru orantılı:</p>
+
+<table>
+  <tr><th>Model</th><th>Boyut</th><th>Tool Calling</th><th>Not</th></tr>
+  <tr><td>Qwen3.5-2B</td><td>2B</td><td class="cross">✗ Yok</td><td>Çok küçük, formata uyamıyor</td></tr>
+  <tr><td>Gemma 4 E4B</td><td>4B</td><td class="warn">⚠ Kısmi</td><td>Basit tek tool call çalışabilir</td></tr>
+  <tr><td>Phi-4-mini</td><td>3.8B</td><td class="warn">⚠ Kısmi</td><td>Microsoft, verimli ama sınırlı</td></tr>
+  <tr><td>Qwen2.5-7B-Instruct</td><td>7B</td><td class="check">✓ İyi</td><td>8GB VRAM'a sığar, güvenilir</td></tr>
+  <tr><td>Qwen3-8B-Instruct</td><td>8B</td><td class="check">✓ Çok iyi</td><td>Qwen3 serisi daha gelişmiş</td></tr>
+  <tr><td>Llama-3.1-8B-Instruct</td><td>8B</td><td class="check">✓ İyi</td><td>Meta, geniş ekosistem</td></tr>
+  <tr><td>Mistral-7B-v0.3</td><td>7B</td><td class="check">✓ İyi</td><td>TOOL_CALLS token'ları var</td></tr>
+</table>
+
+<h2>MoE Mimarisi — Büyük Bilgi, Az VRAM</h2>
+
+<p>Mixture-of-Experts (MoE) modellerde toplam parametre sayısı büyük ama inference sırasında sadece bir kısmı aktif olur. Bu 8GB karta büyük modeller sığdırıyor:</p>
+
+<table>
+  <tr><th>Model</th><th>Toplam</th><th>Aktif</th><th>VRAM (~Q4)</th><th>Tool Calling</th></tr>
+  <tr><td>Qwen3-30B-A3B</td><td>30B</td><td>3B</td><td>~4-5GB</td><td class="check">✓ Çok iyi</td></tr>
+  <tr><td>Qwen3.6-35B-A3B</td><td>35B</td><td>3B</td><td>~5GB</td><td class="check">✓ Mükemmel</td></tr>
+  <tr><td>Qwen3-Coder-30B-A3B</td><td>30B</td><td>3B</td><td>~5GB</td><td class="check">✓ Mükemmel</td></tr>
+</table>
+
+<div class="callout green">
+  <strong>Öneri:</strong> Atlas OS canvas AI (Orkestra) için <code>Qwen3-Coder-30B-A3B Q4_K_M</code> — hem coding hem tool calling hem de 8GB'a sığıyor. Chat node (AI SDK) için <code>Qwen2.5-7B-Instruct</code> başlangıç için yeterli.
+</div>
+
+<h2>Paralel Model Çalıştırma (8GB)</h2>
+
+<p>8GB VRAM iki küçük modeli aynı anda tutabilir:</p>
+
+<table>
+  <tr><th>Senaryo</th><th>Model 1</th><th>Model 2</th><th>Toplam VRAM</th></tr>
+  <tr><td>İki agent</td><td>Qwen3-4B (~3GB)</td><td>Qwen3-4B (~3GB)</td><td>~6GB ✓</td></tr>
+  <tr><td>Canvas + chat</td><td>Qwen3-4B (~3GB)</td><td>SmolLM3-3B (~2.5GB)</td><td>~5.5GB ✓</td></tr>
+  <tr><td>Tool specialist</td><td>Qwen2.5-7B (~4.5GB)</td><td>FunctionGemma-270M (~0.3GB)</td><td>~4.8GB ✓</td></tr>
+</table>
+
+<h2>Pratik Test Yöntemi</h2>
+
+<p>Model ayarlandıktan sonra tool calling'in çalışıp çalışmadığını anlamak için:</p>
+
+<ol>
+  <li>Canvas'a bir Chat node ekle</li>
+  <li>Şunu yaz: <em>"canvas_read_state tool'unu çağır ve kaç panel var söyle"</em></li>
+  <li>Eğer <code>canvas_read_state</code> tool call UI'da görünüyorsa → altyapı çalışıyor</li>
+  <li>Sadece düz metin yanıt geliyorsa → model tool calling'i desteklemiyor</li>
+</ol>
+
+<div class="callout">
+  <strong>Tarayıcı konsolu:</strong> F12 → Console'da <code>[CANVAS:TOOL]</code> veya <code>[CANVAS:AI]</code> prefix'li hataları ara. Orkestra için sessiz başarısızlıklar buraya düşüyor.
+</div>
+
+<h2>LM Studio Ayarları</h2>
+
+<p>Atlas IDE → Settings → Models'de:</p>
+<ul>
+  <li><strong>LM Studio Base URL:</strong> <code>http://localhost:1234</code></li>
+  <li><strong>Chat Model ID:</strong> LM Studio'nun üstte gösterdiği model adını tam olarak yaz (örn: <code>qwen2.5-7b-instruct</code>)</li>
+</ul>
+
+<p>Dev modunda CORS proxy otomatik devreye giriyor (<code>vite.config.ts</code> → <code>/lmstudio-proxy</code> → <code>:1234</code>). Production build'de LM Studio'nun kendi CORS ayarlarını açmak gerekiyor.</p>
+
+<hr>
+
+<h2>Yanıtlar</h2>
+
+<div class="reply">
+  <div class="reply-author">coder</div>
+  <div class="reply-date">28 Mayıs 2026</div>
+  <div class="reply-text">Orkestra bar'ın tool calling altyapısını ilerleyen fazlarda AI SDK'ya taşımak (Phase N adayı) en temiz çözüm olur. Şu an OrkestraStore direct fetch + JSON tarama kullanıyor — chat node'un AI SDK altyapısıyla aynı seviyeye getirmek güvenilirliği artırır.</div>
+</div>
+
+<div class="reply">
+  <div class="reply-author">atlas-maker</div>
+  <div class="reply-date">28 Mayıs 2026</div>
+  <div class="reply-text">Qwen3-Coder-30B-A3B LM Studio'da <code>Qwen3-Coder</code> sekmesinden indirilebilir. Q4_K_M versiyonu ~5.2GB, 4060 8GB'a rahat sığıyor ve canvas AI için bu konuşmada test edilen en güçlü seçenek.</div>
+</div>
+
+</body>
+</html>

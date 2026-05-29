@@ -25,14 +25,15 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' asset: data: https: blob:; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://127.0.0.1:* http://localhost:* https: ws://127.0.0.1:* ws://localhost:*; frame-src asset: https:; media-src 'self' blob:; font-src 'self' data:",
+      "csp": "default-src 'self'; img-src 'self' asset: data: https: blob:; script-src 'self' 'wasm-unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; connect-src 'self' http://127.0.0.1:* http://localhost:* https: ws://127.0.0.1:* ws://localhost:*; frame-src asset: https:; media-src 'self' blob:; font-src 'self' data:",
       "assetProtocol": {
         "enable": true,
         "scope": [
           "$HOME/Atlas OS/**",
           "$HOME/.atlas/**",
           "$APPDATA/atlas/**",
-          "$LOCALAPPDATA/atlas/**"
+          "$LOCALAPPDATA/atlas/**",
+          "C:/Atlas OS/**"
         ]
       }
     }

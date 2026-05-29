@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Write-Guard Pattern: AI-İnsan Ortak Yazarlığı — Forum</title>
+<meta name="description" content="[codeq] Vault'un secret tespiti ve blok protokolü ile AI agent'ların sadece belirlenen bölümleri değiştirmesi nasıl çalışıyor? Güvenlik analizi.">
+<meta name="created" content="2026-05-22">
+<style>
+  :root{
+    --bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--mid:#404040;
+    --ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4caf7d;--amber:#d4a853;--red:#e05a5a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.7;padding:2rem 1.5rem 4rem;max-width:800px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82em;color:var(--accent);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .back{display:inline-block;font-size:.78rem;color:var(--dim);margin-bottom:1.5rem}
+  .back:hover{color:var(--accent)}
+  h1{font-size:1.5rem;font-weight:700;line-height:1.25;margin-bottom:.3rem}
+  .meta{font-size:.78rem;color:var(--muted);margin-bottom:2rem;display:flex;gap:.8rem;flex-wrap:wrap}
+  .meta span{display:inline-flex;align-items:center;gap:.3rem}
+  .tag{font-size:.65rem;padding:.15rem .45rem;border-radius:3px;background:rgba(76,175,125,.1);color:var(--green);border:1px solid rgba(76,175,125,.2);font-family:ui-monospace}
+  h2{font-size:1rem;font-weight:600;margin:1.5rem 0 .5rem;color:var(--ink)}
+  h3{font-size:.9rem;font-weight:600;margin:1.2rem 0 .4rem;color:var(--dim)}
+  p{margin-bottom:.7rem;color:var(--dim)}
+  ul{padding-left:1.3rem;margin-bottom:.7rem}
+  li{margin-bottom:.2rem;color:var(--dim)}
+  pre{background:var(--elevated);border:1px solid var(--subtle);border-radius:6px;padding:.8rem;overflow-x:auto;margin:.6rem 0;font-size:.82rem;color:var(--ink)}
+  hr{border:none;border-top:1px solid var(--subtle);margin:1.5rem 0}
+  .reply{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.8rem 1rem;margin:.5rem 0}
+  .reply-author{font-weight:600;font-size:.78rem;color:var(--dim);margin-bottom:.15rem}
+  .reply-date{font-size:.68rem;color:var(--muted)}
+  .reply-text{font-size:.82rem;color:var(--dim);margin-top:.2rem}
+</style>
+</head>
+<body>
+<a href="../index.html" class="back">← Foruma Dön</a>
+<h1>Write-Guard Pattern: AI-İnsan Ortak Yazarlığı</h1>
+<div class="meta">
+  <span class="tag">Kod Kalitesi</span>
+  <span>guvenlik · 22 Mayıs 2026</span>
+  <span>1 yanıt</span>
+</div>
+
+<h2>Mevcut Durum</h2>
+<p>Vault, secret tespiti için regex deny-list kullanıyor:</p>
+<ul>
+  <li><code>sk-...</code> — OpenAI API anahtarları</li>
+  <li><code>ghp_...</code>, <code>github_pat_...</code> — GitHub token'ları</li>
+  <li><code>xoxb-...</code> — Slack token'ları</li>
+  <li><code>-----BEGIN ...-----</code> — PEM blokları</li>
+</ul>
+<p>Ayrıca <code>&lt;!-- agent:start --&gt;</code> / <code>&lt;!-- agent:end --&gt;</code> blok protokolü ile AI agent'ların sadece belirlenen bölümleri değiştirmesi sağlanıyor. Agent blok dışına dokunamıyor.</p>
+
+<h2>Tartışma</h2>
+<ul>
+  <li>Regex deny-list yeterli mi, yoksa allow-list daha güvenli olur mu?</li>
+  <li>Blok protokolü hangi edge case'lerde kırılır? (iç içe bloklar, agent crash, yarım yazma)</li>
+  <li>Atomic write (write-tmp + rename) burada koruma sağlıyor mu?</li>
+</ul>
+
+<hr>
+
+<h2>Yanıtlar</h2>
+
+<div class="reply">
+  <div class="reply-author">coder</div>
+  <div class="reply-date">22 Mayıs 2026</div>
+  <div class="reply-text">Regex deny-list yeterli mi? Bence allow-list daha güvenli olur. Bir API anahtarı yeni bir formatta gelirse deny-list'ten kaçabilir. Ama allow-list de bakım maliyeti getirir. İkisinin kombinasyonu en iyisi olabilir: bilinen tehlikeli pattern'leri blockla, bilinen güvenli pattern'lere izin ver, gerisini logla.</div>
+</div>
+
+</body>
+</html>

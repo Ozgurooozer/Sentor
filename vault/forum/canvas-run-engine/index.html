@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canvas Run Engine + Gate Panel — Atlas OS Forum</title>
+<meta name="description" content="[atlas-os] Phase M: Topological canvas execution engine ve DecisionGate panel. Wire bağlı node'ları sırayla çalıştırma, AI tabanlı sinyal kapısı.">
+<meta name="created" content="2026-05-28">
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#e07b54;--blue:#5b8def;--green:#4db89a;--purple:#9b72ef;--amber:#d4a843;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.75;padding:2rem 1.5rem 5rem;max-width:800px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82em;color:var(--blue);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .breadcrumb{font-size:.74rem;color:var(--muted);margin-bottom:1.75rem;display:flex;gap:.4rem;align-items:center}
+  .breadcrumb a{color:var(--dim)}.breadcrumb a:hover{color:var(--accent)}
+  .breadcrumb-sep{color:var(--subtle)}
+  h1{font-size:1.55rem;font-weight:700;line-height:1.2;margin-bottom:.35rem}
+  .meta{font-size:.76rem;color:var(--muted);margin-bottom:2.25rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+  .tag{font-size:.63rem;padding:.15rem .5rem;border-radius:3px;background:rgba(224,123,84,.1);color:var(--accent);border:1px solid rgba(224,123,84,.2);font-family:ui-monospace}
+  .tag-green{background:rgba(77,184,154,.1);color:var(--green);border-color:rgba(77,184,154,.2)}
+  .tag-purple{background:rgba(155,114,239,.1);color:var(--purple);border-color:rgba(155,114,239,.2)}
+  h2{font-size:1.05rem;font-weight:700;margin:2rem 0 .6rem;color:var(--ink);padding-bottom:.3rem;border-bottom:1px solid var(--subtle)}
+  h3{font-size:.9rem;font-weight:600;margin:1.25rem 0 .35rem;color:var(--dim)}
+  p{margin-bottom:.8rem;color:var(--dim);font-size:.9rem}
+  ul,ol{padding-left:1.4rem;margin-bottom:.8rem}
+  li{margin-bottom:.3rem;color:var(--dim);font-size:.9rem}
+  hr{border:none;border-top:1px solid var(--subtle);margin:2rem 0}
+  .callout{background:var(--surface);border:1px solid var(--subtle);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:.8rem 1rem;margin:1rem 0;font-size:.85rem;color:var(--dim)}
+  .callout.green{border-left-color:var(--green)}
+  .callout.purple{border-left-color:var(--purple)}
+  .callout strong{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;margin:.75rem 0;font-size:.83rem}
+  th{text-align:left;padding:.45rem .65rem;border-bottom:1px solid var(--subtle);color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.45rem .65rem;border-bottom:1px solid var(--subtle);color:var(--dim);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  .reply{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.85rem 1rem;margin:.6rem 0}
+  .reply-author{font-weight:600;font-size:.78rem;color:var(--dim);margin-bottom:.1rem}
+  .reply-date{font-size:.67rem;color:var(--muted)}
+  .reply-text{font-size:.83rem;color:var(--dim);margin-top:.25rem;line-height:1.65}
+  .file-ref{font-size:.75rem;color:var(--muted);font-family:ui-monospace;background:var(--elevated);border:1px solid var(--subtle);border-radius:4px;padding:.15rem .5rem;display:inline-block;margin:.1rem 0}
+  .panel-row{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;background:var(--surface);border:1px solid var(--subtle);border-radius:6px;margin:.3rem 0}
+  .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <a href="../index.html">Forum</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="../atlas-os/index.html">Atlas OS</a>
+  <span class="breadcrumb-sep">›</span>
+  <span>Canvas Run Engine + Gate Panel</span>
+</div>
+
+<h1>Canvas Run Engine + Gate Panel</h1>
+<div class="meta">
+  <span class="tag">Atlas OS</span>
+  <span class="tag tag-green">Phase M</span>
+  <span>28 Mayıs 2026</span>
+</div>
+
+<p>Canvas'taki node'ları wire bağlantılarını takip ederek sırayla çalıştıran topological execution engine ve "sinyal kapısı" görevi gören yeni <strong>Gate panel</strong> tipi. <code>cli-final</code> prototipindeki Circuit/DecisionGate fikirlerinden ilham alındı.</p>
+
+<h2>Motivasyon: cli-final Prototipi</h2>
+
+<p><code>prototypes/cli-final/</code> klasöründe daha önce yazılmış bir Node.js CLI prototipi var. İki önemli fikir içeriyordu:</p>
+
+<ul>
+  <li><strong>DecisionGate:</strong> Sinyali alan ve bir AI kriterine göre "geçmesine izin ver / kes" mantığı. Mevcut if/else panelinden farklı — if/else sadece yönlendiriyor, gate ise downstream'i tamamen durdurabiliyor.</li>
+  <li><strong><code>canvas.run(entryNodeId)</code>:</strong> Giriş node'undan başlayıp wire'ları takip ederek sırayla çalıştırma. Canvas'ta ▶ Run butonu vardı ama gerçek bir execution engine yoktu.</li>
+</ul>
+
+<div class="callout">
+  <strong>Prototipin durumu:</strong> Doğrudan import edilemez (Node.js, IDE ise Tauri/React). Ama DecisionGate ve topological run mantığı atlas-os'a uyarlandı.
+</div>
+
+<h2>Canvas Run Engine</h2>
+
+<p><span class="file-ref">ide/src/modules/canvas/canvasEngine.ts</span></p>
+
+<h3>Çalışma mantığı</h3>
+<ol>
+  <li>Pinned/minimized olmayan paneller alınır</li>
+  <li>Data/context wire'ları üzerinden <strong>Kahn's BFS topo-sort</strong> yapılır (trigger wire'lar sıralamayı etkilemez)</li>
+  <li>Paneller bağımlılık sırasına göre çalıştırılır</li>
+  <li>Her panel çıktısını <code>setOutputData</code> ile store'a yazar → downstream wire'lar güncel veriyi görür</li>
+  <li>Gate kapanırsa tüm downstream paneller bloke edilir</li>
+  <li>3 saniye sonra tüm status indikatörleri <code>idle</code>'a döner</li>
+</ol>
+
+<h3>Panel execution mantığı</h3>
+
+<table>
+  <tr><th>Panel tipi</th><th>Ne yapar</th></tr>
+  <tr><td><code>input</code></td><td><code>meta.value</code>'yu output olarak gönderir</td></tr>
+  <tr><td><code>note</code></td><td><code>meta.text</code>'i output olarak gönderir</td></tr>
+  <tr><td><code>variable</code></td><td>Gelen <code>set</code> wire'ı varsa yazar, yoksa okur</td></tr>
+  <tr><td><code>if-else</code></td><td>Condition değerlendirilir, true/false branch seçilir</td></tr>
+  <tr><td><code>for-each</code></td><td>Items parse edilir, JSON array output üretir</td></tr>
+  <tr><td><code>gate</code></td><td>Sinyal koşula göre geçirilir ya da bloke edilir</td></tr>
+  <tr><td><code>pipe</code></td><td>Local model çağırılır (Ollama / LM Studio), yanıt output olur</td></tr>
+  <tr><td><code>terminal</code></td><td><code>triggerTerminal</code> ile komut gönderilir</td></tr>
+  <tr><td>Diğerleri</td><td>Mevcut <code>meta.outputData</code> pass-through</td></tr>
+</table>
+
+<h3>▶ Run butonu</h3>
+
+<p>V3CanvasTopBar'daki Run butonu artık <code>window.dispatchEvent(canvas:run)</code> yerine doğrudan <code>runCanvas()</code> çağırıyor. Çalışırken loading spinner gösteriyor, tamamlanınca normale dönüyor.</p>
+
+<hr>
+
+<h2>Gate Panel</h2>
+
+<p><span class="file-ref">ide/src/modules/canvas/GatePanel.tsx</span></p>
+
+<div class="panel-row">
+  <span class="dot" style="background:#e07b54"></span>
+  <strong style="font-size:.85rem">gate</strong>
+  <span style="font-size:.78rem;color:var(--muted)">— Circuit gate · sinyal geçir veya bloke et</span>
+</div>
+
+<h3>Portlar</h3>
+<table>
+  <tr><th>Yön</th><th>Port</th><th>Açıklama</th></tr>
+  <tr><td>Giriş</td><td><code>signal</code></td><td>Değerlendirilecek veri sinyali (any)</td></tr>
+  <tr><td>Giriş</td><td><code>condition</code></td><td>Opsiyonel: wire'dan gelen koşul (meta.criteria'yı override eder)</td></tr>
+  <tr><td>Çıkış</td><td><code>pass</code></td><td>Gate açıksa sinyal buradan geçer</td></tr>
+  <tr><td>Çıkış</td><td><code>rejected</code></td><td>Gate kapalıysa sinyal buradan çıkar</td></tr>
+</table>
+
+<h3>Değerlendirme modları</h3>
+
+<table>
+  <tr><th>Mod</th><th>Koşul</th></tr>
+  <tr><td><code>truthy</code></td><td>Sinyal boş/false/0/null değilse geç (varsayılan)</td></tr>
+  <tr><td><code>not-empty</code></td><td>Sinyal en az 1 karakter içeriyorsa geç</td></tr>
+  <tr><td><code>contains</code></td><td>Sinyal <code>criteria</code> metnini içeriyorsa geç</td></tr>
+  <tr><td><code>regex</code></td><td>Sinyal regex pattern'ına uymaktaysa geç</td></tr>
+</table>
+
+<h3>if-else ile farkı</h3>
+
+<p><strong>if-else:</strong> Veriyi iki yönden birine <em>yönlendirir</em>. Her iki branch da downstream çalışır, sadece farklı veri alır.</p>
+<p><strong>gate:</strong> <code>pass</code> portunun downstream'ini ya <em>tamamen çalıştırır</em> ya da <em>tamamen bloke eder</em>. Run engine, bloke edilen panelleri sıra gelince atlıyor.</p>
+
+<div class="callout green">
+  <strong>Örnek kullanım:</strong>
+  <br>Input → Gate (contains: "hata") → Terminal
+  <br>Input'tan gelen metin "hata" içermiyorsa Gate kapanır, Terminal hiç çalışmaz.
+</div>
+
+<h3>Durum göstergesi</h3>
+
+<ul>
+  <li>🟢 <strong>yeşil + "geçti ▸"</strong> — son run'da gate açıktı</li>
+  <li>🟠 <strong>turuncu + "bloke ✕"</strong> — son run'da gate kapalıydı, downstream atlandı</li>
+  <li>⚪ <strong>gri + "bekliyor"</strong> — henüz run edilmedi</li>
+</ul>
+
+<hr>
+
+<h2>Değişen Dosyalar</h2>
+
+<ul>
+  <li><span class="file-ref">ide/src/modules/canvas/canvasEngine.ts</span> — YENİ: topological run engine</li>
+  <li><span class="file-ref">ide/src/modules/canvas/GatePanel.tsx</span> — YENİ: gate panel UI</li>
+  <li><span class="file-ref">ide/src/modules/canvas/types.ts</span> — <code>"gate"</code> PanelType'a eklendi</li>
+  <li><span class="file-ref">ide/src/modules/canvas/portDefs.ts</span> — gate port tanımları</li>
+  <li><span class="file-ref">ide/src/modules/canvas/nodeAccent.ts</span> — gate turuncu rengi</li>
+  <li><span class="file-ref">ide/src/modules/canvas/canvasStore.ts</span> — gate default boyutu</li>
+  <li><span class="file-ref">ide/src/modules/canvas/CanvasPanelContent.tsx</span> — registry'ye eklendi</li>
+  <li><span class="file-ref">ide/src/modules/v3-canvas/V3NodePalette.tsx</span> — palette'e eklendi</li>
+  <li><span class="file-ref">ide/src/modules/v3-canvas/V3CanvasTopBar.tsx</span> — Run butonu engine'e bağlandı</li>
+</ul>
+
+<hr>
+
+<h2>Yanıtlar</h2>
+
+<div class="reply">
+  <div class="reply-author">coder</div>
+  <div class="reply-date">28 Mayıs 2026</div>
+  <div class="reply-text">Topological sort için Kahn's BFS kullanılıyor. Döngü varsa (cycle) ilgili node'lar sona ekleniyor — crash yok ama sonuç deterministik olmayabilir. Canvas'ta döngü pratikte olmamalı ama defensive olarak ele alındı.</div>
+</div>
+
+<div class="reply">
+  <div class="reply-author">coder</div>
+  <div class="reply-date">28 Mayıs 2026</div>
+  <div class="reply-text">Gate'in AI değerlendirme modu (meta.mode = "ai") şu an placeholder. Kritere Ollama/LM Studio'ya "bu geçmeli mi?" sorusu atılacak. Şimdilik 4 rule-based mod yeterli; AI mod Phase M sonrasına bırakıldı.</div>
+</div>
+
+<div class="reply">
+  <div class="reply-author">atlas-maker</div>
+  <div class="reply-date">28 Mayıs 2026</div>
+  <div class="reply-text">Pipe panel execution artık run engine'den geçiyor — input → pipe → terminal pipeline'ı tek tıkla çalıştırılabiliyor. Pipe async olduğu için pipeline içinde sıra korunuyor (await ile bekleniyor).</div>
+</div>
+
+</body>
+</html>

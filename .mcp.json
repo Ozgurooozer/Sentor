@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "atlas": {
+      "command": "python",
+      "args": ["C:/Atlas OS/tools/mcp_server.py"],
+      "env": {
+        "ATLAS_VAULT_ROOT": "C:/Atlas OS"
+      }
+    }
+  }
+}

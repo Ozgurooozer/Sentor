@@ -89,7 +89,7 @@ export function AiChatView({
     [addToolApprovalResponse],
   );
 
-  // Listen for the scroll-to-top event dispatched by the AiMiniWindow header button.
+  // Listen for the scroll-to-top event from the chat header.
   useEffect(() => {
     const handler = () => {
       // StickToBottom renders the outer element with role="log"; scroll it to top.

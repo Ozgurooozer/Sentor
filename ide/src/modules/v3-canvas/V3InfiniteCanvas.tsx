@@ -5,7 +5,7 @@ import { useCanvasStore } from "@/modules/canvas/canvasStore";
 import { PORT_DEFS, namedPortPoint } from "@/modules/canvas/portDefs";
 import type { PortDataType } from "@/modules/canvas/portDefs";
 import type { CanvasPanelNode } from "@/modules/canvas/types";
-import { V3CanvasBgAmbient } from "./V3CanvasBgAmbient";
+import { V3CanvasBgPanel } from "./V3CanvasBgPanel";
 import { V3CanvasNode } from "./V3CanvasNode";
 import { V3WireLayer, type PendingConn } from "./V3WireLayer";
 import { V3NodePalette } from "./V3NodePalette";
@@ -264,7 +264,7 @@ export function V3InfiniteCanvas() {
       onPointerUp={onCanvasPointerUp}
       onPointerCancel={onCanvasPointerCancel}
     >
-      <V3CanvasBgAmbient />
+      <V3CanvasBgPanel />
 
       {/* Canvas-space transform layer */}
       <div
@@ -306,7 +306,7 @@ export function V3InfiniteCanvas() {
       {/* Empty state */}
       {panels.length === 0 && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <span className="font-mono text-[12px] tracking-wide" style={{ color: "rgba(255,255,255,0.10)" }}>
+          <span className="font-mono text-[12px] tracking-wide" style={{ color: "rgba(255,255,255,0.22)" }}>
             Ctrl+K — add node  ·  Ctrl+0 — fit all
           </span>
         </div>

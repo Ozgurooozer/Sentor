@@ -142,7 +142,7 @@ async function callModel(prompt: string, opts: RunOptions): Promise<string> {
         Authorization: `Bearer ${opts.opencodeKey ?? ""}`,
       },
       body: JSON.stringify({
-        model: opts.opencodeModel || "deepseek/deepseek-v4-flash-free",
+        model: opts.opencodeModel || "deepseek-v4-flash-free",
         messages: [{ role: "user", content: prompt }],
       }),
     });

@@ -67,9 +67,10 @@ export function useMcpBridge({
   const addPanel = useCanvasStore((s) => s.addPanel);
   const removePanel = useCanvasStore((s) => s.removePanel);
   const updatePanel = useCanvasStore((s) => s.updatePanel);
+  const addConnection = useCanvasStore((s) => s.addConnection);
 
   useEffect(() => {
-    if (!canvasHydrated) return;
+    if (!canvasHydrated || !workspaceRoot) return;
     const drain = async () => {
       const cmds = await safeInvoke<Array<Record<string, unknown>>>(
         "mcp_dequeue",
@@ -94,6 +95,23 @@ export function useMcpBridge({
           }
         } else if (cmd.type === "remove_panel") {
           removePanel(cmd.id as string);
+        } else if (cmd.type === "update_panel") {
+          const patch = (cmd.patch as Record<string, unknown>) ?? {};
+          updatePanel(cmd.id as string, patch as Parameters<typeof updatePanel>[1]);
+        } else if (cmd.type === "connect_panels") {
+          addConnection(
+            cmd.fromPanel as string,
+            "right",
+            cmd.toPanel as string,
+            "left",
+            cmd.fromPort as string | undefined,
+            cmd.toPort as string | undefined,
+            (cmd.kind as "data" | "context" | "trigger") ?? "data",
+          );
+        } else if (cmd.type === "clear_canvas") {
+          // Remove all non-pinned panels
+          const { panels } = useCanvasStore.getState();
+          for (const p of panels) if (!p.pinned) removePanel(p.id);
         } else if (cmd.type === "open_tab") {
           const url = cmd.url as string;
           if (url.startsWith("http")) openWebTab(url);
@@ -125,6 +143,7 @@ export function useMcpBridge({
     addPanel,
     removePanel,
     updatePanel,
+    addConnection,
     openVaultTab,
     openWebTab,
     openPanel,

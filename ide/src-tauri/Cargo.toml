@@ -60,6 +60,7 @@ keyring = { version = "3.6", default-features = false, features = [
 keyring = { version = "3.6", default-features = false, features = [
 	"windows-native",
 ] }
+window-vibrancy = "0.5"
 windows-sys = { version = "0.59", features = [
 	"Win32_Foundation",
 	"Win32_Security",

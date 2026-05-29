@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { AiViewIcon, Link01Icon } from "@hugeicons/core-free-icons";
 
 type BacklinkItem = { id: string; title: string; type?: string; url?: string };
 type SimilarItem = { id: string; title: string; score: number };
@@ -37,17 +35,41 @@ export function BacklinkPanel({
   }, [noteId]);
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto border-l border-[#2a2a2a] bg-[#0a0a0a] px-3 py-3 gap-5">
-      <section>
-        <div className="mb-2 flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-[#555]">
-          <HugeiconsIcon icon={Link01Icon} size={11} strokeWidth={1.75} />
-          Backlinks
+    <div
+      className="flex h-full flex-col overflow-y-auto no-scrollbar"
+      style={{ borderLeft: "1px solid rgba(255,255,255,0.05)" }}
+    >
+      {/* Backlinks section */}
+      <div className="px-2.5 pt-3 pb-1">
+        <div
+          className="mb-2 flex items-center gap-1.5"
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.04)", paddingBottom: 6 }}
+        >
+          <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="rgba(255,255,255,0.30)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 8H2a2 2 0 010-4h2M8 4h2a2 2 0 010 4H8M4 6h4"/>
+          </svg>
+          <span
+            className="font-mono text-[8px] uppercase tracking-widest"
+            style={{ color: "rgba(255,255,255,0.28)" }}
+          >
+            Links
+          </span>
           {backlinks.length > 0 && (
-            <span className="ml-auto text-[#444]">{backlinks.length}</span>
+            <span
+              className="ml-auto rounded-[4px] px-1.5 font-mono text-[8px]"
+              style={{ background: "rgba(91,141,239,0.10)", color: "rgba(91,141,239,0.65)" }}
+            >
+              {backlinks.length}
+            </span>
           )}
         </div>
+
         {backlinks.length === 0 ? (
-          <span className="text-[11px] italic text-[#444]">No backlinks</span>
+          <div className="py-3 text-center">
+            <span className="font-mono text-[9px]" style={{ color: "rgba(255,255,255,0.15)" }}>
+              —
+            </span>
+          </div>
         ) : (
           <div className="flex flex-col gap-0.5">
             {backlinks.map((link) => (
@@ -55,7 +77,16 @@ export function BacklinkPanel({
                 key={link.id}
                 type="button"
                 onClick={() => onNavigate?.(link.id)}
-                className="truncate rounded px-1 py-0.5 text-left text-[11px] text-[#888] hover:bg-[#1a1a1a] hover:text-[#f5f5f5]"
+                className="w-full truncate rounded-[5px] px-2 py-1 text-left text-[10px] transition-colors duration-150"
+                style={{ color: "rgba(255,255,255,0.40)" }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.05)";
+                  (e.currentTarget as HTMLButtonElement).style.color = "#c8c8d0";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+                  (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.40)";
+                }}
                 title={link.id}
               >
                 {link.title || link.id}
@@ -63,18 +94,42 @@ export function BacklinkPanel({
             ))}
           </div>
         )}
-      </section>
+      </div>
 
-      <section>
-        <div className="mb-2 flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-[#555]">
-          <HugeiconsIcon icon={AiViewIcon} size={11} strokeWidth={1.75} />
-          Similar
+      {/* Divider */}
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.04)", margin: "4px 0" }} />
+
+      {/* Similar section */}
+      <div className="px-2.5 pb-3">
+        <div
+          className="mb-2 flex items-center gap-1.5"
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.04)", paddingBottom: 6 }}
+        >
+          <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="rgba(255,255,255,0.30)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="6" cy="6" r="4"/><path d="M6 4v4M4 6h4"/>
+          </svg>
+          <span
+            className="font-mono text-[8px] uppercase tracking-widest"
+            style={{ color: "rgba(255,255,255,0.28)" }}
+          >
+            Similar
+          </span>
           {similar.length > 0 && (
-            <span className="ml-auto text-[#444]">{similar.length}</span>
+            <span
+              className="ml-auto rounded-[4px] px-1.5 font-mono text-[8px]"
+              style={{ background: "rgba(155,114,239,0.10)", color: "rgba(155,114,239,0.65)" }}
+            >
+              {similar.length}
+            </span>
           )}
         </div>
+
         {similar.length === 0 ? (
-          <span className="text-[11px] italic text-[#444]">No embeddings yet</span>
+          <div className="py-3 text-center">
+            <span className="font-mono text-[9px]" style={{ color: "rgba(255,255,255,0.15)" }}>
+              —
+            </span>
+          </div>
         ) : (
           <div className="flex flex-col gap-1.5">
             {similar.map((note) => (
@@ -82,23 +137,38 @@ export function BacklinkPanel({
                 key={note.id}
                 type="button"
                 onClick={() => onNavigate?.(note.id)}
-                className="flex flex-col gap-0.5 rounded px-1 py-0.5 text-left hover:bg-[#1a1a1a]"
+                className="flex w-full flex-col gap-1 rounded-[5px] px-2 py-1 text-left transition-colors duration-150"
+                style={{ color: "rgba(255,255,255,0.40)" }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.05)";
+                  (e.currentTarget as HTMLButtonElement).style.color = "#c8c8d0";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+                  (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.40)";
+                }}
                 title={`${note.id} (${(note.score * 100).toFixed(0)}%)`}
               >
-                <span className="truncate text-[11px] text-[#888] hover:text-[#f5f5f5]">
+                <span className="truncate text-[10px]">
                   {note.title || note.id}
                 </span>
-                <div className="h-0.5 w-full overflow-hidden rounded-full bg-[#1a1a1a]">
+                <div
+                  className="h-[2px] w-full overflow-hidden rounded-full"
+                  style={{ background: "rgba(255,255,255,0.06)" }}
+                >
                   <div
-                    className="h-full rounded-full bg-[#5b8def]"
-                    style={{ width: `${Math.min(note.score * 100, 100)}%` }}
+                    className="h-full rounded-full transition-all duration-300"
+                    style={{
+                      width: `${Math.min(note.score * 100, 100)}%`,
+                      background: note.score > 0.75 ? "#9b72ef" : note.score > 0.5 ? "#5b8def" : "rgba(255,255,255,0.20)",
+                    }}
                   />
                 </div>
               </button>
             ))}
           </div>
         )}
-      </section>
+      </div>
     </div>
   );
 }

@@ -35,14 +35,18 @@ export async function runSubagent({
   const def = SUBAGENTS[type];
   if (!def) throw new Error(`unknown subagent type: ${type}`);
 
-  // Subagents get read-only tools plus todo_write and vault tools.
+  // Subagents get read-only tools: fs, search, vault, codegraph.
   const { buildTodoTools } = await import("../tools/todo");
   const { buildVaultTools } = await import("../tools/vault");
+  const { buildCodegraphTools } = await import("../tools/codegraph");
+  const { buildWebTools } = await import("../tools/web");
   const readOnly: Record<string, unknown> = {
     ...buildFsTools(toolContext),
     ...buildSearchTools(toolContext),
     ...buildTodoTools(toolContext),
     ...buildVaultTools(toolContext),
+    ...buildCodegraphTools(toolContext),
+    ...buildWebTools(toolContext),
   };
   const filtered: Record<string, unknown> = {};
   for (const t of def.tools) {

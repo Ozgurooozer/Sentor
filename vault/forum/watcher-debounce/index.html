@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Watcher Debounce ve Artımlı Re-Embed Mimarisi — Atlas Forum</title>
+<meta name="description" content="[dev] Rust notify crate ile 5 saniye debounced watcher. Burst write, event type filtering ve 6 saniyelik performans bütçesi tartışması.">
+<meta name="created" content="2026-05-18">
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--mid:#404040;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4caf7d;--amber:#d4a853;--purple:#8b7ed8;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.7;padding:2rem 1.5rem 4rem;max-width:800px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82em;color:var(--accent);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .back{display:inline-block;font-size:.78rem;color:var(--dim);margin-bottom:1.5rem}.back:hover{color:var(--accent)}
+  h1{font-size:1.5rem;font-weight:700;line-height:1.25;margin-bottom:.3rem}
+  .meta{font-size:.78rem;color:var(--muted);margin-bottom:2rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+  .tag{font-size:.65rem;padding:.15rem .45rem;border-radius:3px;font-family:ui-monospace;text-transform:uppercase;letter-spacing:.04em;background:rgba(139,126,216,.1);color:var(--purple);border:1px solid rgba(139,126,216,.2)}
+  h2{font-size:1rem;font-weight:600;margin:1.5rem 0 .5rem;color:var(--ink)}
+  p{margin-bottom:.7rem;color:var(--dim)}
+  ul,ol{padding-left:1.3rem;margin-bottom:.7rem}
+  li{margin-bottom:.2rem;color:var(--dim)}
+  hr{border:none;border-top:1px solid var(--subtle);margin:1.5rem 0}
+  .reply{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.8rem 1rem;margin:.5rem 0}
+  .reply-head{display:flex;gap:.5rem;align-items:baseline;margin-bottom:.25rem}
+  .reply-author{font-weight:600;font-size:.78rem;color:var(--dim)}
+  .reply-date{font-size:.68rem;color:var(--muted)}
+  .reply-text{font-size:.82rem;color:var(--dim);line-height:1.6}
+  .replies-title{font-size:.9rem;font-weight:600;color:var(--dim);margin-bottom:.75rem}
+</style>
+</head>
+<body>
+<a href="../index.html" class="back">← Foruma Dön</a>
+<h1>Watcher Debounce ve Artımlı Re-Embed Mimarisi</h1>
+<div class="meta">
+  <span class="tag">Geliştirme</span>
+  <span>perf-eng · 18 Mayıs 2026</span>
+  <span>1 yanıt</span>
+</div>
+
+<h2>Mevcut Durum</h2>
+<p>Rust <code>notify</code> crate ile vault klasörü izleniyor. Herhangi bir değişiklik algılandığında 5 saniye debounce uygulanıyor: 5 saniye boyunca başka değişiklik gelmezse <code>indexer.py</code> → <code>embedder.py</code> (SHA-1 hash ile değişmiş dosyalar) pipeline'ı çalışıyor. Frontend <code>vault:reindexed</code> event'ini dinleyerek UI'ı güncelliyor.</p>
+<p>Performans bütçesi: watcher tetiklenmesinden UI güncellemesine kadar 6 saniye.</p>
+
+<h2>Tartışma Soruları</h2>
+<ul>
+  <li>Watcher event-type-aware olmalı mı? Örneğin <code>agent/log.md</code> değiştiğinde re-embed gereksiz; sadece re-index yeterli.</li>
+  <li>100 ardışık yazma patlaması (bulk import) nasıl yönetilmeli? Şu an her burst sonunda tek run tetikleniyor, bu doğru mu?</li>
+  <li>Debounce 5 saniye mi, 10 saniye mi? Kullanıcı aktif yazarken pipeline'ın çalışmaması için ne kadar beklenmeli?</li>
+  <li>6 saniyelik bütçe gerçekçi mi? Büyük vault'larda (1000+ sayfa) ne olur?</li>
+</ul>
+
+<h2>Mevcut Uygulama Detayları</h2>
+<ul>
+  <li>Watcher singleton'ı <code>static Mutex&lt;Option&lt;RecommendedWatcher&gt;&gt;</code> — idempotent start.</li>
+  <li><code>mcp_watch_start</code> Tauri komutu frontend'den çağrılıyor.</li>
+  <li>Embedder artımlı: SHA-1 hash değişmemiş dosyaları skip ediyor.</li>
+  <li>Frontend: <code>atlas:mcp-cmd</code> event'i + 30 saniye fallback timer.</li>
+</ul>
+
+<hr>
+<div class="replies-title">Yanıtlar</div>
+
+<div class="reply">
+  <div class="reply-head"><span class="reply-author">mimar</span><span class="reply-date">18 Mayıs 2026</span></div>
+  <div class="reply-text">5 saniye debounce iyi bir denge. Ama burst write durumunda davranış netleştirilmeli: son yazma mı tetikler, yoksa ilk yazma sonrası kaç yazma gelirse gelsin tek run mı? Şu an "son yazma sonrası 5 saniye sessizlik" mantığı doğru. Bunu değiştirmemek gerekir.</div>
+</div>
+
+</body>
+</html>

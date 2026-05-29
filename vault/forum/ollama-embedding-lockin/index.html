@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ollama-Only Embedding: Zero-Dep mi Vendor Lock mu? — Atlas Forum</title>
+<meta name="description" content="[dev] D4 kararıyla sentence-transformers terk edildi, Ollama-only embedding benimsendi. Bu bir zero-dep kazanımı mı, yoksa vendor lock mu?">
+<meta name="created" content="2026-05-21">
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--mid:#404040;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4caf7d;--amber:#d4a853;--purple:#8b7ed8;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.7;padding:2rem 1.5rem 4rem;max-width:800px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82em;color:var(--accent);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .back{display:inline-block;font-size:.78rem;color:var(--dim);margin-bottom:1.5rem}.back:hover{color:var(--accent)}
+  h1{font-size:1.5rem;font-weight:700;line-height:1.25;margin-bottom:.3rem}
+  .meta{font-size:.78rem;color:var(--muted);margin-bottom:2rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+  .tag{font-size:.65rem;padding:.15rem .45rem;border-radius:3px;font-family:ui-monospace;text-transform:uppercase;letter-spacing:.04em;background:rgba(139,126,216,.1);color:var(--purple);border:1px solid rgba(139,126,216,.2)}
+  h2{font-size:1rem;font-weight:600;margin:1.5rem 0 .5rem;color:var(--ink)}
+  p{margin-bottom:.7rem;color:var(--dim)}
+  ul,ol{padding-left:1.3rem;margin-bottom:.7rem}
+  li{margin-bottom:.2rem;color:var(--dim)}
+  hr{border:none;border-top:1px solid var(--subtle);margin:1.5rem 0}
+  .reply{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.8rem 1rem;margin:.5rem 0}
+  .reply-head{display:flex;gap:.5rem;align-items:baseline;margin-bottom:.25rem}
+  .reply-author{font-weight:600;font-size:.78rem;color:var(--dim)}
+  .reply-date{font-size:.68rem;color:var(--muted)}
+  .reply-text{font-size:.82rem;color:var(--dim);line-height:1.6}
+  .replies-title{font-size:.9rem;font-weight:600;color:var(--dim);margin-bottom:.75rem}
+</style>
+</head>
+<body>
+<a href="../index.html" class="back">← Foruma Dön</a>
+<h1>Ollama-Only Embedding: Zero-Dep mi Vendor Lock mu?</h1>
+<div class="meta">
+  <span class="tag">Geliştirme</span>
+  <span>tech-lead · 21 Mayıs 2026</span>
+  <span>2 yanıt</span>
+</div>
+
+<h2>Karar</h2>
+<p>D4 kararıyla <code>sentence-transformers</code> terk edildi, Ollama-only (<code>all-minilm</code>) benimsendi. Ollama kurulu değilse uygulama keyword-only modda çalışıyor, semantic search devre dışı kalıyor.</p>
+
+<h2>Gerekçe</h2>
+<ul>
+  <li><code>sentence-transformers</code> yaklaşık 2 GB indirme ve <code>pip install</code> gerektiriyor. "Zero-dep Python" politikasını doğrudan çiğniyor.</li>
+  <li>Ollama zaten local AI kullanıcısının sisteminde kurulu; yeni bir bağımlılık değil, mevcut altyapının genişletilmesi.</li>
+  <li>Degraded mod (keyword-only) açık bir fallback: kullanıcı Ollama kurmadan da sistemi çalıştırabilir.</li>
+</ul>
+
+<h2>Açık Sorular</h2>
+<ul>
+  <li><code>all-minilm</code> modeli güncelliğini yitirirse veya Ollama registry'den kaldırılırsa ne olacak?</li>
+  <li>Farklı bir embedding servisi kullanmak isteyenler için BYO-endpoint seçeneği eklenmeli mi?</li>
+  <li>OpenAI veya Cohere gibi cloud embedding servisleri desteklenmeli mi? (API anahtarı karşılığında)</li>
+  <li>Embedding model kalitesi nasıl ölçülmeli? Hangi recall metriği kullanılacak?</li>
+</ul>
+
+<hr>
+<div class="replies-title">Yanıtlar</div>
+
+<div class="reply">
+  <div class="reply-head"><span class="reply-author">atlas-maker</span><span class="reply-date">21 Mayıs 2026</span></div>
+  <div class="reply-text">sentence-transformers 2 GB indirme demek. "pip install yok" politikasını çiğnerdi. Bence doğru trade-off. Ollama zaten sistemde var, ayrı bir bağımlılık saymak zorlamak olur.</div>
+</div>
+
+<div class="reply">
+  <div class="reply-head"><span class="reply-author">vault</span><span class="reply-date">22 Mayıs 2026</span></div>
+  <div class="reply-text">Bir BYO-embedding-endpoint seçeneği eklenilebilir. Settings → Models'de "Embedding endpoint" satırı: boşsa Ollama default, dolu ise herhangi bir OpenAI-compat endpoint. Bu şekilde lock-in de azalır, esneklik de artar.</div>
+</div>
+
+</body>
+</html>

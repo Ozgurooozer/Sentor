@@ -19,6 +19,7 @@ atlas.py'den çağrılır:
 
 import json
 import os
+import shlex
 import subprocess
 import sys
 import uuid
@@ -29,19 +30,12 @@ ROOT          = Path(__file__).resolve().parent.parent
 PIPELINES_DIR = ROOT / 'vault' / 'agents' / 'sentor' / 'pipelines'
 PIPELINES_DIR.mkdir(parents=True, exist_ok=True)
 
-_COLOR  = sys.stdout.isatty()
-_ACCENT = '\033[38;2;91;141;239m'
-_DIM    = '\033[2m'
-_OK     = '\033[38;2;29;158;117m'
-_ERR    = '\033[38;2;221;82;82m'
-_RESET  = '\033[0m'
-
-
-def _c(s, code): return f'{code}{s}{_RESET}' if _COLOR else s
-def accent(s):   return _c(s, _ACCENT)
-def dim(s):      return _c(s, _DIM)
-def ok(s):       return _c(s, _OK)
-def err(s):      return _c(s, _ERR)
+_cli_path   = str(ROOT / 'cli')
+_tools_path = str(ROOT / 'tools')
+for _p in (_cli_path, _tools_path):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+from colors import accent, dim, ok, err  # noqa: E402
 
 
 def _now_iso():
@@ -55,8 +49,7 @@ def _pipeline_path(pid):
 def _load_pipeline(pid):
     p = _pipeline_path(pid)
     if not p.exists():
-        print(f'\n  {err(f"pipeline not found: {pid}")}\n')
-        sys.exit(1)
+        raise FileNotFoundError(f"pipeline not found: {pid}")
     return json.loads(p.read_text(encoding='utf-8'))
 
 
@@ -69,18 +62,17 @@ def _save_pipeline(pl):
 # ── Step executor ─────────────────────────────────────────────────────────────
 
 def _run_shell_step(step, ctx):
-    cmd = step.get('cmd', '')
+    raw = step.get('cmd', '')
     for k, v in ctx.items():
-        cmd = cmd.replace(f'{{{{{k}}}}}', str(v))
+        raw = raw.replace(f'{{{{{k}}}}}', str(v))
+    cmd = shlex.split(raw)
     cwd = ctx.get('cwd', str(ROOT))
-    result = subprocess.run(cmd, shell=True, cwd=cwd, capture_output=True, text=True)
+    result = subprocess.run(cmd, shell=False, cwd=cwd, capture_output=True, text=True)
     output = (result.stdout + result.stderr).strip()
     return result.returncode == 0, output
 
 
 def _run_task_step(step, ctx):
-    # Import sentor lazily to avoid circular at module load.
-    sys.path.insert(0, str(ROOT / 'cli'))
     from sentor import run_task  # noqa: PLC0415
     task_id = step.get('task_id', '')
     extra   = step.get('input', ctx.get('input', ''))
@@ -89,7 +81,6 @@ def _run_task_step(step, ctx):
 
 
 def _run_notify_step(step, ctx):
-    sys.path.insert(0, str(ROOT / 'cli'))
     from sentor import notify as _notify  # noqa: PLC0415
     msg = step.get('msg', 'pipeline step done')
     for k, v in ctx.items():
@@ -126,14 +117,22 @@ def list_pipelines():
 
 
 def show_pipeline(pid):
-    pl = _load_pipeline(pid)
+    try:
+        pl = _load_pipeline(pid)
+    except FileNotFoundError as e:
+        print(f'\n  {err(str(e))}\n')
+        return
     print()
     print(json.dumps(pl, indent=2, ensure_ascii=False))
     print()
 
 
 def run_pipeline(pid, extra_ctx=None):
-    pl = _load_pipeline(pid)
+    try:
+        pl = _load_pipeline(pid)
+    except FileNotFoundError as e:
+        print(f'\n  {err(str(e))}\n')
+        return 1
     ctx = dict(extra_ctx or {})
     ctx.setdefault('cwd', str(ROOT))
 
@@ -168,7 +167,6 @@ def run_pipeline(pid, extra_ctx=None):
                 print(f'\n  {err("pipeline stopped at")} {label}\n')
                 return 1
             elif on_error == 'notify':
-                sys.path.insert(0, str(ROOT / 'cli'))
                 from sentor import notify as _notify  # noqa: PLC0415
                 _notify(f'pipeline {pid} step {label} failed', error=True)
             # on_error == 'continue' → fall through

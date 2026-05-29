@@ -25,20 +25,8 @@ PIPELINES_DIR = ROOT / 'vault' / 'agents' / 'sentor' / 'pipelines'
 TASKS_DIR     = ROOT / 'vault' / 'agents' / 'sentor' / 'tasks'
 RUNS_DIR      = ROOT / 'vault' / 'agents' / 'sentor' / 'runs'
 
-_COLOR  = sys.stdout.isatty()
-_ACCENT = '\033[38;2;91;141;239m'
-_DIM    = '\033[2m'
-_OK     = '\033[38;2;29;158;117m'
-_ERR    = '\033[38;2;221;82;82m'
-_PRP    = '\033[38;2;123;109;239m'
-_RESET  = '\033[0m'
-
-def _c(s, code): return f'{code}{s}{_RESET}' if _COLOR else s
-def acc(s):  return _c(s, _ACCENT)
-def dim(s):  return _c(s, _DIM)
-def ok(s):   return _c(s, _OK)
-def err(s):  return _c(s, _ERR)
-def prp(s):  return _c(s, _PRP)
+sys.path.insert(0, str(ROOT / 'tools'))
+from colors import accent as acc, dim, ok, err, prp  # noqa: E402
 
 _ANSI_RE = re.compile(r'\033\[[^m]*m')
 def _strip_ansi(s: str) -> str:

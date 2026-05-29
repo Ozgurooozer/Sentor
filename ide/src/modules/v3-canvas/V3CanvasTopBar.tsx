@@ -28,7 +28,7 @@ export function V3CanvasTopBar({ onOpenSettings, secondary = false }: Props) {
 
   const [running, setRunning] = useState(false);
 
-  const opencodeModel = usePreferencesStore((s) => s.opencodeChatModelId) || "deepseek/deepseek-v4-flash-free";
+  const opencodeModel = usePreferencesStore((s) => s.opencodeChatModelId) || "deepseek-v4-flash-free";
   const selectedModelId = useChatStore((s) => s.selectedModelId);
   const apiKeys       = useChatStore((s) => s.apiKeys);
   const modelProvider = getModel(selectedModelId).provider;

@@ -4,7 +4,10 @@
   "description": "Capability for the main window",
   "windows": [
     "main",
-    "settings"
+    "settings",
+    "v3-input",
+    "v3-output",
+    "v3-launcher"
   ],
   "permissions": [
     "core:default",
@@ -16,6 +19,8 @@
     "core:window:allow-internal-toggle-maximize",
     "core:window:allow-show",
     "core:window:allow-set-focus",
+    "core:window:allow-set-size",
+    "core:window:allow-set-position",
     "core:event:allow-listen",
     "core:event:allow-unlisten",
     "opener:default",

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prototip: OpenGenerativeUI — Atlas OS Entegrasyonu</title>
+<meta name="description" content="[dev] CopilotKit OpenGenerativeUI prototipi Atlas OS'a taşınıyor. AI-generated UI, sandboxed iframe render, LangGraph Deep Agent entegrasyonu.">
+<meta name="created" content="2026-05-29">
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#8b7ed8;--blue:#5b8def;--green:#4caf7d;--amber:#d4a853;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.75;padding:2rem 1.5rem 5rem;max-width:800px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82em;color:var(--blue);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .breadcrumb{font-size:.74rem;color:var(--muted);margin-bottom:1.75rem;display:flex;gap:.4rem;align-items:center}
+  .breadcrumb a{color:var(--dim)}.breadcrumb a:hover{color:var(--accent)}
+  .breadcrumb-sep{color:var(--subtle)}
+  h1{font-size:1.55rem;font-weight:700;line-height:1.2;margin-bottom:.35rem}
+  .meta{font-size:.76rem;color:var(--muted);margin-bottom:2.25rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+  .tag{font-size:.63rem;padding:.15rem .5rem;border-radius:3px;background:rgba(139,126,216,.1);color:var(--accent);border:1px solid rgba(139,126,216,.2);font-family:ui-monospace}
+  .tag-green{background:rgba(76,184,154,.1);color:var(--green);border-color:rgba(76,184,154,.2)}
+  h2{font-size:1.05rem;font-weight:700;margin:2rem 0 .6rem;color:var(--ink);padding-bottom:.3rem;border-bottom:1px solid var(--subtle)}
+  h3{font-size:.9rem;font-weight:600;margin:1.25rem 0 .35rem;color:var(--dim)}
+  p{margin-bottom:.8rem;color:var(--dim);font-size:.9rem}
+  ul{padding-left:1.4rem;margin-bottom:.8rem}
+  li{margin-bottom:.3rem;color:var(--dim);font-size:.9rem}
+  hr{border:none;border-top:1px solid var(--subtle);margin:2rem 0}
+  .callout{background:var(--surface);border:1px solid var(--subtle);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:.8rem 1rem;margin:1rem 0;font-size:.85rem;color:var(--dim)}
+  .callout.green{border-left-color:var(--green)}
+  .callout.blue{border-left-color:var(--blue)}
+  .callout strong{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;margin:.75rem 0;font-size:.83rem}
+  th{text-align:left;padding:.45rem .65rem;border-bottom:1px solid var(--subtle);color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.45rem .65rem;border-bottom:1px solid var(--subtle);color:var(--dim);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  .status-done::before{content:"✓ ";color:var(--green)}
+  .status-open::before{content:"◌ ";color:var(--amber)}
+  .reply{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.85rem 1rem;margin:.6rem 0}
+  .reply-author{font-weight:600;font-size:.78rem;color:var(--dim);margin-bottom:.1rem}
+  .reply-date{font-size:.67rem;color:var(--muted)}
+  .reply-text{font-size:.83rem;color:var(--dim);margin-top:.25rem;line-height:1.65}
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <a href="../index.html">Forum</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="../dev/index.html">Geliştirme</a>
+  <span class="breadcrumb-sep">›</span>
+  <span>Prototip: OpenGenerativeUI</span>
+</div>
+
+<h1>Prototip: OpenGenerativeUI — Atlas OS Entegrasyonu</h1>
+<div class="meta">
+  <span class="tag">Prototip</span>
+  <span>29 Mayıs 2026</span>
+  <span>Geliştiriliyor</span>
+</div>
+
+<p><strong>OpenGenerativeUI</strong> (<a href="https://github.com/CopilotKit/OpenGenerativeUI">CopilotKit/OpenGenerativeUI</a>) — AI'nın sadece metin değil, interaktif görsel bileşenler (HTML/SVG/Chart.js/Three.js) üretmesini sağlayan bir showcase projesi. CopilotKit v2 + LangChain Deep Agents ile çalışıyor.</p>
+
+<h2>Ne İşe Yarar</h2>
+<ul>
+  <li><strong>Algorithm visualizations</strong> — binary search, BFS vs DFS, sorting</li>
+  <li><strong>3D animations</strong> — interaktif WebGL/CSS3D sahneleri</li>
+  <li><strong>Charts & diagrams</strong> — pie/bar charts, network diagrams (Recharts, Chart.js)</li>
+  <li><strong>Interactive widgets</strong> — formlar, simülasyonlar, matematik plotları</li>
+  <li>Tüm görseller sandboxed iframe içinde render edilir, dark/light tema otomatik</li>
+</ul>
+
+<h2>Mevcut Durum</h2>
+<table>
+  <tr><th>Adım</th><th>Açıklama</th><th>Durum</th></tr>
+  <tr><td>1</td><td>Repo <code>prototypes/open-generative-ui/</code> klasörüne klonlandı</td><td class="status-done">tamam</td></tr>
+  <tr><td>2</td><td>Proje yapısı incelendi — Next.js 16 + LangGraph Python agent + MCP server</td><td class="status-done">tamam</td></tr>
+  <tr><td>3</td><td>Atlas OS modülü olarak panel tipi tanımlama</td><td class="status-open">plan</td></tr>
+  <tr><td>4</td><td>iframe tabanlı Generative UI paneli (CopilotKit <code>useComponent</code>)</td><td class="status-open">plan</td></tr>
+  <tr><td>5</td><td>Canvas wire entegrasyonu — agent output'u panel'e bağlama</td><td class="status-open">plan</td></tr>
+  <tr><td>6</td><td>MCP server'ı Atlas OS MCP tool'larına ekleme</td><td class="status-open">plan</td></tr>
+  <tr><td>7</td><td>Vault forum + canvas üzerinden test ve geri bildirim</td><td class="status-open">plan</td></tr>
+</table>
+
+<h2>Entegrasyon Planı</h2>
+
+<h3>1. Atlas OS Modül Yapısı</h3>
+<p><code>modules/open-generative-ui/</code> altında bağımsız bir modül olarak çalışacak. Kendi <code>package.json</code>'ı ile bağımsız build alabilir, Atlas OS IDE bundler'ı ile dahil edilebilir.</p>
+
+<h3>2. Canvas Paneli</h3>
+<p>Yeni bir panel tipi (<code>generative-ui</code>) eklenerek CopilotKit'in <code>useComponent</code> hook'unu saran bir React komponenti yapılacak. Agent mesajlarındaki HTML/SVG çıktılarını sandboxed iframe'de gösterecek.</p>
+
+<h3>3. Agent Entegrasyonu</h3>
+<p>Atlas OS Canvas AI agent'ı (Orkestra), OpenGenerativeUI'nin LangGraph Deep Agent'ını bir alt-agent veya tool olarak çağırabilecek. Bu sayede kullanıcı "bana binary search görselleştirmesi yap" dediğinde canvas'ta bir Generative UI paneli açılacak.</p>
+
+<h3>4. MCP Server</h3>
+<p>OpenGenerativeUI'nin kendi MCP server'ı (<code>apps/mcp</code>) Atlas OS MCP tool'larına eklenecek. <code>assemble_document</code> ve skill resource'ları kullanılabilecek.</p>
+
+<h2>Teknik Zorluklar</h2>
+<ul>
+  <li><strong>Model gereksinimi:</strong> Generative UI güçlü modeller ister (GPT-5.4, Claude Opus 4, Gemini 3.1 Pro). Küçük modellerde çıktı kalitesi düşer.</li>
+  <li><strong>Sandbox güvenliği:</strong> iframe içinde üretilen HTML'in güvenli şekilde render edilmesi (sandbox attribute, CSP).</li>
+  <li><strong>State yönetimi:</strong> CopilotKit agent state pattern ile Atlas OS variable store arasında köprü.</li>
+  <li><strong>Bağımlılık yükü:</strong> Next.js 16 + Turborepo + pnpm — Atlas OS'un zero-dep felsefesiyle çelişebilir.</li>
+</ul>
+
+<h2>Karar Noktaları</h2>
+<ul>
+  <li>Bağımsız submodule olarak mı kalsın, yoksa core'a mı çekilsin?</li>
+  <li>Hangi modeller için fallback davranışı tanımlanmalı?</li>
+  <li>Canvas panel tipi <code>generative-ui</code> mi yoksa mevcut <code>web</code> panelinin bir varyantı mı olsun?</li>
+</ul>
+
+<div class="callout">
+  <strong>Not:</strong> Bu prototip <code>prototypes/open-generative-ui/</code> altında geliştirilecek. İlerleme durumu bu forum başlığından takip edilebilir.
+</div>
+
+<hr>
+
+<h2>Yanıtlar</h2>
+
+<div class="reply">
+  <div class="reply-author">vault (system)</div>
+  <div class="reply-date">29 Mayıs 2026</div>
+  <div class="reply-text">Forum konusu açıldı. Prototip geliştirme <code>prototypes/open-generative-ui/</code> yolunda başladı. Katkı ve yorumlarınızı bekliyoruz.</div>
+</div>
+
+</body>
+</html>

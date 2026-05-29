@@ -66,7 +66,7 @@ export type Preferences = {
   barCollapsed: boolean;
   focusedTopOpen: boolean;
   focusedLeftOpen: boolean;
-  /** OpenCode Zen model identifier (e.g. "deepseek/deepseek-v4-flash-free"). Empty = use provider default. */
+  /** OpenCode Zen model identifier (e.g. "deepseek-v4-flash-free"). Empty = use provider default. */
   opencodeChatModelId: string;
 };
 
@@ -119,7 +119,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   barCollapsed: false,
   focusedTopOpen: true,
   focusedLeftOpen: false,
-  opencodeChatModelId: "deepseek/deepseek-v4-flash-free",
+  opencodeChatModelId: "deepseek-v4-flash-free",
   onboarded: false,
 };
 
@@ -182,8 +182,12 @@ export async function loadPreferences(): Promise<Preferences> {
       get<string>(KEY_SENTOR_PATH) ?? DEFAULT_PREFERENCES.sentorPath,
     barCollapsed:
       get<boolean>(KEY_BAR_COLLAPSED) ?? DEFAULT_PREFERENCES.barCollapsed,
-    opencodeChatModelId:
-      get<string>(KEY_OPENCODE_CHAT_MODEL) ?? DEFAULT_PREFERENCES.opencodeChatModelId,
+    opencodeChatModelId: (() => {
+      const raw = get<string>(KEY_OPENCODE_CHAT_MODEL) ?? DEFAULT_PREFERENCES.opencodeChatModelId;
+      // Strip "provider/" prefix — old default was "deepseek/deepseek-v4-flash-free"
+      const slash = raw.lastIndexOf("/");
+      return slash !== -1 && raw.lastIndexOf(".") === -1 ? raw.slice(slash + 1) : raw;
+    })(),
     onboarded: get<boolean>(KEY_ONBOARDED) ?? DEFAULT_PREFERENCES.onboarded,
     focusedTopOpen: get<boolean>(KEY_FOCUSED_TOP_OPEN) ?? DEFAULT_PREFERENCES.focusedTopOpen,
     focusedLeftOpen: get<boolean>(KEY_FOCUSED_LEFT_OPEN) ?? DEFAULT_PREFERENCES.focusedLeftOpen,

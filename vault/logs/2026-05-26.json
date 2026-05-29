@@ -1,0 +1,536 @@
+[
+  {
+    "id": 1,
+    "ts": 1779810923627,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779812493947,
+    "level": "error",
+    "message": "The number of tokens to keep from the initial prompt is greater than the context length (n_keep: 6260>= n_ctx: 4096). Try to load the model with a larger context length, or provide a shorter input."
+  },
+  {
+    "id": 3,
+    "ts": 1779812610435,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 4,
+    "ts": 1779812610435,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 5,
+    "ts": 1779812610584,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 6,
+    "ts": 1779812610584,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 7,
+    "ts": 1779812610596,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 8,
+    "ts": 1779812610596,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 9,
+    "ts": 1779812610609,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 10,
+    "ts": 1779812610609,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 11,
+    "ts": 1779812610622,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 12,
+    "ts": 1779812610622,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 13,
+    "ts": 1779812610637,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 14,
+    "ts": 1779812610637,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 15,
+    "ts": 1779812610649,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 16,
+    "ts": 1779812610649,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 17,
+    "ts": 1779812610662,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 18,
+    "ts": 1779812610663,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 19,
+    "ts": 1779812610676,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 20,
+    "ts": 1779812610676,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 21,
+    "ts": 1779812610703,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 22,
+    "ts": 1779812610703,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 23,
+    "ts": 1779812610716,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 24,
+    "ts": 1779812610716,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 25,
+    "ts": 1779812610729,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 26,
+    "ts": 1779812610729,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 27,
+    "ts": 1779812611117,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 28,
+    "ts": 1779812611117,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 29,
+    "ts": 1779812611322,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 30,
+    "ts": 1779812611322,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 31,
+    "ts": 1779812611435,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 32,
+    "ts": 1779812611435,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 33,
+    "ts": 1779812612142,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 34,
+    "ts": 1779812612142,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 35,
+    "ts": 1779812612329,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 36,
+    "ts": 1779812612329,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 37,
+    "ts": 1779812613304,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 38,
+    "ts": 1779812613304,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 39,
+    "ts": 1779812613317,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 40,
+    "ts": 1779812613317,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 41,
+    "ts": 1779812613331,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 42,
+    "ts": 1779812613331,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 43,
+    "ts": 1779812613371,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 44,
+    "ts": 1779812613371,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 45,
+    "ts": 1779812613397,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 46,
+    "ts": 1779812613397,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 47,
+    "ts": 1779812613464,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 48,
+    "ts": 1779812613464,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 49,
+    "ts": 1779812613526,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 50,
+    "ts": 1779812613526,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 51,
+    "ts": 1779812613636,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 52,
+    "ts": 1779812613636,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 53,
+    "ts": 1779812613636,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 54,
+    "ts": 1779812613636,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 55,
+    "ts": 1779812613652,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 56,
+    "ts": 1779812613652,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 57,
+    "ts": 1779812613663,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 58,
+    "ts": 1779812613664,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 59,
+    "ts": 1779812613731,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 60,
+    "ts": 1779812613731,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 61,
+    "ts": 1779812613824,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 62,
+    "ts": 1779812613824,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 63,
+    "ts": 1779812613851,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 64,
+    "ts": 1779812613851,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 65,
+    "ts": 1779812613891,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 66,
+    "ts": 1779812613891,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 67,
+    "ts": 1779812614471,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 68,
+    "ts": 1779812614471,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 69,
+    "ts": 1779812614502,
+    "level": "error",
+    "message": "[promise] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 70,
+    "ts": 1779812614503,
+    "level": "error",
+    "message": "[global:unhandledrejection] Boru kapatılıyor. (os error 232)"
+  },
+  {
+    "id": 1,
+    "ts": 1779821007632,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779826315741,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779826321892,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 1,
+    "ts": 1779826901681,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779833933053,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779833978834,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779834589826,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779835487940,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779835598721,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 3,
+    "ts": 1779835598721,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 4,
+    "ts": 1779835615613,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1779835615613,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 1,
+    "ts": 1779835720816,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1779835810249,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3OutputShell.tsx"
+  },
+  {
+    "id": 3,
+    "ts": 1779835810249,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 4,
+    "ts": 1779835813618,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3/V3InputShell.tsx"
+  },
+  {
+    "id": 5,
+    "ts": 1779835813618,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 1,
+    "ts": 1779836007107,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1779836653241,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  }
+]

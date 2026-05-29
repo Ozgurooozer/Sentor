@@ -24,7 +24,7 @@ export function PipePanel({ panel }: Props) {
   const panels      = useCanvasStore((s) => s.panels);
   const updatePanel = useCanvasStore((s) => s.updatePanel);
 
-  const opencodeModel = usePreferencesStore((s) => s.opencodeChatModelId) || "deepseek/deepseek-v4-flash-free";
+  const opencodeModel = usePreferencesStore((s) => s.opencodeChatModelId) || "deepseek-v4-flash-free";
   const apiKeys    = useChatStore((s) => s.apiKeys);
 
   const [prompt, setPrompt] = useState<string>((panel.meta?.pipePrompt as string) || "Translate to English:");

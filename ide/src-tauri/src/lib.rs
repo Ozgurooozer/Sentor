@@ -9,6 +9,9 @@ use tauri::{
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_window_state::StateFlags;
 
+#[cfg(target_os = "windows")]
+use window_vibrancy::apply_mica;
+
 #[tauri::command]
 async fn open_settings_window(app: tauri::AppHandle, tab: Option<String>) -> Result<(), String> {
     let url_path = match tab.as_deref() {
@@ -207,6 +210,36 @@ fn apply_wayland_webkit_workaround() {
     unsafe { std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1") };
 }
 
+/// Show/hide the v3-output window from the input bar.
+#[tauri::command]
+fn v3_show_output(app: tauri::AppHandle, visible: bool) {
+    if let Some(win) = app.get_webview_window("v3-output") {
+        if visible {
+            let _ = win.show();
+            let _ = win.set_focus();
+        } else {
+            let _ = win.hide();
+        }
+    }
+}
+
+/// Called by the launcher after project selection: hide launcher, show canvas + input bar.
+#[tauri::command]
+fn v3_launcher_done(app: tauri::AppHandle) {
+    if let Some(launcher) = app.get_webview_window("v3-launcher") {
+        let _ = launcher.hide();
+    }
+    // Show main canvas window (no focus — v3-input takes focus)
+    if let Some(main) = app.get_webview_window("main") {
+        let _ = main.show();
+    }
+    // v3-input is always_on_top so it sits above the canvas
+    if let Some(bar) = app.get_webview_window("v3-input") {
+        let _ = bar.show();
+        let _ = bar.set_focus();
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[cfg(target_os = "linux")]
@@ -218,6 +251,10 @@ pub fn run() {
         .plugin(
             tauri_plugin_window_state::Builder::new()
                 .with_state_flags(StateFlags::all() & !StateFlags::VISIBLE)
+                // V3 floating windows always open at calculated position — never restore saved state
+                .skip_initial_state("v3-input")
+                .skip_initial_state("v3-output")
+                .skip_initial_state("v3-launcher")
                 .build(),
         )
         .plugin(tauri_plugin_autostart::Builder::new().build())
@@ -243,6 +280,134 @@ pub fn run() {
                 log::warn!("init_tray failed: {e}");
             }
             vault::watcher::start_vault_watcher(app.handle().clone());
+
+            // V3 dual-window mode: V3_MODE=1 → input bar + output window (separate, independent)
+            if std::env::var("V3_MODE").is_ok() {
+                let app_handle = app.handle().clone();
+
+                // Use monitor work_area (excludes taskbar, docks, etc.) for correct positioning
+                let (wa_x, wa_y, wa_w, wa_h) = app.get_webview_window("main")
+                    .and_then(|w| w.primary_monitor().ok().flatten())
+                    .map(|m| {
+                        let sf = m.scale_factor();
+                        let wa = m.work_area();
+                        (
+                            wa.position.x as f64 / sf,
+                            wa.position.y as f64 / sf,
+                            wa.size.width  as f64 / sf,
+                            wa.size.height as f64 / sf,
+                        )
+                    })
+                    .unwrap_or((0.0, 0.0, 1920.0, 1032.0));
+
+                let bar_h: f64 = 52.0;
+                let bar_w: f64 = (wa_w * 0.40).min(620.0).max(480.0); // 40% of work area
+                let bar_x: f64 = wa_x + (wa_w - bar_w) / 2.0;
+                let bar_y: f64 = wa_y + wa_h - bar_h - 8.0;   // 8px gap above taskbar
+
+                let out_w: f64 = 520.0;
+                let out_h: f64 = (wa_h * 0.45).min(480.0).max(320.0); // 45% of work area, clamped
+                let out_x: f64 = wa_x + (wa_w - out_w) / 2.0;
+                let out_y: f64 = (bar_y - out_h - 12.0).max(wa_y + 8.0); // never above work area
+
+                // Hide the default main window — we don't use it in v3
+                if let Some(main) = app.get_webview_window("main") {
+                    let _ = main.hide();
+                }
+
+                // v3-launcher: centered startup window — always shown first
+                let launcher_w: f64 = 460.0;
+                let launcher_h: f64 = 380.0;
+                let launcher_x: f64 = wa_x + (wa_w - launcher_w) / 2.0;
+                let launcher_y: f64 = wa_y + (wa_h - launcher_h) / 2.0;
+
+                let launcher_url = if cfg!(debug_assertions) {
+                    tauri::WebviewUrl::External("http://localhost:1420/#v3-launcher".parse().unwrap())
+                } else {
+                    tauri::WebviewUrl::App("index.html#v3-launcher".into())
+                };
+
+                let v3_launcher = WebviewWindowBuilder::new(&app_handle, "v3-launcher", launcher_url)
+                    .title("Atlas OS")
+                    .inner_size(launcher_w, launcher_h)
+                    .position(launcher_x, launcher_y)
+                    .decorations(false)
+                    .transparent(true)
+                    .always_on_top(true)
+                    .skip_taskbar(false) // visible in taskbar so user can find it
+                    .resizable(false)
+                    .visible(true)
+                    .build();
+
+                #[cfg(target_os = "windows")]
+                if let Ok(ref win) = v3_launcher {
+                    let _ = apply_mica(win, Some(true));
+                }
+                if let Ok(ref win) = v3_launcher {
+                    let _ = win.set_focus();
+                }
+
+                // v3-input: thin floating bar — always visible so user can start typing immediately
+                let input_url = if cfg!(debug_assertions) {
+                    tauri::WebviewUrl::External("http://localhost:1420/#v3-input".parse().unwrap())
+                } else {
+                    tauri::WebviewUrl::App("index.html#v3-input".into())
+                };
+
+                let v3_input = WebviewWindowBuilder::new(&app_handle, "v3-input", input_url)
+                    .title("Atlas")
+                    .inner_size(bar_w, bar_h)
+                    .position(bar_x, bar_y)
+                    .decorations(false)
+                    .transparent(true)
+                    .always_on_top(true)
+                    .skip_taskbar(true)
+                    .resizable(false)
+                    .visible(true)
+                    .build();
+
+                // Apply Windows 11 Mica effect (OS-compositor desktop blur)
+                #[cfg(target_os = "windows")]
+                if let Ok(ref win) = v3_input {
+                    let _ = apply_mica(win, Some(true)); // true = dark Mica variant
+                }
+
+                // v3-output: independent chat output window (hidden until first message)
+                let output_url = if cfg!(debug_assertions) {
+                    tauri::WebviewUrl::External("http://localhost:1420/#v3-output".parse().unwrap())
+                } else {
+                    tauri::WebviewUrl::App("index.html#v3-output".into())
+                };
+
+                let v3_output = WebviewWindowBuilder::new(&app_handle, "v3-output", output_url)
+                    .title("Atlas — Yanıt")
+                    .inner_size(out_w, out_h)
+                    .position(out_x, out_y)
+                    .decorations(false)
+                    .transparent(true)
+                    .always_on_top(true)
+                    .skip_taskbar(true)
+                    .resizable(true)
+                    .visible(false)
+                    .build();
+
+                #[cfg(target_os = "windows")]
+                if let Ok(ref win) = v3_output {
+                    let _ = apply_mica(win, Some(true));
+                }
+
+                // Intercept close on v3-output — hide instead of destroy so chat history is preserved
+                if let Ok(ref win) = v3_output {
+                    let win_clone = win.clone();
+                    win.on_window_event(move |event| {
+                        if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                            api.prevent_close();
+                            let _ = win_clone.hide();
+                        }
+                    });
+                }
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -271,11 +436,14 @@ pub fn run() {
             shell::shell_bg_kill,
             shell::shell_bg_list,
             open_settings_window,
+            v3_show_output,
+            v3_launcher_done,
             secrets::secrets_get,
             secrets::secrets_set,
             secrets::secrets_delete,
             secrets::secrets_get_all,
             net::http_ping,
+            net::http_get_json,
             web::web_search,
             web::web_fetch,
             webview::web_open,

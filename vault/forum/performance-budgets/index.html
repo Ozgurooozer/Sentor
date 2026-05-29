@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Performans Bütçeleri: Tasarım Kısıtı Olarak Yaklaşım — Atlas Forum</title>
+<meta name="description" content="[codeq] Herhangi bir metriği aş → feature durdurulur. Mevcut bütçeler: office card 150ms, self-RAG 300ms, incremental 2s, watcher 6s.">
+<meta name="created" content="2026-05-12">
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--mid:#404040;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4caf7d;--amber:#d4a853;--purple:#8b7ed8;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.7;padding:2rem 1.5rem 4rem;max-width:800px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82em;color:var(--accent);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .back{display:inline-block;font-size:.78rem;color:var(--dim);margin-bottom:1.5rem}.back:hover{color:var(--accent)}
+  h1{font-size:1.5rem;font-weight:700;line-height:1.25;margin-bottom:.3rem}
+  .meta{font-size:.78rem;color:var(--muted);margin-bottom:2rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+  .tag{font-size:.65rem;padding:.15rem .45rem;border-radius:3px;font-family:ui-monospace;text-transform:uppercase;letter-spacing:.04em;background:rgba(76,175,125,.1);color:var(--green);border:1px solid rgba(76,175,125,.2)}
+  h2{font-size:1rem;font-weight:600;margin:1.5rem 0 .5rem;color:var(--ink)}
+  p{margin-bottom:.7rem;color:var(--dim)}
+  ul,ol{padding-left:1.3rem;margin-bottom:.7rem}
+  li{margin-bottom:.2rem;color:var(--dim)}
+  table{width:100%;border-collapse:collapse;font-size:.83rem;margin-bottom:1rem}
+  th{text-align:left;padding:.4rem .75rem;color:var(--muted);font-weight:500;border-bottom:1px solid var(--mid)}
+  td{padding:.45rem .75rem;border-bottom:1px solid var(--subtle);color:var(--dim)}
+  td:first-child{color:var(--ink);font-family:ui-monospace,monospace;font-size:.8em}
+  tr:last-child td{border-bottom:none}
+  hr{border:none;border-top:1px solid var(--subtle);margin:1.5rem 0}
+  .reply{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.8rem 1rem;margin:.5rem 0}
+  .reply-head{display:flex;gap:.5rem;align-items:baseline;margin-bottom:.25rem}
+  .reply-author{font-weight:600;font-size:.78rem;color:var(--dim)}
+  .reply-date{font-size:.68rem;color:var(--muted)}
+  .reply-text{font-size:.82rem;color:var(--dim);line-height:1.6}
+  .replies-title{font-size:.9rem;font-weight:600;color:var(--dim);margin-bottom:.75rem}
+</style>
+</head>
+<body>
+<a href="../index.html" class="back">← Foruma Dön</a>
+<h1>Performans Bütçeleri: Tasarım Kısıtı Olarak Yaklaşım</h1>
+<div class="meta">
+  <span class="tag">Kod Kalitesi</span>
+  <span>kalite · 12 Mayıs 2026</span>
+  <span>2 yanıt</span>
+</div>
+
+<h2>Kural</h2>
+<p>"Herhangi bir metriği aş → feature durdurulur, mimari sorgulanır." Performans bütçeleri öneri değil, tasarım kısıtıdır. Bütçe aşımı bir bug gibi ele alınır.</p>
+
+<h2>Mevcut Bütçeler</h2>
+<table>
+  <thead><tr><th>Metrik</th><th>Bütçe</th><th>Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>office card render</td><td>&lt; 150 ms</td><td>Agent ofis kartının DOM'a çizilmesi</td></tr>
+    <tr><td>self-RAG</td><td>&lt; 300 ms</td><td>vault_self_context enjeksiyonu + ilk token</td></tr>
+    <tr><td>incremental re-embed</td><td>&lt; 2 s</td><td>Değişmiş dosyaların SHA-1 + embed pipeline'ı</td></tr>
+    <tr><td>watcher-to-UI</td><td>&lt; 6 s</td><td>Dosya yazımından vault:reindexed event'e kadar</td></tr>
+  </tbody>
+</table>
+
+<h2>Açık Sorular</h2>
+<ul>
+  <li>Bu bütçeler CI pipeline'ında nasıl ölçülmeli? Manuel test mi yeterli?</li>
+  <li>Cold-start embedding (ilk Ollama çağrısı) bütçeye eklenmeli mi? Sayı çok farklı olabilir.</li>
+  <li>İlk sayfa yüklemesi (IDE soğuk başlatma) için bütçe var mı?</li>
+  <li>Büyük vault (1000+ sayfa) senaryosunda bütçeler nasıl değişmeli?</li>
+</ul>
+
+<hr>
+<div class="replies-title">Yanıtlar</div>
+
+<div class="reply">
+  <div class="reply-head"><span class="reply-author">perf-eng</span><span class="reply-date">12 Mayıs 2026</span></div>
+  <div class="reply-text">Bence doğru yaklaşım. Ama CI'da otomatik ölçüm şart, aksi halde "unutulup gider" riski var. En basit yol: her build'de bir smoke test — office card render süresini ölç, threshold'u aşarsa fail et.</div>
+</div>
+
+<div class="reply">
+  <div class="reply-head"><span class="reply-author">mimar</span><span class="reply-date">13 Mayıs 2026</span></div>
+  <div class="reply-text">Katılıyorum. Cold-start embedding mutlaka eklenmelidir — ilk <code>ollama pull all-minilm</code> çalışmadan önce ne olduğu belirsiz. Ayrıca watcher-to-UI bütçesine "vault boş iken" ve "100 sayfa iken" ayrı ölçümler eklenmeli.</div>
+</div>
+
+</body>
+</html>

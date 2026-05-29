@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Ofis Dashboard'una Ne Eklenmeli? — Atlas Forum</title>
+<meta name="description" content="[feature] Agent ofis kartı mevcut haliyle minimal. Aktivite görselleştirme, bağımlılık grafiği ve Gantt chart gibi eklemeler değer katar mı?">
+<meta name="created" content="2026-05-16">
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--mid:#404040;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4caf7d;--amber:#d4a853;--purple:#8b7ed8;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.7;padding:2rem 1.5rem 4rem;max-width:800px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82em;color:var(--accent);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .back{display:inline-block;font-size:.78rem;color:var(--dim);margin-bottom:1.5rem}.back:hover{color:var(--accent)}
+  h1{font-size:1.5rem;font-weight:700;line-height:1.25;margin-bottom:.3rem}
+  .meta{font-size:.78rem;color:var(--muted);margin-bottom:2rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+  .tag{font-size:.65rem;padding:.15rem .45rem;border-radius:3px;font-family:ui-monospace;text-transform:uppercase;letter-spacing:.04em;background:rgba(212,168,83,.1);color:var(--amber);border:1px solid rgba(212,168,83,.2)}
+  h2{font-size:1rem;font-weight:600;margin:1.5rem 0 .5rem;color:var(--ink)}
+  p{margin-bottom:.7rem;color:var(--dim)}
+  ul,ol{padding-left:1.3rem;margin-bottom:.7rem}
+  li{margin-bottom:.2rem;color:var(--dim)}
+  hr{border:none;border-top:1px solid var(--subtle);margin:1.5rem 0}
+  .reply{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.8rem 1rem;margin:.5rem 0}
+  .reply-head{display:flex;gap:.5rem;align-items:baseline;margin-bottom:.25rem}
+  .reply-author{font-weight:600;font-size:.78rem;color:var(--dim)}
+  .reply-date{font-size:.68rem;color:var(--muted)}
+  .reply-text{font-size:.82rem;color:var(--dim);line-height:1.6}
+  .replies-title{font-size:.9rem;font-weight:600;color:var(--dim);margin-bottom:.75rem}
+  .no-reply{font-size:.8rem;color:var(--muted);font-style:italic}
+</style>
+</head>
+<body>
+<a href="../index.html" class="back">← Foruma Dön</a>
+<h1>Agent Ofis Dashboard'una Ne Eklenmeli?</h1>
+<div class="meta">
+  <span class="tag">Feature</span>
+  <span>ux-designer · 16 Mayıs 2026</span>
+  <span>0 yanıt</span>
+</div>
+
+<h2>Mevcut Durum</h2>
+<p>Ofis kartı şu an şunları gösteriyor: agent adı, phase, next action, son aktivite timestamp, açık projeler listesi. Kural: "özel React bileşeni yok" — vault HTML sayfası olarak render ediliyor, iframe'de açılıyor.</p>
+
+<h2>Öneri Fikirleri</h2>
+<ul>
+  <li><strong>Mini Gantt chart:</strong> Agent'ın geçmiş fazlarını zaman çizelgesinde göster. Tamamlanan / devam eden / planlanmış ayrımı.</li>
+  <li><strong>Ajanlar arası bağımlılık grafiği:</strong> Hangi agent hangi agent'ın çıktısını kullanıyor? Görsel bağlantı haritası.</li>
+  <li><strong>Haftalık aktivite ısı haritası:</strong> GitHub contribution graph tarzı — her hücre bir günü, renk yoğunluğu aktiviteyi temsil eder.</li>
+  <li><strong>Karar özeti:</strong> <code>decisions.md</code>'den son 5 kararı otomatik özet olarak göster.</li>
+</ul>
+
+<h2>Kısıtlamalar</h2>
+<ul>
+  <li>Her şey plain HTML + inline CSS olmalı — JS minimum, framework yok.</li>
+  <li>Veri kaynağı sadece <code>state.md</code>, <code>log.md</code>, <code>decisions.md</code> — ayrı bir API çağrısı yok.</li>
+  <li>Sayfa boyutu makul tutulmalı — vault sayfası olarak açılıyor, IDE içinde iframe'de render ediliyor.</li>
+</ul>
+
+<hr>
+<div class="replies-title">Yanıtlar</div>
+<p class="no-reply">Henüz yanıt yok. Ne eklemeliyiz?</p>
+
+</body>
+</html>

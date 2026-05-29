@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import { useCanvasStore } from "./canvasStore";
 
 interface Props {
@@ -7,14 +7,12 @@ interface Props {
 }
 
 export function NotePanel({ panelId, initialText = "" }: Props) {
-  const updatePanel = useCanvasStore((s) => s.updatePanel);
+  const updatePanel  = useCanvasStore((s) => s.updatePanel);
   const setOutputData = useCanvasStore((s) => s.setOutputData);
-  const textRef = useRef<HTMLTextAreaElement>(null);
 
-  // Seed outputData from initial text on mount so pre-existing notes are wired.
   useEffect(() => {
     if (initialText) setOutputData(panelId, { kind: "text", value: initialText });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onChange = useCallback(
@@ -28,24 +26,33 @@ export function NotePanel({ panelId, initialText = "" }: Props) {
   );
 
   return (
-    <div
-      className="relative flex h-full flex-col"
-      style={{ background: "linear-gradient(135deg, #f5e58b 0%, #eed572 100%)" }}
-    >
-      {/* Folded corner */}
+    <div className="relative flex h-full flex-col overflow-hidden">
+      {/* Ambient amber tint */}
       <div
-        className="absolute right-0 top-0 h-5 w-5"
+        className="pointer-events-none absolute inset-0"
         style={{
-          background: "linear-gradient(225deg, #c8b84a 50%, transparent 50%)",
+          background: "radial-gradient(ellipse at 30% 20%, rgba(210,165,30,0.10) 0%, transparent 65%)",
+        }}
+      />
+      {/* Folded corner — glass style */}
+      <div
+        className="pointer-events-none absolute right-0 top-0 z-10"
+        style={{
+          width: 20,
+          height: 20,
+          background: "linear-gradient(225deg, rgba(210,165,30,0.35) 50%, transparent 50%)",
         }}
       />
       <textarea
-        ref={textRef}
         defaultValue={initialText}
         onChange={onChange}
         placeholder="Write a note…"
-        className="flex-1 resize-none bg-transparent p-3 pr-6 text-[12px] leading-relaxed text-[#3a3000] placeholder-[#a09040] outline-none"
-        style={{ fontFamily: "system-ui, sans-serif" }}
+        className="relative z-0 flex-1 resize-none bg-transparent p-3 pr-6 text-[12px] leading-relaxed outline-none"
+        style={{
+          color: "#e8dfc0",
+          fontFamily: "system-ui, sans-serif",
+          caretColor: "#d4a843",
+        }}
         onPointerDown={(e) => e.stopPropagation()}
       />
     </div>

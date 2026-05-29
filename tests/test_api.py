@@ -103,10 +103,13 @@ def _get_unauth(path: str) -> int:
         return e.code
 
 
-def _get_error(path: str) -> tuple[int, dict]:
+def _get_error(path: str, auth: bool = True) -> tuple[int, dict]:
     """Expect a non-200 response; return (status, body)."""
+    req = urllib.request.Request(f'{BASE}{path}')
+    if auth:
+        req.add_header('Authorization', f'Bearer {_API_TOKEN}')
     try:
-        urllib.request.urlopen(f'{BASE}{path}', timeout=5)
+        urllib.request.urlopen(req, timeout=5)
         raise AssertionError(f'Expected an error response but got 200 for {path}')
     except urllib.error.HTTPError as exc:
         body = json.loads(exc.read().decode('utf-8'))
@@ -192,8 +195,8 @@ def test_page_full_text():
     page_id = _first_page_id()
     if not page_id:
         return                          # vault is empty, skip
-    cat, slug = page_id.split('/')
-    data = _get(f'/api/page/{cat}/{slug}')
+    api_path = '/api/page/' + page_id
+    data = _get(api_path)
     assert isinstance(data, dict), 'Expected object'
     for key in ('id', 'title', 'text', 'headings', 'links', 'backlinks', 'modified'):
         assert key in data, f'Page response missing field "{key}"'
@@ -208,9 +211,8 @@ def test_page_cors_header():
     page_id = _first_page_id()
     if not page_id:
         return
-    cat, slug = page_id.split('/')
     # _get() already asserts the CORS header; calling it here is sufficient
-    _get(f'/api/page/{cat}/{slug}')
+    _get('/api/page/' + page_id)
 
 
 def test_page_not_found():
@@ -222,7 +224,7 @@ def test_page_not_found():
 
 def test_page_bad_path():
     status, body = _get_error('/api/page/only-one-segment')
-    assert status == 400,   f'Expected 400, got {status}'
+    assert status == 404,   f'Expected 404, got {status}'
     assert 'error' in body, 'Error response must contain "error" field'
 
 
@@ -281,7 +283,7 @@ def main() -> None:
     test('GET /api/page/{cat}/{slug}      returns full stripped text',    test_page_full_text)
     test('GET /api/page/{cat}/{slug}      CORS header present',           test_page_cors_header)
     test('GET /api/page/x/x              404 + error body',              test_page_not_found)
-    test('GET /api/page/one-segment      400 + error body',              test_page_bad_path)
+    test('GET /api/page/one-segment      404 + error body',              test_page_bad_path)
     test('GET /api/does-not-exist        404 + error body',              test_unknown_endpoint)
     test('OPTIONS /api/categories         204 CORS preflight',           test_cors_preflight)
     test('GET /api/page/x/y (error)      CORS header on error response', test_cors_on_error)

@@ -19,18 +19,8 @@ from pathlib import Path
 ROOT      = Path(__file__).resolve().parent.parent
 FLOWS_DIR = ROOT / 'vault' / 'agents' / 'sentor' / 'flows'
 
-_COLOR  = sys.stdout.isatty()
-_ACCENT = '\033[38;2;91;141;239m'
-_DIM    = '\033[2m'
-_OK     = '\033[38;2;29;158;117m'
-_ERR    = '\033[38;2;221;82;82m'
-_RESET  = '\033[0m'
-
-def _c(s, code): return f'{code}{s}{_RESET}' if _COLOR else s
-def acc(s):  return _c(s, _ACCENT)
-def dim(s):  return _c(s, _DIM)
-def ok(s):   return _c(s, _OK)
-def err(s):  return _c(s, _ERR)
+sys.path.insert(0, str(ROOT / 'tools'))
+from colors import accent as acc, dim, ok, err  # noqa: E402
 
 
 def _now():

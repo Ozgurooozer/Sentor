@@ -29,6 +29,7 @@ const PANEL_ICONS: Record<string, string> = {
   note: "◧",
   tool: "⚡",
   filebrowser: "◫",
+  pipe: "⇢",
 };
 
 const PANEL_LABELS: Record<string, string> = {
@@ -51,6 +52,7 @@ const PANEL_LABELS: Record<string, string> = {
   note: "note",
   tool: "tool",
   filebrowser: "files",
+  pipe: "pipe",
 };
 
 
@@ -60,16 +62,24 @@ interface Props {
   /** Callback from InfiniteCanvas so it can suppress canvas-pan when dragging a panel */
   onDragStart(): void;
   onDragEnd(): void;
+  onHover?(): void;
+  onHoverEnd?(): void;
+  /** Called when the user clicks the ⊕ connect button in the header. */
+  onStartConnect?(): void;
+  onPanelContextMenu?(screenX: number, screenY: number): void;
   children?: React.ReactNode;
 }
 
-export function CanvasPanel({ panel, viewport, onDragStart, onDragEnd, children }: Props) {
+export function CanvasPanel({ panel, viewport, onDragStart, onDragEnd, onHover, onHoverEnd, onStartConnect, onPanelContextMenu, children }: Props) {
   const updatePanel = useCanvasStore((s) => s.updatePanel);
   const removePanel = useCanvasStore((s) => s.removePanel);
   const bringToFront = useCanvasStore((s) => s.bringToFront);
   const togglePin = useCanvasStore((s) => s.togglePin);
   const toggleMinimized = useCanvasStore((s) => s.toggleMinimized);
   const connections = useCanvasStore((s) => s.connections);
+  const selectedPanelIds = useCanvasStore((s) => s.selectedPanelIds);
+  const selectPanel = useCanvasStore((s) => s.selectPanel);
+  const isSelected = selectedPanelIds.includes(panel.id);
 
   const inWires  = connections.filter((c) => c.toPanel   === panel.id).length;
   const outWires = connections.filter((c) => c.fromPanel === panel.id).length;
@@ -234,10 +244,17 @@ export function CanvasPanel({ panel, viewport, onDragStart, onDragEnd, children 
   // The header panel chooses its own colour via panel.meta.headerColor.
   const accent = accentFor(panel);
 
+  const STATUS_DOT: Record<NonNullable<CanvasPanelNode["status"]>, string> = {
+    idle: "#3a3a3a",
+    running: "#4caf7d",
+    error: "#ef5b5b",
+    done: "#5b8def",
+  };
+  const statusColor = panel.status && panel.status !== "idle" ? STATUS_DOT[panel.status] : null;
+
   const baseStyle: React.CSSProperties = {
-    borderColor: accent,
-    boxShadow: `0 10px 32px -8px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.35), 0 0 14px ${accent}${GLOW_ALPHA}`,
-    // expose accent for CSS rules that need it
+    borderColor: isSelected ? "#5b8def" : accent,
+    boxShadow: `0 10px 32px -8px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.35), 0 0 14px ${isSelected ? "#5b8def" : accent}${GLOW_ALPHA}`,
     ["--cv-accent" as string]: accent,
   };
 
@@ -269,20 +286,26 @@ export function CanvasPanel({ panel, viewport, onDragStart, onDragEnd, children 
       data-canvas-panel
       style={panelStyle}
       className={cn(
-        "canvas-node-card flex flex-col overflow-hidden rounded-[10px]",
+        "group canvas-node-card flex flex-col overflow-hidden rounded-[10px]",
         "border bg-[#111111] backdrop-blur-sm",
         "transition-[border-color,box-shadow,transform] duration-150",
         panel.pinned && "ring-1 ring-[#5b8def]/30",
       )}
-      onPointerDownCapture={() => bringToFront(panel.id)}
+      onPointerDownCapture={(e) => {
+        bringToFront(panel.id);
+        selectPanel(panel.id, e.shiftKey);
+      }}
+      onMouseEnter={onHover}
+      onMouseLeave={onHoverEnd}
+      onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); onPanelContextMenu?.(e.clientX, e.clientY); }}
     >
-      {/* Title bar — drag handle; double-click anywhere on the bar toggles fullscreen */}
+      {/* Title bar — drag handle; z-20 ensures it stays above content layers */}
       <div
-        className="relative flex h-8 shrink-0 cursor-move select-none items-center gap-2 border-b border-[#2a2a2a] bg-[#111111] pl-4 pr-2"
+        className="relative z-20 flex h-8 shrink-0 cursor-move select-none items-center gap-2 border-b border-[#2a2a2a] bg-[#111111] pl-4 pr-2"
         onPointerDown={onTitlePointerDown}
         onPointerMove={onTitlePointerMove}
         onPointerUp={onTitlePointerUp}
-        onDoubleClick={() => panel.type === "canvas" ? setFullscreen(true) : setFullscreen((v) => !v)}
+        onDoubleClick={() => setFullscreen((v) => !v)}
       >
         {/* Left accent stripe */}
         <div
@@ -290,6 +313,17 @@ export function CanvasPanel({ panel, viewport, onDragStart, onDragEnd, children 
           style={{ background: accent }}
         />
         <span className="text-[10px]" style={{ color: accent }}>{PANEL_ICONS[panel.type] ?? "□"}</span>
+        {statusColor && (
+          <span
+            className="shrink-0 rounded-full"
+            style={{
+              width: 6, height: 6,
+              background: statusColor,
+              boxShadow: panel.status === "running" ? `0 0 6px ${statusColor}` : undefined,
+            }}
+            title={panel.status}
+          />
+        )}
         {editingTitle ? (
           <input
             autoFocus
@@ -385,6 +419,19 @@ export function CanvasPanel({ panel, viewport, onDragStart, onDragEnd, children 
             )}
           >
             <span className="text-[10px] leading-none">⤵</span>
+          </button>
+        )}
+        {/* Connect button — hover-only; starts a wire from this node's output */}
+        {onStartConnect && (
+          <button
+            type="button"
+            title="Connect — draw a wire from this node's output"
+            onPointerDown={(e) => e.stopPropagation()}
+            onDoubleClick={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); onStartConnect(); }}
+            className="flex size-5 items-center justify-center rounded text-[#5b8def] opacity-0 transition-[opacity,color] duration-150 ease-out group-hover:opacity-100 hover:bg-[#1a2a3a]"
+          >
+            <span className="text-[11px] leading-none">⊕</span>
           </button>
         )}
         {/* Controls */}
