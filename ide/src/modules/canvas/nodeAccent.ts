@@ -29,6 +29,7 @@ export const NODE_ACCENT: Partial<Record<PanelType, string>> = {
   "gate":                "#e07b54", // orange — circuit gate
   "variable":            "#d4a843", // gold — stores data
   "variable-inspector":  "#d4a843", // gold — inspector reads the store
+  "voice-variable":      "#ef4444", // red — voice/mic input
   "if-else":             "#4db89a", // green — control flow
   "for-each":            "#9b72ef", // purple — iteration
   // Previously missing

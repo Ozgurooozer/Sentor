@@ -40,6 +40,7 @@ import { LogsPanel } from "./LogsPanel";
 import { AudioPanel } from "./AudioPanel";
 import { VariablePanel } from "./VariablePanel";
 import { VariableInspectorPanel } from "./VariableInspectorPanel";
+import { VoiceVariablePanel } from "./VoiceVariablePanel";
 import { IfElsePanel } from "./IfElsePanel";
 import { ForEachPanel } from "./ForEachPanel";
 import { GatePanel } from "./GatePanel";
@@ -156,6 +157,7 @@ const PANEL_REGISTRY: Partial<Record<PanelType, PanelRenderer>> = {
   "canvas-3d":   Canvas3dWrapper,
   "variable":            ({ panel }) => <VariablePanel panelId={panel.id} />,
   "variable-inspector":  () => <VariableInspectorPanel />,
+  "voice-variable":      ({ panel }) => <VoiceVariablePanel panel={panel} />,
   "if-else":     ({ panel }) => <IfElsePanel panelId={panel.id} />,
   "for-each":    ({ panel }) => <ForEachPanel panelId={panel.id} />,
   "gate":        ({ panel }) => <GatePanel panelId={panel.id} />,

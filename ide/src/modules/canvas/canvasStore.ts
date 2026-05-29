@@ -170,6 +170,7 @@ const PANEL_DEFAULTS: Record<PanelType, { width: number; height: number; title: 
   audio:       { width: 320, height: 380, title: "Audio" },
   variable:             { width: 220, height: 120, title: "Variable" },
   "variable-inspector": { width: 300, height: 360, title: "Var Inspector" },
+  "voice-variable":     { width: 240, height: 300, title: "Voice Variable" },
   "if-else":            { width: 260, height: 160, title: "If / Else" },
   "for-each":           { width: 260, height: 160, title: "For Each" },
   "gate":               { width: 240, height: 180, title: "Gate" },

@@ -29,6 +29,7 @@ const NODES_2D: NodeDef[] = [
   { type: "logs",        label: "Logs",        desc: "Canlı log akışı — tüm console output / hata izleme", accent: "#4db89a", icon: IC("M3 4h10M3 7h8M3 10h6M3 13h4") },
   { type: "variable",            label: "Variable",          desc: "Named variable — store & share values across canvas", accent: "#d4a843", icon: IC("M4 4h3l1 4-1 4H4M12 4h-3l-1 4 1 4h3") },
   { type: "variable-inspector", label: "Var Inspector",     desc: "Browse, inspect and delete all canvas variables",     accent: "#d4a843", icon: IC("M3 4h10M3 7h8M3 10h5M3 13h3M13 10l2 2-2 2") },
+  { type: "voice-variable",     label: "Voice Variable",   desc: "Record speech → store as variable + wire output",     accent: "#ef4444", icon: IC("M8 2a3 3 0 013 3v4a3 3 0 01-6 0V5a3 3 0 013-3zM3 9a5 5 0 0010 0M8 14v2") },
   { type: "if-else",    label: "If / Else",   desc: "Conditional routing — outputs true or false branch",  accent: "#d4a843", icon: IC("M8 2v5M5 7H3l-1 4 1 4h2M11 7h2l1 4-1 4h-2M8 11v3") },
   { type: "for-each",   label: "For Each",    desc: "Iterate over a list of items",                        accent: "#9b72ef", icon: IC("M3 8h10M10 5l3 3-3 3M6 3v10") },
   { type: "gate",       label: "Gate",        desc: "Circuit gate — block or pass signal based on condition", accent: "#e07b54", icon: IC("M2 8h3M11 8h3M5 5h6v6H5zM8 5v6") },

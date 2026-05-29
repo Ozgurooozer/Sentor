@@ -25,6 +25,7 @@ export type PanelType =
   | "audio"
   | "variable"
   | "variable-inspector"
+  | "voice-variable"
   | "if-else"
   | "for-each"
   | "gate";
