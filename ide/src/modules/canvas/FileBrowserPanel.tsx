@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { useCanvasStore } from "./canvasStore";
 import { usePreferencesStore } from "@/modules/settings/preferences";
@@ -34,6 +34,10 @@ function fmtSize(bytes: number): string {
 
 const IMAGE_EXTS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp", "ico", "avif"]);
 
+type SortField = "name" | "size" | "type" | "date";
+type SortDir   = "asc" | "desc";
+type ViewMode  = "list" | "small" | "large";
+
 export function FileBrowserPanel({ panel }: { panel: CanvasPanelNode }) {
   const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot) ?? "c:\\Atlas OS";
   const addPanel      = useCanvasStore((s) => s.addPanel);
@@ -48,6 +52,16 @@ export function FileBrowserPanel({ panel }: { panel: CanvasPanelNode }) {
   const [selected, setSelected] = useState<string | null>(null);
   const [vaultCats, setVaultCats] = useState<string[]>([]);
   const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [viewMode,  setViewMode]  = useState<ViewMode>(
+    () => (panel.meta?.viewMode  as ViewMode  | undefined) ?? "list",
+  );
+  const [sortField, setSortField] = useState<SortField>(
+    () => (panel.meta?.sortField as SortField | undefined) ?? "name",
+  );
+  const [sortDir,   setSortDir]   = useState<SortDir>(
+    () => (panel.meta?.sortDir   as SortDir   | undefined) ?? "asc",
+  );
 
   const loadDir = useCallback(async (path: string) => {
     setLoading(true); setError(null); setSelected(null);
@@ -66,7 +80,36 @@ export function FileBrowserPanel({ panel }: { panel: CanvasPanelNode }) {
       .catch(() => undefined);
   }, [workspaceRoot]);
 
+  const sorted = useMemo(() => {
+    const arr = [...entries];
+    arr.sort((a, b) => {
+      if (a.kind === "dir" && b.kind !== "dir") return -1;
+      if (b.kind === "dir" && a.kind !== "dir") return  1;
+      let cmp = 0;
+      switch (sortField) {
+        case "name": cmp = a.name.localeCompare(b.name, undefined, { sensitivity: "base" }); break;
+        case "size": cmp = a.size - b.size; break;
+        case "type": {
+          const ea = a.name.split(".").pop()?.toLowerCase() ?? "";
+          const eb = b.name.split(".").pop()?.toLowerCase() ?? "";
+          cmp = ea.localeCompare(eb);
+          break;
+        }
+        case "date": cmp = a.mtime - b.mtime; break;
+      }
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+    return arr;
+  }, [entries, sortField, sortDir]);
+
   useEffect(() => { void loadDir(initCwd); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    updatePanel(panel.id, {
+      meta: { ...panel.meta, viewMode, sortField, sortDir },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewMode, sortField, sortDir]);
 
   const handleClick = (entry: DirEntry) => {
     if (clickTimer.current) {
@@ -160,6 +203,70 @@ export function FileBrowserPanel({ panel }: { panel: CanvasPanelNode }) {
         >↺</button>
       </div>
 
+      {/* Toolbar: sort + view mode */}
+      <div
+        className="flex shrink-0 items-center justify-between px-2 py-[3px]"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}
+      >
+        {/* Sort buttons */}
+        <div className="flex items-center gap-0.5">
+          {(["name", "size", "type", "date"] as SortField[]).map(field => {
+            const active = sortField === field;
+            return (
+              <button
+                key={field}
+                type="button"
+                onClick={() => {
+                  if (sortField === field) setSortDir(d => d === "asc" ? "desc" : "asc");
+                  else { setSortField(field); setSortDir("asc"); }
+                }}
+                className="flex items-center gap-0.5 rounded-[4px] px-1.5 py-0.5 transition-all duration-150"
+                style={{
+                  fontSize: 8,
+                  fontFamily: "monospace",
+                  textTransform: "uppercase" as const,
+                  letterSpacing: "0.04em",
+                  background: active ? "rgba(91,141,239,0.12)" : "transparent",
+                  color: active ? "#5b8def" : "rgba(255,255,255,0.28)",
+                  border: active ? "1px solid rgba(91,141,239,0.22)" : "1px solid transparent",
+                }}
+              >
+                {field === "name" ? "Ad" : field === "size" ? "Boy" : field === "type" ? "Tür" : "Tarih"}
+                {active && (
+                  <span style={{ fontSize: 7, lineHeight: 1 }}>
+                    {sortDir === "asc" ? "↑" : "↓"}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* View mode buttons */}
+        <div className="flex items-center gap-0.5">
+          {([
+            ["list",  "≡", "Liste"],
+            ["small", "⊞", "Küçük simgeler"],
+            ["large", "⊟", "Büyük simgeler"],
+          ] as [ViewMode, string, string][]).map(([mode, icon, title]) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => setViewMode(mode)}
+              title={title}
+              className="flex h-[18px] w-[18px] items-center justify-center rounded-[4px] transition-all duration-150"
+              style={{
+                fontSize: 10,
+                background: viewMode === mode ? "rgba(255,255,255,0.10)" : "transparent",
+                color: viewMode === mode ? "#c8c8d0" : "rgba(255,255,255,0.28)",
+              }}
+            >
+              {icon}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Body: sidebar + file list */}
       <div className="flex min-h-0 flex-1">
         {/* Sidebar */}
@@ -231,22 +338,37 @@ export function FileBrowserPanel({ panel }: { panel: CanvasPanelNode }) {
           )}
         </div>
 
-        {/* File list */}
-        <div className="flex-1 overflow-y-auto p-1 no-scrollbar">
+        {/* File list — list / small-grid / large-grid */}
+        <div
+          className={viewMode === "list"
+            ? "flex-1 overflow-y-auto p-1 no-scrollbar"
+            : "flex-1 overflow-y-auto p-1.5 no-scrollbar"}
+          style={viewMode !== "list" ? {
+            display: "grid",
+            gridTemplateColumns: viewMode === "large" ? "1fr 1fr" : "1fr 1fr 1fr 1fr",
+            gap: 4,
+            alignContent: "start",
+          } : undefined}
+        >
           {loading && (
-            <div className="flex h-12 items-center justify-center font-mono text-[9px]" style={{ color: "rgba(255,255,255,0.18)" }}>
+            <div className="flex h-12 items-center justify-center font-mono text-[9px]"
+              style={{ color: "rgba(255,255,255,0.18)", gridColumn: "1 / -1" }}>
               Loading…
             </div>
           )}
           {error && (
-            <div className="px-2 py-1 text-[9px] text-red-400/70">{error}</div>
+            <div className="px-2 py-1 text-[9px] text-red-400/70"
+              style={{ gridColumn: "1 / -1" }}>{error}</div>
           )}
-          {!loading && !error && entries.length === 0 && (
-            <div className="flex h-12 items-center justify-center font-mono text-[9px]" style={{ color: "rgba(255,255,255,0.18)" }}>
+          {!loading && !error && sorted.length === 0 && (
+            <div className="flex h-12 items-center justify-center font-mono text-[9px]"
+              style={{ color: "rgba(255,255,255,0.18)", gridColumn: "1 / -1" }}>
               Empty
             </div>
           )}
-          {!loading && entries.map((entry) => {
+
+          {/* LIST VIEW */}
+          {!loading && viewMode === "list" && sorted.map((entry) => {
             const [glyph, color] = entryIcon(entry.name, entry.kind);
             const isSel = entry.name === selected;
             return (
@@ -258,8 +380,8 @@ export function FileBrowserPanel({ panel }: { panel: CanvasPanelNode }) {
                   background: isSel ? "rgba(91,141,239,0.10)" : "transparent",
                   color: isSel ? "#c8c8d0" : "rgba(255,255,255,0.45)",
                 }}
-                onMouseEnter={(e) => { if (!isSel) (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.04)"; }}
-                onMouseLeave={(e) => { if (!isSel) (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+                onMouseEnter={e => { if (!isSel) (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.04)"; }}
+                onMouseLeave={e => { if (!isSel) (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
               >
                 <span className="w-[13px] shrink-0 text-center text-[10px] leading-none" style={{ color }}>
                   {glyph}
@@ -273,6 +395,43 @@ export function FileBrowserPanel({ panel }: { panel: CanvasPanelNode }) {
                 {entry.kind === "dir" && (
                   <span className="shrink-0 text-[9px]" style={{ color: "rgba(255,255,255,0.20)" }}>›</span>
                 )}
+              </button>
+            );
+          })}
+
+          {/* GRID VIEW (small = 4 cols, large = 2 cols) */}
+          {!loading && viewMode !== "list" && sorted.map((entry) => {
+            const [glyph, color] = entryIcon(entry.name, entry.kind);
+            const isSel = entry.name === selected;
+            const iconSize = viewMode === "large" ? 28 : 18;
+            return (
+              <button
+                key={entry.name}
+                onClick={() => handleClick(entry)}
+                className="flex flex-col items-center rounded-[6px] transition-all duration-150"
+                style={{
+                  padding: viewMode === "large" ? "8px 4px 6px" : "5px 2px 4px",
+                  background: isSel ? "rgba(91,141,239,0.10)" : "transparent",
+                  gap: 3,
+                }}
+                onMouseEnter={e => { if (!isSel) (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.05)"; }}
+                onMouseLeave={e => { if (!isSel) (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+              >
+                <span style={{ fontSize: iconSize, lineHeight: 1, color }}>{glyph}</span>
+                <span
+                  className="w-full text-center leading-tight"
+                  style={{
+                    fontSize: viewMode === "large" ? 9 : 8,
+                    color: isSel ? "#c8c8d0" : "rgba(255,255,255,0.55)",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical" as const,
+                    overflow: "hidden",
+                    wordBreak: "break-all",
+                  }}
+                >
+                  {entry.name}
+                </span>
               </button>
             );
           })}
