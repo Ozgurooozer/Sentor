@@ -1,61 +1,77 @@
 export function V3CanvasBgAmbient() {
   return (
-    <div className="pointer-events-none absolute inset-0" style={{ zIndex: 0 }}>
-      {/* Base */}
-      <div className="absolute inset-0" style={{ background: "#050507" }} />
-
-      {/* Orb 1 — blue, top-left */}
+    <div
+      className="pointer-events-none absolute inset-0"
+      style={{ zIndex: 0, background: "#050507", overflow: "hidden" }}
+    >
+      {/* ── 3D perspective grid ───────────────────────────────────────────── */}
       <div
-        className="absolute"
         style={{
-          width: 900, height: 900, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(91,141,239,0.11) 0%, transparent 68%)",
-          top: -280, left: -180,
-          animation: "atlas-orb-1 20s ease-in-out infinite alternate",
-          willChange: "transform",
+          position: "absolute",
+          inset: 0,
+          perspective: "280px",
+          perspectiveOrigin: "50% 58%",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            left: "-120%", right: "-120%",
+            top: "-10%", bottom: 0,
+            transformOrigin: "50% 100%",
+            transform: "rotateX(72deg)",
+            backgroundImage: [
+              "linear-gradient(rgba(91,141,239,0.22) 1px, transparent 1px)",
+              "linear-gradient(90deg, rgba(91,141,239,0.22) 1px, transparent 1px)",
+            ].join(", "),
+            backgroundSize: "80px 80px",
+            animation: "atlas-grid-scroll 10s linear infinite",
+          }}
+        />
+      </div>
+
+      {/* ── Vignette — edges dark, grid converges at horizon ─────────────── */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: [
+            "radial-gradient(ellipse 100% 55% at 50% 100%, transparent 40%, #050507 100%)",
+            "radial-gradient(ellipse 60% 40% at 50% 0%, #050507 0%, transparent 100%)",
+            "linear-gradient(to right, #050507 0%, transparent 15%, transparent 85%, #050507 100%)",
+          ].join(", "),
         }}
       />
 
-      {/* Orb 2 — violet, right */}
+      {/* ── Soft blue horizon glow ────────────────────────────────────────── */}
       <div
-        className="absolute"
         style={{
-          width: 760, height: 760, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(155,114,239,0.09) 0%, transparent 68%)",
-          top: "18%", right: -200,
-          animation: "atlas-orb-2 25s ease-in-out infinite alternate",
-          willChange: "transform",
+          position: "absolute",
+          width: "80%", height: "35%",
+          borderRadius: "50%",
+          background: "radial-gradient(ellipse, rgba(91,141,239,0.18) 0%, transparent 70%)",
+          bottom: "8%", left: "10%",
+          animation: "atlas-orb-pulse 4s ease-in-out infinite alternate",
+          willChange: "transform, opacity",
         }}
       />
 
-      {/* Orb 3 — teal, bottom-center */}
+      {/* ── Purple accent top-right ───────────────────────────────────────── */}
       <div
-        className="absolute"
         style={{
-          width: 640, height: 640, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(77,184,154,0.07) 0%, transparent 68%)",
-          bottom: -120, left: "28%",
-          animation: "atlas-orb-3 30s ease-in-out infinite alternate",
-          willChange: "transform",
+          position: "absolute",
+          width: 500, height: 500,
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(155,114,239,0.07) 0%, transparent 70%)",
+          top: -120, right: -80,
         }}
       />
 
-      {/* Orb 4 — blue, center drift */}
-      <div
-        className="absolute"
-        style={{
-          width: 520, height: 520, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(91,141,239,0.06) 0%, transparent 68%)",
-          top: "38%", left: "38%",
-          animation: "atlas-orb-4 35s ease-in-out infinite alternate",
-          willChange: "transform",
-        }}
-      />
-
-      {/* Noise grain — SVG feTurbulence, overlay blend */}
+      {/* ── Noise grain ──────────────────────────────────────────────────── */}
       <svg
         className="pointer-events-none absolute inset-0 h-full w-full"
-        style={{ opacity: 0.032, mixBlendMode: "overlay" }}
+        style={{ opacity: 0.025, mixBlendMode: "overlay" }}
         xmlns="http://www.w3.org/2000/svg"
       >
         <filter id="atlas-canvas-noise">

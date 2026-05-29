@@ -49,6 +49,13 @@ function CanvasAppShellInner() {
     setLogVaultRoot(workspaceRoot || "C:\\Atlas OS");
   }, [workspaceRoot]);
 
+  // Switch canvas storage file when vault (workspace root) changes.
+  // Without this, all vaults share the same atlas-canvas.json file.
+  useEffect(() => {
+    if (!prefsHydrated) return;
+    void useCanvasStore.getState().switchVault(workspaceRoot);
+  }, [workspaceRoot, prefsHydrated]);
+
   // ── V3 Input → Canvas bridge ─────────────────────────────────────────────
   useEffect(() => {
     const ork = useOrkestraStore.getState();

@@ -82,15 +82,17 @@ export function V3MiniMap() {
 
   return (
     <div
-      className="absolute bottom-3 right-3 z-50 select-none overflow-hidden"
+      className="absolute bottom-3 right-3 select-none overflow-hidden"
       style={{
         width: MAP_W, height: MAP_H,
-        background: "rgba(8,8,14,0.82)",
+        zIndex: 9999,
+        background: "rgba(10,10,18,0.88)",
         backdropFilter: "blur(14px) saturate(140%)",
         WebkitBackdropFilter: "blur(14px) saturate(140%)",
-        border: "1px solid rgba(255,255,255,0.06)",
+        border: "1px solid rgba(91,141,239,0.30)",
         borderRadius: 8,
         cursor: "crosshair",
+        boxShadow: "0 0 0 1px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.5)",
       }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
