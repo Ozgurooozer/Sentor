@@ -41,10 +41,15 @@ export function useAllIncomingWireData(panelId: string): WireBlock[] {
           const data: WireData | null = raw
             ? {
                 kind: raw.kind,
-                value:
-                  typeof raw.value === "string"
-                    ? raw.value.slice(0, limit)
-                    : raw.value,
+                value: (() => {
+                  if (typeof raw.value === "string") return raw.value.slice(0, limit);
+                  if (raw.value == null) return raw.value;
+                  try {
+                    return JSON.stringify(raw.value).slice(0, limit);
+                  } catch {
+                    return String(raw.value).slice(0, limit);
+                  }
+                })(),
               }
             : null;
           return {
@@ -54,6 +59,7 @@ export function useAllIncomingWireData(panelId: string): WireBlock[] {
             connectionKind: c.kind ?? "data",
             charLimit: limit,
             data,
+            toPort: c.toPort,
           } satisfies WireBlock;
         })
         .filter((b) => b.data?.value != null),

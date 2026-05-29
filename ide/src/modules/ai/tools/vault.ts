@@ -556,8 +556,9 @@ Use scope to isolate results to a specific agent office (e.g. "agent:vault") or 
               .replace(/[:.]/g, "-")
               .replace("T", "_")
               .slice(0, 19);
-            const trashDir = `${root}${sep}.vault-trash${sep}${category}`;
-            trashPath = `${trashDir}${sep}${slug}-${ts}.html`;
+            const sanitizePath = (s: string) => s.replace(/[\/\\:.?*"<>|]/g, "_");
+            const trashDir = `${root}${sep}.vault-trash${sep}${sanitizePath(category)}`;
+            trashPath = `${trashDir}${sep}${sanitizePath(slug)}-${ts}.html`;
             try {
               await native.createDir(trashDir);
             } catch {

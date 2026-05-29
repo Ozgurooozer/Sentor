@@ -94,6 +94,28 @@ export function V3InfiniteCanvas() {
         }
         return;
       }
+      if ((e.ctrlKey || e.metaKey) && e.key === "0") {
+        e.preventDefault();
+        const { panels } = useCanvasStore.getState();
+        const visible = panels.filter((p) => !p.pinned && !p.minimized);
+        if (visible.length === 0) {
+          useCanvasStore.getState().setViewport({ x: 0, y: 0, scale: 1 });
+          return;
+        }
+        const minX = Math.min(...visible.map((p) => p.x));
+        const minY = Math.min(...visible.map((p) => p.y));
+        const maxX = Math.max(...visible.map((p) => p.x + p.width));
+        const maxY = Math.max(...visible.map((p) => p.y + p.height));
+        const pw = window.innerWidth;
+        const ph = window.innerHeight;
+        const bw = maxX - minX + 120;
+        const bh = maxY - minY + 120;
+        const scale = Math.min(1.0, Math.min(pw / bw, ph / bh));
+        const x = pw / 2 - (minX + bw / 2 - 60) * scale;
+        const y = ph / 2 - (minY + bh / 2 - 60) * scale;
+        useCanvasStore.getState().setViewport({ x, y, scale });
+        return;
+      }
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
         setShowAddPanel(true);
@@ -285,7 +307,7 @@ export function V3InfiniteCanvas() {
       {panels.length === 0 && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <span className="font-mono text-[12px] tracking-wide" style={{ color: "rgba(255,255,255,0.10)" }}>
-            Ctrl+K — add a node
+            Ctrl+K — add node  ·  Ctrl+0 — fit all
           </span>
         </div>
       )}
