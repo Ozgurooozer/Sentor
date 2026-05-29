@@ -20,8 +20,8 @@ export type { AtlasOpenInput };
 const FONT_SIZE = 14;
 const BACKWARD_KILL_WORD = "\x17";
 
-const LOCAL_URL_RE =
-  /\bhttps?:\/\/(?:localhost|127\.0\.0\.1|0\.0\.0\.0)(?::\d{1,5})?(?:\/[^\s\x1b]*)?/g;
+// eslint-disable-next-line no-control-regex
+const LOCAL_URL_RE = /\bhttps?:\/\/(?:localhost|127\.0\.0\.1|0\.0\.0\.0)(?::\d{1,5})?(?:\/[^\s\x1b]*)?/g;
 
 type Callbacks = {
   onSearchReady?: (addon: SearchAddon) => void;

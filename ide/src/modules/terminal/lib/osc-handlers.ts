@@ -58,7 +58,7 @@ function parseOsc7(data: string): string | null {
   let path = m[1];
   try {
     path = decodeURIComponent(path);
-  } catch {}
+  } catch { /* decodeURIComponent may throw on malformed % sequences — ignore */ }
   // /C:/Users/foo -> C:/Users/foo so it's a valid Windows path.
   if (/^\/[A-Za-z]:/.test(path)) path = path.slice(1);
   return path;

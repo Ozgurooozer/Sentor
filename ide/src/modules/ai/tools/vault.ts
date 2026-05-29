@@ -374,7 +374,7 @@ Use scope to isolate results to a specific agent office (e.g. "agent:vault") or 
         const root = ctx.getWorkspaceRoot();
         if (!root) return { error: "No workspace root — open a folder first" };
 
-        let pages: IndexPage[] = [];
+        let pages: IndexPage[];
         try {
           pages = await readIndex(root);
         } catch (e) {

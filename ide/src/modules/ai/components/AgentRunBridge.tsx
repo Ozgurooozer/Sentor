@@ -229,7 +229,7 @@ function Bridge({
         }
         const original = await readOriginal(abs);
         if (cancelled) return;
-        let proposed = "";
+        let proposed: string;
         if (p.derive.kind === "literal") {
           proposed = p.derive.content;
         } else {

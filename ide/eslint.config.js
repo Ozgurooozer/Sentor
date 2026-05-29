@@ -16,13 +16,22 @@ export default tseslint.config(
       "react-hooks": reactHooks,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
-      // Downgrade noisy TypeScript rules to warnings
+      // ── Critical: catches hook-after-return and conditional hooks ───────
+      "react-hooks/rules-of-hooks": "error",
+      // ── Useful warnings: missing deps in effects/callbacks ───────────────
+      "react-hooks/exhaustive-deps": "warn",
+      // ── v7 new rules — too many false positives in this codebase ────────
+      "react-hooks/react-compiler": "off",
+      "react-hooks/refs": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/no-leaked-subscriptions": "off",
+      // ── TypeScript — off noise, keep real errors ─────────────────────────
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/no-unsafe-function-type": "off",
+      "@typescript-eslint/no-require-imports": "off",
     },
   },
 );
