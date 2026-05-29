@@ -19,7 +19,7 @@ import { AgentEditorPanel } from "./AgentEditorPanel";
 import { localToAsset } from "@/modules/browser/assetUrl";
 import { EditorPane } from "@/modules/editor/EditorPane";
 import { usePreferencesStore } from "@/modules/settings/preferences";
-import { TerminalPane, type TerminalPaneHandle } from "@/modules/terminal";
+import { TerminalPane, type TerminalPaneHandle, disposeSession } from "@/modules/terminal";
 import { VaultHomePane } from "@/modules/vault-home/VaultHomePane";
 import { useCanvasStore } from "./canvasStore";
 import { useAllIncomingWireData, PANEL_ICONS } from "./useWireData";
@@ -41,6 +41,7 @@ import { AudioPanel } from "./AudioPanel";
 import { VariablePanel } from "./VariablePanel";
 import { IfElsePanel } from "./IfElsePanel";
 import { ForEachPanel } from "./ForEachPanel";
+import { GatePanel } from "./GatePanel";
 import { webLayerManager } from "./webLayer/WebLayerManager";
 import { useAgentsStore } from "@/modules/ai/store/agentsStore";
 import type { Agent } from "@/modules/ai/lib/agents";
@@ -155,6 +156,7 @@ const PANEL_REGISTRY: Partial<Record<PanelType, PanelRenderer>> = {
   "variable":    ({ panel }) => <VariablePanel panelId={panel.id} />,
   "if-else":     ({ panel }) => <IfElsePanel panelId={panel.id} />,
   "for-each":    ({ panel }) => <ForEachPanel panelId={panel.id} />,
+  "gate":        ({ panel }) => <GatePanel panelId={panel.id} />,
 };
 
 // ── Entry point ──────────────────────────────────────────────────────────────
@@ -296,6 +298,15 @@ function fmtResult(val: unknown): string {
 
 function V3TerminalPanel({ panel }: { panel: CanvasPanelNode }) {
   const leafId = getLeafId(panel.id);
+
+  // Clean up PTY session and leafId mapping when panel is removed
+  useEffect(() => {
+    return () => {
+      disposeSession(leafId);
+      leafIdMap.delete(panel.id);
+    };
+  }, [leafId, panel.id]);
+
   const initCmd = (panel.meta?.initCmd as string | undefined) || undefined;
   const paneRef = useRef<TerminalPaneHandle>(null);
   const setOutputData = useCanvasStore((s) => s.setOutputData);
@@ -425,7 +436,7 @@ function V3TerminalPanel({ panel }: { panel: CanvasPanelNode }) {
     setCmdHist((h) => [src, ...h.slice(0, 49)]);
     setHistIdx(-1);
     try {
-      // eslint-disable-next-line no-eval
+       
       const val = (0, eval)(src);
       setJsLog((p) => [...p, { kind: "result", text: fmtResult(val) }]);
     } catch (err) {

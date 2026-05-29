@@ -502,22 +502,28 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
   },
 
   async switchVault(root) {
-    const key = root ? `atlas-canvas-${_simpleHash(root)}.json` : "atlas-canvas.json";
-    if (key === _persistKey) return;
+    if (_vaultSwitching) return;
+    _vaultSwitching = true;
+    try {
+      const key = root ? `atlas-canvas-${_simpleHash(root)}.json` : "atlas-canvas.json";
+      if (key === _persistKey) return;
 
-    // Flush current state before switching.
-    const cur = get();
-    if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
-    await _persistStore
-      .set(PERSIST_KEY, { panels: cur.panels, connections: cur.connections, viewport: cur.viewport, nextZ: cur.nextZ })
-      .catch(() => undefined);
+      // Flush current state before switching.
+      const cur = get();
+      if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+      await _persistStore
+        .set(PERSIST_KEY, { panels: cur.panels, connections: cur.connections, viewport: cur.viewport, nextZ: cur.nextZ })
+        .catch(() => undefined);
 
-    _persistKey = key;
-    _persistStore = new LazyStore(key, { defaults: {}, autoSave: 300 });
-    _hydrated = false;
+      _persistKey = key;
+      _persistStore = new LazyStore(key, { defaults: {}, autoSave: 300 });
+      _hydrated = false;
 
-    useCanvasStore.setState({ panels: [], connections: [], viewport: { x: 0, y: 0, scale: 1 }, nextZ: 1, hydrated: false });
-    await hydrate();
+      useCanvasStore.setState({ panels: [], connections: [], viewport: { x: 0, y: 0, scale: 1 }, nextZ: 1, hydrated: false });
+      await hydrate();
+    } finally {
+      _vaultSwitching = false;
+    }
   },
 
   ensureSystemCanvas(workspaceRoot) {
@@ -716,6 +722,7 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
 // ── Persistence wiring ──────────────────────────────────────────────────────
 
 let _hydrated = false;
+let _vaultSwitching = false;
 async function hydrate(): Promise<void> {
   if (_hydrated) return;
   _hydrated = true;
