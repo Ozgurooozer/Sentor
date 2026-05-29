@@ -1,10 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { emit, emitTo } from "@tauri-apps/api/event";
+import { emit, emitTo, listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { LogicalSize, PhysicalPosition } from "@tauri-apps/api/dpi";
 import { currentMonitor } from "@tauri-apps/api/window";
-import { cn } from "@/lib/utils";
 import { V3Cursor } from "./V3Cursor";
 import { V3ProjectPanel } from "./V3ProjectPanel";
 import { V3TtsOverlay } from "./V3TtsOverlay";
@@ -34,9 +33,14 @@ export function V3InputShell() {
   const [busy, setBusy]             = useState(false);
   const [panelOpen, setPanelOpen]   = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [canvasLinked, setCanvasLinked] = useState(
-    () => localStorage.getItem("v3-canvas-linked") === "1"
+  const [linkedCanvasId, setLinkedCanvasId] = useState<string | null>(
+    () => localStorage.getItem("v3-linked-canvas-id") ?? null,
   );
+  const [canvasList, setCanvasList] = useState<{ id: string; title: string }[]>([]);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const BASE_H   = 52;
+  const PICKER_H = 196;
+
   const inputRef   = useRef<HTMLInputElement>(null);
   const historyRef = useRef<HTMLDivElement>(null);
   const orkMessages = useOrkestraStore((s) => s.messages);
@@ -76,6 +80,16 @@ export function V3InputShell() {
     }
     prevLoadingRef.current = orkLoading;
   }, [orkLoading, ttsEnabled, orkMessages]);
+
+  // ── Canvas list from main window ─────────────────────────────────────────
+  useEffect(() => {
+    const unsubP = listen<{ canvases: { id: string; title: string }[] }>(
+      "atlas:canvas-list",
+      ({ payload }) => setCanvasList(payload.canvases),
+    );
+    void emit("atlas:request-canvases", {}).catch(() => {});
+    return () => { void unsubP.then(fn => fn()); };
+  }, []);
 
   // Release mic + AudioContext on unmount
   useEffect(() => {
@@ -147,13 +161,13 @@ export function V3InputShell() {
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, []);
 
   // ── Send helpers ──────────────────────────────────────────────────────────
   const sendText = useCallback(async (text: string) => {
     if (!text || busy || orkLoading) return;
-    if (canvasLinked) {
+    if (linkedCanvasId !== null) {
       await emit("atlas:canvas-prompt", { text }).catch((err) => {
         console.error("[V3:INPUT] canvas emit failed:", err);
       });
@@ -168,7 +182,7 @@ export function V3InputShell() {
       }
     }
     inputRef.current?.focus();
-  }, [busy, orkLoading, canvasLinked, vaultRoute]);
+  }, [busy, orkLoading, linkedCanvasId, vaultRoute]);
 
   // ── Mic recording (single click — VAD auto-stop → Whisper transcription) ───
   const toggleMic = useCallback(async () => {
@@ -214,43 +228,12 @@ export function V3InputShell() {
     }
   }, [micState, startLevelMeter, stopLevelMeter, sendText]);
 
-  // Auto-open history when first canvas message arrives
-  const prevMsgCountRef = useRef(0);
-  useEffect(() => {
-    const count = orkMessages.length;
-    if (canvasLinked && count > 0 && !historyOpen && !panelOpen && prevMsgCountRef.current === 0) {
-      setHistoryOpen(true);
-      // Resize window to show history
-      void (async () => {
-        const win = getCurrentWindow();
-        const curSize = await win.outerSize();
-        const mon = await currentMonitor();
-        const sf  = mon?.scaleFactor ?? 1;
-        const curH = curSize.height / sf;
-        await win.setSize(new LogicalSize(getBarW(), curH + HISTORY_H));
-        const pos = await win.outerPosition();
-        await win.setPosition(new PhysicalPosition(pos.x, Math.round((pos.y / sf - HISTORY_H) * sf)));
-      })();
-    }
-    prevMsgCountRef.current = count;
-  }, [orkMessages.length, canvasLinked, historyOpen, panelOpen]);
-
   // Scroll to bottom on new message
   useEffect(() => {
     if (historyOpen) {
       historyRef.current?.scrollTo({ top: historyRef.current.scrollHeight, behavior: "smooth" });
     }
   }, [orkMessages.length, historyOpen]);
-
-  const toggleCanvasLink = useCallback(() => {
-    const next = !canvasLinked;
-    setCanvasLinked(next);
-    localStorage.setItem("v3-canvas-linked", next ? "1" : "0");
-    if (!next) {
-      emit("atlas:canvas-unlink", {}).catch(() => {});
-      setHistoryOpen(false);
-    }
-  }, [canvasLinked]);
 
   // Mark this window as V3 so globals.css clears the opaque body background
   useEffect(() => {
@@ -262,53 +245,73 @@ export function V3InputShell() {
   useEffect(() => { void useProjectStore.getState().hydrate(); }, []);
   const activeProject = useProjectStore(s => s.getActive());
 
-  // Pencereyi yeniden boyutlandır — iş alanı sınırlarını aşmaz
-  const resizeWindow = useCallback(async (deltaH: number, growing: boolean) => {
-    const win  = getCurrentWindow();
-    const curr = await win.outerSize();
-    const mon  = await currentMonitor();
-    const sf   = mon?.scaleFactor ?? 1;
-    const curH = curr.height / sf;
-    const newH = curH + deltaH;
-
-    // Work area top edge in logical pixels (prevent overflowing upward)
-    const monTop    = (mon?.position.y ?? 0) / sf;
-    const monH      = (mon?.size.height ?? 1080) / sf;
-    // Estimate taskbar ~48px; use that as a floor for work area bottom
-    const workTop   = monTop;
-    const workH     = monH - 48;
-
-    const pos    = await win.outerPosition();
-    const curY   = pos.y / sf;
-    const newY   = growing ? curY - deltaH : curY + deltaH;
-    const clampY = Math.max(workTop + 4, Math.min(newY, workTop + workH - newH - 4));
-
-    await win.setSize(new LogicalSize(getBarW(), newH));
+  const resizeTo = useCallback(async (targetH: number) => {
+    const win = getCurrentWindow();
+    const mon = await currentMonitor();
+    const sf  = mon?.scaleFactor ?? 1;
+    const monTop = (mon?.position.y ?? 0) / sf;
+    const monH   = (mon?.size.height ?? 1080) / sf;
+    const workH  = monH - 48;
+    const size = await win.outerSize();
+    const pos  = await win.outerPosition();
+    const curBottom = (pos.y + size.height) / sf;
+    const newY = curBottom - targetH;
+    const clampY = Math.max(monTop + 4, Math.min(newY, monTop + workH - targetH - 4));
+    await win.setSize(new LogicalSize(getBarW(), targetH));
     await win.setPosition(new PhysicalPosition(pos.x, Math.round(clampY * sf)));
   }, []);
 
-  // Panel açılınca pencereyi yukarı doğru genişlet
   const togglePanel = useCallback(async () => {
     const opening = !panelOpen;
     setPanelOpen(opening);
-    // Close history if opening project panel
-    if (opening && historyOpen) {
-      setHistoryOpen(false);
-      await resizeWindow(PANEL_H - HISTORY_H, true);
-    } else {
-      await resizeWindow(PANEL_H, opening);
-    }
+    if (opening && historyOpen) setHistoryOpen(false);
+    if (opening && pickerOpen)  setPickerOpen(false);
+    await resizeTo(BASE_H + (opening ? PANEL_H : 0));
     if (!opening) inputRef.current?.focus();
-  }, [panelOpen, historyOpen, resizeWindow]);
+  }, [panelOpen, historyOpen, pickerOpen, resizeTo]);
 
-  // Toggle canvas history panel
   const toggleHistory = useCallback(async () => {
-    if (panelOpen) return; // don't overlap with project panel
+    if (panelOpen) return;
     const opening = !historyOpen;
     setHistoryOpen(opening);
-    await resizeWindow(HISTORY_H, opening);
+    await resizeTo(BASE_H + (opening ? HISTORY_H : 0) + (pickerOpen ? PICKER_H : 0));
     if (!opening) inputRef.current?.focus();
-  }, [historyOpen, panelOpen, resizeWindow]);
+  }, [historyOpen, panelOpen, pickerOpen, resizeTo]);
+
+  const togglePicker = useCallback(async () => {
+    const opening = !pickerOpen;
+    setPickerOpen(opening);
+    if (opening) void emit("atlas:request-canvases", {}).catch(() => {});
+    await resizeTo(BASE_H + (opening ? PICKER_H : 0) + (historyOpen ? HISTORY_H : 0));
+  }, [pickerOpen, historyOpen, resizeTo]);
+
+  const handleSelectCanvas = useCallback(async (id: string) => {
+    setLinkedCanvasId(id);
+    localStorage.setItem("v3-linked-canvas-id", id);
+    setPickerOpen(false);
+    void emit("atlas:canvas-switch", { id }).catch(() => {});
+    await resizeTo(BASE_H + (historyOpen ? HISTORY_H : 0));
+  }, [historyOpen, resizeTo]);
+
+  const handleDisconnect = useCallback(async () => {
+    setLinkedCanvasId(null);
+    localStorage.removeItem("v3-linked-canvas-id");
+    setPickerOpen(false);
+    setHistoryOpen(false);
+    void emit("atlas:canvas-unlink", {}).catch(() => {});
+    await resizeTo(BASE_H);
+  }, [resizeTo]);
+
+  // Auto-open history when first canvas message arrives
+  const prevMsgCountRef = useRef(0);
+  useEffect(() => {
+    const count = orkMessages.length;
+    if (linkedCanvasId !== null && count > 0 && !historyOpen && !panelOpen && prevMsgCountRef.current === 0) {
+      setHistoryOpen(true);
+      void resizeTo(BASE_H + HISTORY_H + (pickerOpen ? PICKER_H : 0));
+    }
+    prevMsgCountRef.current = count;
+  }, [orkMessages.length, linkedCanvasId, historyOpen, panelOpen, pickerOpen, resizeTo]);
 
   const send = async () => {
     const text = val.trim();
@@ -338,7 +341,7 @@ export function V3InputShell() {
           backdropFilter: "blur(28px) saturate(160%)",
           WebkitBackdropFilter: "blur(28px) saturate(160%)",
           borderRadius: 12,
-          border: canvasLinked ? "1px solid rgba(77,184,154,0.30)" : "1px solid rgba(255,255,255,0.08)",
+          border: linkedCanvasId !== null ? "1px solid rgba(77,184,154,0.30)" : "1px solid rgba(255,255,255,0.08)",
           transition: "border-color 250ms ease",
           fontFamily: '"Segoe UI Variable", "Segoe UI", system-ui, sans-serif',
           fontFeatureSettings: '"ss01", "cv01"',
@@ -352,7 +355,7 @@ export function V3InputShell() {
         )}
 
         {/* ── Canvas AI geçmişi — canvas-linked iken görünür ────────── */}
-        {canvasLinked && historyOpen && orkMessages.length > 0 && (
+        {linkedCanvasId !== null && historyOpen && orkMessages.length > 0 && (
           <div
             ref={historyRef}
             style={{
@@ -464,205 +467,334 @@ export function V3InputShell() {
               value={val}
               onChange={e => setVal(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") void send(); }}
-              placeholder={canvasLinked ? "Canvas'ı yönet — node ekle, bağla, çalıştır…" : vaultRoute ? "Vault'a yaz — Atlas-Maker sayfa oluşturacak…" : "Atlas'a bir şey sor…"}
+              placeholder={linkedCanvasId !== null ? "Canvas'ı yönet — node ekle, bağla, çalıştır…" : vaultRoute ? "Vault'a yaz — Atlas-Maker sayfa oluşturacak…" : "Atlas'a bir şey sor…"}
               autoFocus
               className="min-w-0 flex-1 bg-transparent text-[13.5px] text-[#e8e8ec] outline-none placeholder:text-[#2e2e3a]"
               style={{ caretColor: "#5b8def" }}
             />
           </div>
 
-          {/* Sağ: canvas link + geçmiş + gönder + küçült + kapat */}
-          <div className="flex shrink-0 items-center gap-1 px-2">
+          {/* Sağ: fonksiyonel tuşlar + ayırıcı + pencere chrome */}
+          <div className="flex shrink-0 items-center gap-[3px] px-2">
 
-            {/* Canvas history toggle — only shown when linked */}
-            {canvasLinked && orkMessages.length > 0 && (
-              <button
-                type="button"
+            {/* Canvas history toggle */}
+            {linkedCanvasId !== null && orkMessages.length > 0 && (
+              <IBtn
                 onClick={() => void toggleHistory()}
                 title={historyOpen ? "Geçmişi gizle" : "Konuşmayı göster"}
-                className="flex h-[28px] w-[28px] items-center justify-center rounded-full transition-all duration-150"
-                style={{
-                  background: historyOpen ? "rgba(91,141,239,0.15)" : "rgba(255,255,255,0.03)",
-                  color:      historyOpen ? "#5b8def" : "#555",
-                  border:     `1px solid ${historyOpen ? "rgba(91,141,239,0.30)" : "rgba(255,255,255,0.05)"}`,
-                }}
+                active={historyOpen}
+                activeColor="blue"
               >
-                <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                  <path d="M1 3h10M1 6h8M1 9h6"/>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                  <path d="M1 2.5h10M1 6h7.5M1 9.5h5"/>
                 </svg>
-              </button>
+              </IBtn>
             )}
 
-            {/* Vault-route toggle — routes text to Atlas-Maker instead of normal chat */}
-            {!canvasLinked && (
-              <button
-                type="button"
+            {/* Vault-route toggle */}
+            {linkedCanvasId === null && (
+              <IBtn
                 onClick={() => setVaultRoute((v) => !v)}
-                title={vaultRoute ? "Vault modunu kapat" : "Vault modu — ses/yazı Atlas-Maker'a gönderilir"}
-                className="flex h-[28px] w-[28px] items-center justify-center rounded-full transition-all duration-150"
-                style={{
-                  background: vaultRoute ? "rgba(155,114,239,0.15)" : "rgba(255,255,255,0.03)",
-                  color:      vaultRoute ? "#9b72ef" : "#2e2e3a",
-                  border:     `1px solid ${vaultRoute ? "rgba(155,114,239,0.35)" : "rgba(255,255,255,0.05)"}`,
-                }}
-                onMouseEnter={(e) => { if (!vaultRoute) (e.currentTarget as HTMLElement).style.color = "#888"; }}
-                onMouseLeave={(e) => { if (!vaultRoute) (e.currentTarget as HTMLElement).style.color = "#2e2e3a"; }}
+                title={vaultRoute ? "Vault modunu kapat" : "Vault modu"}
+                active={vaultRoute}
+                activeColor="purple"
               >
-                <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M7 1l1.5 4h4l-3 2.5 1 4L7 9l-3.5 2.5 1-4L1.5 5H6z"/>
+                <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 1.5l1.4 3.8h3.8l-3 2.3 1.1 3.8L7 9l-3.3 2.4 1.1-3.8-3-2.3H5.6z"/>
                 </svg>
-              </button>
+              </IBtn>
             )}
 
-            {/* Canvas link toggle */}
-            <button
-              type="button"
-              onClick={toggleCanvasLink}
-              title={canvasLinked ? "Canvas'tan bağlantıyı kes" : "Canvas'a bağlan — konuşarak canvas'ı yönet"}
-              className="flex h-[28px] w-[28px] items-center justify-center rounded-full transition-all duration-150"
-              style={{
-                background: canvasLinked ? "rgba(77,184,154,0.15)" : "rgba(255,255,255,0.03)",
-                color:      canvasLinked ? "#4db89a" : "#2e2e3a",
-                border:     `1px solid ${canvasLinked ? "rgba(77,184,154,0.35)" : "rgba(255,255,255,0.05)"}`,
-              }}
-              onMouseEnter={(e) => { if (!canvasLinked) (e.currentTarget as HTMLElement).style.color = "#888"; }}
-              onMouseLeave={(e) => { if (!canvasLinked) (e.currentTarget as HTMLElement).style.color = "#2e2e3a"; }}
-            >
-              <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="1" y="1" width="12" height="12" rx="2"/>
-                <path d="M4 5h6M4 7h4M4 9h2"/>
-              </svg>
-            </button>
+            {/* Canvas picker */}
+            <CanvasPicker
+              canvasList={canvasList}
+              linkedId={linkedCanvasId}
+              open={pickerOpen}
+              onToggle={() => void togglePicker()}
+              onSelect={(id) => void handleSelectCanvas(id)}
+              onDisconnect={() => void handleDisconnect()}
+            />
 
-            {/* TTS toggle */}
-            <button
-              type="button"
+            {/* TTS */}
+            <IBtn
               onClick={toggleTts}
-              title={ttsEnabled ? "Sesli yanıtı kapat" : "Sesli yanıtı aç"}
-              className="flex h-[28px] w-[28px] items-center justify-center rounded-full transition-all duration-150"
-              style={{
-                background: ttsEnabled ? "rgba(155,114,239,0.15)" : "rgba(255,255,255,0.03)",
-                color:      ttsEnabled ? "#9b72ef" : "#2e2e3a",
-                border:     `1px solid ${ttsEnabled ? "rgba(155,114,239,0.35)" : "rgba(255,255,255,0.05)"}`,
-              }}
+              title={ttsEnabled ? "Sesli yanıtı kapat" : "Sesli yanıt"}
+              active={ttsEnabled}
+              activeColor="purple"
             >
-              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 6H1v4h2l4 3V3L3 6z"/>
                 {ttsEnabled
-                  ? <path d="M11 5a4 4 0 010 6M13.5 3a7 7 0 010 10"/>
+                  ? <path d="M11 5a4 4 0 010 6M13.5 2.5a7.5 7.5 0 010 11"/>
                   : <path d="M13 5l-4 6"/>
                 }
               </svg>
-            </button>
+            </IBtn>
 
-            {/* Mic button with VAD silence-countdown arc */}
+            {/* Mic */}
             <button
               type="button"
               onClick={() => void toggleMic()}
               title={
                 micState === "recording"
-                  ? silenceProgress > 0 ? "Sessizlik algılandı — durduruyor…" : "Konuşuyor — susunca otomatik gönderilir"
+                  ? silenceProgress > 0 ? "Sessizlik — durduruyor…" : "Dinliyor…"
                   : micState === "transcribing" ? "Yazıya döküyor…"
-                  : "Sesli giriş — bir kez bas, sus, gönderilir"
+                  : "Sesli giriş"
               }
-              className="relative flex h-[28px] w-[28px] items-center justify-center rounded-full"
+              className="relative flex h-[28px] w-[28px] items-center justify-center rounded-md"
               style={{
                 transition: "background 80ms ease-out, border-color 80ms ease-out, box-shadow 80ms ease-out",
                 background: micState === "recording"
-                  ? `rgba(224,90,60,${0.12 + audioLevel * 0.30})`
-                  : micState === "transcribing"
-                    ? "rgba(91,141,239,0.12)"
-                    : "rgba(255,255,255,0.03)",
+                  ? `rgba(224,90,60,${0.15 + audioLevel * 0.28})`
+                  : micState === "transcribing" ? "rgba(91,141,239,0.15)"
+                  : "rgba(255,255,255,0.06)",
                 color: micState === "recording"
                   ? `rgb(${Math.round(224 + audioLevel * 20)},${Math.round(90 - audioLevel * 20)},60)`
-                  : micState === "transcribing"
-                    ? "#5b8def"
-                    : "#2e2e3a",
+                  : micState === "transcribing" ? "#5b8def"
+                  : "#666",
                 border: micState === "recording"
-                  ? `1px solid rgba(224,90,60,${0.25 + audioLevel * 0.55})`
-                  : micState === "transcribing"
-                    ? "1px solid rgba(91,141,239,0.25)"
-                    : "1px solid rgba(255,255,255,0.05)",
+                  ? `1px solid rgba(224,90,60,${0.35 + audioLevel * 0.45})`
+                  : micState === "transcribing" ? "1px solid rgba(91,141,239,0.30)"
+                  : "1px solid rgba(255,255,255,0.10)",
                 boxShadow: micState === "recording" && audioLevel > 0.15
-                  ? `0 0 ${Math.round(audioLevel * 14)}px rgba(224,90,60,${audioLevel * 0.55})`
+                  ? `0 0 ${Math.round(audioLevel * 12)}px rgba(224,90,60,${audioLevel * 0.5})`
                   : "none",
               }}
             >
-              {/* Silence countdown arc — appears when user stops speaking */}
               {micState === "recording" && silenceProgress > 0 && (
-                <svg
-                  style={{ position: "absolute", inset: -1, pointerEvents: "none" }}
-                  width="30" height="30" viewBox="0 0 30 30"
-                >
-                  <circle
-                    cx="15" cy="15" r="13"
-                    fill="none"
-                    stroke="rgba(224,90,60,0.75)"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeDasharray={`${81.7 * (1 - silenceProgress)} 81.7`}
-                    transform="rotate(-90 15 15)"
-                  />
+                <svg style={{ position: "absolute", inset: -1, pointerEvents: "none" }} width="30" height="30" viewBox="0 0 30 30">
+                  <circle cx="15" cy="15" r="13" fill="none" stroke="rgba(224,90,60,0.75)" strokeWidth="2" strokeLinecap="round"
+                    strokeDasharray={`${81.7 * (1 - silenceProgress)} 81.7`} transform="rotate(-90 15 15)"/>
                 </svg>
               )}
               {micState === "transcribing" ? (
-                <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                  <path d="M8 2v4M8 10v4M2 8h4M10 8h4" style={{ animation: "atlas-pulse 1s ease-in-out infinite" }} />
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                  <path d="M8 2v4M8 10v4M2 8h4M10 8h4" style={{ animation: "atlas-pulse 1s ease-in-out infinite" }}/>
                 </svg>
               ) : (
-                <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="5" y="1" width="6" height="9" rx="3"
-                    fill={micState === "recording" ? `rgba(224,90,60,${0.15 + audioLevel * 0.35})` : "none"}
-                  />
-                  <path d="M3 8a5 5 0 0010 0M8 13v2M5 15h6" />
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="5" y="1" width="6" height="9" rx="3" fill={micState === "recording" ? `rgba(224,90,60,${0.15 + audioLevel * 0.3})` : "none"}/>
+                  <path d="M3 8a5 5 0 0010 0M8 13v2M5 15h6"/>
                 </svg>
               )}
             </button>
 
+            {/* Gönder */}
             <button
               type="button"
               onClick={() => void send()}
               disabled={!val.trim() || busy}
-              className={cn(
-                "flex h-[28px] w-[28px] items-center justify-center rounded-full transition-all duration-150",
-                val.trim() && !busy
-                  ? canvasLinked
-                    ? "bg-[rgba(77,184,154,0.18)] text-[#4db89a] hover:bg-[rgba(77,184,154,0.32)]"
-                    : "bg-[rgba(91,141,239,0.18)] text-[#5b8def] hover:bg-[rgba(91,141,239,0.32)]"
-                  : "text-[#252530]",
-              )}
+              className="flex h-[28px] w-[28px] items-center justify-center rounded-md transition-all duration-150"
+              style={{
+                background: val.trim() && !busy
+                  ? linkedCanvasId !== null ? "rgba(77,184,154,0.20)" : "rgba(91,141,239,0.20)"
+                  : "rgba(255,255,255,0.04)",
+                color: val.trim() && !busy
+                  ? linkedCanvasId !== null ? "#4db89a" : "#5b8def"
+                  : "#3a3a48",
+                border: val.trim() && !busy
+                  ? linkedCanvasId !== null ? "1px solid rgba(77,184,154,0.35)" : "1px solid rgba(91,141,239,0.35)"
+                  : "1px solid rgba(255,255,255,0.07)",
+              }}
             >
               {busy
-                ? <span className="size-1.5 animate-pulse rounded-full" style={{ background: canvasLinked ? "#4db89a" : "#5b8def" }} />
+                ? <span className="size-1.5 animate-pulse rounded-full" style={{ background: linkedCanvasId !== null ? "#4db89a" : "#5b8def" }}/>
                 : <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
                     <path d="M8 13V3M3 8l5-5 5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
               }
             </button>
+
+            {/* Ayırıcı */}
+            <div style={{ width: 1, height: 18, background: "rgba(255,255,255,0.07)", margin: "0 2px" }}/>
+
+            {/* Gizle (close → hide, pencere yok olmaz) */}
             <button
               type="button"
-              onClick={() => void getCurrentWindow().minimize()}
-              className="flex h-[22px] w-[22px] items-center justify-center rounded text-[#333] transition-colors hover:bg-white/5 hover:text-[#888]"
-              title="Küçült"
+              onClick={() => void getCurrentWindow().hide()}
+              className="flex h-[22px] w-[22px] items-center justify-center rounded text-[#444] transition-colors duration-150 hover:bg-white/[0.07] hover:text-[#aaa]"
+              title="Gizle — uygulamayı kapatmaz"
             >
               <svg width="10" height="2" viewBox="0 0 10 2" fill="none">
                 <path d="M0 1h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
-              </svg>
-            </button>
-            <button
-              type="button"
-              onClick={() => void getCurrentWindow().close()}
-              className="flex h-[22px] w-[22px] items-center justify-center rounded text-[#333] transition-colors hover:bg-[rgba(255,70,70,0.12)] hover:text-[#ff4646]"
-              title="Kapat"
-            >
-              <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
               </svg>
             </button>
           </div>
         </div>
       </div>
     </>
+  );
+}
+
+function CanvasPicker({
+  canvasList, linkedId, open, onToggle, onSelect, onDisconnect,
+}: {
+  canvasList: { id: string; title: string }[];
+  linkedId: string | null;
+  open: boolean;
+  onToggle: () => void;
+  onSelect: (id: string) => void;
+  onDisconnect: () => void;
+}) {
+  const label = linkedId
+    ? (canvasList.find(c => c.id === linkedId)?.title ?? "Canvas")
+    : "Canvas";
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={onToggle}
+        title="Canvas bağlantısı"
+        className="flex h-[28px] items-center gap-1 rounded-md px-2 transition-all duration-150"
+        style={{
+          background: linkedId  ? "rgba(77,184,154,0.16)"
+                    : open      ? "rgba(255,255,255,0.08)"
+                    :             "rgba(255,255,255,0.06)",
+          color:     linkedId  ? "#4db89a"
+                    : open      ? "#c8c8d0"
+                    :             "#666",
+          border: linkedId
+            ? "1px solid rgba(77,184,154,0.32)"
+            : "1px solid rgba(255,255,255,0.10)",
+          maxWidth: 100,
+        }}
+      >
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none"
+          stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="1.5" y="1.5" width="11" height="11" rx="2"/>
+          <path d="M4 5h6M4 7h4M4 9h2.5"/>
+        </svg>
+        <span className="truncate text-[10px]" style={{ maxWidth: 52 }}>{label}</span>
+        <svg width="8" height="8" viewBox="0 0 10 10" fill="none"
+          stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+          <path d="M2 3.5l3-2.5 3 2.5M2 6.5l3 2.5 3-2.5"/>
+        </svg>
+      </button>
+
+      {open && (
+        <div
+          className="absolute bottom-[calc(100%+6px)] left-0 z-50 w-[176px] overflow-hidden rounded-[9px]"
+          style={{
+            background: "rgba(11,11,17,0.98)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            animation: "v3-fadein 0.12s ease",
+          }}
+        >
+          <div className="px-3 pt-2 pb-1">
+            <span className="font-mono text-[8px] uppercase tracking-widest"
+              style={{ color: "rgba(255,255,255,0.22)" }}>
+              Kanvaslar
+            </span>
+          </div>
+
+          <div className="px-1 pb-1">
+            {canvasList.length === 0 && (
+              <div className="px-2 py-2 text-[10px]" style={{ color: "rgba(255,255,255,0.25)" }}>
+                Kanvas bulunamadı
+              </div>
+            )}
+            {canvasList.map(c => {
+              const isLinked = c.id === linkedId;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => onSelect(c.id)}
+                  className="flex w-full items-center gap-2 rounded-[6px] px-2 py-[5px] text-left transition-all duration-150"
+                  style={{
+                    background: isLinked ? "rgba(77,184,154,0.08)" : "transparent",
+                    border: isLinked ? "1px solid rgba(77,184,154,0.20)" : "1px solid transparent",
+                  }}
+                  onMouseEnter={e => {
+                    if (!isLinked) (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.05)";
+                  }}
+                  onMouseLeave={e => {
+                    if (!isLinked) (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+                  }}
+                >
+                  <span style={{ fontSize: 7, lineHeight: 1, color: isLinked ? "#4db89a" : "rgba(255,255,255,0.25)" }}>◈</span>
+                  <span className="min-w-0 flex-1 truncate text-[11px]"
+                    style={{ color: isLinked ? "#4db89a" : "rgba(255,255,255,0.60)" }}>
+                    {c.title}
+                  </span>
+                  {isLinked && (
+                    <svg width="9" height="9" viewBox="0 0 12 12" fill="none"
+                      stroke="#4db89a" strokeWidth="1.6" strokeLinecap="round">
+                      <path d="M2 6l3 3 5-5"/>
+                    </svg>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {linkedId && (
+            <>
+              <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "0 8px" }} />
+              <div className="p-1">
+                <button
+                  type="button"
+                  onClick={onDisconnect}
+                  className="flex w-full items-center gap-2 rounded-[6px] px-2 py-[5px] text-left transition-all duration-150"
+                  style={{ color: "rgba(224,90,60,0.65)" }}
+                  onMouseEnter={e => {
+                    const b = e.currentTarget as HTMLButtonElement;
+                    b.style.background = "rgba(224,90,60,0.08)";
+                    b.style.color = "#e05a3c";
+                  }}
+                  onMouseLeave={e => {
+                    const b = e.currentTarget as HTMLButtonElement;
+                    b.style.background = "transparent";
+                    b.style.color = "rgba(224,90,60,0.65)";
+                  }}
+                >
+                  <svg width="9" height="9" viewBox="0 0 12 12" fill="none"
+                    stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                    <path d="M2 2l8 8M10 2l-8 8"/>
+                  </svg>
+                  <span className="text-[11px]">Bağlantıyı kes</span>
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Küçük icon tuş bileşeni ───────────────────────────────────────────────────
+const COLOR = {
+  blue:   { bg: "rgba(91,141,239,0.16)",  border: "rgba(91,141,239,0.32)",  text: "#5b8def" },
+  green:  { bg: "rgba(77,184,154,0.16)",  border: "rgba(77,184,154,0.32)",  text: "#4db89a" },
+  purple: { bg: "rgba(155,114,239,0.16)", border: "rgba(155,114,239,0.32)", text: "#9b72ef" },
+} as const;
+
+function IBtn({ children, onClick, title, active, activeColor }: {
+  children: React.ReactNode;
+  onClick: () => void;
+  title?: string;
+  active?: boolean;
+  activeColor?: keyof typeof COLOR;
+}) {
+  const c = active && activeColor ? COLOR[activeColor] : null;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      className="flex h-[28px] w-[28px] items-center justify-center rounded-md transition-all duration-150 hover:brightness-125"
+      style={{
+        background: c ? c.bg : "rgba(255,255,255,0.06)",
+        color:      c ? c.text : "#666",
+        border:     `1px solid ${c ? c.border : "rgba(255,255,255,0.10)"}`,
+      }}
+    >
+      {children}
+    </button>
   );
 }
 
