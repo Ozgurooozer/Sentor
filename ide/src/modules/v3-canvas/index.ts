@@ -6,3 +6,4 @@ export { V3WireLayer } from "./V3WireLayer";
 export { V3NodePalette } from "./V3NodePalette";
 export { V3CanvasBgPanel } from "./V3CanvasBgPanel";
 export { V3SecondaryCanvas } from "./V3SecondaryCanvas";
+export { V3MiniMap } from "./V3MiniMap";

@@ -9,6 +9,7 @@ import { V3CanvasBgAmbient } from "./V3CanvasBgAmbient";
 import { V3CanvasNode } from "./V3CanvasNode";
 import { V3WireLayer, type PendingConn } from "./V3WireLayer";
 import { V3NodePalette } from "./V3NodePalette";
+import { V3MiniMap } from "./V3MiniMap";
 
 // Module-level clipboard — tab-isolated, no persistence needed
 let _clipboard: CanvasPanelNode[] = [];
@@ -302,6 +303,8 @@ export function V3InfiniteCanvas() {
           }}
         />
       )}
+
+      <V3MiniMap />
 
       {showAddPanel && <V3NodePalette onClose={() => setShowAddPanel(false)} />}
     </div>
