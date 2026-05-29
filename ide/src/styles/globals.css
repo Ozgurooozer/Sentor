@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/geist";
 
@@ -142,6 +141,66 @@
 html[data-layout="focused"],
 html[data-layout="focused"] body {
   background: transparent !important;
+}
+
+/* V3 floating windows — body must be transparent so backdrop-filter (and OS Mica)
+ * composites against the actual Windows desktop, not an opaque body background. */
+html[data-v3="true"],
+html[data-v3="true"] body {
+  background: transparent !important;
+}
+
+/* ─── Glass panel — V3 UI building block ─────────────────────────────────── */
+.glass-panel {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.055) 0%,
+      rgba(255, 255, 255, 0.015) 50%,
+      rgba(91, 141, 239, 0.025) 100%
+    ),
+    rgba(12, 12, 20, 0.58);
+  backdrop-filter: blur(24px) saturate(160%) brightness(0.95);
+  -webkit-backdrop-filter: blur(24px) saturate(160%) brightness(0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Inner top-edge highlight — replaces forbidden box-shadow: inset */
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border-top: 1px solid rgba(255, 255, 255, 0.11);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ─── V3 animations ───────────────────────────────────────────────────────── */
+@keyframes v3-fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes v3-enter {
+  from { opacity: 0; transform: scale(0.97) translateY(4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Atlas logo thinking ring: conic-gradient arc rotates clockwise */
+@keyframes atlas-thinking {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Thinking radial wave: particle glow pulse */
+@keyframes v3-thinking-pulse {
+  0%   { opacity: 0; transform: scale(0.6); }
+  40%  { opacity: 0.5; }
+  100% { opacity: 0; transform: scale(1.8); }
 }
 
 /* Custom window chrome (Linux/Windows): the OS gives us a transparent
@@ -348,10 +407,10 @@ html[data-chrome="borderless"] *::-webkit-scrollbar {
     0 0 40px color-mix(in oklab, var(--cv-accent, #5b8def) 30%, transparent);
 }
 
-/* Backdrop blur helper for chrome elements */
+/* Backdrop blur helper for chrome elements — toggled via --chrome-blur CSS var */
 .canvas-chrome {
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: var(--chrome-blur, none) saturate(140%);
+  -webkit-backdrop-filter: var(--chrome-blur, none) saturate(140%);
 }
 
 /* Node footer type label */
@@ -373,6 +432,16 @@ html[data-chrome="borderless"] *::-webkit-scrollbar {
   to   { opacity: 1; transform: translateY(-50%) translateX(0); }
 }
 
+@keyframes addpanel-slide {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes v3-fadein {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .canvas-node-foot .cv-dot {
   width: 6px;
   height: 6px;
@@ -380,4 +449,40 @@ html[data-chrome="borderless"] *::-webkit-scrollbar {
   background: var(--cv-accent, #5b8def);
   box-shadow: 0 0 6px var(--cv-accent, #5b8def);
   flex-shrink: 0;
+}
+
+/* ── V3 Canvas new components ───────────────────────────────────── */
+@keyframes v3-node-enter {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+.v3-canvas-node {
+  animation: v3-node-enter 200ms cubic-bezier(.2,.7,.2,1) both;
+}
+
+.v3-canvas-node-footer {
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+.v3-canvas-node:hover .v3-canvas-node-footer {
+  opacity: 1;
+}
+
+/* ── Canvas ambient orb animations ──────────────────────────────────────── */
+@keyframes atlas-orb-1 {
+  0%   { transform: translate(0px,   0px)   scale(1.00); }
+  100% { transform: translate(60px,  40px)  scale(1.08); }
+}
+@keyframes atlas-orb-2 {
+  0%   { transform: translate(0px,   0px)   scale(1.00); }
+  100% { transform: translate(-50px, 60px)  scale(0.94); }
+}
+@keyframes atlas-orb-3 {
+  0%   { transform: translate(0px,   0px)   scale(1.00); }
+  100% { transform: translate(80px, -40px)  scale(1.06); }
+}
+@keyframes atlas-orb-4 {
+  0%   { transform: translate(0px,   0px)   scale(1.00); }
+  100% { transform: translate(-60px,-50px)  scale(1.10); }
 }

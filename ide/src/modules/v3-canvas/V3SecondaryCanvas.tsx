@@ -1,6 +1,5 @@
 import { useRef, useCallback, useEffect, useState, useMemo } from "react";
 import { CANVAS_MAX_SCALE, CANVAS_MIN_SCALE, CANVAS_ZOOM_STEP } from "@/lib/constants";
-import { ErrorBoundary } from "@/app/ErrorBoundary";
 import { useCanvasStore } from "@/modules/canvas/canvasStore";
 import { PORT_DEFS, namedPortPoint } from "@/modules/canvas/portDefs";
 import type { PortDataType } from "@/modules/canvas/portDefs";
@@ -9,7 +8,12 @@ import { V3CanvasNode } from "./V3CanvasNode";
 import { V3WireLayer, type PendingConn } from "./V3WireLayer";
 import { V3NodePalette } from "./V3NodePalette";
 
-/** Inward-facing semicircle port handle on the canvas edge. */
+function isEditingTarget(e: KeyboardEvent): boolean {
+  const t = e.target as HTMLElement;
+  return t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable;
+}
+
+/** Inward-facing semicircle port handle for secondary canvas. */
 function CanvasPort({ side, label, color }: { side: "left" | "right"; label: string; color: string }) {
   const [hovered, setHovered] = useState(false);
   const isLeft = side === "left";
@@ -38,7 +42,6 @@ function CanvasPort({ side, label, color }: { side: "left" | "right"; label: str
         gap: 3,
         zIndex: 30,
       }}
-      title={isLeft ? "Canvas output — data leaves this canvas" : "Canvas input — data enters this canvas"}
     >
       <div style={{ width: 5, height: 5, borderRadius: "50%", background: hovered ? color : `${color}88`, flexShrink: 0 }} />
       {hovered && (
@@ -50,51 +53,42 @@ function CanvasPort({ side, label, color }: { side: "left" | "right"; label: str
   );
 }
 
-function isEditingTarget(e: KeyboardEvent): boolean {
-  const t = e.target as HTMLElement;
-  return t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable;
-}
-
-export function V3InfiniteCanvas() {
-  const panels      = useCanvasStore((s) => s.panels);
-  const connections = useCanvasStore((s) => s.connections);
-  const viewport    = useCanvasStore((s) => s.viewport);
-  const setViewport = useCanvasStore((s) => s.setViewport);
-  const deselectAll = useCanvasStore((s) => s.deselectAll);
-  const deleteSelected = useCanvasStore((s) => s.deleteSelected);
+export function V3SecondaryCanvas() {
+  const panels      = useCanvasStore((s) => s.secondaryPanels);
+  const connections = useCanvasStore((s) => s.secondaryConnections);
+  const viewport    = useCanvasStore((s) => s.secondaryViewport);
+  const setViewport = useCanvasStore((s) => s.setSecondaryViewport);
+  const deselectAll = useCanvasStore((s) => s.deselectAllSecondary);
+  const deleteSelected = useCanvasStore((s) => s.deleteSecondarySelected);
+  const updatePanel = useCanvasStore((s) => s.updateSecondaryPanel);
+  const bringToFront = useCanvasStore((s) => s.bringSecondaryToFront);
+  const removePanel = useCanvasStore((s) => s.removeSecondaryPanel);
+  const selectPanel = useCanvasStore((s) => s.selectSecondaryPanel);
+  const selectedPanelIds = useCanvasStore((s) => s.secondarySelectedIds);
+  const addConnection = useCanvasStore((s) => s.addSecondaryConnection);
+  const removeConnection = useCanvasStore((s) => s.removeSecondaryConnection);
 
   const [panelDragging, setPanelDragging] = useState(false);
   const [pendingConn, setPendingConn]     = useState<PendingConn | null>(null);
   const [hoveredPanelId, setHoveredPanelId] = useState<string | null>(null);
   const [showAddPanel, setShowAddPanel]   = useState(false);
 
-  // Ctrl+K / canvas:open-add-panel → palette; Delete/Backspace → delete selected
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
-        e.preventDefault();
-        setShowAddPanel(true);
-        return;
-      }
       if ((e.key === "Delete" || e.key === "Backspace") && !isEditingTarget(e)) {
-        const { selectedPanelIds } = useCanvasStore.getState();
-        if (selectedPanelIds.length > 0) {
-          e.preventDefault();
-          deleteSelected();
-        }
+        if (selectedPanelIds.length > 0) { e.preventDefault(); deleteSelected(); }
       }
     };
     const onOpen = () => setShowAddPanel(true);
     window.addEventListener("keydown", onKey);
-    window.addEventListener("canvas:open-add-panel", onOpen);
+    window.addEventListener("canvas:open-secondary-add-panel", onOpen);
     return () => {
       window.removeEventListener("keydown", onKey);
-      window.removeEventListener("canvas:open-add-panel", onOpen);
+      window.removeEventListener("canvas:open-secondary-add-panel", onOpen);
     };
-  }, [deleteSelected]);
+  }, [deleteSelected, selectedPanelIds.length]);
 
   const containerRef = useRef<HTMLDivElement>(null);
-
   const panState = useRef<{ active: boolean; startX: number; startY: number; origVX: number; origVY: number }>({
     active: false, startX: 0, startY: 0, origVX: 0, origVY: 0,
   });
@@ -102,9 +96,7 @@ export function V3InfiniteCanvas() {
   const onCanvasPointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (e.button !== 0 || panelDragging) return;
-      // Only pan on empty canvas space — never activate panning inside a panel
-      if ((e.target as HTMLElement).closest("[data-canvas-panel]")) return;
-      deselectAll();
+      if (!(e.target as HTMLElement).closest("[data-canvas-panel]")) deselectAll();
       panState.current = { active: true, startX: e.clientX, startY: e.clientY, origVX: viewport.x, origVY: viewport.y };
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     },
@@ -124,24 +116,21 @@ export function V3InfiniteCanvas() {
     (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
   }, []);
 
-  // Pinch/wheel zoom
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const handler = (e: WheelEvent) => {
       e.preventDefault();
       const factor = e.deltaY < 0 ? CANVAS_ZOOM_STEP : 1 / CANVAS_ZOOM_STEP;
-      const { scale, x, y } = useCanvasStore.getState().viewport;
+      const { secondaryViewport: { scale, x, y } } = useCanvasStore.getState();
       const next = Math.min(CANVAS_MAX_SCALE, Math.max(CANVAS_MIN_SCALE, scale * factor));
       const rect = el.getBoundingClientRect();
       const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
-      useCanvasStore.getState().setViewport({ scale: next, x: cx - (cx - x) * (next / scale), y: cy - (cy - y) * (next / scale) });
+      useCanvasStore.getState().setSecondaryViewport({ scale: next, x: cx - (cx - x) * (next / scale), y: cy - (cy - y) * (next / scale) });
     };
     el.addEventListener("wheel", handler, { passive: false });
     return () => el.removeEventListener("wheel", handler);
   }, []);
-
-  const canvasPanels = useMemo(() => panels.filter((p) => !p.pinned && !p.minimized), [panels]);
 
   const [canvasRect, setCanvasRect] = useState<DOMRect | null>(null);
   useEffect(() => {
@@ -152,6 +141,15 @@ export function V3InfiniteCanvas() {
     setCanvasRect(el.getBoundingClientRect());
     return () => ro.disconnect();
   }, []);
+
+  const canvasPanels = useMemo(() => panels.filter((p) => !p.pinned && !p.minimized), [panels]);
+
+  const storeOverrides = {
+    updatePanel,
+    removePanel,
+    bringToFront,
+    selectPanel,
+  };
 
   return (
     <div
@@ -164,30 +162,29 @@ export function V3InfiniteCanvas() {
     >
       <V3CanvasBgAmbient />
 
-      {/* Canvas-space transform layer */}
       <div
         className="absolute inset-0"
         style={{ transform: `translate(${viewport.x}px,${viewport.y}px) scale(${viewport.scale})`, transformOrigin: "0 0" }}
       >
         {canvasPanels.map((panel) => (
-          <ErrorBoundary key={panel.id} name={`node:${panel.type}:${panel.id.slice(0, 6)}`}>
-            <V3CanvasNode
-              panel={panel}
-              viewportScale={viewport.scale}
-              onDragStart={() => setPanelDragging(true)}
-              onDragEnd={() => setPanelDragging(false)}
-              onHover={() => setHoveredPanelId(panel.id)}
-              onHoverEnd={() => setHoveredPanelId((cur) => (cur === panel.id ? null : cur))}
-              onStartConnect={() => {
-                const defs = PORT_DEFS[panel.type];
-                const firstOut = defs?.outputs[0];
-                const pt = firstOut
-                  ? namedPortPoint(panel, "right", 0, defs!.outputs.length)
-                  : { x: panel.x + panel.width, y: panel.y + panel.height / 2 };
-                setPendingConn({ fromPanel: panel.id, fromSide: "right", fromPort: firstOut?.id, fromDataType: firstOut?.dataType as PortDataType | undefined, cursorX: pt.x, cursorY: pt.y });
-              }}
-            />
-          </ErrorBoundary>
+          <V3CanvasNode
+            key={panel.id}
+            panel={panel}
+            viewportScale={viewport.scale}
+            storeOverrides={{ ...storeOverrides, isSelected: selectedPanelIds.includes(panel.id) }}
+            onDragStart={() => setPanelDragging(true)}
+            onDragEnd={() => setPanelDragging(false)}
+            onHover={() => setHoveredPanelId(panel.id)}
+            onHoverEnd={() => setHoveredPanelId((cur) => (cur === panel.id ? null : cur))}
+            onStartConnect={() => {
+              const defs = PORT_DEFS[panel.type];
+              const firstOut = defs?.outputs[0];
+              const pt = firstOut
+                ? namedPortPoint(panel, "right", 0, defs!.outputs.length)
+                : { x: panel.x + panel.width, y: panel.y + panel.height / 2 };
+              setPendingConn({ fromPanel: panel.id, fromSide: "right", fromPort: firstOut?.id, fromDataType: firstOut?.dataType as PortDataType | undefined, cursorX: pt.x, cursorY: pt.y });
+            }}
+          />
         ))}
 
         <V3WireLayer
@@ -198,24 +195,28 @@ export function V3InfiniteCanvas() {
           pending={pendingConn}
           onPendingChange={setPendingConn}
           hoveredPanelId={hoveredPanelId}
+          addConnectionOverride={addConnection}
+          removeConnectionOverride={removeConnection}
         />
       </div>
 
-      {/* Empty state */}
       {panels.length === 0 && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <span className="font-mono text-[12px] tracking-wide" style={{ color: "rgba(255,255,255,0.10)" }}>
-            Ctrl+K — add a node
+            Click + Add to start
           </span>
         </div>
       )}
 
-      {/* OUTPUT port — left edge, inward-facing semicircle */}
       <CanvasPort side="left" label="OUT" color="#4db89a" />
-      {/* INPUT port — right edge, inward-facing semicircle */}
       <CanvasPort side="right" label="IN" color="#5b8def" />
 
-      {showAddPanel && <V3NodePalette onClose={() => setShowAddPanel(false)} />}
+      {showAddPanel && (
+        <V3NodePalette
+          onClose={() => setShowAddPanel(false)}
+          onAddPanel={(type) => useCanvasStore.getState().addSecondaryPanel(type)}
+        />
+      )}
     </div>
   );
 }
