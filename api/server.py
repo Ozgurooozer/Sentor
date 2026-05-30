@@ -155,7 +155,7 @@ def _get_records() -> list[dict]:
         except OSError:
             raise RuntimeError("Embeddings not built yet. Run: python tools/embedder.py")
         if mtime != _sem_mtime:
-            data = json.loads(EMBED_FILE.read_text(encoding="utf-8"))
+            data = json.loads(EMBED_FILE.read_text(encoding="utf-8-sig"))
             # Support both old (list) and new (dict with "records") format
             _sem_records = data.get("records", data) if isinstance(data, dict) else data
             _sem_mtime   = mtime
@@ -395,8 +395,8 @@ class _Handler(BaseHTTPRequestHandler):
                     if s > 0.1:
                         sem_scores[r['id']] = round(s, 4)
                 sem_available = True
-            except RuntimeError:
-                pass  # embeddings not built yet — keyword-only
+            except (RuntimeError, ValueError):
+                pass  # embeddings not built / malformed — keyword-only
             except urllib.error.URLError:
                 pass  # Ollama offline — keyword-only
 
@@ -496,8 +496,8 @@ class _Handler(BaseHTTPRequestHandler):
 
         try:
             records = _get_records()
-        except RuntimeError as exc:
-            # No embeddings — degrade to empty result with hint header.
+        except (RuntimeError, ValueError) as exc:
+            # No embeddings or malformed file — degrade to empty result with hint header.
             self._error(503, str(exc))
             return
 

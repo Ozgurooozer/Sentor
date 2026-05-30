@@ -1,6 +1,6 @@
+use notify::{EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use std::path::Path;
 use std::sync::Mutex;
-use notify::{EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use tauri::{AppHandle, Emitter};
 
 #[derive(Default)]
@@ -70,7 +70,10 @@ pub fn mcp_watch_start(
         .ok_or_else(|| "invalid workspace root".to_string())?
         .to_path_buf();
     if !parent.exists() {
-        return Err(format!("workspace root does not exist: {}", parent.display()));
+        return Err(format!(
+            "workspace root does not exist: {}",
+            parent.display()
+        ));
     }
     let queue_name = queue_path
         .file_name()

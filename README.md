@@ -1,12 +1,12 @@
-# Atlas OS
+# Sentor
 
-**A local-first second brain.** Personal knowledge base + AI IDE + web browser — offline, no cloud, no API keys.
+**A personal second brain with a built-in AI IDE.** Knowledge base + AI chat + web browser — works with any AI provider: local (LM Studio, Ollama) or cloud (OpenCode, any OpenAI-compatible API).
 
 > **Platform:** Windows 10/11 64-bit · **Requirements:** 8 GB RAM · Python 3.10+ · Node.js 20+ · Rust toolchain · *(Optional)* Ollama for semantic search
 
 ## What it is
 
-Atlas OS stores everything you know as HTML pages in `vault/`. An AI agent writes and retrieves them. You can search, browse, and chat — all offline, no cloud.
+Sentor stores everything you know as HTML pages in `vault/`. AI agents write and retrieve them. You can search, browse, and chat — using whichever AI backend you prefer.
 
 ```
 vault/{category}/{slug}/index.html   ← your knowledge, as HTML pages
@@ -14,7 +14,7 @@ vault/{category}/{slug}/index.html   ← your knowledge, as HTML pages
 
 Three jobs:
 
-1. **Answer questions** using local AI (LM Studio + Ollama) — no API keys, no cloud
+1. **Answer questions** using any AI — local (LM Studio, Ollama) or cloud (OpenCode, any OpenAI-compatible endpoint)
 2. **Remember everything** as vault HTML pages — written by agents, searchable instantly
 3. **Browse the web** with a real native browser built into the IDE
 
@@ -27,21 +27,21 @@ Three jobs:
 | Editor | CodeMirror 6 |
 | Terminal | xterm.js + portable-pty |
 | AI | Vercel AI SDK (`@ai-sdk/openai-compatible`) |
-| Local providers | LM Studio `localhost:1234` · Ollama `localhost:11434` |
+| AI providers | LM Studio · Ollama · OpenCode · any OpenAI-compatible endpoint |
 | Vault search | Keyword (TF-IDF) + semantic (384-dim embeddings via Ollama) |
 | Web search | SearXNG JSON API (self-hosted or public instance) |
 | Indexer | Python stdlib — zero dependencies |
 
 ## Installation (Windows)
 
-**Recommended:** Download the latest installer from [Releases](../../releases/latest), run it, done. The first-run wizard walks you through four short steps: pick a vault folder, probe local AI providers (LM Studio + Ollama, with a one-click `all-minilm` pull), build the vault index, and optionally start SearXNG for web search.
+**Recommended:** Download the latest installer from [Releases](../../releases/latest), run it, done. The first-run wizard walks you through four short steps: pick a vault folder, configure your AI provider, build the vault index, and optionally start SearXNG for web search.
 
 **From source:**
 
 ```bash
 # 1 — Clone
-git clone https://github.com/YOUR_USERNAME/atlas-os
-cd atlas-os
+git clone https://github.com/Ozgurooozer/Sentor
+cd Sentor
 
 # 2 — Install IDE dependencies (requires pnpm)
 cd ide && pnpm install && cd ..
@@ -77,7 +77,7 @@ docker run -d -p 8888:8080 --name searxng searxng/searxng
 
 | Feature | Description |
 |---|---|
-| **AI Chat** | Three agents: Vault (research), Atlas-Maker (writes vault pages), Coder (edits source files) |
+| **AI Chat** | Five agents: Vault (research), Atlas-Maker (writes vault pages), Coder (edits source files), Orkestra (coordinator), Vault-Exporter |
 | **Web tab** | Real browser using native WebView — no iframe X-Frame-Options limits |
 | **Vault tab** | Local `asset://` vault pages in iframe — fast, same-origin |
 | **Vault Home** | Startup search UI over your own knowledge base |
@@ -190,7 +190,7 @@ ide/                                 ← Tauri v2 desktop app
 
 ## Philosophy
 
-- Local first — no cloud, no telemetry
+- Your choice of AI — local or cloud, swap without rewriting prompts
 - Zero Python dependencies — stdlib only for indexer, CLI, API
 - Vault pages are plain HTML — readable by any browser, not locked in
 - Fewer lines > more lines
