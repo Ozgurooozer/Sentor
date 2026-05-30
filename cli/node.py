@@ -17,7 +17,9 @@ import io
 import json
 import os
 import re
+import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 
 ROOT          = Path(__file__).resolve().parent.parent
@@ -74,14 +76,14 @@ def list_nodes():
             steps = dim(f'{len(p.get("steps",[]))} steps')
             trig  = dim(f'[{p.get("trigger",{}).get("type","manual")}]')
             print(f'  {acc(p["id"].ljust(28))} {trig.ljust(12)} {steps}  {p.get("name","")}')
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f'  [node] skipping pipeline {f.name}: {exc}', file=sys.stderr)
     for f in tasks:
         try:
             t = json.loads(f.read_text(encoding='utf-8'))
             print(f'  {prp(t["id"].ljust(28))} {dim("[task]".ljust(12))} {dim("1 step")}  {t.get("name","")}')
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f'  [node] skipping task {f.name}: {exc}', file=sys.stderr)
     print()
 
 
@@ -102,7 +104,6 @@ def log_node(node_id: str):
     print(f'  {len(runs)} run{"s" if len(runs) != 1 else ""} for {acc(node_id)}\n')
     for r in runs[:20]:
         stat = r.stat()
-        from datetime import datetime
         ts = datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
         size = f'{stat.st_size}b'
         print(f'  {dim(ts)}  {r.name}  {dim(size)}')
@@ -117,7 +118,7 @@ def edit_node(node_id: str):
         print(f'\n  {err(f"node not found: {node_id}")}\n')
         sys.exit(1)
     editor = os.environ.get('EDITOR', os.environ.get('VISUAL', 'notepad' if os.name == 'nt' else 'nano'))
-    os.system(f'"{editor}" "{path}"')
+    subprocess.run([editor, str(path)])
 
 
 def run_node(node_id: str, ctx: dict | None = None):

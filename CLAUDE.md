@@ -54,6 +54,12 @@ atlas-ide.bat
 npm run tauri dev
 ```
 
+**Start CodeGraph bridge** (symbol index for AI code tools; port 4245):
+```bash
+node tools/codegraph_bridge.js "<workspace-path>"
+```
+Required for `code_search` / `code_explore` / `code_callers` / `code_callees` / `code_impact` tools in the IDE AI agents. Without it, those tools return a "not_running" error. Index stored in `ide/.codegraph/codegraph.db`.
+
 **Offline semantic search in IDE** — pull the embedding model for Ollama:
 ```bash
 ollama pull all-minilm
@@ -160,7 +166,7 @@ ide/src/modules/
     lib/
       agent.ts          ← agent runner loop; ProviderConfig/ProviderConfigs types,
                           buildLanguageModel, createAtlasAgent, toDevProxyURL (dev CORS proxy)
-      agents.ts         ← 3 built-in agents: Vault (default), Atlas-Maker, Coder
+      agents.ts         ← 5 built-in agents: Vault (default), Atlas-Maker, Coder, Orkestra (coordinator), Vault-Exporter
       transport.ts      ← AI HTTP transport (DirectChatTransport + live context injection)
       composer.tsx      ← React context for shared input state (text, files, voice, snippets)
       useComposer.ts    ← useComposer hook (separate file — Fast Refresh compliance)
@@ -175,6 +181,10 @@ ide/src/modules/
     tools/
       tools.ts          ← buildTools (aggregates all tool modules)
       fs.ts, edit.ts, search.ts, shell.ts, terminal.ts, todo.ts, subagent.ts, vault.ts, web.ts, sentor.ts, context.ts
+      forum.ts          ← forum_search/read/new_thread/forum_reply — writes forum HTML pages into the vault
+      orchestration.ts  ← agent_invoke — lets Orkestra delegate read-only tasks to other agents
+      codegraph.ts      ← code_search/explore/callers/callees/impact/status — CodeGraph bridge at :4245
+      canvas.ts         ← canvas_read_state + buildCanvasTools (structured tools for full AI agents)
     hooks/
       useSpeechRecognition.ts ← voice: MediaRecorder → POST to faster-whisper server at localhost:3001
   browser/              ← Vault + Web browser panes, AddressBar, bookmarks, assetUrl
@@ -190,7 +200,7 @@ ide/src/modules/
   v3-canvas/            ← V3 canvas UI: V3InfiniteCanvas, V3CanvasNode, V3WireLayer, V3NodePalette,
                           V3CanvasTopBar, V3CanvasBgPanel (Three.js grid+bloom — used for both main bg and canvas-3d panels),
                           V3MiniMap (always visible; crosshair when empty, panel rects when panels exist),
-                          V3SecondaryCanvas
+                          V3SecondaryCanvas, V3OrkPanel (Orkestra chat panel embedded in the canvas)
   canvas/               ← canvas panel content components (one file per PanelType)
 ```
 
@@ -231,7 +241,9 @@ ide/src/modules/
 
 **Orkestra (`orkestraStore.ts`):** Raw streaming fetch to Ollama/LM Studio — does **not** use the AI SDK. Parses embedded JSON tool calls (`{"tool":"add_node",...}`) in the response stream. Alias map rebuilt once per message via `buildSystem()`, then incrementally on each `add` call. Variable list injected into system prompt.
 
-**Canvas AI tools (`buildCanvasTools()`):** 6 structured tools for full agents (Claude/GPT): `canvas_add_node`, `canvas_remove_node`, `canvas_update_node`, `canvas_connect`, `canvas_clear`, `canvas_send_to_terminal`.
+**Canvas AI tools (`buildCanvasTools()`):** 6 structured tools for full agents (Claude/GPT): `canvas_add_node`, `canvas_remove_node`, `canvas_update_node`, `canvas_connect`, `canvas_clear`, `canvas_send_to_terminal`. `canvas_read_state` is a separate read-only tool always available to all agents.
+
+**Canvas run engine (`canvasEngine.ts`):** `runCanvas(options, onEvent)` executes the full node graph — Kahn's BFS topo-sort on data/context wires (triggers ignored for ordering). Gate panels can block their downstream subgraph. Results written back to `canvasStore` via `setOutputData` so wires and panels see live output. ForEach panels iterate their upstream array and run downstream for each item.
 
 **Event communication rule:**
 - Cross-window: Tauri `emitTo` / `listen` with `atlas:` prefix
@@ -242,7 +254,7 @@ ide/src/modules/
 
 **Local file iframes use `asset://` not `file://`:** Tauri blocks `file://` in iframes. Use `convertFileSrc()` from `@tauri-apps/api/core`. Helper: `ide/src/modules/browser/assetUrl.ts` → `vaultPageAssetUrl(root, cat, slug)`.
 
-**Agents (current):** Three built-in — **Vault** (default), **Atlas-Maker** (writes vault HTML pages), **Coder** (edits source files). Subagent types: `explore` + `general` only. Keep at three.
+**Agents (current):** Five built-in — **Vault** (default, knowledge lookup), **Atlas-Maker** (writes vault HTML pages), **Coder** (edits source files), **Orkestra** (coordinator — delegates via `agent_invoke`, never edits files directly), **Vault-Exporter** (converts canvas panels to vault pages). Subagent types: `explore` + `general` only. Each agent supports a per-agent `model` override and a `thinking` boolean toggle (stored in `AgentConfig`, persisted in `agentsStore`).
 
 **Fast Refresh:** `useComposer` lives in `useComposer.ts`, `useTheme` in `useTheme.ts`. Do not re-merge hooks back into component files.
 
@@ -298,8 +310,3 @@ Read `interface-setup/.interface-design/system.md` before touching any UI. Key r
 - Warn on design inconsistencies against `system.md`
 - Never suggest unnecessary dependencies
 
----
-
-## Next (Phase M)
-
-Canvas-as-function (sub-canvas → callable blueprint), Voice Variable node, per-port output system (multiple output wires per port), variable inspector panel, canvas run engine (real for-each iteration).

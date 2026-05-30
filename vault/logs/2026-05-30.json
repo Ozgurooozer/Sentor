@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "ts": 1780124666189,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780124743910,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780125025370,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780125043338,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780125062685,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780125066486,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1780125066486,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1780125095936,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780125136817,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/styles/globals.css"
+  },
+  {
+    "id": 3,
+    "ts": 1780125136818,
+    "level": "debug",
+    "message": "[vite] hot updated: /src/modules/v3-canvas/V3NodePalette.tsx"
+  },
+  {
+    "id": 1,
+    "ts": 1780125683130,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780127578485,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780127811630,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780129108452,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780135756317,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780136448872,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  }
+]

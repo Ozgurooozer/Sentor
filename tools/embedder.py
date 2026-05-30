@@ -52,8 +52,8 @@ def _load_config() -> tuple[str, str]:
         try:
             cfg = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
             return cfg.get("ollamaUrl", DEFAULT_URL), cfg.get("ollamaModel", DEFAULT_MODEL)
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f'  [embedder] config parse error, using defaults: {exc}', file=sys.stderr)
     return DEFAULT_URL, DEFAULT_MODEL
 
 
@@ -112,7 +112,8 @@ def _load_existing() -> dict[str, dict]:
         # Support both old format (list) and new format (dict with "records" key)
         records = data.get("records", data) if isinstance(data, dict) else data
         return {r["id"]: r for r in records if "id" in r}
-    except Exception:
+    except Exception as exc:
+        print(f'  [embedder] could not load existing embeddings: {exc}', file=sys.stderr)
         return {}
 
 

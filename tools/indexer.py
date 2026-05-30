@@ -438,7 +438,8 @@ def build_incremental(changed_paths: list[Path]) -> list[dict]:
     if INDEX_FILE.exists():
         try:
             existing = json.loads(INDEX_FILE.read_text(encoding="utf-8")).get("pages", [])
-        except Exception:
+        except Exception as exc:
+            print(f"  [indexer] could not load existing index, rebuilding: {exc}", file=sys.stderr)
             existing = []
     by_id = {p["id"]: p for p in existing}
 

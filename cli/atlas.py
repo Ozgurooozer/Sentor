@@ -12,6 +12,9 @@ import json
 import os
 import subprocess
 import sys
+import urllib.error
+import urllib.parse
+import urllib.request
 import webbrowser
 from pathlib import Path
 
@@ -224,7 +227,6 @@ def cmd_chat(model_name: str | None) -> None:
     system = system_file.read_text(encoding='utf-8') if system_file.exists() else ''
 
     # Discover available models
-    import urllib.request, urllib.error
     try:
         resp   = urllib.request.urlopen('http://localhost:11434/api/tags', timeout=3)
         models = [m['name'] for m in json.loads(resp.read())['models']]
@@ -260,7 +262,6 @@ def cmd_chat(model_name: str | None) -> None:
         messages.append({'role': 'system', 'content': system})
 
     def _call_tool(name: str, args: dict):
-        import urllib.parse
         if name == 'search_knowledge':
             query    = args.get('query', '')
             limit    = args.get('limit', 5)

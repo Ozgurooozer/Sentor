@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Settings01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { invoke } from "@tauri-apps/api/core";
 import { useCanvasStore } from "@/modules/canvas/canvasStore";
 import { runCanvas } from "@/modules/canvas/canvasEngine";
 import { usePreferencesStore } from "@/modules/settings/preferences";
@@ -197,15 +197,7 @@ export function V3CanvasTopBar({ onOpenSettings, secondary = false }: Props) {
         {/* Input bar'ı geri getir */}
         <button
           type="button"
-          onClick={() => {
-            void (async () => {
-              const w = await WebviewWindow.getByLabel("v3-input");
-              if (!w) return;
-              await w.show();
-              await w.setAlwaysOnTop(true);
-              await w.setFocus();
-            })();
-          }}
+          onClick={() => void invoke("v3_show_input").catch(() => {})}
           className="flex h-7 w-7 items-center justify-center rounded-[6px] transition-colors duration-150 ease-out"
           style={{ color: "rgba(255,255,255,0.3)" }}
           title="Input bar'ı göster"

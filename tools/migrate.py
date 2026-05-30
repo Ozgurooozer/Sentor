@@ -38,7 +38,8 @@ def _index_version() -> int:
     try:
         data = json.loads(INDEX_FILE.read_text(encoding="utf-8"))
         return int(data.get("schema_version", 1))
-    except Exception:
+    except Exception as exc:
+        print(f"  [migrate] could not read index schema version: {exc}", file=sys.stderr)
         return 0
 
 
@@ -50,7 +51,8 @@ def _embed_version() -> int:
         if isinstance(data, list):
             return 0  # old format
         return int(data.get("schema_version", 0))
-    except Exception:
+    except Exception as exc:
+        print(f"  [migrate] could not read embed schema version: {exc}", file=sys.stderr)
         return 0
 
 

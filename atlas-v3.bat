@@ -33,12 +33,15 @@ rem ── IDE ─────────────────────�
 echo   [4/4] Atlas IDE baslatiliyor...
 echo.
 
+set V3_MODE=1
+
 if exist "%~dp0ide\src-tauri\target\release\atlas.exe" (
   start "" "%~dp0ide\src-tauri\target\release\atlas.exe"
 ) else (
   echo   Release binary bulunamadi — dev modda baslatiliyor...
   echo   Tip: atlas.bat menusu ^> ^[B^] Build IDE ile once derleyin.
   echo.
-  start /min "Atlas IDE Dev" cmd /k "title Atlas IDE Dev && cd /d "%~dp0ide" && npx tauri dev"
+  set V3_MODE=1
+  start /min "Atlas IDE Dev" cmd /k "title Atlas IDE Dev && set V3_MODE=1 && cd /d "%~dp0ide" && npx tauri dev"
   timeout /t 3 /nobreak >nul
 )

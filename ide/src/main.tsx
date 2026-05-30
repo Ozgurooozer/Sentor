@@ -17,6 +17,13 @@ if (USE_CUSTOM_WINDOW_CONTROLS) {
   document.documentElement.dataset.chrome = "borderless";
 }
 
+// V3 floating windows — set data-v3 synchronously so the body is transparent
+// from the very first paint. Setting it inside useEffect causes a white flash
+// because the Tauri window is transparent but body background is opaque by default.
+if (window.location.hash.startsWith("#v3-")) {
+  document.documentElement.setAttribute("data-v3", "true");
+}
+
 window.addEventListener("error", (e) => {
   console.error("[global:error]", e.error ?? e.message);
 });

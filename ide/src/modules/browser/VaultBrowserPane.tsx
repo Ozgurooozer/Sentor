@@ -39,14 +39,20 @@ type Props = {
   onTitleChange: (title: string) => void;
 };
 
-function resolveInput(input: string): { kind: "asset" | "external"; value: string } {
+type Resolution = { kind: "asset" | "external"; value: string };
+
+const RESOLVE_RULES: Array<[(s: string) => boolean, (s: string) => Resolution]> = [
+  [s => !s,                                              ()  => ({ kind: "asset",    value: "" })],
+  [s => /^https?:\/\//i.test(s),                        s   => ({ kind: "external", value: s })],
+  [s => /^asset:\/\//i.test(s),                         s   => ({ kind: "asset",    value: s })],
+  [s => /^[a-zA-Z]:\\/.test(s) || s.startsWith("/"),    s   => ({ kind: "asset",    value: localToAsset(s) })],
+  [s => /^[a-z0-9-]+\.[a-z]{2,}(\/.*)?$/i.test(s),     s   => ({ kind: "external", value: `https://${s}` })],
+];
+
+function resolveInput(input: string): Resolution {
   const s = input.trim();
-  if (!s) return { kind: "asset", value: "" };
-  if (/^https?:\/\//i.test(s)) return { kind: "external", value: s };
-  if (/^asset:\/\//i.test(s)) return { kind: "asset", value: s };
-  if (/^[a-zA-Z]:\\/.test(s) || s.startsWith("/")) return { kind: "asset", value: localToAsset(s) };
-  if (/^[a-z0-9-]+\.[a-z]{2,}(\/.*)?$/i.test(s)) return { kind: "external", value: `https://${s}` };
-  return { kind: "external", value: s };
+  const rule = RESOLVE_RULES.find(([test]) => test(s));
+  return rule ? rule[1](s) : { kind: "external", value: s };
 }
 
 export function VaultBrowserPane({ tab, onNavigate, onNavigateExternal, onGoBack, onGoForward, onTitleChange }: Props) {

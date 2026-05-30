@@ -11,7 +11,7 @@ import threading
 import time
 import urllib.error
 import urllib.request
-from http.server import HTTPServer
+from http.server import ThreadingHTTPServer
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -39,8 +39,8 @@ BASE      = f'http://localhost:{TEST_PORT}'
 
 # ── Server lifecycle ───────────────────────────────────────────────────────────
 
-def _start_server() -> HTTPServer:
-    httpd  = HTTPServer(('127.0.0.1', TEST_PORT), _Handler)
+def _start_server() -> ThreadingHTTPServer:
+    httpd  = ThreadingHTTPServer(('127.0.0.1', TEST_PORT), _Handler)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
     thread.start()
     return httpd
@@ -120,6 +120,19 @@ def _options(path: str) -> int:
     req  = urllib.request.Request(f'{BASE}{path}', method='OPTIONS')
     resp = urllib.request.urlopen(req, timeout=5)
     return resp.status
+
+
+def _post_raw(path: str, data: bytes, auth: bool = True) -> tuple[int, dict]:
+    req = urllib.request.Request(f'{BASE}{path}', data=data, method='POST')
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('Content-Length', str(len(data)))
+    if auth:
+        req.add_header('Authorization', f'Bearer {_API_TOKEN}')
+    try:
+        resp = urllib.request.urlopen(req, timeout=10)
+        return resp.status, json.loads(resp.read().decode('utf-8'))
+    except urllib.error.HTTPError as exc:
+        return exc.code, json.loads(exc.read().decode('utf-8'))
 
 
 # ── Tests ──────────────────────────────────────────────────────────────────────
@@ -263,6 +276,77 @@ def test_public_path_no_auth():
     assert resp.status == 200, f'Expected 200 for public /api/categories without auth'
 
 
+# ── Regression tests (5 bugs fixed 2026-05-30) ────────────────────────────────
+
+def test_post_body_size_limit():
+    """POST body > 1 MB must return 413, not hang or crash."""
+    big = b'{"x":"' + b'a' * 1_100_000 + b'"}'
+    status, body = _post_raw('/api/ide/agent/message', big)
+    assert status == 413, f'Expected 413 for oversized body, got {status}'
+    assert 'error' in body, 'Error body must contain "error" field'
+
+
+def test_hybrid_mode_field_present():
+    """/api/hybrid must always return a mode field — regression for ternary bug."""
+    req = urllib.request.Request(f'{BASE}/api/hybrid?q=html')
+    req.add_header('Authorization', f'Bearer {_API_TOKEN}')
+    resp = urllib.request.urlopen(req, timeout=5)
+    data = json.loads(resp.read().decode('utf-8'))
+    assert 'mode' in data, '/api/hybrid response missing "mode" field'
+    assert data['mode'] in ('hybrid', 'keyword', 'keyword-only', 'empty'), \
+        f'Unexpected mode value: {data["mode"]!r}'
+
+
+def test_cache_control_no_store():
+    """All API responses must carry Cache-Control: no-store."""
+    req = urllib.request.Request(f'{BASE}/api/categories')
+    resp = urllib.request.urlopen(req, timeout=5)
+    cc = resp.getheader('Cache-Control') or ''
+    assert 'no-store' in cc, f'Cache-Control header missing no-store: {cc!r}'
+
+
+def test_unauth_returns_json_error():
+    """401 responses must include a JSON error body, not empty."""
+    req = urllib.request.Request(f'{BASE}/api/pages')
+    try:
+        urllib.request.urlopen(req, timeout=5)
+    except urllib.error.HTTPError as exc:
+        assert exc.code == 401, f'Expected 401, got {exc.code}'
+        body = exc.read()
+        parsed = json.loads(body.decode('utf-8'))
+        assert 'error' in parsed, '401 body must contain "error" field'
+
+
+# ── Concurrent smoke test (K-2b) ──────────────────────────────────────────────
+
+def test_concurrent_requests():
+    """10 threads hitting the same endpoint simultaneously must all succeed."""
+    results: list[int] = []
+    errors:  list[str] = []
+    lock = threading.Lock()
+
+    def _worker():
+        try:
+            req = urllib.request.Request(f'{BASE}/api/categories')
+            resp = urllib.request.urlopen(req, timeout=5)
+            with lock:
+                results.append(resp.status)
+        except Exception as exc:
+            with lock:
+                errors.append(str(exc))
+
+    threads = [threading.Thread(target=_worker) for _ in range(10)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join(timeout=10)
+
+    assert not errors, f'Concurrent requests produced errors: {errors}'
+    assert len(results) == 10, f'Expected 10 results, got {len(results)}'
+    assert all(s == 200 for s in results), \
+        f'Not all concurrent requests returned 200: {results}'
+
+
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 def main() -> None:
@@ -289,6 +373,15 @@ def main() -> None:
     test('GET /api/page/x/y (error)      CORS header on error response', test_cors_on_error)
     test('GET /api/pages (no auth)       401 Unauthorised',              test_auth_required)
     test('GET /api/categories (no auth)  200 public endpoint',           test_public_path_no_auth)
+
+    # Regression tests
+    test('POST >1MB body                  413 size limit',                test_post_body_size_limit)
+    test('GET /api/hybrid                 mode field always present',     test_hybrid_mode_field_present)
+    test('GET /api/categories             Cache-Control: no-store',       test_cache_control_no_store)
+    test('GET /api/pages (no auth)        401 body has error field',      test_unauth_returns_json_error)
+
+    # Concurrent smoke test (ThreadingHTTPServer)
+    test('10 concurrent GET /api/categories  all 200, no errors',        test_concurrent_requests)
 
     httpd.shutdown()
 

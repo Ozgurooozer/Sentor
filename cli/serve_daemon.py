@@ -36,8 +36,8 @@ def _log(msg, level='INFO'):
     try:
         with DAEMON_LOG.open('a', encoding='utf-8') as f:
             f.write(line)
-    except Exception:
-        pass
+    except Exception as exc:
+        print(f'  [daemon] log write failed: {exc}', file=sys.stderr)
     tag = ok('✓') if level == 'OK' else (err('!') if level == 'ERR' else dim('·'))
     print(f'  {tag} {msg}')
 
@@ -168,7 +168,8 @@ def run_daemon(poll_interval=5):
             for pf in pipelines:
                 try:
                     pl = json.loads(pf.read_text(encoding='utf-8'))
-                except Exception:
+                except Exception as exc:
+                    print(f'  [daemon] skipping pipeline {pf.name}: {exc}', file=sys.stderr)
                     continue
 
                 pid     = pl['id']

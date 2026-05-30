@@ -63,8 +63,8 @@ def list_flows():
             nodes = ' → '.join(s['node'] for s in steps) if steps else dim('(empty)')
             print(f'  {acc(fl["id"].ljust(24))}  {fl.get("name", fl["id"])}')
             print(f'  {"".ljust(24)}  {dim(nodes)}\n')
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f'  [flow] skipping {f.name}: {exc}', file=sys.stderr)
     print()
 
 

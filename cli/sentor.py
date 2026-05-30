@@ -220,7 +220,8 @@ def list_tasks():
     for f in files:
         try:
             t = json.loads(f.read_text(encoding='utf-8'))
-        except Exception:
+        except Exception as exc:
+            print(f'  [sentor] skipping task {f.name}: {exc}', file=sys.stderr)
             continue
         type_col = dim(f'[{t.get("type","?"):<6}]')
         prov_col = dim(f'{t.get("provider","?"):<16}')
@@ -398,8 +399,8 @@ def _notify(msg, error=False):
     try:
         with NOTIFY_LOG.open('a', encoding='utf-8') as f:
             f.write(line)
-    except Exception:
-        pass
+    except Exception as exc:
+        print(f'  [sentor] notify log write failed: {exc}', file=sys.stderr)
 
     tag = err('!') if error else ok('✓')
     print(f'  {tag} {msg}')

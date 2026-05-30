@@ -283,7 +283,8 @@ def _enqueue(cmd: dict) -> dict:
                 existing = json.loads(QUEUE_FILE.read_text(encoding="utf-8"))
                 if not isinstance(existing, list):
                     existing = []
-            except Exception:
+            except Exception as exc:
+                print(f'  [mcp] queue parse error, resetting: {exc}', file=sys.stderr)
                 existing = []
         else:
             QUEUE_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -295,7 +296,8 @@ def _enqueue(cmd: dict) -> dict:
             with os.fdopen(tmp_fd, "w", encoding="utf-8") as f:
                 f.write(content)
             os.replace(tmp_path, QUEUE_FILE)
-        except Exception:
+        except Exception as exc:
+            print(f'  [mcp] queue write failed: {exc}', file=sys.stderr)
             try:
                 os.unlink(tmp_path)
             except OSError:
@@ -419,8 +421,8 @@ def tool_ide_get_logs(args: dict) -> dict:
             batch = json.loads(fpath.read_text(encoding="utf-8"))
             if isinstance(batch, list):
                 entries.extend(batch)
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f'  [mcp] log read error {fpath.name}: {exc}', file=sys.stderr)
 
     # Apply filters
     if level:

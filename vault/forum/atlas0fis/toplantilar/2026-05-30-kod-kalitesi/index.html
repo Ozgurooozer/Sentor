@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kod Kalitesi Aksiyon Planı — Atlas0fis Toplantısı</title>
+<meta name="description" content="[atlas0fis] 12 persona (10 kadro + 2 yeni çalışan) — api/server.py bulgularından sonra sıradaki kritik adımlar. Motor: ultracode.">
+<meta name="created" content="2026-05-30">
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--mid:#404040;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4caf7d;--amber:#d4a853;--purple:#8b7ed8;--red:#e05a5a;--font:system-ui,-apple-system,sans-serif;--mono:ui-monospace,"Cascadia Code",monospace;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.65;padding:2rem 1.5rem 4rem;max-width:860px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:var(--mono);font-size:.82em;color:var(--accent);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .back{display:inline-block;font-size:.76rem;color:var(--dim);margin-bottom:1.4rem}.back:hover{color:var(--accent)}
+  h1{font-size:1.45rem;font-weight:700;line-height:1.2;margin-bottom:.35rem}
+  .meta{font-size:.76rem;color:var(--muted);margin-bottom:1.6rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+  .tag{font-size:.64rem;padding:.15rem .45rem;border-radius:3px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;background:rgba(91,141,239,.1);color:var(--accent);border:1px solid rgba(91,141,239,.2)}
+  .tag-new{background:rgba(76,175,125,.1);color:var(--green);border:1px solid rgba(76,175,125,.2)}
+  .tag-warn{background:rgba(224,90,90,.1);color:var(--red);border:1px solid rgba(224,90,90,.2)}
+  h2{font-size:.95rem;font-weight:600;margin:1.7rem 0 .55rem;color:var(--ink);border-bottom:1px solid var(--subtle);padding-bottom:.35rem}
+  p{margin-bottom:.7rem;color:var(--dim);font-size:.88rem}
+  ul,ol{padding-left:1.3rem;margin-bottom:.7rem}
+  li{margin-bottom:.25rem;color:var(--dim);font-size:.85rem}
+  .who{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem}
+  .chip{font-size:.7rem;font-family:var(--mono);padding:.18rem .55rem;border-radius:3px;border:1px solid var(--subtle);color:var(--dim)}
+  .chip.new{border-color:rgba(76,175,125,.4);color:var(--green)}
+  table{width:100%;border-collapse:collapse;font-size:.78rem;border:1px solid var(--subtle);border-radius:6px;overflow:hidden;margin:.5rem 0 1.2rem}
+  th,td{text-align:center;padding:.38rem .45rem;border-bottom:1px solid var(--subtle);border-right:1px solid var(--subtle)}
+  th:last-child,td:last-child{border-right:none}
+  th{background:var(--elevated);color:var(--dim);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
+  td:first-child{text-align:left;color:var(--ink);font-weight:500}
+  .ort{font-weight:700;color:var(--accent)}
+  .karar-list{display:flex;flex-direction:column;gap:.5rem;margin:.5rem 0 1.2rem}
+  .karar{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.75rem 1rem;display:flex;gap:.75rem;align-items:flex-start}
+  .karar-no{font-family:var(--mono);font-size:.7rem;color:var(--accent);background:rgba(91,141,239,.1);border:1px solid rgba(91,141,239,.2);border-radius:3px;padding:.1rem .4rem;flex-shrink:0;margin-top:.1rem}
+  .karar-text{font-size:.85rem;color:var(--ink);line-height:1.55}
+  .karar-gerekcesi{font-size:.76rem;color:var(--dim);margin-top:.25rem}
+  .karar-warn{font-size:.74rem;color:var(--red);margin-top:.3rem;padding:.3rem .5rem;background:rgba(224,90,90,.05);border:1px solid rgba(224,90,90,.15);border-radius:3px}
+  .aksiyon-tablo{width:100%;border-collapse:collapse;font-size:.78rem;border:1px solid var(--subtle);border-radius:6px;overflow:hidden;margin:.5rem 0 1.2rem}
+  .aksiyon-tablo th{background:var(--elevated);color:var(--dim);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;padding:.38rem .55rem;text-align:left;border-bottom:1px solid var(--subtle);border-right:1px solid var(--subtle)}
+  .aksiyon-tablo td{padding:.38rem .55rem;border-bottom:1px solid var(--subtle);border-right:1px solid var(--subtle);color:var(--dim);font-size:.8rem;vertical-align:middle}
+  .aksiyon-tablo td:first-child{font-family:var(--mono);color:var(--accent);font-size:.72rem}
+  .badge{display:inline-block;font-size:.64rem;font-family:var(--mono);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .badge-p1{background:rgba(224,90,90,.08);color:var(--red);border-color:rgba(224,90,90,.2)}
+  .badge-p2{background:rgba(212,168,83,.08);color:var(--amber);border-color:rgba(212,168,83,.2)}
+  .badge-p3{background:rgba(91,141,239,.08);color:var(--accent);border-color:rgba(91,141,239,.2)}
+  .badge-s{background:rgba(76,175,125,.08);color:var(--green);border-color:rgba(76,175,125,.2)}
+  .badge-m{background:rgba(139,126,216,.08);color:var(--purple);border-color:rgba(139,126,216,.2)}
+  .selfcheck{background:rgba(224,90,90,.04);border:1px solid rgba(224,90,90,.2);border-radius:6px;padding:1rem 1.1rem;margin:.5rem 0 1.2rem}
+  .selfcheck h3{font-size:.8rem;font-weight:600;color:var(--red);margin-bottom:.6rem}
+  .selfcheck li{color:var(--dim);font-size:.8rem;margin-bottom:.35rem}
+  .motor-badge{font-size:.68rem;font-family:var(--mono);padding:.12rem .5rem;border-radius:3px;background:rgba(139,126,216,.1);color:var(--purple);border:1px solid rgba(139,126,216,.2)}
+</style>
+</head>
+<body>
+<a href="../index.html" class="back">← Atlas0fis Ofisi</a>
+
+<h1>Kod Kalitesi Aksiyon Planı</h1>
+<div class="meta">
+  <span class="tag">atlas0fis</span>
+  <span class="motor-badge">ultracode motoru</span>
+  <span>2026-05-30</span>
+  <span>12 persona · 1 tur · self-check ✓</span>
+</div>
+
+<h2>Katılımcılar</h2>
+<div class="who">
+  <span class="chip">✂ Zeki</span>
+  <span class="chip">✦ Deva</span>
+  <span class="chip">∑ Nazım</span>
+  <span class="chip">¢ Mert</span>
+  <span class="chip">▢ Çelik</span>
+  <span class="chip">⚿ Sena</span>
+  <span class="chip">⚙ Ege</span>
+  <span class="chip">◔ Yıldız</span>
+  <span class="chip">⚡ Can</span>
+  <span class="chip">◈ Moderatör</span>
+  <span class="chip new">🧹 Sıla <em>(yeni)</em></span>
+  <span class="chip new">✓ Berk <em>(yeni)</em></span>
+</div>
+
+<h2>Bağlam</h2>
+<p>
+  <code>api/server.py</code> incelemesinde 5 hata giderildi (mode ternary bug, inline imports, silent exceptions,
+  stderr yönlendirme, POST 1 MB limit). Root dizini temizlendi (loose dökümanlar <code>docs/</code>'a taşındı,
+  geçici dosyalar silindi). Gündem: sıradaki en kritik 3–4 aksiyon nedir?
+</p>
+
+<h2>Pozisyonlar Özeti</h2>
+<p>
+  12 personanın tamamı <strong>ThreadingHTTPServer geçişini</strong> P1 veya P2 olarak işaretledi.
+  <strong>CI pipeline yokluğu</strong> Ege, Berk ve Sıla'nın ortak birinci önceliğiydi.
+  <strong>Test coverage genişletmesi</strong> ve <strong>silent exception audit</strong> ikinci katmanda
+  kümelendi. Sıla ve Berk (yeni çalışanlar) prototypes/threadmind temizliğini P1'e taşıdı.
+  Can, ThreadingHTTPServer geçişini cache thread-safety sorununun çözülmesine bağladı — kritik bulgu.
+</p>
+
+<h2>Oylama (1–5)</h2>
+<table>
+  <tr><th>Öneri</th><th>Zeki</th><th>Deva</th><th>Nazım</th><th>Mert</th><th>Çelik</th><th>Sena</th><th>Ege</th><th>Yıldız</th><th>Can</th><th>Sıla</th><th>Berk</th><th class="ort">Ort</th></tr>
+  <tr><td>A. ThreadingHTTPServer + global Lock'lar</td><td>4</td><td>5</td><td>5</td><td>5</td><td>4</td><td>5</td><td>3</td><td>5</td><td>5</td><td>4</td><td>3</td><td class="ort">4.4</td></tr>
+  <tr><td>B. Test coverage / concurrent smoke test</td><td>4</td><td>4</td><td>5</td><td>5</td><td>4</td><td>3</td><td>4</td><td>4</td><td>5</td><td>3</td><td>5</td><td class="ort">4.2</td></tr>
+  <tr><td>C. CI pipeline (GitHub Actions)</td><td>3</td><td>3</td><td>3</td><td>3</td><td>3</td><td>3</td><td>5</td><td>3</td><td>3</td><td>5</td><td>5</td><td class="ort">3.5</td></tr>
+  <tr><td>D. Silent exception audit + prototypes temizliği</td><td>4</td><td>4</td><td>4</td><td>3</td><td>4</td><td>5</td><td>3</td><td>3</td><td>5</td><td>5</td><td>3</td><td class="ort">3.9</td></tr>
+</table>
+
+<h2>Self-Check Bulguları (Can + Sena)</h2>
+<div class="selfcheck">
+  <h3>⚡⚿ Şeytanın Avukatı</h3>
+  <ul>
+    <li><strong>ThreadingHTTPServer geçişi tek başına yetersiz:</strong> <code>_sem_records</code> / <code>_sem_mtime</code> ve <code>_Cache.pages()</code> Lock'suz global state — geçiş yapılırsa race condition gizlenir değil, görünür hale gelir. Önce Lock, sonra geçiş.</li>
+    <li><strong>CI'da <code>cargo build</code> tehlikeli:</strong> <code>WebView2Loader.dll</code> GitHub Actions runner'ında yok → runtime panic. Çözüm: <code>cargo check + clippy</code> yeter, release build tag push'a ertelenir.</li>
+    <li><strong>Silent exception audit kapsamı dar:</strong> <code>api/server.py</code> düzeltildi ama <code>tools/mcp_server.py</code> ve <code>cli/sentor.py</code> içinde 35+ bare <code>except: pass</code> mevcut — dış servislerle konuşan kod sessiz hata yutmamalı.</li>
+    <li><strong>Concurrent test sunucu sınıfıyla eşleşmeli:</strong> test ortamındaki server sınıfı üretimle aynı olmazsa concurrent test anlamsız.</li>
+  </ul>
+</div>
+
+<h2>Kararlar</h2>
+<div class="karar-list">
+  <div class="karar">
+    <span class="karar-no">K-1</span>
+    <div>
+      <div class="karar-text">Önce <code>_sem_records/_sem_mtime</code> ve <code>_Cache.pages()</code> için <code>threading.Lock()</code> eklenir, ardından <code>BaseHTTPRequestHandler → ThreadingHTTPServer</code> geçişi yapılır.</div>
+      <div class="karar-gerekcesi">Lock'suz ThreadingHTTPServer race'i çözmez, sadece görünür kılar; sıralama kritik.</div>
+      <div class="karar-warn">⚠ Self-check: geçiş lock'tan önce yapılırsa _sem_records TOCTOU race garantili.</div>
+    </div>
+  </div>
+  <div class="karar">
+    <span class="karar-no">K-2</span>
+    <div>
+      <div class="karar-text"><code>test_api.py</code> genişletilir: 5 düzeltilen bug için regresyon testi + <code>ThreadingHTTPServer</code> üzerinde concurrent smoke test (10 thread × aynı endpoint).</div>
+      <div class="karar-gerekcesi">Test ortamı production sunucu sınıfıyla eşleşmezse concurrent test anlamsız.</div>
+    </div>
+  </div>
+  <div class="karar">
+    <span class="karar-no">K-3</span>
+    <div>
+      <div class="karar-text">GitHub Actions CI: <code>cargo check + clippy</code> (cargo build değil) + <code>tsc --noEmit</code> + <code>test_api.py</code> tek workflow. <code>pnpm audit</code> içinde <code>|| true</code> kaldırılır.</div>
+      <div class="karar-gerekcesi">cargo build WebView2 runtime gerektiriyor, runner'da yok; cargo check yeterli ve hızlı.</div>
+      <div class="karar-warn">⚠ Self-check: <code>pnpm audit || true</code> güvenlik görüntüsü verir ama korumaz; <code>|| true</code> kaldırılmalı.</div>
+    </div>
+  </div>
+  <div class="karar">
+    <span class="karar-no">K-4</span>
+    <div>
+      <div class="karar-text">Silent exception audit kapsamı <code>tools/mcp_server.py</code> ve <code>cli/sentor.py</code>'ye genişletilir; tüm bare <code>except: pass</code> bloklarına <code>stderr log</code> eklenir.</div>
+      <div class="karar-gerekcesi">Dış servislerle konuşan kod sessiz hata yutarsa debug imkânsızlaşır.</div>
+    </div>
+  </div>
+</div>
+
+<h2>Aksiyon Planı</h2>
+<table class="aksiyon-tablo">
+  <tr><th>ID</th><th>Görev</th><th>Sahip</th><th>Efor</th><th>Öncelik</th><th>Durum</th></tr>
+  <tr><td>K-1a</td><td><code>_sem_records/_sem_mtime</code> + <code>_Cache.pages()</code> → threading.Lock</td><td>can</td><td><span class="badge badge-s">S</span></td><td><span class="badge badge-p1">P1</span></td><td>Yapılacak</td></tr>
+  <tr><td>K-1b</td><td>BaseHTTPRequestHandler → ThreadingHTTPServer</td><td>mert / nazim</td><td><span class="badge badge-s">S</span></td><td><span class="badge badge-p1">P1</span></td><td>Yapılacak</td></tr>
+  <tr><td>K-2a</td><td>test_api.py: 5 bug regresyon testi</td><td>berk</td><td><span class="badge badge-m">M</span></td><td><span class="badge badge-p1">P1</span></td><td>Yapılacak</td></tr>
+  <tr><td>K-2b</td><td>test_api.py: concurrent smoke test (ThreadingHTTPServer)</td><td>can / mert</td><td><span class="badge badge-m">M</span></td><td><span class="badge badge-p2">P2</span></td><td>Yapılacak</td></tr>
+  <tr><td>K-3</td><td>GitHub Actions: cargo check + tsc + test_api.py (pnpm audit || true kaldır)</td><td>ege / berk</td><td><span class="badge badge-s">S</span></td><td><span class="badge badge-p2">P2</span></td><td>Yapılacak</td></tr>
+  <tr><td>K-4</td><td>Silent exception audit: tools/ + cli/ (mcp_server.py, sentor.py öncelikli)</td><td>sena / can</td><td><span class="badge badge-m">M</span></td><td><span class="badge badge-p2">P2</span></td><td>Yapılacak</td></tr>
+  <tr><td>K-5</td><td>Pre-commit hook: tsc --noEmit + cargo check</td><td>ege / sila</td><td><span class="badge badge-s">S</span></td><td><span class="badge badge-p3">P3</span></td><td>Yapılacak</td></tr>
+</table>
+
+<p style="font-size:.78rem;color:var(--muted);margin-top:1rem">Motor: ultracode · 12 persona · 14 subagent · self-check: Can + Sena · Kararlar self-check bulgularıyla güçlendirildi.</p>
+</body>
+</html>

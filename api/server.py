@@ -15,8 +15,11 @@ Via CLI:         atlas serve [port]            (default port: 4242)
 import json
 import math
 import mimetypes
+import os
+import subprocess
 import sys
-from http.server import BaseHTTPRequestHandler, HTTPServer
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
@@ -52,8 +55,7 @@ QUEUE_FILE   = ROOT / ".mcp-queue.json"
 STATE_FILE   = ROOT / ".ide-state.json"
 DEFAULT_PORT = 4242
 
-import threading as _threading
-_queue_lock = _threading.Lock()
+_queue_lock = threading.Lock()
 
 def _ide_enqueue(cmd: dict) -> None:
     with _queue_lock:
@@ -99,20 +101,22 @@ class _Cache:
     def __init__(self):
         self._pages: list[dict] = []
         self._mtime: float      = 0.0
+        self._lock              = threading.Lock()
 
     def pages(self) -> list[dict]:
-        try:
-            mtime = INDEX_FILE.stat().st_mtime
-        except OSError:
-            return []
-        if mtime != self._mtime:
+        with self._lock:
             try:
-                data        = json.loads(INDEX_FILE.read_text(encoding='utf-8'))
-                self._pages = data.get('pages', [])
-                self._mtime = mtime
-            except (json.JSONDecodeError, OSError):
-                pass
-        return self._pages
+                mtime = INDEX_FILE.stat().st_mtime
+            except OSError:
+                return []
+            if mtime != self._mtime:
+                try:
+                    data        = json.loads(INDEX_FILE.read_text(encoding='utf-8'))
+                    self._pages = data.get('pages', [])
+                    self._mtime = mtime
+                except (json.JSONDecodeError, OSError):
+                    pass
+            return self._pages
 
 
 _cache = _Cache()
@@ -123,6 +127,7 @@ _cache = _Cache()
 _sem_model     = None
 _sem_records:  list[dict] = []
 _sem_mtime:    float      = 0.0
+_sem_lock                 = threading.Lock()
 
 
 def _ollama_embed(text: str, url: str, model: str) -> list[float]:
@@ -144,16 +149,17 @@ def _ollama_embed(text: str, url: str, model: str) -> list[float]:
 def _get_records() -> list[dict]:
     """Reload embeddings from disk when the file changes."""
     global _sem_records, _sem_mtime
-    try:
-        mtime = EMBED_FILE.stat().st_mtime
-    except OSError:
-        raise RuntimeError("Embeddings not built yet. Run: python tools/embedder.py")
-    if mtime != _sem_mtime:
-        data = json.loads(EMBED_FILE.read_text(encoding="utf-8"))
-        # Support both old (list) and new (dict with "records") format
-        _sem_records = data.get("records", data) if isinstance(data, dict) else data
-        _sem_mtime   = mtime
-    return _sem_records
+    with _sem_lock:
+        try:
+            mtime = EMBED_FILE.stat().st_mtime
+        except OSError:
+            raise RuntimeError("Embeddings not built yet. Run: python tools/embedder.py")
+        if mtime != _sem_mtime:
+            data = json.loads(EMBED_FILE.read_text(encoding="utf-8"))
+            # Support both old (list) and new (dict with "records") format
+            _sem_records = data.get("records", data) if isinstance(data, dict) else data
+            _sem_mtime   = mtime
+        return _sem_records
 
 
 def _embed_query(q: str) -> list[float]:
@@ -270,6 +276,9 @@ class _Handler(BaseHTTPRequestHandler):
         length = int(self.headers.get('Content-Length', 0))
         body   = {}
         if length:
+            if length > 1_048_576:  # 1 MB
+                self._error(413, 'request body too large (max 1 MB)')
+                return
             try:
                 body = json.loads(self.rfile.read(length).decode('utf-8'))
             except Exception:
@@ -429,7 +438,7 @@ class _Handler(BaseHTTPRequestHandler):
                 entry['semantic_score'] = sem_scores[pid]
             result.append(entry)
 
-        mode = 'hybrid' if sem_available and sem_scores else ('keyword' if not sem_available else 'keyword')
+        mode = 'hybrid' if sem_available and sem_scores else ('keyword' if sem_available else 'keyword-only')
         self._json({'results': result, 'mode': mode, 'alpha': effective_alpha})
 
     def _search(self, params: dict) -> None:
@@ -714,8 +723,8 @@ class _Handler(BaseHTTPRequestHandler):
                 t = json.loads(f.read_text(encoding='utf-8'))
                 tasks.append({k: t[k] for k in ('id','name','type','provider','description')
                                if k in t})
-            except Exception:
-                pass
+            except Exception as exc:
+                print(f'  [tasks] skipping {f.name}: {exc}', file=sys.stderr)
         self._json({'tasks': tasks})
 
     def _cli_pipelines(self):
@@ -727,29 +736,24 @@ class _Handler(BaseHTTPRequestHandler):
                 pls.append({'id': p['id'], 'name': p.get('name',''),
                              'steps': len(p.get('steps',[])),
                              'trigger': p.get('trigger',{}).get('type','manual')})
-            except Exception:
-                pass
+            except Exception as exc:
+                print(f'  [pipelines] skipping {f.name}: {exc}', file=sys.stderr)
         self._json({'pipelines': pls})
 
     def _cli_provider(self):
-        import urllib.request as _req
-        import urllib.error as _uerr
         def probe(url):
             try:
-                r = _req.urlopen(url, timeout=2)
+                r = urllib.request.urlopen(url, timeout=2)
                 return r.status == 200
             except Exception:
                 return False
-        import os as _os
         self._json({
             'local-ollama':   probe('http://localhost:11434/api/tags'),
             'local-lmstudio': probe('http://localhost:1234/v1/models'),
-            'openrouter':     bool(_os.environ.get('OPENROUTER_API_KEY')),
+            'openrouter':     bool(os.environ.get('OPENROUTER_API_KEY')),
         })
 
     def _cli_run(self, body):
-        import threading as _th
-        import sys as _sys, os as _os
         task_id = body.get('task_id', '').strip()
         if not task_id:
             self._error(400, 'task_id required')
@@ -760,32 +764,29 @@ class _Handler(BaseHTTPRequestHandler):
         def _go():
             try:
                 cli_dir = str(ROOT / 'cli')
-                if cli_dir not in _sys.path:
-                    _sys.path.insert(0, cli_dir)
+                if cli_dir not in sys.path:
+                    sys.path.insert(0, cli_dir)
                 from sentor import run_task  # noqa: PLC0415
                 run_task(task_id, wait=wait, extra_input=extra)
             except Exception as exc:
-                print(f'  [task:{task_id}] error: {exc}')
+                print(f'  [task:{task_id}] error: {exc}', file=sys.stderr)
 
-        _th.Thread(target=_go, daemon=True).start()
+        threading.Thread(target=_go, daemon=True).start()
         self._json({'ok': True, 'task_id': task_id, 'status': 'started'})
 
     def _cli_notify(self, body):
-        import sys as _sys
         msg = body.get('msg', '').strip()
         if not msg:
             self._error(400, 'msg required')
             return
         cli_dir = str(ROOT / 'cli')
-        if cli_dir not in _sys.path:
-            _sys.path.insert(0, cli_dir)
+        if cli_dir not in sys.path:
+            sys.path.insert(0, cli_dir)
         from sentor import notify as _notify  # noqa: PLC0415
         _notify(msg)
         self._json({'ok': True})
 
     def _cli_pipeline_run(self, body):
-        import threading as _th
-        import sys as _sys
         pid = body.get('pipeline_id', '').strip()
         if not pid:
             self._error(400, 'pipeline_id required')
@@ -795,14 +796,14 @@ class _Handler(BaseHTTPRequestHandler):
         def _go():
             try:
                 cli_dir = str(ROOT / 'cli')
-                if cli_dir not in _sys.path:
-                    _sys.path.insert(0, cli_dir)
+                if cli_dir not in sys.path:
+                    sys.path.insert(0, cli_dir)
                 from pipeline import run_pipeline  # noqa: PLC0415
                 run_pipeline(pid, ctx)
             except Exception as exc:
-                print(f'  [pipeline:{pid}] error: {exc}')
+                print(f'  [pipeline:{pid}] error: {exc}', file=sys.stderr)
 
-        _th.Thread(target=_go, daemon=True).start()
+        threading.Thread(target=_go, daemon=True).start()
         self._json({'ok': True, 'pipeline_id': pid, 'status': 'started'})
 
     # ── Nodes (unified pipeline + task listing for canvas menu) ───────────────
@@ -825,8 +826,8 @@ class _Handler(BaseHTTPRequestHandler):
                     'icon':        cm.get('icon', '▶'),
                     'output_kind': cm.get('output_kind', 'text'),
                 })
-            except Exception:
-                pass
+            except Exception as exc:
+                print(f'  [nodes] skipping pipeline {f.name}: {exc}', file=sys.stderr)
         for f in sorted(tsk_dir.glob('*.json')):
             try:
                 t = json.loads(f.read_text(encoding='utf-8'))
@@ -841,12 +842,11 @@ class _Handler(BaseHTTPRequestHandler):
                     'icon':        cm.get('icon', '⚙'),
                     'output_kind': cm.get('output_kind', 'text'),
                 })
-            except Exception:
-                pass
+            except Exception as exc:
+                print(f'  [nodes] skipping task {f.name}: {exc}', file=sys.stderr)
         self._json({'nodes': nodes})
 
     def _node_run(self, node_id: str, body: dict):
-        import threading as _th, subprocess as _sp, sys as _sys
         if not node_id:
             self._error(400, 'node id required')
             return
@@ -867,8 +867,8 @@ class _Handler(BaseHTTPRequestHandler):
         def _go():
             try:
                 cli_dir = str(ROOT / 'cli')
-                if cli_dir not in _sys.path:
-                    _sys.path.insert(0, cli_dir)
+                if cli_dir not in sys.path:
+                    sys.path.insert(0, cli_dir)
                 if kind == 'pipeline':
                     from pipeline import run_pipeline  # noqa: PLC0415
                     run_pipeline(node_id, ctx)
@@ -876,9 +876,9 @@ class _Handler(BaseHTTPRequestHandler):
                     from sentor import run_task  # noqa: PLC0415
                     run_task(node_id, wait=False, extra_input=ctx.get('input'))
             except Exception as exc:
-                print(f'  [node:{node_id}] error: {exc}')
+                print(f'  [node:{node_id}] error: {exc}', file=sys.stderr)
 
-        _th.Thread(target=_go, daemon=True).start()
+        threading.Thread(target=_go, daemon=True).start()
         self._json({'ok': True, 'id': node_id, 'kind': kind, 'status': 'started'})
 
     # ── Response helpers ───────────────────────────────────────────────────────
@@ -926,8 +926,8 @@ class _Handler(BaseHTTPRequestHandler):
 # ── Public entry point (called by atlas serve or directly) ────────────────────
 
 def serve(port: int = DEFAULT_PORT) -> None:
-    HTTPServer.allow_reuse_address = True
-    server = HTTPServer(('127.0.0.1', port), _Handler)
+    ThreadingHTTPServer.allow_reuse_address = True
+    server = ThreadingHTTPServer(('127.0.0.1', port), _Handler)
     base   = f'http://localhost:{port}'
     print(f'\n  Atlas OS API  —  {base}')
     print(f'  Token:      see ~/.atlas/api-token  ({_API_TOKEN[:8]}…)')

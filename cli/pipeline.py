@@ -108,7 +108,8 @@ def list_pipelines():
     for f in files:
         try:
             p = json.loads(f.read_text(encoding='utf-8'))
-        except Exception:
+        except Exception as exc:
+            print(f'  [pipeline] skipping {f.name}: {exc}', file=sys.stderr)
             continue
         steps_col = dim(f'{len(p.get("steps",[]))} steps')
         trig = p.get('trigger', {}).get('type', 'manual')
