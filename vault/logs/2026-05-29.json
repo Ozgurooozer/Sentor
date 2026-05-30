@@ -3352,5 +3352,65 @@
     "ts": 1780070424713,
     "level": "error",
     "message": "[WebLayer] web_navigate failed: webview 'web-panel-b05fe46a-6fb0-4fa5-b0ee-56b564619670' not found"
+  },
+  {
+    "id": 1,
+    "ts": 1780079979513,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780083095429,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780083132923,
+    "level": "system",
+    "message": "Atlas OS — log stream started"
+  },
+  {
+    "id": 2,
+    "ts": 1780083215451,
+    "level": "error",
+    "message": "[WebLayer] web_navigate failed: webview 'web-panel-922a2f36-a9c6-4275-97ab-9bea87cdebe8' not found"
+  },
+  {
+    "id": 3,
+    "ts": 1780083441590,
+    "level": "error",
+    "message": "[pipe] {}"
+  },
+  {
+    "id": 4,
+    "ts": 1780083443426,
+    "level": "error",
+    "message": "[pipe] {}"
+  },
+  {
+    "id": 5,
+    "ts": 1780083630897,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 6,
+    "ts": 1780083631525,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 7,
+    "ts": 1780083631632,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
+  },
+  {
+    "id": 8,
+    "ts": 1780083633698,
+    "level": "error",
+    "message": "%s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderLeft"
   }
 ]
