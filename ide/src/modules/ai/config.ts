@@ -1,4 +1,4 @@
-export const KEYRING_SERVICE = "atlas-ai";
+export const KEYRING_SERVICE = "sentor-ai";
 
 export type ProviderId = "opencode";
 
@@ -86,7 +86,7 @@ export const OPENCODE_DEFAULT_BASE_URL = "https://opencode.ai/zen/v1";
 export const MAX_AGENT_STEPS = 24;
 export const TERMINAL_BUFFER_LINES = 300;
 
-export const SYSTEM_PROMPT = `You are Atlas, an AI coding assistant in a developer IDE with access to a local knowledge vault (offline HTML notes the user has saved).
+export const SYSTEM_PROMPT = `You are Sentor, an AI coding assistant in a developer IDE with access to a local knowledge vault (offline HTML notes the user has saved).
 
 Each turn has a <terminal-context> block: workspace_root, active_terminal_cwd, active_file, terminal output. Use it as ground truth.
 

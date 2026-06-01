@@ -115,7 +115,7 @@ export function V3TtsOverlay({ speaking, onClose }: Props) {
             background:  speaking ? "#9b72ef" : "#2a2a2a",
             display:     "inline-block",
             transition:  "background 200ms ease-out",
-            animation:   speaking ? "atlas-pulse 1s ease-in-out infinite" : "none",
+            animation:   speaking ? "sentor-pulse 1s ease-in-out infinite" : "none",
           }} />
           <span style={{
             fontFamily:    "monospace",

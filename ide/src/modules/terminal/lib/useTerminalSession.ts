@@ -10,12 +10,12 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import {
   registerCwdHandler,
   registerPromptTracker,
-  registerAtlasOpenHandler,
-  type AtlasOpenInput,
+  registerSentorOpenHandler,
+  type SentorOpenInput,
 } from "./osc-handlers";
 import { openPty, type PtySession } from "./pty-bridge";
 
-export type { AtlasOpenInput };
+export type { SentorOpenInput };
 
 const FONT_SIZE = 14;
 const BACKWARD_KILL_WORD = "\x17";
@@ -28,7 +28,7 @@ type Callbacks = {
   onExit?: (code: number) => void;
   onCwd?: (cwd: string) => void;
   onDetectedLocalUrl?: (url: string) => void;
-  onAtlasOpen?: (input: AtlasOpenInput) => void;
+  onSentorOpen?: (input: SentorOpenInput) => void;
 };
 
 // Lives outside React so split/unsplit re-parent the DOM without tearing
@@ -138,8 +138,8 @@ function ensureSession(leafId: number, initialCwd?: string): Session {
         session.lastCwd = cwd;
         session.callbacks.onCwd?.(cwd);
       }),
-      registerAtlasOpenHandler(term, (input) => {
-        session.callbacks.onAtlasOpen?.(input);
+      registerSentorOpenHandler(term, (input) => {
+        session.callbacks.onSentorOpen?.(input);
       }),
     );
   })();
@@ -384,7 +384,7 @@ type Options = {
   onExit?: (code: number) => void;
   onCwd?: (cwd: string) => void;
   onDetectedLocalUrl?: (url: string) => void;
-  onAtlasOpen?: (input: AtlasOpenInput) => void;
+  onSentorOpen?: (input: SentorOpenInput) => void;
 };
 
 export function useTerminalSession({
@@ -397,21 +397,21 @@ export function useTerminalSession({
   onExit,
   onCwd,
   onDetectedLocalUrl,
-  onAtlasOpen,
+  onSentorOpen,
 }: Options) {
   const cbRef = useRef({
     onSearchReady,
     onExit,
     onCwd,
     onDetectedLocalUrl,
-    onAtlasOpen,
+    onSentorOpen,
   });
   cbRef.current = {
     onSearchReady,
     onExit,
     onCwd,
     onDetectedLocalUrl,
-    onAtlasOpen,
+    onSentorOpen,
   };
 
   useEffect(() => {
@@ -424,7 +424,7 @@ export function useTerminalSession({
         onExit: (c) => cbRef.current.onExit?.(c),
         onCwd: (c) => cbRef.current.onCwd?.(c),
         onDetectedLocalUrl: (u) => cbRef.current.onDetectedLocalUrl?.(u),
-        onAtlasOpen: (input) => cbRef.current.onAtlasOpen?.(input),
+        onSentorOpen: (input) => cbRef.current.onSentorOpen?.(input),
       });
       if (visible && focused) s.term.focus();
     });

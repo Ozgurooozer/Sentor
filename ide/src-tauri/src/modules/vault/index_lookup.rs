@@ -83,7 +83,10 @@ pub async fn vault_get_note_titles(query: String) -> Result<Vec<String>, String>
         .filter_map(|p| {
             let title = p.get("title")?.as_str()?.to_string();
             if q.is_empty() || title.to_lowercase().contains(&q) {
-                Some((title.clone(), if title.to_lowercase() == q { 100 } else { 1 }))
+                Some((
+                    title.clone(),
+                    if title.to_lowercase() == q { 100 } else { 1 },
+                ))
             } else {
                 None
             }
@@ -105,7 +108,11 @@ pub async fn vault_get_backlinks(note_id: String) -> Result<Vec<serde_json::Valu
     let bl_ids: Vec<String> = page
         .get("backlinks")
         .and_then(|v| v.as_array())
-        .map(|a| a.iter().filter_map(|x| x.as_str().map(String::from)).collect())
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(String::from))
+                .collect()
+        })
         .unwrap_or_default();
     let mut out = Vec::new();
     for id in bl_ids {
@@ -140,7 +147,11 @@ pub async fn vault_get_similar_notes(
     let target_vec: Vec<f32> = target
         .get("embedding")
         .and_then(|v| v.as_array())
-        .map(|a| a.iter().filter_map(|x| x.as_f64().map(|f| f as f32)).collect())
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_f64().map(|f| f as f32))
+                .collect()
+        })
         .unwrap_or_default();
     if target_vec.is_empty() {
         return Ok(vec![]);
@@ -194,8 +205,7 @@ pub async fn vault_agent_snapshot(slug: String) -> Result<serde_json::Value, Str
         let raw = fs::read_to_string(&state_md).unwrap_or_default();
         let re = regex::Regex::new(r"(?s)^---\s*\n(.*?)\n---\s*\n").unwrap();
         if let Some(c) = re.captures(&raw) {
-            frontmatter =
-                super::parse_yaml_lite(c.get(1).map(|x| x.as_str()).unwrap_or(""));
+            frontmatter = super::parse_yaml_lite(c.get(1).map(|x| x.as_str()).unwrap_or(""));
         }
     }
     let log_md = dir.join("log.md");

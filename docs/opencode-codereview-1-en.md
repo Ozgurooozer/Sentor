@@ -1,4 +1,4 @@
-# Atlas OS — Comprehensive Code Review Report
+# Sentor — Comprehensive Code Review Report
 
 **Date:** May 28, 2026
 **Total files:** ~300+ (Python, TypeScript, Rust, HTML, CSS, JS, JSON)
@@ -12,7 +12,7 @@
 ```mermaid
 graph TB
     subgraph Python_Backend["Python Backend (stdlib)"]
-        CLI["cli/atlas.py<br/>Main CLI"]
+        CLI["cli/main.py<br/>Main CLI"]
         API["api/server.py<br/>REST API (port 4242)"]
         MCP["tools/mcp_server.py<br/>MCP stdio Server"]
         INDEXER["tools/indexer.py<br/>Vault Indexer"]
@@ -77,7 +77,7 @@ graph TB
 
 ```mermaid
 graph LR
-    ROOT["📁 Atlas OS/"] --> API["api/<br/>REST API server"]
+    ROOT["📁 Sentor/"] --> API["api/<br/>REST API server"]
     ROOT --> CLI["cli/<br/>CLI tools"]
     ROOT --> IDE["ide/<br/>Tauri Desktop App"]
     ROOT --> TOOLS["tools/<br/>Python utilities"]
@@ -90,7 +90,7 @@ graph LR
     ROOT --> PROTOS["prototypes/<br/>Prototypes"]
 
     API --> API_F["server.py<br/>962 lines<br/>REST API"]
-    CLI --> CLI_F1["atlas.py<br/>Main CLI"]
+    CLI --> CLI_F1["main.py<br/>Main CLI"]
     CLI --> CLI_F2["sentor.py<br/>Task worker"]
     CLI --> CLI_F3["pipeline.py<br/>Pipeline"]
     CLI --> CLI_F4["node.py<br/>Node mgr"]
@@ -113,7 +113,7 @@ graph LR
 | Folder | Purpose | Quality |
 |--------|---------|:-------:|
 | `api/` | REST API (port 4242), hybrid search, auth, CLI bridge | 7.5/10 |
-| `cli/` | 6 CLI modules: atlas, sentor, pipeline, node, flow, serve_daemon | 7.5/10 |
+| `cli/` | 6 CLI modules: main, sentor, pipeline, node, flow, serve_daemon | 7.5/10 |
 | `ide/` | Tauri v2 desktop app (Rust + TypeScript/React) | Rust: 7.5/10, TS: 7.5/10 |
 | `tools/` | 11 Python/JS tools (indexer, embedder, MCP, scoring...) | 8.5/10 |
 | `ui/` | Browser UI (index.html Fuse.js + control.html API) | 9/10 |
@@ -248,14 +248,14 @@ flowchart TD
     subgraph DRY["🔴 DRY Violations"]
         D1["_parse_yaml_lite()<br/>indexer.py:207<br/>render_office.py:37"]
         D2["_ollama_embed()<br/>embedder.py:78<br/>server.py:128"]
-        D3["ANSI color fn<br/>cli/atlas.py:46<br/>tools/colors.py"]
+        D3["ANSI color fn<br/>cli/main.py:46<br/>tools/colors.py"]
         D4["Context parsing<br/>node.py:252<br/>flow.py:184<br/>pipeline.py:209"]
         D5["Provider probing<br/>server.py:744<br/>sentor.py:48"]
     end
 
     D1 --> FIX1["Fix: tools/yaml_utils.py"]
     D2 --> FIX2["Fix: tools/llm_utils.py"]
-    D3 --> FIX3["Fix: atlas.py import colors"]
+    D3 --> FIX3["Fix: main.py import colors"]
     D4 --> FIX4["Fix: tools/cli_utils.py"]
     D5 --> FIX5["Fix: tools/llm_utils.py"]
 ```
@@ -289,7 +289,7 @@ flowchart TD
 | `transcribe/server.py` | flask, faster-whisper | **❌ Yes** |
 | `ide/` | 55+ npm packages | **❌ Yes** (expected) |
 | `api/server.py` | **stdlib only** ✅ | — |
-| `cli/atlas.py` | **stdlib only** ✅ | — |
+| `cli/main.py` | **stdlib only** ✅ | — |
 | `tools/mcp_server.py` | **stdlib only** ✅ | — |
 | `tools/indexer.py` | **stdlib only** ✅ | — |
 | `tools/embedder.py` | **stdlib only** ✅ | — |
@@ -304,7 +304,7 @@ flowchart TD
 | `prototypes/tlas/index.html` | Unrelated AI comparison page |
 | `prototypes/taslak/index.html` | Unrelated 10 web design prototypes | 
 | `ui/control.html` | Duplicate UI with `ui/index.html`, API-dependent |
-| `atlas-v3.bat` | Undocumented, overlaps with `atlas.bat` |
+| `sentor-v3.bat` | Undocumented, overlaps with `sentor.bat` |
 | `opencode.json` | Same config as `.mcp.json` |
 | `tools/common.py` | Deprecated wrapper, should be removed |
 | `vault/logs/*.json` (1.57 MB) | 72% of vault! Move to hidden directory |
@@ -341,7 +341,7 @@ flowchart TD
 15. Move `vault/logs/` to `.index/logs/`
 16. Fix language inconsistencies (especially "jika" → "if")
 17. Remove one of `opencode.json` or `.mcp.json`
-18. Document `atlas-v3.bat` or merge with `atlas.bat`
+18. Document `sentor-v3.bat` or merge with `sentor.bat`
 19. Complete or remove `ai_local/mod.rs`
 20. Remove `db/mod.rs` if unused
 
@@ -369,8 +369,8 @@ xychart-beta
 4. **Win32 WindowProc subclass**: Lock-free bitmap click-through, impressive native solution
 5. **BoundedRingBuffer**: Offset-based tailing, monotonic offset — textbook quality
 6. **Secret scanning guard** (`vault/guard.rs`): Detects API keys, private keys
-7. **Lazy imports** (`cli/atlas.py`): 7 modules lazy-imported, optimized startup
-8. **Batch scripts** (`atlas.bat`): 268 lines, simulated functions, error handling — best file in project
+7. **Lazy imports** (`cli/main.py`): 7 modules lazy-imported, optimized startup
+8. **Batch scripts** (`sentor.bat`): 268 lines, simulated functions, error handling — best file in project
 9. **Web UI** (`ui/style.css` + `app.js`): Zero build, Fuse.js, XSS protection, accessibility
 10. **MCP server queue**: Atomic write + rename prevents Windows race conditions
 11. **Multiple shell support** (`shell_init.rs`): Auto-detects Zsh, Bash, Fish, PowerShell
@@ -409,7 +409,7 @@ The project's core mechanics (vault, indexing, CLI, API, MCP) are **solid, clean
 The project carries typical AI-generated code diseases: **language inconsistency** (English + Turkish + Indonesian), **DRY violations** (same function in 2-3 files), **security vulnerabilities** (timing attack, path traversal). The Rust backend has **zero tests**. `threadmind` completely violates the zero-deps philosophy.
 
 ### What's Unnecessary?
-`prototypes/`, `ui/control.html`, `atlas-v3.bat`, `opencode.json`, `tools/common.py`, 1.57 MB vault log files, `ai_local/mod.rs` draft.
+`prototypes/`, `ui/control.html`, `sentor-v3.bat`, `opencode.json`, `tools/common.py`, 1.57 MB vault log files, `ai_local/mod.rs` draft.
 
 ### What Needs Optimization?
 Batch embedding, `rglob` filter, thread pooling, `spawn_blocking` usage, DRY violations, V3SecondaryCanvas merge, `_hybrid` method decomposition.

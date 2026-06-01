@@ -1,20 +1,20 @@
 # Project Status Report
 
 **Date:** May 26, 2026
-**Branch:** atlas-ide-v2
+**Branch:** sentor-ide-v2
 **Status:** Stable — Phase G (Canvas UI) complete. Tech debt addressed.
 
 ---
 
 ## Executive Summary
 
-Atlas OS is a **zero-dependency offline AI IDE + personal knowledge base + canvas workflow engine**:
+Sentor is a **zero-dependency offline AI IDE + personal knowledge base + canvas workflow engine**:
 
 - **Vault:** HTML pages indexed locally, searchable by keyword + semantic embedding (Ollama all-minilm)
 - **CLI/API:** Python stdlib only, REST API on port 4242, MCP server for external tools
 - **IDE:** Tauri v2 (Rust backend + React frontend), Canvas infinite workspace, 3 built-in agents
 - **Canvas:** Infinite pan/zoom node editor — 20 panel types, typed wire system, Orkestra AI orchestrator
-- **Agents:** Vault (research), Coder (edit), Atlas-Maker (write HTML)
+- **Agents:** Vault (research), Coder (edit), Sentor-Maker (write HTML)
 
 ---
 
@@ -22,7 +22,7 @@ Atlas OS is a **zero-dependency offline AI IDE + personal knowledge base + canva
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  AGENT LAYER (Vault + Coder + Atlas-Maker)              │
+│  AGENT LAYER (Vault + Coder + Sentor-Maker)              │
 ├─────────────────────────────────────────────────────────┤
 │  CANVAS LAYER (20 panel types, typed wires, Orkestra)   │
 ├─────────────────────────────────────────────────────────┤
@@ -42,7 +42,7 @@ Atlas OS is a **zero-dependency offline AI IDE + personal knowledge base + canva
 |---|---|---|
 | 0 | Fast Refresh fixes (`useComposer.ts`, `useTheme.ts` split) | ✅ |
 | A | `web_search` + `web_fetch` via SearXNG + reqwest | ✅ |
-| B | Agent consolidation (Vault/Coder/Atlas-Maker); Mermaid offline | ✅ |
+| B | Agent consolidation (Vault/Coder/Sentor-Maker); Mermaid offline | ✅ |
 | C | Auto re-index after `vault_write` via `findPython()` | ✅ |
 | D | Browser tabs — Vault (asset://) + Web (native WebView) | ✅ |
 | E | Vault Home tab — startup search front door | ✅ |
@@ -132,7 +132,7 @@ terminal · editor · chat · agent · canvas · pipeline · codegraph · input 
 - [x] Keyword search (TF-IDF scoring via `tools/scoring.py`)
 
 ### CLI & API
-- [x] `atlas.py` chat loop — now uses `ollama.Client(timeout=120)` (no more hangs)
+- [x] `main.py` chat loop — now uses `ollama.Client(timeout=120)` (no more hangs)
 - [x] `pipeline.py` — shell/task/notify steps with on_error policy
 - [x] `serve_daemon.py` — cron + file-watcher triggers; concurrent run guard added
 - [x] REST API port 4242 — search, semantic, pages, categories, IDE control endpoints
@@ -159,7 +159,7 @@ terminal · editor · chat · agent · canvas · pipeline · codegraph · input 
 |---|-----|------|
 | 🔴 | `sentor._load_task` + `pipeline._load_pipeline` raise `FileNotFoundError` instead of `sys.exit(1)` — pipeline `on_error` policy now works | `cli/sentor.py`, `cli/pipeline.py` |
 | 🟡 | `serve_daemon._fire()` skips if pipeline already running (`_running` set + lock) | `cli/serve_daemon.py` |
-| 🟡 | `atlas chat` uses `ollama.Client(timeout=120)` — no more frozen sessions | `cli/atlas.py` |
+| 🟡 | `sentor chat` uses `ollama.Client(timeout=120)` — no more frozen sessions | `cli/main.py` |
 | 🟢 | `embedder.py` caches `_page_text()` per page — no double call | `tools/embedder.py` |
 | 🟢 | `pipeline.py` deduplicates `sys.path.insert` at module level | `cli/pipeline.py` |
 
@@ -167,7 +167,7 @@ terminal · editor · chat · agent · canvas · pipeline · codegraph · input 
 
 ## Security Notes
 
-- ✅ API auth: Bearer token at `~/.atlas/api-token`
+- ✅ API auth: Bearer token at `~/.sentor/api-token`
 - ✅ Path traversal: `Path.is_relative_to()` blocks `..` escapes
 - ✅ Write-guard: secret pattern deny-list in `vault_write`
 - ✅ Blueprint validation: JSON schema + tool whitelist on import
@@ -190,10 +190,10 @@ terminal · editor · chat · agent · canvas · pipeline · codegraph · input 
 ## Repository Structure
 
 ```
-c:\Atlas OS\
+c:\Sentor\
 ├── vault/                ← User knowledge base (HTML pages)
 ├── tools/                ← Python indexer, embedder, scoring, MCP server
-├── cli/                  ← Python CLI (atlas.py, pipeline.py, sentor.py, serve_daemon.py)
+├── cli/                  ← Python CLI (main.py, pipeline.py, sentor.py, serve_daemon.py)
 ├── api/                  ← REST API server (port 4242)
 ├── ide/                  ← Tauri v2 IDE (React + Vite + Rust backend)
 │   └── src/modules/canvas/  ← Canvas node system (20 panel types, wire system)

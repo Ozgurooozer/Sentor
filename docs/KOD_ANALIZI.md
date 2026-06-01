@@ -1,4 +1,4 @@
-# Atlas OS — Kapsamlı Kod Analiz Raporu
+# Sentor — Kapsamlı Kod Analiz Raporu
 
 **Tarih:** 28 Mayıs 2026
 **Toplam dosya:** ~300+ (Python, TypeScript, Rust, HTML, CSS, JS, JSON)
@@ -12,7 +12,7 @@
 ```mermaid
 graph TB
     subgraph Python_Backend["Python Backend (stdlib)"]
-        CLI["cli/atlas.py<br/>Ana CLI"]
+        CLI["cli/main.py<br/>Ana CLI"]
         API["api/server.py<br/>REST API (port 4242)"]
         MCP["tools/mcp_server.py<br/>MCP stdio Server"]
         INDEXER["tools/indexer.py<br/>Vault Indexer"]
@@ -77,7 +77,7 @@ graph TB
 
 ```mermaid
 graph LR
-    ROOT["📁 Atlas OS/"] --> API["api/<br/>REST API server"]
+    ROOT["📁 Sentor/"] --> API["api/<br/>REST API server"]
     ROOT --> CLI["cli/<br/>CLI tools"]
     ROOT --> IDE["ide/<br/>Tauri Desktop App"]
     ROOT --> TOOLS["tools/<br/>Python araçları"]
@@ -90,7 +90,7 @@ graph LR
     ROOT --> PROTOS["prototypes/<br/>Prototipler"]
 
     API --> API_F["server.py<br/>962 satır<br/>REST API"]
-    CLI --> CLI_F1["atlas.py<br/>Ana CLI"]
+    CLI --> CLI_F1["main.py<br/>Ana CLI"]
     CLI --> CLI_F2["sentor.py<br/>Task worker"]
     CLI --> CLI_F3["pipeline.py<br/>Pipeline"]
     CLI --> CLI_F4["node.py<br/>Node mgr"]
@@ -113,7 +113,7 @@ graph LR
 | Klasör | Amaç | Kalite |
 |--------|------|--------|
 | `api/` | REST API (port 4242), hybrid search, auth, CLI bridge | 7.5/10 |
-| `cli/` | 6 CLI modülü: atlas, sentor, pipeline, node, flow, serve_daemon | 7.5/10 |
+| `cli/` | 6 CLI modülü: main, sentor, pipeline, node, flow, serve_daemon | 7.5/10 |
 | `ide/` | Tauri v2 desktop app (Rust + TypeScript/React) | Rust: 7.5/10, TS: 7.5/10 |
 | `tools/` | 11 Python/JS aracı (indexer, embedder, MCP, scoring...) | 8.5/10 |
 | `ui/` | Browser UI (index.html Fuse.js + control.html API) | 9/10 |
@@ -248,14 +248,14 @@ flowchart TD
     subgraph DRY["🔴 DRY İhlalleri"]
         D1["_parse_yaml_lite()<br/>indexer.py:207<br/>render_office.py:37"]
         D2["_ollama_embed()<br/>embedder.py:78<br/>server.py:128"]
-        D3["ANSI color fn<br/>cli/atlas.py:46<br/>tools/colors.py"]
+        D3["ANSI color fn<br/>cli/main.py:46<br/>tools/colors.py"]
         D4["Context parsing<br/>node.py:252<br/>flow.py:184<br/>pipeline.py:209"]
         D5["Provider probing<br/>server.py:744<br/>sentor.py:48"]
     end
 
     D1 --> FIX1["Çözüm: tools/yaml_utils.py"]
     D2 --> FIX2["Çözüm: tools/llm_utils.py"]
-    D3 --> FIX3["Çözüm: atlas.py import colors"]
+    D3 --> FIX3["Çözüm: main.py import colors"]
     D4 --> FIX4["Çözüm: tools/cli_utils.py"]
     D5 --> FIX5["Çözüm: tools/llm_utils.py"]
 ```
@@ -289,7 +289,7 @@ flowchart TD
 | `transcribe/server.py` | flask, faster-whisper | **❌ Evet** |
 | `ide/` | 55+ npm paketi | **❌ Evet** (beklenen) |
 | `api/server.py` | **stdlib only** ✅ | — |
-| `cli/atlas.py` | **stdlib only** ✅ | — |
+| `cli/main.py` | **stdlib only** ✅ | — |
 | `tools/mcp_server.py` | **stdlib only** ✅ | — |
 | `tools/indexer.py` | **stdlib only** ✅ | — |
 | `tools/embedder.py` | **stdlib only** ✅ | — |
@@ -304,7 +304,7 @@ flowchart TD
 | `prototypes/tlas/index.html` | Projeyle alakasız AI karşılaştırması |
 | `prototypes/taslak/index.html` | Projeyle alakasız 10 web tasarımı | 
 | `ui/control.html` | `ui/index.html` ile çift UI, API'ye bağımlı |
-| `atlas-v3.bat` | Dokümante edilmemiş, `atlas.bat` ile örtüşüyor |
+| `sentor-v3.bat` | Dokümante edilmemiş, `sentor.bat` ile örtüşüyor |
 | `opencode.json` | `.mcp.json` ile aynı config |
 | `tools/common.py` | Deprecated wrapper, yakında silinmeli |
 | `vault/logs/*.json` (1.57 MB) | Vault'un %72'si! Gizli dizine taşınmalı |
@@ -341,7 +341,7 @@ flowchart TD
 15. `vault/logs/`'u `.index/logs/`'a taşı
 16. Dil tutarsızlıklarını düzelt (özellikle "jika" → "if")
 17. `opencode.json` ve `.mcp.json`'dan birini kaldır
-18. `atlas-v3.bat`'ı dokümante et veya `atlas.bat` ile birleştir
+18. `sentor-v3.bat`'ı dokümante et veya `sentor.bat` ile birleştir
 19. `ai_local/mod.rs`'i tamamla veya kaldır
 20. `db/mod.rs` kullanılmıyorsa kaldır
 
@@ -369,8 +369,8 @@ xychart-beta
 4. **Win32 WindowProc subclass**: Lock-free bitmap click-through, etkileyici bir native çözüm
 5. **BoundedRingBuffer**: Offset-based tailing, monotonic offset — ders kitabı kalitesinde
 6. **Secret scanning guard** (`vault/guard.rs`): API key'leri, private key'leri tespit eder
-7. **Lazy imports** (`cli/atlas.py`): 7 farklı modül lazy import, startup hızı için optimize
-8. **Batch script'ler** (`atlas.bat`): 268 satır, fonksiyon taklidi, error handling — projenin en iyi dosyası
+7. **Lazy imports** (`cli/main.py`): 7 farklı modül lazy import, startup hızı için optimize
+8. **Batch script'ler** (`sentor.bat`): 268 satır, fonksiyon taklidi, error handling — projenin en iyi dosyası
 9. **Web UI** (`ui/style.css` + `app.js`): Sıfır build, Fuse.js, XSS koruması, accessibility
 10. **MCP server queue**: Atomic write + rename ile Windows race condition önlemi
 11. **Multiple shell support** (`shell_init.rs`): Zsh, Bash, Fish, PowerShell otomatik tespit
@@ -409,7 +409,7 @@ Projenin core mekaniği (vault, indexing, CLI, API, MCP) **sağlam, temiz ve iyi
 Proje AI-generated kodun tipik hastalıklarını taşıyor: **dil tutarsızlığı** (İngilizce + Türkçe + Endonezce), **DRY ihlalleri** (aynı fonksiyon 2-3 dosyada), **güvenlik açıkları** (timing attack, path traversal). Rust backend'de **hiç test yok**. `threadmind` zero-deps felsefesini tamamen ihlal ediyor.
 
 ### Ne Gereksiz?
-`prototypes/`, `ui/control.html`, `atlas-v3.bat`, `opencode.json`, `tools/common.py`, 1.57 MB vault log dosyası, `ai_local/mod.rs` taslağı.
+`prototypes/`, `ui/control.html`, `sentor-v3.bat`, `opencode.json`, `tools/common.py`, 1.57 MB vault log dosyası, `ai_local/mod.rs` taslağı.
 
 ### Ne Optimize Edilmeli?
 Batch embedding, `rglob` filter, thread pooling, `spawn_blocking` kullanımı, DRY ihlalleri, V3SecondaryCanvas birleştirme, `_hybrid` metot bölme.

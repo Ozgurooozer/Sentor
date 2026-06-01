@@ -11,7 +11,7 @@
   const resultsList  = document.getElementById('results-list');
 
   // ── Guard: index must exist ─────────────────────────────────────────────
-  const INDEX = window.ATLAS_INDEX;
+  const INDEX = window.SENTOR_INDEX;
   if (!INDEX || !Array.isArray(INDEX.pages) || INDEX.pages.length === 0) {
     noIndexMsg.classList.remove('hidden');
     return;
@@ -128,23 +128,23 @@
 
   function buildCard(page, query) {
     const li = document.createElement('li');
-    li.className = 'atlas-card';
+    li.className = 'sentor-card';
 
     // Entire card is a link to the vault page
     const a = document.createElement('a');
     a.href      = page.url;
-    a.className = 'atlas-card-link';
+    a.className = 'sentor-card-link';
 
     // ── Title row: heading + category badge ──
     const titleRow = document.createElement('div');
-    titleRow.className = 'atlas-card-title-row';
+    titleRow.className = 'sentor-card-title-row';
 
     const h2 = document.createElement('h2');
-    h2.className   = 'atlas-card-title';
+    h2.className   = 'sentor-card-title';
     h2.textContent = page.title;
 
     const badge = document.createElement('span');
-    badge.className   = 'atlas-badge';
+    badge.className   = 'sentor-badge';
     badge.textContent = page.category;
 
     titleRow.append(h2, badge);
@@ -153,7 +153,7 @@
     // ── Description (optional) ──
     if (page.description) {
       const desc = document.createElement('p');
-      desc.className   = 'atlas-card-desc';
+      desc.className   = 'sentor-card-desc';
       desc.textContent = page.description;
       a.appendChild(desc);
     }
@@ -162,14 +162,14 @@
     const headings = relevantHeadings(page, query);
     if (headings.length) {
       const hdLine = document.createElement('p');
-      hdLine.className   = 'atlas-card-headings';
+      hdLine.className   = 'sentor-card-headings';
       hdLine.textContent = headings.join('  ·  ');
       a.appendChild(hdLine);
     }
 
     // ── Modified date ──
     const meta = document.createElement('p');
-    meta.className   = 'atlas-card-meta';
+    meta.className   = 'sentor-card-meta';
     meta.textContent = page.modified.slice(0, 10);
     a.appendChild(meta);
 
@@ -197,13 +197,13 @@
 
     items.forEach(item => {
       const btn = document.createElement('button');
-      btn.className   = 'atlas-cat-btn';
+      btn.className   = 'sentor-cat-btn';
       btn.dataset.cat = item.id ?? '';
       // Using innerHTML here — label comes from folder names (user-controlled),
       // count is a number. escapeHtml applied to label.
       btn.innerHTML =
-        `<span class="atlas-cat-label">${escapeHtml(item.label)}</span>` +
-        `<span class="atlas-cat-count">${item.count}</span>`;
+        `<span class="sentor-cat-label">${escapeHtml(item.label)}</span>` +
+        `<span class="sentor-cat-count">${item.count}</span>`;
 
       btn.addEventListener('click', () => {
         activeCategory = item.id;
@@ -216,10 +216,10 @@
 
   // Update active state without rebuilding the whole nav
   function refreshCategoryNav() {
-    categoryNav.querySelectorAll('.atlas-cat-btn').forEach(btn => {
+    categoryNav.querySelectorAll('.sentor-cat-btn').forEach(btn => {
       const cat    = btn.dataset.cat || null;
       const active = cat === activeCategory;
-      btn.classList.toggle('atlas-cat-btn--active', active);
+      btn.classList.toggle('sentor-cat-btn--active', active);
       btn.setAttribute('aria-pressed', String(active));
     });
   }

@@ -47,7 +47,7 @@ export function VaultSection() {
       null,
       2,
     );
-    const path = workspaceRoot.replace(/[\\/]$/, "") + "/.atlas-embed.json";
+    const path = workspaceRoot.replace(/[\\/]$/, "") + "/.sentor-embed.json";
     try {
       await invoke("fs_write_file", { path, content: cfg });
       setWriteStatus("ok");
@@ -103,7 +103,7 @@ export function VaultSection() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>Atlas API</Label>
+        <Label>Sentor API</Label>
         <p className="text-[10.5px] leading-relaxed text-muted-foreground">
           REST API for search, pages, and semantic lookup. Start with{" "}
           <code className="font-mono">python api/server.py</code> (default port 4242).
@@ -113,8 +113,8 @@ export function VaultSection() {
           variant="outline"
           className="h-7 w-fit px-2.5 text-[11px]"
           onClick={() => void invoke<number>("http_ping", { url: "http://localhost:4242/api/categories" })
-            .then((s) => alert(s >= 200 && s < 400 ? "Atlas API is running ✓" : `Got status ${s}`))
-            .catch(() => alert("Atlas API is not running on port 4242."))}
+            .then((s) => alert(s >= 200 && s < 400 ? "Sentor API is running ✓" : `Got status ${s}`))
+            .catch(() => alert("Sentor API is not running on port 4242."))}
         >
           Test connection
         </Button>
@@ -148,7 +148,7 @@ export function VaultSection() {
           <Label>Embedding backend</Label>
           <p className="mt-0.5 text-[10.5px] leading-relaxed text-muted-foreground">
             Used by <code className="font-mono">tools/embedder.py</code> for semantic vault search.
-            Writes <code className="font-mono">.atlas-embed.json</code>.
+            Writes <code className="font-mono">.sentor-embed.json</code>.
           </p>
         </div>
 
@@ -188,14 +188,14 @@ export function VaultSection() {
 
         {!workspaceRoot && (
           <p className="text-[10.5px] text-amber-500">
-            Set a workspace root to auto-write <code className="font-mono">.atlas-embed.json</code>.
+            Set a workspace root to auto-write <code className="font-mono">.sentor-embed.json</code>.
           </p>
         )}
         {writeStatus === "ok" && (
-          <p className="text-[10.5px] text-emerald-500">Config saved to .atlas-embed.json</p>
+          <p className="text-[10.5px] text-emerald-500">Config saved to .sentor-embed.json</p>
         )}
         {writeStatus === "fail" && (
-          <p className="text-[10.5px] text-destructive">Could not write .atlas-embed.json</p>
+          <p className="text-[10.5px] text-destructive">Could not write .sentor-embed.json</p>
         )}
       </div>
     </div>

@@ -110,7 +110,7 @@ export function AddressBar({
           name="address-bar"
           ref={inputRef}
           type="text"
-          list="atlas-url-history"
+          list="sentor-url-history"
           value={focused ? inputValue : url}
           onChange={(e) => setInputValue(e.target.value)}
           onFocus={() => {
@@ -126,7 +126,7 @@ export function AddressBar({
           autoComplete="off"
         />
         {history && history.length > 0 && (
-          <datalist id="atlas-url-history">
+          <datalist id="sentor-url-history">
             {history.map((h) => <option key={h} value={h} />)}
           </datalist>
         )}

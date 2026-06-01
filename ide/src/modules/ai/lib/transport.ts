@@ -1,12 +1,12 @@
 import type { UIMessage } from "@ai-sdk/react";
 import { DirectChatTransport } from "ai";
 import { TERMINAL_BUFFER_LINES, type ModelId } from "../config";
-import { createAtlasAgent, type ProviderConfigs } from "./agent";
+import { createSentorAgent, type ProviderConfigs } from "./agent";
 import type { ProviderKeys } from "./keyring";
 import { native } from "./native";
 import type { ToolContext } from "../tools/tools";
 
-const ATLAS_MD_MAX_BYTES = 6 * 1024;
+const SENTOR_MD_MAX_BYTES = 6 * 1024;
 type MemoryCacheEntry = { content: string | null; mtime: number };
 const projectMemoryCache = new Map<string, MemoryCacheEntry>();
 
@@ -49,9 +49,9 @@ async function readAgentSelfContext(): Promise<string | null> {
   }
 }
 
-async function readAtlasMd(workspaceRoot: string | null): Promise<string | null> {
+async function readSentorMd(workspaceRoot: string | null): Promise<string | null> {
   if (!workspaceRoot) return null;
-  const path = `${workspaceRoot.replace(/\/$/, "")}/ATLAS.md`;
+  const path = `${workspaceRoot.replace(/\/$/, "")}/SENTOR.md`;
   const cached = projectMemoryCache.get(workspaceRoot);
   // Cache for 30s — cheap re-read after that to pick up edits.
   if (cached && Date.now() - cached.mtime < 30_000) return cached.content;
@@ -62,8 +62,8 @@ async function readAtlasMd(workspaceRoot: string | null): Promise<string | null>
       return null;
     }
     const content =
-      r.content.length > ATLAS_MD_MAX_BYTES
-        ? r.content.slice(0, ATLAS_MD_MAX_BYTES)
+      r.content.length > SENTOR_MD_MAX_BYTES
+        ? r.content.slice(0, SENTOR_MD_MAX_BYTES)
         : r.content;
     projectMemoryCache.set(workspaceRoot, { content, mtime: Date.now() });
     return content;
@@ -108,10 +108,10 @@ export function createContextAwareTransport(deps: Deps) {
     }) {
       const live = deps.getLive();
       const [projectMemory, agentSelfContext] = await Promise.all([
-        readAtlasMd(live.workspaceRoot),
+        readSentorMd(live.workspaceRoot),
         readAgentSelfContext(),
       ]);
-      const agent = await createAtlasAgent({
+      const agent = await createSentorAgent({
         keys: deps.getKeys(),
         modelId: deps.getModelId(),
         customInstructions: deps.getCustomInstructions(),
@@ -135,10 +135,10 @@ export function createContextAwareTransport(deps: Deps) {
     async reconnectToStream(options: unknown) {
       const live = deps.getLive();
       const [projectMemory, agentSelfContext] = await Promise.all([
-        readAtlasMd(live.workspaceRoot),
+        readSentorMd(live.workspaceRoot),
         readAgentSelfContext(),
       ]);
-      const agent = await createAtlasAgent({
+      const agent = await createSentorAgent({
         keys: deps.getKeys(),
         modelId: deps.getModelId(),
         customInstructions: deps.getCustomInstructions(),

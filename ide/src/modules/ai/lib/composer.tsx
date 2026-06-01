@@ -111,8 +111,8 @@ export function AiComposerProvider({
         void attachFileByPath(path);
       }
     };
-    window.addEventListener("atlas:ai-attach-file", onAttach);
-    return () => window.removeEventListener("atlas:ai-attach-file", onAttach);
+    window.addEventListener("sentor:ai-attach-file", onAttach);
+    return () => window.removeEventListener("sentor:ai-attach-file", onAttach);
     // attachFileByPath is stable for our purposes (closes over setFiles only)
      
   }, []);
@@ -238,7 +238,7 @@ export function AiComposerProvider({
       return;
 
     // Slash-command interception. `/plan` toggles plan mode; `/init` rewrites
-    // the prompt to the ATLAS.md scan template before sending.
+    // the prompt to the SENTOR.md scan template before sending.
     let effectiveText = trimmed;
     let commandMarker: string | null = null;
     let commandSource = trimmed;
@@ -255,7 +255,7 @@ export function AiComposerProvider({
       if (outcome.kind === "send-prompt") {
         effectiveText = outcome.prompt;
         if (outcome.commandName) {
-          commandMarker = `<atlas-command name="${outcome.commandName}" />`;
+          commandMarker = `<sentor-command name="${outcome.commandName}" />`;
         }
       }
     }

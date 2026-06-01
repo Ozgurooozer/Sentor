@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Atlas Forum — Tartışmalar</title>
-<meta name="description" content="Atlas OS tartışma forumu. Mimari kararlar, kod kalitesi, feature önerileri. Her konu ayrı bir vault sayfasıdır.">
+<title>Sentor Forum — Tartışmalar</title>
+<meta name="description" content="Sentor tartışma forumu. Mimari kararlar, kod kalitesi, feature önerileri. Her konu ayrı bir vault sayfasıdır.">
 <meta name="created" content="2026-05-26">
 <script src="../../../.index/pages.js"></script>
 <style>
@@ -67,8 +67,8 @@
   .t-feature{background:rgba(212,168,83,.1);color:var(--amber);border:1px solid rgba(212,168,83,.2)}
   .t-dev    {background:rgba(139,126,216,.1);color:var(--purple);border:1px solid rgba(139,126,216,.2)}
   .t-sohbet   {background:rgba(136,136,136,.1);color:var(--dim);border:1px solid rgba(136,136,136,.2)}
-  .t-atlas-os {background:rgba(224,123,84,.1);color:#e07b54;border:1px solid rgba(224,123,84,.2)}
-  .t-atlas0fis{background:rgba(76,175,125,.1);color:var(--green);border:1px solid rgba(76,175,125,.2)}
+  .t-sentor {background:rgba(224,123,84,.1);color:#e07b54;border:1px solid rgba(224,123,84,.2)}
+  .t-sentor0fis{background:rgba(76,175,125,.1);color:var(--green);border:1px solid rgba(76,175,125,.2)}
 
   /* recent thread list */
   .thread-list{display:flex;flex-direction:column;gap:1px;background:var(--subtle);border:1px solid var(--subtle);border-radius:8px;overflow:hidden}
@@ -96,7 +96,7 @@
 <body>
 
 <nav class="topbar">
-  <span class="logo">ATLAS FORUM</span>
+  <span class="logo">Sentor Forum</span>
   <div class="topbar-right">
     <a href="rehber/index.html">Rehber</a>
     <a href="../../../ui/index.html">← Vault</a>
@@ -105,7 +105,7 @@
 
 <div class="wrap">
   <div class="hero">
-    <h1>Atlas Forum</h1>
+    <h1>Sentor Forum</h1>
     <p>Mimari kararlar, kod kalitesi, feature önerileri. Vault'taki her konu ajanlar tarafından okunabilir, aranabilir, yanıtlanabilir.</p>
     <div class="stats">
       <div class="stat"><span class="snum" id="statThreads">—</span><span class="slabel">konu</span></div>
@@ -136,7 +136,7 @@
 </div>
 
 <div class="forum-footer">
-  <span>Atlas Forum · her konu bir vault sayfasıdır</span>
+  <span>Sentor Forum · her konu bir vault sayfasıdır</span>
   <a href="../../../ui/index.html">Vault Search →</a>
 </div>
 
@@ -148,11 +148,11 @@
     { cat:'feature', icon:'✦',  name:'Feature Request', desc:'Yeni özellik önerileri, iyileştirme fikirleri, yol haritası',     href:'feature/index.html' },
     { cat:'dev',     icon:'⚡', name:'Geliştirme',      desc:'Stack tartışmaları, performans ve mimari araştırmalar',            href:'dev/index.html' },
     { cat:'sohbet',  icon:'💬', name:'Sohbet',          desc:'Genel muhabbet, duyurular ve proje güncellemeleri',               href:'sohbet/index.html' },
-    { cat:'atlas-os',icon:'◈',  name:'Atlas OS',         desc:'Proje tanıtımı, canvas sistemi, vault, agent ve MCP belgeleri',    href:'atlas-os/index.html' },
-    { cat:'atlas0fis',icon:'🏢', name:'Atlas0fis Ofis',   desc:'Uzman personalar, toplantılar ve oylama, rol-bazlı görev panosu', href:'atlas0fis/index.html' },
+    { cat:'sentor',icon:'◈',  name:'Sentor',         desc:'Proje tanıtımı, canvas sistemi, vault, agent ve MCP belgeleri',    href:'sentor/index.html' },
+    { cat:'sentor0fis',icon:'🏢', name:'Sentor0fis Ofis',   desc:'Uzman personalar, toplantılar ve oylama, rol-bazlı görev panosu', href:'sentor0fis/index.html' },
   ];
 
-  const SKIP = new Set(['forum/index','forum/rehber','forum/arch','forum/codeq','forum/dev','forum/feature','forum/sohbet','forum/atlas-os','forum/atlas0fis','forum/atlas0fis/persona','forum/atlas0fis/gorev-panosu']);
+  const SKIP = new Set(['forum/index','forum/rehber','forum/arch','forum/codeq','forum/dev','forum/feature','forum/sohbet','forum/sentor','forum/sentor0fis','forum/sentor0fis/persona','forum/sentor0fis/gorev-panosu']);
 
   function parseCat(desc){ const m=(desc||'').match(/^\[([a-z]+)\]/); return m?m[1]:null; }
   function cleanDesc(desc){ return (desc||'').replace(/^\[[a-z]+\]\s*/,''); }
@@ -164,7 +164,7 @@
   }
 
   function init(){
-    const idx = window.ATLAS_INDEX;
+    const idx = window.SENTOR_INDEX;
     if(!idx||!Array.isArray(idx.pages)){
       document.getElementById('recentList').innerHTML='<div class="empty">Vault indexi bulunamadı — <code>python tools/indexer.py</code> çalıştır.</div>';
       return;
@@ -203,7 +203,7 @@
       const cat = parseCat(p.description);
       const slug = p.id.replace('forum/','');
       const catCls = cat ? 't-'+cat : '';
-      const catLabels = {arch:'Mimari',codeq:'Kalite',feature:'Feature',dev:'Dev',sohbet:'Sohbet','atlas-os':'Atlas OS','atlas0fis':'Atlas0fis'};
+      const catLabels = {arch:'Mimari',codeq:'Kalite',feature:'Feature',dev:'Dev',sohbet:'Sohbet','sentor':'Sentor','sentor0fis':'Sentor0fis'};
       return `<a class="thread-row" href="${slug}/index.html">
         <div class="thread-main">
           <span class="thread-title">

@@ -1,0 +1,526 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Sentor StickMan — 3D Prototype</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a; color: #f5f5f5;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex; height: 100vh; overflow: hidden;
+    }
+    #canvas-wrap { flex: 1; position: relative; min-width: 0; }
+    canvas { display: block; }
+
+    #panel {
+      width: 196px; background: #111; border-left: 1px solid #1e1e1e;
+      padding: 18px 12px 12px; display: flex; flex-direction: column;
+      gap: 5px; overflow-y: auto; flex-shrink: 0;
+    }
+    .panel-title { font-size: 11px; font-weight: 700; color: #5b8def; letter-spacing: .12em; text-transform: uppercase; }
+    .panel-sub   { font-size: 10px; color: #3a3a3a; margin-bottom: 6px; }
+    .section-label {
+      font-size: 9px; color: #3a3a3a; text-transform: uppercase;
+      letter-spacing: .12em; margin-top: 12px; margin-bottom: 2px;
+    }
+    .anim-btn {
+      background: #191919; border: 1px solid #242424; color: #555;
+      padding: 7px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;
+      text-align: left; transition: all 150ms ease-out; font-family: inherit; width: 100%;
+    }
+    .anim-btn:hover  { border-color: #3a3a3a; color: #aaa; background: #1d1d1d; }
+    .anim-btn.active { background: #0d1a32; border-color: #5b8def; color: #5b8def; }
+    .render-btn {
+      background: #1a1a1a; border: 1px solid #2a2a2a; color: #888;
+      padding: 7px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;
+      text-align: center; transition: all 150ms ease-out; font-family: inherit; width: 100%;
+    }
+    .render-btn:hover { border-color: #4a7de0; color: #5b8def; }
+    textarea.bubble-input {
+      width: 100%; height: 44px; resize: none;
+      background: #161616; border: 1px solid #222; color: #ccc;
+      font-family: inherit; font-size: 10px; padding: 5px 7px;
+      border-radius: 4px; outline: none;
+    }
+    textarea.bubble-input:focus { border-color: #5b8def; }
+    .status-row {
+      margin-top: auto; padding-top: 10px; border-top: 1px solid #181818;
+      display: flex; align-items: center; gap: 8px; font-size: 10px; color: #333;
+    }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #5b8def; animation: pulse 2.4s ease-in-out infinite; flex-shrink: 0; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.2} }
+    #hint { position: absolute; bottom: 10px; left: 10px; font-size: 9px; color: #282828; pointer-events: none; }
+    #error-overlay {
+      display: none; position: absolute; inset: 0; background: #0a0a0a;
+      align-items: center; justify-content: center; flex-direction: column;
+      gap: 8px; color: #e07b54; font-size: 11px; z-index: 20; text-align: center; padding: 20px;
+    }
+    #error-overlay.show { display: flex; }
+    #capturing-overlay {
+      display: none; position: absolute; inset: 0; background: rgba(0,0,0,.55);
+      align-items: center; justify-content: center; flex-direction: column;
+      gap: 10px; font-size: 12px; color: #5b8def; z-index: 10;
+    }
+    #capturing-overlay.show { display: flex; }
+    .cap-spin { width: 26px; height: 26px; border: 2px solid #1e2a44; border-top-color: #5b8def; border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div id="canvas-wrap">
+  <canvas id="c"></canvas>
+  <div id="error-overlay"><span id="error-msg"></span><small style="color:#555">Open console (F12) for details</small></div>
+  <div id="capturing-overlay"><div class="cap-spin"></div><span id="cap-label">Capturing…</span></div>
+  <div id="hint">drag · scroll · right-drag pan</div>
+</div>
+
+<div id="panel">
+  <div class="panel-title">SentorBot</div>
+  <div class="panel-sub">3D Mascot · Three.js</div>
+  <div class="section-label">Animation</div>
+  <div class="section-label" id="bubble-section-label">Speech Bubble</div>
+  <textarea class="bubble-input" id="bubble-text" placeholder="Type text…"></textarea>
+  <div class="section-label">Export</div>
+  <button class="render-btn" id="btn-render">📸 Render PNG</button>
+  <button class="render-btn" id="btn-render-all">🎞 Capture All</button>
+  <div class="status-row"><span class="status-dot"></span><span id="status-text">idle</span></div>
+</div>
+
+<script type="importmap">
+{ "imports": {
+    "three":         "https://cdn.jsdelivr.net/npm/three@0.168.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.168.0/examples/jsm/"
+} }
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ─── error UI ────────────────────────────────────────────────────────────────
+function showError(msg) {
+  const el = document.getElementById('error-overlay');
+  document.getElementById('error-msg').textContent = msg;
+  el.classList.add('show');
+  console.error('[SentorBot]', msg);
+}
+
+try {
+
+// ─── renderer ────────────────────────────────────────────────────────────────
+const canvas   = document.getElementById('c');
+const wrap     = document.getElementById('canvas-wrap');
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled  = true;
+renderer.shadowMap.type     = THREE.PCFSoftShadowMap;
+renderer.toneMapping        = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+
+// ─── scene ───────────────────────────────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x090912);
+scene.fog = new THREE.Fog(0x090912, 14, 36);
+
+// ─── camera + controls ───────────────────────────────────────────────────────
+const camera = new THREE.PerspectiveCamera(46, 1, 0.05, 80);
+camera.position.set(0, 1.6, 6.5);
+
+const controls = new OrbitControls(camera, canvas);
+controls.target.set(0, 1.6, 0);
+controls.enableDamping  = true;
+controls.dampingFactor  = 0.08;
+controls.minDistance    = 2;
+controls.maxDistance    = 16;
+controls.maxPolarAngle  = Math.PI * 0.88;
+controls.update();
+
+// ─── lights ──────────────────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+
+const key = new THREE.DirectionalLight(0x9bbeff, 4.0);
+key.position.set(3, 7, 5);
+key.castShadow = true;
+key.shadow.mapSize.set(1024, 1024);
+key.shadow.camera.left = key.shadow.camera.bottom = -4;
+key.shadow.camera.right = key.shadow.camera.top  =  4;
+scene.add(key);
+
+const rim = new THREE.DirectionalLight(0x4a7de0, 2.2);
+rim.position.set(-4, 5, -4);
+scene.add(rim);
+
+// dynamic glow light (follows skeleton mid-point)
+const glowLight = new THREE.PointLight(0x5b8def, 4.0, 5, 2.5);
+scene.add(glowLight);
+
+// ─── ground ──────────────────────────────────────────────────────────────────
+const gnd = new THREE.Mesh(
+  new THREE.PlaneGeometry(22, 22),
+  new THREE.MeshStandardMaterial({ color: 0x07070f, roughness: 0.98, metalness: 0.0 })
+);
+gnd.rotation.x = -Math.PI / 2;
+gnd.receiveShadow = true;
+scene.add(gnd);
+
+const grid = new THREE.GridHelper(22, 22, 0x141422, 0x0f0f1a);
+grid.position.y = 0.002;
+scene.add(grid);
+
+// ─── materials ───────────────────────────────────────────────────────────────
+const AC = 0x5b8def;
+
+function jMat() {   // joint — bright emissive blue
+  return new THREE.MeshStandardMaterial({
+    color: AC, emissive: AC, emissiveIntensity: 2.5,
+    roughness: 0.2, metalness: 0.6,
+  });
+}
+function bMat() {   // bone — pale with subtle glow
+  return new THREE.MeshStandardMaterial({
+    color: 0xbdd4ff, emissive: AC, emissiveIntensity: 0.5,
+    roughness: 0.35, metalness: 0.3,
+  });
+}
+const headMat = new THREE.MeshStandardMaterial({
+  color: 0xe2eeff, emissive: AC, emissiveIntensity: 0.7,
+  roughness: 0.22, metalness: 0.2,
+});
+
+// ─── geometry helpers ────────────────────────────────────────────────────────
+function sphere(r, mat) {
+  const m = new THREE.Mesh(new THREE.SphereGeometry(r, 14, 10), mat);
+  m.castShadow = true; return m;
+}
+function cylinder(len, rT, rB, mat, pivotAtTop = false) {
+  const g = new THREE.CylinderGeometry(rT, rB, len, 8);
+  g.translate(0, pivotAtTop ? -len / 2 : len / 2, 0);
+  const m = new THREE.Mesh(g, mat);
+  m.castShadow = true; return m;
+}
+
+// ─── skeleton ────────────────────────────────────────────────────────────────
+const H = 1.72;   // total height
+const c = {
+  pelvisY:  H * 0.49,   // ground → pelvis centre
+  spine:    H * 0.30,
+  neck:     H * 0.115,
+  head:     H * 0.108,
+  shoulder: H * 0.133,
+  upperArm: H * 0.192,
+  foreArm:  H * 0.170,
+  hip:      H * 0.075,
+  thigh:    H * 0.248,
+  shin:     H * 0.222,
+};
+
+// root (pelvis)
+const root = new THREE.Group();
+root.position.y = c.pelvisY;
+scene.add(root);
+root.add(sphere(H * 0.052, jMat()));
+
+// spine → chest
+const spineG = new THREE.Group(); root.add(spineG);
+spineG.add(cylinder(c.spine, H*0.024, H*0.030, bMat()));
+const chestG = new THREE.Group(); chestG.position.y = c.spine; spineG.add(chestG);
+chestG.add(sphere(H * 0.065, jMat()));
+
+// neck → head
+const neckG = new THREE.Group(); chestG.add(neckG);
+neckG.add(cylinder(c.neck, H*0.019, H*0.022, bMat()));
+const headG = new THREE.Group(); headG.position.y = c.neck; neckG.add(headG);
+headG.add(sphere(c.head, () => headMat));
+
+// eyes
+const eyeM = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 2.0 });
+[-1, 1].forEach(s => {
+  const e = new THREE.Mesh(new THREE.SphereGeometry(c.head * 0.155, 8, 6), eyeM);
+  e.position.set(s * c.head * 0.42, c.head * 0.22, c.head * 0.89);
+  headG.add(e);
+});
+
+// arms
+function buildArm(side) {
+  const sg = new THREE.Group(); sg.position.set(side * c.shoulder, 0, 0); chestG.add(sg);
+  sg.add(sphere(H * 0.042, jMat()));
+  const ua = new THREE.Group(); sg.add(ua);
+  ua.add(cylinder(c.upperArm, H*0.020, H*0.016, bMat(), true));
+  const eg = new THREE.Group(); eg.position.y = -c.upperArm; ua.add(eg);
+  eg.add(sphere(H * 0.034, jMat()));
+  const fa = new THREE.Group(); eg.add(fa);
+  fa.add(cylinder(c.foreArm, H*0.016, H*0.013, bMat(), true));
+  const wg = new THREE.Group(); wg.position.y = -c.foreArm; fa.add(wg);
+  wg.add(sphere(H * 0.028, jMat()));
+  return { shoulderG: sg, upperArmG: ua, elbowG: eg, foreArmG: fa, wristG: wg };
+}
+
+// legs
+function buildLeg(side) {
+  const hg = new THREE.Group(); hg.position.set(side * c.hip, 0, 0); root.add(hg);
+  hg.add(sphere(H * 0.044, jMat()));
+  const tg = new THREE.Group(); hg.add(tg);
+  tg.add(cylinder(c.thigh, H*0.027, H*0.022, bMat(), true));
+  const kg = new THREE.Group(); kg.position.y = -c.thigh; tg.add(kg);
+  kg.add(sphere(H * 0.037, jMat()));
+  const sg = new THREE.Group(); kg.add(sg);
+  sg.add(cylinder(c.shin, H*0.022, H*0.018, bMat(), true));
+  const ag = new THREE.Group(); ag.position.y = -c.shin; sg.add(ag);
+  ag.add(sphere(H * 0.030, jMat()));
+  // foot
+  const fg = new THREE.Group(); ag.add(fg);
+  const fgeo = new THREE.BoxGeometry(H*0.066, H*0.038, H*0.110);
+  fgeo.translate(0, -H*0.019, H*0.038);
+  const fm = new THREE.Mesh(fgeo, bMat()); fm.castShadow = true; fg.add(fm);
+  return { hipG: hg, thighG: tg, kneeG: kg, shinG: sg, ankleG: ag, footG: fg };
+}
+
+const sk = {
+  root, spineG, chestG, neckG, headG,
+  left:  buildArm(-1), right: buildArm(+1),
+  lLeg:  buildLeg(-1), rLeg:  buildLeg(+1),
+};
+
+// ─── thinking dots ───────────────────────────────────────────────────────────
+const dotGrp = new THREE.Group(); dotGrp.position.set(0, c.head * 1.9, 0); headG.add(dotGrp);
+const dotMat = () => new THREE.MeshStandardMaterial({ color: AC, emissive: AC, emissiveIntensity: 3.0, transparent: true, opacity: 0 });
+const dots = [];
+for (let i = 0; i < 3; i++) {
+  const d = new THREE.Mesh(new THREE.SphereGeometry(0.027, 8, 6), dotMat());
+  d.position.x = (i - 1) * 0.1; dotGrp.add(d); dots.push(d);
+}
+
+// ─── speech bubble (canvas texture) ─────────────────────────────────────────
+const bcvs = document.createElement('canvas'); bcvs.width = 384; bcvs.height = 160;
+const bctx = bcvs.getContext('2d');
+const bubbleTex = new THREE.CanvasTexture(bcvs);
+const bubbleSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: bubbleTex, transparent: true, depthWrite: false }));
+bubbleSprite.scale.set(1.5, 0.62, 1);
+bubbleSprite.position.set(0.55, c.head * 2.2, 0);
+bubbleSprite.visible = false;
+headG.add(bubbleSprite);
+
+function drawBubble(text) {
+  const w = bcvs.width, h = bcvs.height;
+  bctx.clearRect(0, 0, w, h);
+  if (!text) { bubbleSprite.visible = false; bubbleTex.needsUpdate = true; return; }
+  bubbleSprite.visible = true;
+  const pad = 18, r = 16;
+  bctx.beginPath();
+  bctx.moveTo(pad+r, pad); bctx.lineTo(w-pad-r, pad);
+  bctx.quadraticCurveTo(w-pad, pad, w-pad, pad+r);
+  bctx.lineTo(w-pad, h-34); bctx.quadraticCurveTo(w-pad, h-16, w-pad-r, h-16);
+  bctx.lineTo(pad+58, h-16); bctx.lineTo(pad+36, h-2); bctx.lineTo(pad+18, h-16);
+  bctx.lineTo(pad+r, h-16); bctx.quadraticCurveTo(pad, h-16, pad, h-34);
+  bctx.lineTo(pad, pad+r); bctx.quadraticCurveTo(pad, pad, pad+r, pad);
+  bctx.closePath();
+  bctx.fillStyle = 'rgba(12,20,42,0.95)'; bctx.fill();
+  bctx.strokeStyle = 'rgba(91,141,239,0.75)'; bctx.lineWidth = 2; bctx.stroke();
+  bctx.fillStyle = '#c8d8ff'; bctx.font = '500 21px system-ui,sans-serif';
+  bctx.textAlign = 'center'; bctx.textBaseline = 'middle';
+  const maxW = w - pad*2 - 16;
+  const words = text.split(' '); const lines = []; let line = '';
+  words.forEach(word => {
+    const test = line ? line+' '+word : word;
+    if (bctx.measureText(test).width > maxW && line) { lines.push(line); line = word; } else line = test;
+  });
+  if (line) lines.push(line);
+  const lh = 29; const sy = (h-16-pad)/2 + pad - ((lines.length-1)*lh)/2;
+  lines.forEach((l, i) => bctx.fillText(l, w/2, sy+i*lh));
+  bubbleTex.needsUpdate = true;
+}
+
+// ─── animation system ────────────────────────────────────────────────────────
+let currentAnim = 'idle', animT = 0;
+
+const eo3 = t => 1 - Math.pow(Math.max(0, 1-t), 3);
+const sn  = (t, f=1, a=1, o=0) => Math.sin(t*f+o)*a;
+
+function resetPose() {
+  root.position.x = 0; root.position.y = c.pelvisY; root.rotation.set(0,0,0);
+  [spineG,chestG,neckG,headG,
+   sk.left.upperArmG, sk.left.foreArmG, sk.left.shoulderG,
+   sk.right.upperArmG, sk.right.foreArmG, sk.right.shoulderG,
+   sk.lLeg.thighG, sk.lLeg.shinG, sk.lLeg.ankleG,
+   sk.rLeg.thighG, sk.rLeg.shinG, sk.rLeg.ankleG
+  ].forEach(g => g.rotation.set(0,0,0));
+  chestG.scale.set(1,1,1);
+  dots.forEach(d => { d.material.opacity = 0; });
+}
+
+const ANIMS = {
+  idle(t) {
+    const { left: L, right: R } = sk;
+    chestG.scale.y = 1 + sn(t, 1.1, 0.018);
+    spineG.rotation.z = sn(t, 0.55, 0.016);
+    headG.rotation.y  = sn(t, 0.45, 0.07);
+    headG.rotation.z  = sn(t, 0.33, 0.035);
+    L.upperArmG.rotation.z =  0.09 + sn(t, 0.6, 0.022);
+    R.upperArmG.rotation.z = -0.09 + sn(t, 0.6, 0.022, 1.1);
+    L.foreArmG.rotation.z  = sn(t, 0.5, 0.018);
+    R.foreArmG.rotation.z  = sn(t, 0.5, 0.018, 0.7);
+  },
+  thinking(t) {
+    const { left: L, right: R } = sk; const b = eo3(Math.min(t, 1));
+    R.upperArmG.rotation.z = -1.15*b; R.upperArmG.rotation.x = 0.45*b;
+    R.foreArmG.rotation.x  = -1.25*b;
+    L.upperArmG.rotation.z =  0.32*b; L.upperArmG.rotation.x = -0.18*b;
+    headG.rotation.z = -0.18*b + sn(t, 0.7, 0.04);
+    headG.rotation.y = sn(t, 0.38, 0.09);
+    spineG.rotation.x = 0.08*b;
+    chestG.scale.y = 1 + sn(t, 1.0, 0.012);
+    if (t > 0.6) {
+      dots.forEach((d, i) => {
+        const p = t*2.8 + i*0.9;
+        d.material.opacity = (0.55+Math.sin(p)*0.45) * Math.min((t-0.6)*3, 1);
+        d.position.y = Math.sin(p)*0.04;
+      });
+    }
+  },
+  working(t) {
+    const { left: L, right: R } = sk;
+    const lv = sn(t, 4.5, 0.18), rv = sn(t, 4.5, 0.18, Math.PI);
+    R.upperArmG.rotation.z = -0.62; R.upperArmG.rotation.x = 0.85; R.foreArmG.rotation.x = -0.65+rv*0.35;
+    L.upperArmG.rotation.z =  0.62; L.upperArmG.rotation.x = 0.85; L.foreArmG.rotation.x = -0.65+lv*0.35;
+    headG.rotation.x  = 0.28 + sn(t, 1.8, 0.025);
+    spineG.rotation.x = 0.12; chestG.rotation.x = 0.05;
+    root.position.y = c.pelvisY + sn(t, 4.5, 0.008);
+  },
+  walk(t) {
+    const { left: L, right: R, lLeg: LL, rLeg: RL } = sk; const f = 2.6, s = 0.52;
+    LL.thighG.rotation.x = sn(t, f,  s); LL.shinG.rotation.x = Math.max(0, -sn(t, f, s))*0.88;
+    RL.thighG.rotation.x = sn(t, f,  s, Math.PI); RL.shinG.rotation.x = Math.max(0, -sn(t, f, s, Math.PI))*0.88;
+    L.upperArmG.rotation.x = sn(t, f, 0.38, Math.PI); R.upperArmG.rotation.x = sn(t, f, 0.38);
+    root.position.y = c.pelvisY + Math.abs(sn(t, f*2, 0.028));
+    spineG.rotation.z = sn(t, f, 0.035); headG.rotation.z = sn(t, f, 0.035, Math.PI*0.5);
+  },
+  wave(t) {
+    const { left: L, right: R } = sk;
+    R.upperArmG.rotation.z = -1.55; R.upperArmG.rotation.x = 0.12; R.foreArmG.rotation.z = sn(t, 4.2, 0.62);
+    L.upperArmG.rotation.z = 0.1;
+    root.rotation.z = sn(t, 2.0, 0.04); headG.rotation.z = sn(t, 2.5, 0.09); headG.rotation.y = sn(t, 1.5, 0.06);
+  },
+  celebrate(t) {
+    const { left: L, right: R, lLeg: LL, rLeg: RL } = sk;
+    R.upperArmG.rotation.z = -(Math.PI*0.88)+sn(t, 3.2, 0.18); R.foreArmG.rotation.z = sn(t, 4.0, 0.25);
+    L.upperArmG.rotation.z =  (Math.PI*0.88)-sn(t, 3.2, 0.18); L.foreArmG.rotation.z = -sn(t, 4.0, 0.25);
+    const bounce = Math.abs(sn(t, 3.5, 0.14));
+    root.position.y = c.pelvisY + bounce; root.rotation.z = sn(t, 3.5, 0.07);
+    LL.shinG.rotation.x = sn(t, 3.5, 0.15)*-0.5; RL.shinG.rotation.x = sn(t, 3.5, 0.15, 0.4)*-0.5;
+    headG.rotation.z = sn(t, 4.2, 0.12);
+  },
+};
+
+// ─── resize ──────────────────────────────────────────────────────────────────
+function resize() {
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(wrap);
+resize();
+
+// ─── render loop ─────────────────────────────────────────────────────────────
+const clock = new THREE.Clock();
+function tick() {
+  requestAnimationFrame(tick);
+  const dt = clock.getDelta();
+  animT += dt;
+  resetPose();
+  ANIMS[currentAnim]?.(animT);
+  // glow light follows chest
+  const cPos = new THREE.Vector3();
+  chestG.getWorldPosition(cPos);
+  glowLight.position.copy(cPos);
+  controls.update();
+  renderer.render(scene, camera);
+}
+tick();
+
+// ─── capture ─────────────────────────────────────────────────────────────────
+async function capture() {
+  renderer.render(scene, camera);   // fresh frame
+  return canvas.toDataURL('image/png');
+}
+function downloadDataUrl(url, name) {
+  const a = document.createElement('a'); a.href = url; a.download = name; a.click();
+}
+
+// ─── UI bootstrap ─────────────────────────────────────────────────────────────
+const ANIM_DEFS = [
+  { id: 'idle',      label: 'Idle',      emoji: '💤' },
+  { id: 'thinking',  label: 'Thinking',  emoji: '🤔' },
+  { id: 'working',   label: 'Working',   emoji: '⌨️'  },
+  { id: 'walk',      label: 'Walk',      emoji: '🚶'  },
+  { id: 'wave',      label: 'Wave',      emoji: '👋'  },
+  { id: 'celebrate', label: 'Celebrate', emoji: '🎉'  },
+];
+
+const panel = document.getElementById('panel');
+const bubbleSectionLabel = document.getElementById('bubble-section-label');
+
+ANIM_DEFS.forEach(({ id, label, emoji }) => {
+  const btn = document.createElement('button');
+  btn.className  = 'anim-btn' + (id === 'idle' ? ' active' : '');
+  btn.dataset.id = id;
+  btn.textContent = `${emoji}  ${label}`;
+  btn.addEventListener('click', () => {
+    currentAnim = id; animT = 0;
+    document.getElementById('status-text').textContent = id;
+    document.querySelectorAll('.anim-btn').forEach(b => b.classList.toggle('active', b.dataset.id === id));
+  });
+  panel.insertBefore(btn, bubbleSectionLabel);
+});
+
+document.getElementById('bubble-text').addEventListener('input', e => drawBubble(e.target.value));
+
+document.getElementById('btn-render').addEventListener('click', async () => {
+  downloadDataUrl(await capture(), `SENTORbot-${currentAnim}-${Date.now()}.png`);
+});
+
+const overlay  = document.getElementById('capturing-overlay');
+const capLabel = document.getElementById('cap-label');
+
+document.getElementById('btn-render-all').addEventListener('click', async () => {
+  overlay.classList.add('show');
+  for (const { id, label } of ANIM_DEFS) {
+    capLabel.textContent = `Capturing ${label}…`;
+    currentAnim = id; animT = 0;
+    await new Promise(r => setTimeout(r, 1300));
+    downloadDataUrl(await capture(), `SENTORbot-${id}.png`);
+    await new Promise(r => setTimeout(r, 60));
+  }
+  currentAnim = 'idle';
+  overlay.classList.remove('show');
+});
+
+// ─── postMessage API (iframe embedding) ──────────────────────────────────────
+window.addEventListener('message', async e => {
+  if (!e.data?.type) return;
+  if (e.data.type === 'setAnimation') {
+    currentAnim = e.data.anim; animT = 0;
+    document.getElementById('status-text').textContent = e.data.anim;
+    document.querySelectorAll('.anim-btn').forEach(b => b.classList.toggle('active', b.dataset.id === e.data.anim));
+  }
+  if (e.data.type === 'setSpeechText') {
+    drawBubble(e.data.text ?? '');
+    document.getElementById('bubble-text').value = e.data.text ?? '';
+  }
+  if (e.data.type === 'capture') {
+    const url = await capture();
+    e.source?.postMessage({ type: 'render', dataUrl: url, anim: currentAnim }, '*');
+  }
+});
+
+window.SentorBot = { setAnimation: id => { currentAnim = id; animT = 0; }, capture, setSpeechText: drawBubble };
+
+} catch (err) {
+  showError(String(err));
+}
+</script>
+</body>
+</html>

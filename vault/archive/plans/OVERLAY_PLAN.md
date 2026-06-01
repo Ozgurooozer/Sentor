@@ -1,10 +1,10 @@
-# Atlas OS — v0.2 Focused Overlay Mode: Completion Plan
+# Sentor — v0.2 Focused Overlay Mode: Completion Plan
 
 ## What is "Focused" mode?
 
 A transparent, always-on-top window that floats over the Windows desktop.
 The desktop is visible through the empty space. Only a 148px bottom bar is
-opaque: a mini terminal strip on the left and the Atlas chat input on the right.
+opaque: a mini terminal strip on the left and the Sentor chat input on the right.
 When chatting, the AiMiniWindow balloon appears floating above the bar on the right.
 
 ## Current state (what is already done)

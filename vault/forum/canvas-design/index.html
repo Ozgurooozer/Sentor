@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Canvas Tasarım Toplantısı — Sonsuz Kanvas + Node Sistemi — Atlas Forum</title>
-<meta name="description" content="[arch] 3 uzman ajanın araştırma toplantısı: sonsuz kanvas mimarisi, node sistemi tasarımı, Atlas OS mevcut canvas analizi ve Phase H implementation planı.">
+<title>Canvas Tasarım Toplantısı — Sonsuz Kanvas + Node Sistemi — Sentor Forum</title>
+<meta name="description" content="[arch] 3 uzman ajanın araştırma toplantısı: sonsuz kanvas mimarisi, node sistemi tasarımı, Sentor mevcut canvas analizi ve Phase H implementation planı.">
 <meta name="created" content="2026-05-27">
 <style>
   :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--mid:#404040;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4caf7d;--amber:#d4a853;--purple:#9b72ef;--cyan:#4fc3f7;--red:#ef5b5b;}
@@ -62,13 +62,13 @@
 </div>
 
 <p>
-  3 araştırma ajanı paralel çalıştırıldı: online infinite canvas araştırması, Atlas OS mevcut canvas kodu analizi, ve node sistemi tasarım pattern'ları. Aşağıda 3 uzmanın bulgularının sentezi ve Phase H için somut implementation planı bulunuyor.
+  3 araştırma ajanı paralel çalıştırıldı: online infinite canvas araştırması, Sentor mevcut canvas kodu analizi, ve node sistemi tasarım pattern'ları. Aşağıda 3 uzmanın bulgularının sentezi ve Phase H için somut implementation planı bulunuyor.
 </p>
 
 <h2>1. Mevcut Canvas Durumu (Kod Analizi)</h2>
 
 <span class="expert e2">Canvas Analisti</span>
-<p>Atlas OS'un mevcut canvas'ı temelden sağlam. Çalışan pattern'lar korunacak; bazı kritik eksikler kapatılacak.</p>
+<p>Sentor'un mevcut canvas'ı temelden sağlam. Çalışan pattern'lar korunacak; bazı kritik eksikler kapatılacak.</p>
 
 <h3>Çalışan ve Korunacaklar</h3>
 <ul>
@@ -106,7 +106,7 @@
 <h3>Kanıtlanmış Koordinat Sistemi</h3>
 <p>Figma, tldraw, Excalidraw, React Flow — hepsi aynı "camera" modelini kullanıyor:</p>
 
-<pre><code>// Atlas OS zaten bunu uyguluyor — format doğru
+<pre><code>// Sentor zaten bunu uyguluyor — format doğru
 interface Camera { x: number; y: number; z: number; } // z = zoom
 
 screenToCanvas: (pt, cam) => ({ x: pt.x / cam.z - cam.x, y: pt.y / cam.z - cam.y })
@@ -115,13 +115,13 @@ canvasToScreen: (pt, cam) => ({ x: (pt.x + cam.x) * cam.z, y: (pt.y + cam.y) * c
 // CSS transform — scale ÖNCE translate (sıra önemli):
 transform: `scale(${cam.z}) translate(${cam.x}px, ${cam.y}px)`</code></pre>
 
-<div class="note">Atlas OS mevcut canvas doğru koordinat sistemini kullanıyor. Tamamen yeniden yazılmasına gerek yok — eksikler kapatılacak.</div>
+<div class="note">Sentor mevcut canvas doğru koordinat sistemini kullanıyor. Tamamen yeniden yazılmasına gerek yok — eksikler kapatılacak.</div>
 
 <h3>Library vs Sıfırdan Yazma</h3>
 
 <div class="decision">
   <div class="label">Karar</div>
-  <p>Mevcut hand-rolled canvas korunacak. React Flow / XY Flow'a geçilmeyecek. Sebebi: Atlas OS node'ları derin Tauri entegrasyonu gerektiriyor (PTY terminal, native WebView, wire data forwarding). React Flow bu entegrasyonları kırar. Mevcut canvas zaten doğru temeller üzerinde.</p>
+  <p>Mevcut hand-rolled canvas korunacak. React Flow / XY Flow'a geçilmeyecek. Sebebi: Sentor node'ları derin Tauri entegrasyonu gerektiriyor (PTY terminal, native WebView, wire data forwarding). React Flow bu entegrasyonları kırar. Mevcut canvas zaten doğru temeller üzerinde.</p>
 </div>
 
 <h3>SVG vs Canvas2D Wire Rendering</h3>
@@ -136,7 +136,7 @@ transform: `scale(${cam.z}) translate(${cam.x}px, ${cam.y}px)`</code></pre>
 }
 // Geriye giden bağlantılar için dx'i minimum 80px'e sabitle</code></pre>
 
-<p>Atlas OS mevcut implementasyon: <code>dist * 0.45</code> — bu iyi ayarlanmış, değiştirilmeyecek.</p>
+<p>Sentor mevcut implementasyon: <code>dist * 0.45</code> — bu iyi ayarlanmış, değiştirilmeyecek.</p>
 
 <h2>3. Node Sistemi Tasarımı</h2>
 

@@ -1,6 +1,6 @@
 # MCP Server Guide
 
-Atlas OS exposes an MCP (Model Context Protocol) server for external AI tools (Claude Code, Cursor, Cline, Continue, etc.) to interact with the vault and canvas.
+Sentor exposes an MCP (Model Context Protocol) server for external AI tools (Claude Code, Cursor, Cline, Continue, etc.) to interact with the vault and canvas.
 
 ---
 
@@ -20,7 +20,7 @@ tools/mcp_server.py          ← Python MCP server (zero deps)
                                       │
                                       │  Rust file watcher (notify crate)
                                       ▼
-                              Atlas IDE (Tauri + React)
+                              Sentor IDE (Tauri + React)
                               useMcpBridge hook → canvasStore
 ```
 
@@ -108,9 +108,9 @@ Register in an MCP client config (e.g. `.mcp.json` for Claude Code):
 ```json
 {
   "mcpServers": {
-    "atlas-vault": {
+    "sentor-vault": {
       "command": "python",
-      "args": ["/path/to/Atlas OS/tools/mcp_server.py"]
+      "args": ["/path/to/Sentor/tools/mcp_server.py"]
     }
   }
 }

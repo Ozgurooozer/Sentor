@@ -1,4 +1,4 @@
-const KEY = "atlas-browser-history";
+const KEY = "sentor-browser-history";
 const MAX = 50;
 
 export function addUrl(url: string): void {

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-0: #0a0a0a;
+      --bg-1: #111111;
+      --bg-2: #1a1a1a;
+      --bg-3: #222222;
+      --border: #252525;
+      --border-subtle: #1e1e1e;
+      --text-primary: #e8e8e8;
+      --text-secondary: #888888;
+      --text-muted: #555555;
+      --accent: #5b8def;
+      --accent-hover: #4a7de3;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      background: var(--bg-0);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .mono {
+      font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: 1px solid var(--accent);
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: border-color 150ms ease-out;
+    }
+    .card:hover {
+      border-color: #333333;
+    }
+
+    /* Focus */
+    :focus-visible {
+      outline: 2px solid rgba(91, 141, 239, 0.2);
+      outline-offset: 3px;
+    }
+
+    /* Selection */
+    ::selection {
+      background: rgba(91, 141, 239, 0.15);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+
+<body>
+
+  <!-- Nav bar — vault path breadcrumb -->
+  <nav style="background: var(--bg-0); border-bottom: 1px solid var(--border-subtle);">
+    <div style="max-width: 960px; margin: 0 auto; padding: 0 32px;">
+      <div style="display: flex; align-items: center; height: 44px; gap: 6px;">
+        <span class="mono" style="font-size: 12px; color: var(--text-muted);">vault</span>
+        <span style="font-size: 12px; color: var(--border);">/</span>
+        <span class="mono" style="font-size: 12px; color: var(--text-muted);">sentor</span>
+        <span style="font-size: 12px; color: var(--border);">/</span>
+        <span class="mono" style="font-size: 12px; color: var(--text-secondary);">index.html</span>
+        <span style="margin-left: auto; display: flex; align-items: center; gap: 16px;">
+          <span class="mono" style="font-size: 11px; color: var(--text-muted);">local-first</span>
+          <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #3a7a4a;"></span>
+        </span>
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- ─── HERO ───────────────────────────────────────────────────────────── -->
+  <section style="background: var(--bg-0); border-bottom: 1px solid var(--border-subtle); padding: 96px 32px 88px;">
+    <div style="max-width: 960px; margin: 0 auto; text-align: center;">
+
+      <div class="mono" style="font-size: 11px; color: var(--text-muted); letter-spacing: 0.12em; margin-bottom: 32px;">
+        v0.1.0 &nbsp;·&nbsp; offline &nbsp;·&nbsp; local-first &nbsp;·&nbsp; no telemetry
+      </div>
+
+      <h1 style="font-size: clamp(56px, 10vw, 88px); font-weight: 800; letter-spacing: -0.04em; line-height: 1; color: #f0f0f0; margin-bottom: 20px;">
+        Sentor <span style="color: #c8c8c8; font-weight: 300;">OS</span>
+      </h1>
+
+      <p style="font-size: 20px; color: var(--text-secondary); font-weight: 300; letter-spacing: -0.01em; margin-bottom: 40px;">
+        Your offline knowledge system
+      </p>
+
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <a href="../search.html" class="btn btn-primary">Open Search</a>
+        <a href="https://github.com" target="_blank" rel="noopener" class="btn btn-ghost">
+          GitHub <span style="opacity: 0.5;">→</span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ─── HOW IT WORKS ──────────────────────────────────────────────────── -->
+  <section style="background: var(--bg-1); border-bottom: 1px solid var(--border-subtle); padding: 80px 32px;">
+    <div style="max-width: 960px; margin: 0 auto;">
+
+      <div class="mono" style="font-size: 11px; color: var(--text-muted); letter-spacing: 0.12em; text-align: center; margin-bottom: 56px;">
+        HOW IT WORKS
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1px 1fr 1px 1fr; gap: 0;">
+
+        <!-- Step 01 -->
+        <div style="padding: 0 32px; text-align: center;">
+          <div class="mono" style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">[01]</div>
+          <div style="font-size: 15px; font-weight: 500; color: var(--text-primary); margin-bottom: 10px;">Write HTML</div>
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.7;">
+            Create knowledge pages as plain HTML files. Drop them anywhere inside your vault directory.
+          </p>
+        </div>
+
+        <!-- Divider -->
+        <div style="background: var(--border-subtle);"></div>
+
+        <!-- Step 02 -->
+        <div style="padding: 0 32px; text-align: center;">
+          <div class="mono" style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">[02]</div>
+          <div style="font-size: 15px; font-weight: 500; color: var(--text-primary); margin-bottom: 10px;">
+            Run <span class="mono" style="color: var(--accent);">sentor index</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.7;">
+            The indexer scans your vault and builds a local Fuse.js search index from all pages.
+          </p>
+        </div>
+
+        <!-- Divider -->
+        <div style="background: var(--border-subtle);"></div>
+
+        <!-- Step 03 -->
+        <div style="padding: 0 32px; text-align: center;">
+          <div class="mono" style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">[03]</div>
+          <div style="font-size: 15px; font-weight: 500; color: var(--text-primary); margin-bottom: 10px;">Search</div>
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.7;">
+            Query via browser UI, terminal CLI, or the REST API for your local AI agents.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─── FEATURES ─────────────────────────────────────────────────────── -->
+  <section style="background: var(--bg-2); border-bottom: 1px solid var(--border-subtle); padding: 80px 32px;">
+    <div style="max-width: 960px; margin: 0 auto;">
+
+      <div class="mono" style="font-size: 11px; color: var(--text-muted); letter-spacing: 0.12em; text-align: center; margin-bottom: 56px;">
+        FEATURES
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+
+        <!-- Browser UI -->
+        <div class="card" style="padding: 28px 28px 24px;">
+          <div class="mono" style="font-size: 11px; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 14px;">browser</div>
+          <h3 style="font-size: 15px; font-weight: 500; color: var(--text-primary); margin-bottom: 10px;">Browser UI</h3>
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.75;">
+            Full-featured search interface that runs directly in your browser. Open any vault page from results — no server, no build step required.
+          </p>
+        </div>
+
+        <!-- Terminal CLI -->
+        <div class="card" style="padding: 28px 28px 24px;">
+          <div class="mono" style="font-size: 11px; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 14px;">terminal</div>
+          <h3 style="font-size: 15px; font-weight: 500; color: var(--text-primary); margin-bottom: 10px;">Terminal CLI</h3>
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.75;">
+            Query your vault from the command line. Pipe output, grep results, compose with other tools — it's just a program.
+          </p>
+        </div>
+
+        <!-- Ollama Agent API -->
+        <div class="card" style="padding: 28px 28px 24px;">
+          <div class="mono" style="font-size: 11px; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 14px;">api</div>
+          <h3 style="font-size: 15px; font-weight: 500; color: var(--text-primary); margin-bottom: 10px;">Ollama Agent API</h3>
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.75;">
+            Local AI agents query your knowledge base via REST. Combine Ollama models with your vault for retrieval-augmented answers — offline.
+          </p>
+        </div>
+
+        <!-- Fully Offline -->
+        <div class="card" style="padding: 28px 28px 24px; border-left: 2px solid rgba(91, 141, 239, 0.3);">
+          <div class="mono" style="font-size: 11px; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 14px;">offline</div>
+          <h3 style="font-size: 15px; font-weight: 500; color: var(--text-primary); margin-bottom: 10px;">Fully Offline</h3>
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.75;">
+            No account. No cloud sync. No telemetry. Your knowledge never leaves your machine — available on a plane, in a bunker, always.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─── STACK ─────────────────────────────────────────────────────────── -->
+  <section style="background: var(--bg-3); border-bottom: 1px solid var(--border-subtle); padding: 64px 32px;">
+    <div style="max-width: 960px; margin: 0 auto; text-align: center;">
+
+      <div class="mono" style="font-size: 11px; color: var(--text-muted); letter-spacing: 0.12em; margin-bottom: 28px;">
+        STACK
+      </div>
+
+      <p class="mono" style="font-size: 13px; color: var(--text-secondary); line-height: 2;">
+        <span>HTML + Tailwind</span>
+        <span style="color: var(--border); margin: 0 14px;">·</span>
+        <span>Fuse.js</span>
+        <span style="color: var(--border); margin: 0 14px;">·</span>
+        <span>Python stdlib</span>
+        <span style="color: var(--border); margin: 0 14px;">·</span>
+        <span>Ollama</span>
+      </p>
+
+    </div>
+  </section>
+
+
+  <!-- ─── FOOTER ────────────────────────────────────────────────────────── -->
+  <footer style="background: var(--bg-0); padding: 40px 32px;">
+    <p class="mono" style="text-align: center; font-size: 12px; color: #444444;">
+      Built with Sentor
+    </p>
+  </footer>
+
+</body>
+</html>

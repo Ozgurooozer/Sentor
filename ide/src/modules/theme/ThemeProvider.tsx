@@ -30,7 +30,7 @@ export const ThemeProviderContext = createContext<ThemeProviderState | null>(nul
 // Synchronous fast-path so the initial paint isn't unstyled. The persistent
 // preference (in tauri-plugin-store) overwrites this on mount; we keep a
 // localStorage shadow of the *last applied* theme just for first-paint fidelity.
-const FAST_PATH_KEY = "atlas-ui-theme-shadow";
+const FAST_PATH_KEY = "sentor-ui-theme-shadow";
 
 function readFastTheme(fallback: Theme): Theme {
   if (typeof window === "undefined") return fallback;

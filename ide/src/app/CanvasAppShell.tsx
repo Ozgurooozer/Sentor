@@ -46,7 +46,7 @@ function CanvasAppShellInner() {
 
   const setApiKeys = useChatStore((s) => s.setApiKeys);
 
-  const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot) ?? "C:\\Atlas OS";
+  const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot) ?? "C:\\Sentor";
   const canvasHydrated = useCanvasStore((s) => s.hydrated);
   const addPanel = useCanvasStore((s) => s.addPanel);
   const updatePanel = useCanvasStore((s) => s.updatePanel);
@@ -64,11 +64,11 @@ function CanvasAppShellInner() {
   }, []);
 
   useEffect(() => {
-    setLogVaultRoot(workspaceRoot || "C:\\Atlas OS");
+    setLogVaultRoot(workspaceRoot || "C:\\Sentor");
   }, [workspaceRoot]);
 
   // Switch canvas storage file when vault (workspace root) changes.
-  // Without this, all vaults share the same atlas-canvas.json file.
+  // Without this, all vaults share the same sentor-canvas.json file.
   useEffect(() => {
     if (!prefsHydrated) return;
     void useCanvasStore.getState().switchVault(workspaceRoot);
@@ -76,7 +76,7 @@ function CanvasAppShellInner() {
 
   // ── Vault write undo toast ────────────────────────────────────────────────
   useEffect(() => {
-    const unsub = listen<VaultWritePayload>("atlas://vault-page-written", ({ payload }) => {
+    const unsub = listen<VaultWritePayload>("sentor://vault-page-written", ({ payload }) => {
       if (!payload.previousVersion) return;
       if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
       setUndoToast({
@@ -110,14 +110,14 @@ function CanvasAppShellInner() {
   // ── V3 Input → Canvas bridge ─────────────────────────────────────────────
   useEffect(() => {
     const ork = useOrkestraStore.getState();
-    const promptP = listen<{ text: string }>("atlas:canvas-prompt", ({ payload }) => {
+    const promptP = listen<{ text: string }>("sentor:canvas-prompt", ({ payload }) => {
       ork.setCollapsed(false);
       ork.setV3InputActive(true);
       const model = getModel(selectedModelId);
       const keys = useChatStore.getState().apiKeys;
       void ork.send(payload.text, model.provider, "", "", "", "", keys.opencode ?? "", opencodeBase, opencodeModel);
     });
-    const unlinkP = listen("atlas:canvas-unlink", () => {
+    const unlinkP = listen("sentor:canvas-unlink", () => {
       useOrkestraStore.getState().setV3InputActive(false);
     });
     return () => {
@@ -128,14 +128,14 @@ function CanvasAppShellInner() {
 
   // ── Canvas IPC for V3InputShell (separate Tauri window) ─────────────────
   useEffect(() => {
-    const reqP = listen("atlas:request-canvases", async () => {
+    const reqP = listen("sentor:request-canvases", async () => {
       const { canvases, activeCanvasId } = useCanvasStore.getState();
-      await emitTo("v3-input", "atlas:canvas-list", { canvases, activeCanvasId }).catch(() => {});
+      await emitTo("v3-input", "sentor:canvas-list", { canvases, activeCanvasId }).catch(() => {});
     });
-    const switchP = listen<{ id: string }>("atlas:canvas-switch", async ({ payload }) => {
+    const switchP = listen<{ id: string }>("sentor:canvas-switch", async ({ payload }) => {
       await useCanvasStore.getState().switchCanvas(payload.id);
       const { canvases, activeCanvasId } = useCanvasStore.getState();
-      await emitTo("v3-input", "atlas:canvas-list", { canvases, activeCanvasId }).catch(() => {});
+      await emitTo("v3-input", "sentor:canvas-list", { canvases, activeCanvasId }).catch(() => {});
     });
     return () => {
       void reqP.then(fn => fn());

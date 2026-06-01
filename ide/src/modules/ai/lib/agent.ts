@@ -132,7 +132,7 @@ function buildModel(
   return buildLanguageModel(m.provider, keys, m.id, { providers });
 }
 
-export async function createAtlasAgent({
+export async function createSentorAgent({
   keys,
   modelId = DEFAULT_MODEL_ID,
   customInstructions,
@@ -155,7 +155,7 @@ export async function createAtlasAgent({
     : "";
   const memoryBlock =
     projectMemory && projectMemory.trim().length > 0
-      ? `\n\n## PROJECT — ATLAS.md\n${projectMemory.trim()}`
+      ? `\n\n## PROJECT — SENTOR.md\n${projectMemory.trim()}`
       : "";
   const selfContextBlock =
     agentSelfContext && agentSelfContext.trim().length > 0
@@ -200,8 +200,8 @@ export async function createAtlasAgent({
   });
 }
 
-export type AtlasAgent = Awaited<ReturnType<typeof createAtlasAgent>>;
+export type SentorAgent = Awaited<ReturnType<typeof createSentorAgent>>;
 
-export function createAtlasTransport(agent: AtlasAgent) {
+export function createSentorTransport(agent: SentorAgent) {
   return new DirectChatTransport({ agent });
 }

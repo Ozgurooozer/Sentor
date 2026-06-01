@@ -1,4 +1,4 @@
-﻿import { create } from "zustand";
+import { create } from "zustand";
 import { LazyStore } from "@tauri-apps/plugin-store";
 import { emitTo } from "@tauri-apps/api/event";
 import { webLayerManager } from "./webLayer/WebLayerManager";
@@ -7,7 +7,7 @@ import type { CanvasPanelNode, Connection, PortSide, PanelType, Viewport } from 
 const uid = () => crypto.randomUUID();
 
 // ── Per-vault persistence ────────────────────────────────────────────────────
-// Each vault root gets its own atlas-canvas-{hash}.json so canvas layouts are
+// Each vault root gets its own sentor-canvas-{hash}.json so canvas layouts are
 // isolated between vaults. Webviews outside Tauri silently no-op.
 
 function _simpleHash(str: string): string {
@@ -16,8 +16,8 @@ function _simpleHash(str: string): string {
   return Math.abs(h).toString(36);
 }
 
-let _persistStore = new LazyStore("atlas-canvas.json", { defaults: {}, autoSave: 300 });
-let _persistKey = "atlas-canvas.json";
+let _persistStore = new LazyStore("sentor-canvas.json", { defaults: {}, autoSave: 300 });
+let _persistKey = "sentor-canvas.json";
 const PERSIST_KEY = "state";
 
 interface PersistedCanvas {
@@ -158,7 +158,7 @@ const PANEL_DEFAULTS: Record<PanelType, { width: number; height: number; title: 
   chat:        { width: 420, height: 520, title: "Chat" },
   canvas:      { width: 640, height: 480, title: "Sub Canvas" },
   agent:       { width: 360, height: 520, title: "New Agent" },
-  instance:    { width: 560, height: 500, title: "Atlas Instance" },
+  instance:    { width: 560, height: 500, title: "Sentor Instance" },
   codegraph:   { width: 700, height: 540, title: "Code Graph" },
   input:       { width: 260, height: 160, title: "Input" },
   pipeline:    { width: 400, height: 300, title: "Pipeline" },
@@ -170,7 +170,7 @@ const PANEL_DEFAULTS: Record<PanelType, { width: number; height: number; title: 
   note:        { width: 260, height: 200, title: "Note" },
   tool:        { width: 200, height: 160, title: "Tool" },
   pipe:        { width: 320, height: 260, title: "Auto-Pipe" },
-  stickman:    { width: 460, height: 520, title: "AtlasBot" },
+  stickman:    { width: 460, height: 520, title: "SentorBot" },
   "canvas-3d": { width: 640, height: 480, title: "3D Canvas" },
   logs:        { width: 560, height: 400, title: "Logs" },
   audio:       { width: 320, height: 380, title: "Audio" },
@@ -405,7 +405,7 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
     // Forward to linked V3 window if configured
     if (panel?.windowLabel && data !== null) {
       const payload = typeof data.value === "string" ? data.value : JSON.stringify(data.value ?? "");
-      void emitTo(panel.windowLabel, "atlas:wire-data", { panelId: id, data: payload });
+      void emitTo(panel.windowLabel, "sentor:wire-data", { panelId: id, data: payload });
     }
   },
 
@@ -528,7 +528,7 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
     if (_vaultSwitching) return;
     _vaultSwitching = true;
     try {
-      const key = root ? `atlas-canvas-${_simpleHash(root)}.json` : "atlas-canvas.json";
+      const key = root ? `sentor-canvas-${_simpleHash(root)}.json` : "sentor-canvas.json";
       if (key === _persistKey) return;
 
       // Flush current state before switching.
@@ -552,7 +552,7 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
   ensureSystemCanvas(workspaceRoot) {
     const { panels } = get();
     if (panels.some((p) => p.type === "canvas" && p.meta?.systemCanvas === true)) return;
-    const root = workspaceRoot || "c:\\Atlas OS";
+    const root = workspaceRoot || "c:\\Sentor";
     const systemCanvas: CanvasPanelNode = {
       id: uid(),
       type: "canvas",
@@ -584,7 +584,7 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
           width: 450,
           height: 340,
           zIndex: 2,
-          title: "Atlas CLI",
+          title: "Sentor CLI",
           meta: { cwd: root },
         },
       ],
@@ -707,7 +707,7 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
 
     // Persist current canvas state
     const cur = get();
-    const curKey = `atlas-canvas-multi-${activeCanvasId}`;
+    const curKey = `sentor-canvas-multi-${activeCanvasId}`;
     const curStore = new LazyStore(`${curKey}.json`, { defaults: {}, autoSave: 0 });
     await curStore.set(PERSIST_KEY, {
       panels: cur.panels, connections: cur.connections,
@@ -715,7 +715,7 @@ export const useCanvasStore = create<CanvasState & CanvasActions>((set, get) => 
     }).catch(() => undefined);
 
     // Load target canvas state
-    const targetKey = `atlas-canvas-multi-${id}`;
+    const targetKey = `sentor-canvas-multi-${id}`;
     const targetStore = new LazyStore(`${targetKey}.json`, { defaults: {}, autoSave: 0 });
     const snap = await targetStore.get<PersistedCanvas>(PERSIST_KEY).catch(() => null);
     set({

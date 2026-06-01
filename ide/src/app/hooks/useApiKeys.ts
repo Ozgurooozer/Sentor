@@ -4,7 +4,7 @@ import { onKeysChanged } from "@/modules/settings/store";
 
 /**
  * Load provider API keys on mount and re-load whenever Settings emits the
- * `atlas:keys-changed` event. `keysLoaded` flips to true after the first load
+ * `sentor:keys-changed` event. `keysLoaded` flips to true after the first load
  * so the UI can suppress the AI input bar until keys are actually available.
  */
 export function useApiKeys(setApiKeys: (keys: ProviderKeys) => void) {

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Atlas Serve Daemon — watcher + cron tetikleyici.
+Sentor Serve Daemon — watcher + cron tetikleyici.
 
-  atlas serve-daemon          # ön planda çalışır, Ctrl+C ile dur
-  atlas serve-daemon --bg     # arka planda başlatır (Windows: start /B)
+  sentor serve-daemon          # ön planda çalışır, Ctrl+C ile dur
+  sentor serve-daemon --bg     # arka planda başlatır (Windows: start /B)
 
 Desteklenen tetikleyiciler (pipeline trigger.type):
   manual          — yalnız elle çağrılır, daemon ignore eder
@@ -156,7 +156,7 @@ def _fire(pipeline_id, ctx=None):
 # ── Main daemon loop ──────────────────────────────────────────────────────────
 
 def run_daemon(poll_interval=5):
-    _log(f'Atlas daemon started  (poll={poll_interval}s)')
+    _log(f'Sentor daemon started  (poll={poll_interval}s)')
     _log(f'watching pipelines in {PIPELINES_DIR}')
 
     cron_last    = {}   # pipeline_id → last_run epoch

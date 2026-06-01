@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Atlas OS — Index migration runner.
+Sentor — Index migration runner.
 
 Checks whether .index/pages.json and .index/embeddings.json are up to date
 with the current schema versions. If not, creates a timestamped backup and
@@ -137,7 +137,7 @@ def main() -> None:
             print(f"  embeddings.json schema v{_embed_version()} → needs v{CURRENT_EMBED_SCHEMA}")
         sys.exit(1)
 
-    print("\n  Atlas OS — Index Migration")
+    print("\n  Sentor — Index Migration")
     print(f"  Index schema: v{_index_version()} → v{CURRENT_INDEX_SCHEMA}")
     print(f"  Embed schema: v{_embed_version()} → v{CURRENT_EMBED_SCHEMA}")
 

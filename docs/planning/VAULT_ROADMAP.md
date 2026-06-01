@@ -17,7 +17,7 @@ Remove vault noise; index quality depends on it.
 - Mark `vault/archive/` read-only (indexer skip)
 - Move `.index/Flowise` out of vault index or delete
 
-**Exit:** Indexer runs, only intentional pages listed. Search "atlas" → no prototype variants (or all by user choice).
+**Exit:** Indexer runs, only intentional pages listed. Search "sentor" → no prototype variants (or all by user choice).
 
 ---
 
@@ -40,7 +40,7 @@ Agent office concept needs flexible indexer + scope filter.
 Seed vault with office structure; no Tauri yet.
 
 - `vault/templates/` with agent-state, meeting-notes, decision-record templates
-- `vault/agents/{vault,coder,atlas-maker,sentor}/` with seed index.html, profile.md, state.md, log.md
+- `vault/agents/{vault,coder,sentor-maker,sentor}/` with seed index.html, profile.md, state.md, log.md
 - Re-index; `pages.json` shows 4 agent-profile + 4 agent-state records
 
 **Exit:** IDE Vault Browser opens `vault/agents/vault/`, office card renders. `GET /api/agent/vault` returns state + empty log.

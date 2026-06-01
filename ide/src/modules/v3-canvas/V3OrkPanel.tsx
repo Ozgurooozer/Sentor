@@ -134,7 +134,7 @@ export function V3OrkPanel() {
         }}
       >
         {loading && (
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#5b8def", animation: "atlas-pulse 1s ease-in-out infinite", flexShrink: 0 }} />
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#5b8def", animation: "sentor-pulse 1s ease-in-out infinite", flexShrink: 0 }} />
         )}
         {!loading && v3Active && (
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4db89a", flexShrink: 0 }} />
@@ -237,7 +237,7 @@ export function V3OrkPanel() {
                 color: msg.role === "user" ? "rgba(91,141,239,0.60)" : "rgba(77,184,154,0.50)",
                 letterSpacing: "0.05em",
               }}>
-                {msg.role === "user" ? "sen" : "atlas"}
+                {msg.role === "user" ? "sen" : "sentor"}
               </span>
 
               {/* Content */}
@@ -267,7 +267,7 @@ export function V3OrkPanel() {
                 <span key={i} style={{
                   width: 4, height: 4, borderRadius: "50%",
                   background: "rgba(91,141,239,0.50)",
-                  animation: `atlas-pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
+                  animation: `sentor-pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
                 }} />
               ))}
             </div>
@@ -300,7 +300,7 @@ export function V3OrkPanel() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKey}
-          placeholder={v3Active ? "atlas input'tan bağlı…" : "node ekle, bağla, çalıştır…"}
+          placeholder={v3Active ? "sentor input'tan bağlı…" : "node ekle, bağla, çalıştır…"}
           disabled={loading}
           style={{
             flex: 1, background: "transparent", border: "none", outline: "none",

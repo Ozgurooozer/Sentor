@@ -47,9 +47,9 @@ export function CanvasTopBar({ onOpenSettings }: Props) {
           className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-[6px] font-bold text-[12px] text-[#0a0a0a]"
           style={{ background: "linear-gradient(135deg, #5b8def, #9b72ef)" }}
         >
-          A
+          S
         </div>
-        <span className="text-[12px] font-medium text-[#f5f5f5]">Atlas OS</span>
+        <span className="text-[12px] font-medium text-[#f5f5f5]">Sentor</span>
 
         <div className="h-[18px] w-px bg-[#2a2a2a]" />
 

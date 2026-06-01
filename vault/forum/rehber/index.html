@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Forum Rehberi — Atlas Forum</title>
-<meta name="description" content="Atlas Forum nasıl çalışır? Her konu bir vault sayfasıdır. Yeni konu açmak, yanıt eklemek ve kategori sistemi hakkında kısa kılavuz.">
+<title>Forum Rehberi — Sentor Forum</title>
+<meta name="description" content="Sentor Forum nasıl çalışır? Her konu bir vault sayfasıdır. Yeni konu açmak, yanıt eklemek ve kategori sistemi hakkında kısa kılavuz.">
 <meta name="created" content="2026-05-26">
 <style>
   :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--mid:#404040;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4caf7d;--amber:#d4a853;--purple:#8b7ed8;}
@@ -38,7 +38,7 @@
 <body>
 <a href="../index.html" class="back">← Foruma Dön</a>
 <h1>Forum Rehberi</h1>
-<p class="sub">Atlas Forum nasıl çalışır ve nasıl kullanılır.</p>
+<p class="sub">Sentor Forum nasıl çalışır ve nasıl kullanılır.</p>
 
 <h2>Temel Prensip</h2>
 <p>Forum bir uygulama değil, bir vault kategorisidir. Her konu <code>vault/forum/{slug}/index.html</code> adresinde bir HTML sayfasıdır — indexlenir, aranabilir, kalıcıdır. LocalStorage yok, veritabanı yok.</p>
@@ -54,12 +54,12 @@
 </div>
 
 <h2>Yeni Konu Açmak</h2>
-<div class="step"><span class="step-n">1</span><div class="step-body"><strong>Atlas-Maker ajanına söyle:</strong> "forum/konu-slug adresinde [kategori] bir forum konusu oluştur"</div></div>
+<div class="step"><span class="step-n">1</span><div class="step-body"><strong>Sentor-Maker ajanına söyle:</strong> "forum/konu-slug adresinde [kategori] bir forum konusu oluştur"</div></div>
 <div class="step"><span class="step-n">2</span><div class="step-body">Sayfa <code>vault/forum/{slug}/index.html</code> olarak yazılır. Açılış kısmında <code>&lt;meta name="description" content="[cat] ..."&gt;</code> olması şart — kategori bundan okunur.</div></div>
 <div class="step"><span class="step-n">3</span><div class="step-body"><code>python tools/indexer.py</code> çalıştır. Konu forum indeksinde otomatik görünür.</div></div>
 
 <h2>Yanıt Eklemek</h2>
-<p>Thread sayfasının HTML dosyasını düzenle: <code>&lt;hr&gt;</code> altındaki yanıtlar bölümüne yeni bir <code>.reply</code> bloğu ekle. Bunu Atlas-Maker'dan istemek en kolayı.</p>
+<p>Thread sayfasının HTML dosyasını düzenle: <code>&lt;hr&gt;</code> altındaki yanıtlar bölümüne yeni bir <code>.reply</code> bloğu ekle. Bunu Sentor-Maker'dan istemek en kolayı.</p>
 
 <h2>Konu Formatı</h2>
 <ul>

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentor — Mimari ve Proje Durumu</title>
+  <meta name="description" content="Sentor projesinin tam mimari haritası, modül durumları, agent listesi ve sonraki adımlar. 15 Mayıs 2026.">
+  <meta name="created" content="2026-05-15">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--overlay:#222222;
+      --subtle:#2a2a2a;--mid:#404040;--ink:#f5f5f5;--dim:#888888;--muted:#555555;
+      --accent:#5b8def;--accent-h:#4a7de0;
+      --green:#4caf7d;--yellow:#e5a950;--red:#e05a5a;
+    }
+    body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.7;padding:2.5rem 1.5rem 6rem;max-width:900px;margin:0 auto}
+    header{border-bottom:1px solid var(--subtle);padding-bottom:1rem;margin-bottom:2.5rem;display:flex;justify-content:space-between;align-items:baseline}
+    header .logo{font-size:.85rem;font-weight:700;letter-spacing:.06em;color:var(--accent)}
+    header .meta{font-size:.8rem;color:var(--muted)}
+    h1{font-size:clamp(1.4rem,3vw,2rem);font-weight:700;line-height:1.25;margin-bottom:.5rem}
+    .desc{color:var(--dim);font-size:.9rem;margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--subtle)}
+    h2{font-size:1.05rem;font-weight:600;color:var(--ink);margin:2.5rem 0 1rem;padding-bottom:.35rem;border-bottom:1px solid var(--subtle)}
+    h3{font-size:.95rem;font-weight:600;color:var(--dim);margin:1.5rem 0 .5rem}
+    p{margin-bottom:.9rem}
+    ul,ol{margin:.5rem 0 1rem 1.4rem}
+    li{margin-bottom:.3rem}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Tables */
+    table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.875rem}
+    th{text-align:left;padding:.5rem .75rem;color:var(--dim);font-weight:500;border-bottom:1px solid var(--mid)}
+    td{padding:.5rem .75rem;border-bottom:1px solid var(--subtle)}
+    tr:last-child td{border-bottom:none}
+    td code,th code{background:var(--elevated);padding:.1rem .35rem;border-radius:3px;font-size:.8rem;font-family:ui-monospace,monospace;color:var(--accent)}
+
+    /* Code */
+    pre{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:1rem;overflow-x:auto;margin:1rem 0 1.5rem;font-size:.85rem}
+    code{font-family:ui-monospace,monospace;font-size:.875rem;color:var(--accent)}
+    pre code{color:#c9d1d9}
+
+    /* Status badges */
+    .badge{display:inline-block;padding:.15rem .55rem;border-radius:4px;font-size:.75rem;font-weight:600;letter-spacing:.03em}
+    .badge-done{background:rgba(76,175,125,.15);color:var(--green);border:1px solid rgba(76,175,125,.3)}
+    .badge-active{background:rgba(91,141,239,.15);color:var(--accent);border:1px solid rgba(91,141,239,.3)}
+    .badge-planned{background:rgba(136,136,136,.1);color:var(--dim);border:1px solid var(--subtle)}
+
+    /* Phase cards */
+    .phase-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin:1rem 0 1.5rem}
+    .phase-card{background:var(--surface);border:1px solid var(--subtle);border-radius:8px;padding:1.25rem}
+    .phase-card h3{margin-top:0;font-size:.9rem;color:var(--ink)}
+    .phase-card .phase-status{font-size:.75rem;margin-bottom:.75rem}
+    .phase-card ul{margin:.5rem 0 0 1.2rem}
+    .phase-card li{font-size:.85rem;margin-bottom:.25rem;color:var(--dim)}
+
+    /* Agent grid */
+    .agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem;margin:1rem 0 1.5rem}
+    .agent-card{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:1rem}
+    .agent-name{font-size:.875rem;font-weight:600;color:var(--ink);margin-bottom:.25rem}
+    .agent-id{font-size:.75rem;color:var(--muted);font-family:ui-monospace,monospace;margin-bottom:.5rem}
+    .agent-desc{font-size:.8rem;color:var(--dim);line-height:1.5}
+
+    /* Mermaid wrapper */
+    .diagram-wrap{background:var(--surface);border:1px solid var(--subtle);border-radius:8px;padding:1.5rem;margin:1rem 0 1.5rem;overflow-x:auto}
+    .mermaid{display:flex;justify-content:center}
+
+    /* Provider table accent column */
+    .provider-tag{font-size:.75rem;font-weight:600;padding:.15rem .45rem;border-radius:3px;background:var(--elevated);border:1px solid var(--subtle);color:var(--dim)}
+
+    /* Color swatch table */
+    .swatch{display:inline-block;width:14px;height:14px;border-radius:2px;vertical-align:middle;margin-right:.4rem;border:1px solid var(--mid)}
+
+    /* Back link */
+    .back{display:inline-block;font-size:.8rem;color:var(--muted);text-decoration:none;margin-bottom:2rem}
+    .back:hover{color:var(--accent)}
+
+    /* Stats row */
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.75rem;margin:1rem 0 2rem}
+    .stat{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:1rem;text-align:center}
+    .stat-num{font-size:1.6rem;font-weight:700;color:var(--accent);display:block}
+    .stat-label{font-size:.75rem;color:var(--muted);display:block;margin-top:.2rem}
+
+    /* TOC */
+    .toc{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:1.25rem 1.5rem;margin-bottom:2.5rem}
+    .toc h3{margin-top:0;font-size:.85rem;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
+    .toc ol{margin:0;padding-left:1.4rem}
+    .toc li{font-size:.875rem;margin-bottom:.3rem}
+    .toc a{color:var(--dim)}
+    .toc a:hover{color:var(--accent)}
+  </style>
+</head>
+<body>
+  <header>
+    <span class="logo">Sentor</span>
+    <span class="meta">Güncellendi: 15 Mayıs 2026</span>
+  </header>
+  <a href="../../../ui/index.html" class="back">← Vault'a dön</a>
+
+  <h1>Sentor — Mimari ve Proje Durumu</h1>
+  <p class="desc">Vault, API, CLI ve AI IDE'den oluşan kişisel offline işletim sistemi. Kendi notumuz — tam resim burada.</p>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h3>İçindekiler</h3>
+    <ol>
+      <li><a href="#ozet">Özet İstatistikler</a></li>
+      <li><a href="#mimari">Genel Mimari</a></li>
+      <li><a href="#veri-akisi">Veri Akışı</a></li>
+      <li><a href="#faz">Faz Durumları</a></li>
+      <li><a href="#ide-mimari">IDE Modül Mimarisi</a></li>
+      <li><a href="#agentlar">Built-in Agent'lar</a></li>
+      <li><a href="#vault-loop">Vault Memory Döngüsü</a></li>
+      <li><a href="#providerlar">Provider & Model Listesi</a></li>
+      <li><a href="#api">API Endpoint'leri</a></li>
+      <li><a href="#tasarim">Tasarım Sistemi</a></li>
+      <li><a href="#sonraki">Sonraki Adımlar</a></li>
+    </ol>
+  </div>
+
+  <!-- Stats -->
+  <h2 id="ozet">Özet İstatistikler</h2>
+  <div class="stats">
+    <div class="stat"><span class="stat-num">3</span><span class="stat-label">Tamamlanan Faz</span></div>
+    <div class="stat"><span class="stat-num">18</span><span class="stat-label">AI Model</span></div>
+    <div class="stat"><span class="stat-num">10</span><span class="stat-label">Built-in Agent</span></div>
+    <div class="stat"><span class="stat-num">9</span><span class="stat-label">Provider</span></div>
+    <div class="stat"><span class="stat-num">5</span><span class="stat-label">API Endpoint</span></div>
+    <div class="stat"><span class="stat-num">384</span><span class="stat-label">Embedding Boyutu</span></div>
+    <div class="stat"><span class="stat-num">2410</span><span class="stat-label">Toplam Satır (core)</span></div>
+    <div class="stat"><span class="stat-num">0</span><span class="stat-label">npm/pip Bağımlılık (vault)</span></div>
+  </div>
+
+  <!-- Genel Mimari -->
+  <h2 id="mimari">Genel Mimari</h2>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+graph TD
+    subgraph VAULT["🗄 Vault (kaynak gerçek)"]
+        V["vault/{kategori}/{slug}/index.html"]
+    end
+    subgraph TOOLS["🔧 Tools (Python stdlib)"]
+        IDX["tools/indexer.py"]
+        EMB["tools/embedder.py"]
+    end
+    subgraph INDEX[".index/"]
+        PJ[".index/pages.json"]
+        PJS[".index/pages.js"]
+        EJ[".index/embeddings.json"]
+    end
+    subgraph SURFACES["Yüzeyler"]
+        UI["ui/index.html\n(Fuse.js fuzzy search)"]
+        API["api/server.py\n(port 4242)"]
+        CLI["cli/main.py"]
+        IDE["ide/ (Tauri + React)\nAI IDE"]
+    end
+
+    V -->|"parse"| IDX
+    IDX --> PJ
+    IDX --> PJS
+    V -->|"embed"| EMB
+    EMB --> EJ
+
+    PJS --> UI
+    PJ --> API
+    EJ --> API
+    PJ --> CLI
+    EJ --> CLI
+    PJ --> IDE
+    EJ --> IDE
+
+    style VAULT fill:#111,stroke:#2a2a2a,color:#f5f5f5
+    style TOOLS fill:#111,stroke:#2a2a2a,color:#f5f5f5
+    style INDEX fill:#111,stroke:#2a2a2a,color:#f5f5f5
+    style SURFACES fill:#111,stroke:#2a2a2a,color:#f5f5f5
+    </div>
+  </div>
+
+  <!-- Veri Akışı -->
+  <h2 id="veri-akisi">Veri Akışı — Sayfa Oluşturma ve Arama</h2>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+sequenceDiagram
+    participant U as Kullanıcı / Agent
+    participant VW as vault_write
+    participant IDX as indexer.py
+    participant EMB as embedder.py
+    participant DB as .index/
+    participant API as api/server.py
+    participant VS as vault_search
+
+    U->>VW: title, category, slug, body_html
+    VW->>IDX: python tools/indexer.py
+    IDX->>DB: pages.json + pages.js güncelle
+    Note over EMB,DB: Opsiyonel — semantik
+    U->>EMB: python tools/embedder.py
+    EMB->>DB: embeddings.json güncelle
+
+    U->>VS: query: "hesap makinası"
+    VS->>DB: pages.json oku
+    VS-->>U: skorlanmış sonuçlar
+
+    U->>API: GET /api/semantic?q=hesap+makinasi
+    API->>DB: embeddings.json oku
+    API-->>U: cosine similarity sonuçları
+    </div>
+  </div>
+
+  <!-- Faz Durumları -->
+  <h2 id="faz">Faz Durumları</h2>
+  <div class="phase-grid">
+    <div class="phase-card">
+      <h3>Phase 1 — Vault + UI</h3>
+      <div class="phase-status"><span class="badge badge-done">TAMAMLANDI</span></div>
+      <ul>
+        <li>vault/{cat}/{slug}/index.html formatı</li>
+        <li>tools/indexer.py (264 satır)</li>
+        <li>ui/index.html + Fuse.js arama</li>
+        <li>.index/pages.json + pages.js</li>
+        <li>Tasarım sistemi tokenları</li>
+      </ul>
+    </div>
+    <div class="phase-card">
+      <h3>Phase 2 — API + CLI</h3>
+      <div class="phase-status"><span class="badge badge-done">TAMAMLANDI</span></div>
+      <ul>
+        <li>api/server.py REST (374 satır)</li>
+        <li>Keyword + semantic search</li>
+        <li>cli/main.py (416 satır)</li>
+        <li>tools/embedder.py (136 satır)</li>
+        <li>all-MiniLM-L6-v2 kurulu</li>
+      </ul>
+    </div>
+    <div class="phase-card">
+      <h3>Phase 2.5 — AI IDE</h3>
+      <div class="phase-status"><span class="badge badge-active">AKTİF GELİŞTİRME</span></div>
+      <ul>
+        <li>Tauri + React çerçeve</li>
+        <li>10 built-in agent</li>
+        <li>9 provider, 18 model</li>
+        <li>vault_search/read/write araçları</li>
+        <li>Local lite modu (LM Studio/Ollama)</li>
+      </ul>
+    </div>
+    <div class="phase-card">
+      <h3>Phase 3 — Tool Calling</h3>
+      <div class="phase-status"><span class="badge badge-planned">PLANLANMIYOR</span></div>
+      <ul>
+        <li>Ollama tool-calling entegrasyon</li>
+        <li>ollama-tools.json hazır</li>
+        <li>sentor chat CLI komutu</li>
+        <li>Auto-embed tetikleme</li>
+        <li>Graf görünümü (IDE)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- IDE Modül Mimarisi -->
+  <h2 id="ide-mimari">IDE Modül Mimarisi</h2>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+graph LR
+    subgraph IDE["ide/src/modules/ai/"]
+        CFG["config.ts\nProviders, Models,\nSystem Prompts"]
+        AGS["lib/agents.ts\n10 Built-in Agent"]
+        AG["lib/agent.ts\ncreateSentorAgent\nauto lite-mode"]
+        TLS["tools/tools.ts\nbuildTools / buildLiteTools"]
+        subgraph TOOL_FILES["Tool Dosyaları"]
+            TF["fs.ts"]
+            TE["edit.ts"]
+            TS["search.ts"]
+            TSH["shell.ts"]
+            TV["vault.ts"]
+            TT["todo.ts"]
+            TSB["subagent.ts"]
+            TRM["terminal.ts"]
+        end
+    end
+
+    CFG -->|"isLocalProvider()"| AG
+    AGS -->|"instructions"| AG
+    AG -->|"local?"| TLS
+    TLS -->|"buildTools()"| TOOL_FILES
+    TLS -->|"buildLiteTools()"| TF
+    TLS -->|"buildLiteTools()"| TE
+    TLS -->|"buildLiteTools()"| TS
+    TLS -->|"buildLiteTools()"| TV
+
+    style IDE fill:#111,stroke:#2a2a2a,color:#f5f5f5
+    style TOOL_FILES fill:#1a1a1a,stroke:#2a2a2a,color:#888
+    </div>
+  </div>
+
+  <h3>Local vs Full Mod Karşılaştırması</h3>
+  <table>
+    <thead><tr><th>Parametre</th><th>Full Mod</th><th>Local Lite Mod</th></tr></thead>
+    <tbody>
+      <tr><td>Tetikleyen</td><td>Cloud provider</td><td>LM Studio veya Ollama</td></tr>
+      <tr><td>Sistem promptu</td><td>~800 token</td><td>~120 token</td></tr>
+      <tr><td>Araç sayısı</td><td>17</td><td>8</td></tr>
+      <tr><td>Max adım</td><td>24</td><td>8</td></tr>
+      <tr><td>Vault araçları</td><td>Dahil</td><td>Dahil</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Agentlar -->
+  <h2 id="agentlar">Built-in Agent'lar</h2>
+  <div class="agent-grid">
+    <div class="agent-card">
+      <div class="agent-name">Coder</div>
+      <div class="agent-id">builtin:coder</div>
+      <div class="agent-desc">Genel kodlama. Yazar, düzenler, çalıştırır. En küçük doğru değişiklik.</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">Architect</div>
+      <div class="agent-id">builtin:architect</div>
+      <div class="agent-desc">Tasarım ve trade-off analizi. Kod yazmadan önce plan. Risk ve ölçeklenebilirlik.</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">Code Reviewer</div>
+      <div class="agent-id">builtin:reviewer</div>
+      <div class="agent-desc">Diff inceleme. Mantık hataları, perf, güvenlik. Linter'ın yakalayamadıkları.</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">Security</div>
+      <div class="agent-id">builtin:security</div>
+      <div class="agent-desc">Tehdit modelleme. SSRF, path traversal, injection, CVE tespiti.</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">Designer</div>
+      <div class="agent-id">builtin:designer</div>
+      <div class="agent-desc">UI/UX eleştiri. Hiyerarşi, boşluk, kontrast. Tailwind değerleriyle somut öneriler.</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">Debugger</div>
+      <div class="agent-id">builtin:debug</div>
+      <div class="agent-desc">Hızlı hata tespiti. Hipotez → kök neden → minimal düzeltme → test.</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">Explain</div>
+      <div class="agent-id">builtin:explain</div>
+      <div class="agent-desc">Kod açıklama. Sadece okur, hiçbir zaman düzenlemez. Genel bakış + kritik noktalar.</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">Test Writer</div>
+      <div class="agent-id">builtin:tests</div>
+      <div class="agent-desc">Unit ve entegrasyon testi. Framework'ü otomatik algılar. Arrange-act-assert.</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">Web</div>
+      <div class="agent-id">builtin:web</div>
+      <div class="agent-desc">Her cevap vault'a HTML sayfa olarak kaydedilir. Hesap makinaları, araçlar, makaleler.</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">Vault</div>
+      <div class="agent-id">builtin:vault</div>
+      <div class="agent-desc">Hafıza döngüsü. Her turda vault_search → vault_read → cevap → vault_write.</div>
+    </div>
+  </div>
+
+  <!-- Vault Memory Döngüsü -->
+  <h2 id="vault-loop">Vault Memory Döngüsü</h2>
+  <p>Context window sınırını aşmanın anahtarı: her şey HTML'de yaşıyor, agent ihtiyaç duyunca geri çekiyor.</p>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+flowchart TD
+    A["Kullanıcı soru sorar"] --> B["vault_search\nkonu araması"]
+    B --> C{Eşleşme var mı?}
+    C -->|"score > 0"| D["vault_read\nilgili sayfaları tam oku"]
+    C -->|"yok"| E["Sadece model bilgisiyle devam"]
+    D --> F["Cevap üret\n(geçmiş bağlam + model)"]
+    E --> F
+    F --> G{Kaydedilmeye\ndeğer mi?}
+    G -->|"Hesaplama, karar,\naraştırma, kod"| H["vault_write\nHTML sayfa oluştur"]
+    G -->|"Basit sohbet"| I["Sadece yanıtla"]
+    H --> J["tools/indexer.py çalışır\nOtomatik re-index"]
+    J --> K["Sonraki konuşmada\nvault_search ile geri çekilir"]
+    K --> A
+
+    style A fill:#1a1a1a,stroke:#5b8def,color:#f5f5f5
+    style H fill:#1a1a1a,stroke:#4caf7d,color:#f5f5f5
+    style K fill:#1a1a1a,stroke:#5b8def,color:#f5f5f5
+    </div>
+  </div>
+
+  <!-- Providerlar -->
+  <h2 id="providerlar">Provider & Model Listesi</h2>
+  <table>
+    <thead><tr><th>Provider</th><th>Model ID</th><th>Etiket</th><th>Özellik</th></tr></thead>
+    <tbody>
+      <tr><td><span class="provider-tag">OpenAI</span></td><td><code>gpt-5.4-mini</code></td><td>GPT-5.4 mini</td><td>Hızlı, varsayılan</td></tr>
+      <tr><td><span class="provider-tag">OpenAI</span></td><td><code>gpt-5.5</code></td><td>GPT-5.5</td><td>Yüksek kalite</td></tr>
+      <tr><td><span class="provider-tag">OpenAI</span></td><td><code>gpt-5.3-codex</code></td><td>GPT-5.3 Codex</td><td>Kodlama</td></tr>
+      <tr><td><span class="provider-tag">Anthropic</span></td><td><code>claude-haiku-4-5</code></td><td>Claude Haiku 4.5</td><td>Hızlı</td></tr>
+      <tr><td><span class="provider-tag">Anthropic</span></td><td><code>claude-sonnet-4-6</code></td><td>Claude Sonnet 4.6</td><td>Dengeli</td></tr>
+      <tr><td><span class="provider-tag">Anthropic</span></td><td><code>claude-opus-4-7</code></td><td>Claude Opus 4.7</td><td>En iyi</td></tr>
+      <tr><td><span class="provider-tag">Google</span></td><td><code>gemini-3.1-pro-preview</code></td><td>Gemini 3.1 Pro</td><td>En iyi</td></tr>
+      <tr><td><span class="provider-tag">Google</span></td><td><code>gemini-3-flash-preview</code></td><td>Gemini 3 Flash</td><td>Hızlı</td></tr>
+      <tr><td><span class="provider-tag">Google</span></td><td><code>gemini-2.5-flash</code></td><td>Gemini 2.5 Flash</td><td>Verimli</td></tr>
+      <tr><td><span class="provider-tag">Google</span></td><td><code>gemma-4-31b-it</code></td><td>Gemma 4 31B</td><td>Yalın & güçlü</td></tr>
+      <tr><td><span class="provider-tag">xAI</span></td><td><code>grok-4.20-reasoning</code></td><td>Grok 4.20 Reasoning</td><td>Akıl yürütme</td></tr>
+      <tr><td><span class="provider-tag">xAI</span></td><td><code>grok-4.20-non-reasoning</code></td><td>Grok 4.20</td><td>Hızlı</td></tr>
+      <tr><td><span class="provider-tag">Cerebras</span></td><td><code>gpt-oss-120b</code></td><td>GPT-OSS 120B</td><td>Ultra hızlı</td></tr>
+      <tr><td><span class="provider-tag">Groq</span></td><td><code>openai/gpt-oss-20b</code></td><td>GPT-OSS 20B</td><td>Ultra hızlı</td></tr>
+      <tr><td><span class="provider-tag">DeepSeek</span></td><td><code>deepseek-v4-flash</code></td><td>DeepSeek V4 Flash</td><td>Hızlı</td></tr>
+      <tr><td><span class="provider-tag">DeepSeek</span></td><td><code>deepseek-v4-pro</code></td><td>DeepSeek V4 Pro</td><td>En iyi</td></tr>
+      <tr><td><span class="provider-tag">LM Studio</span></td><td><code>lmstudio-local</code></td><td>LM Studio (local)</td><td>Yerel, key yok</td></tr>
+      <tr><td><span class="provider-tag">Ollama</span></td><td><code>ollama-local</code></td><td>Ollama (local)</td><td>Yerel, key yok</td></tr>
+    </tbody>
+  </table>
+
+  <!-- API -->
+  <h2 id="api">API Endpoint'leri (port 4242)</h2>
+  <table>
+    <thead><tr><th>Endpoint</th><th>Parametre</th><th>Açıklama</th></tr></thead>
+    <tbody>
+      <tr><td><code>GET /api/search</code></td><td><code>?q=&amp;limit=&amp;category=</code></td><td>Keyword arama — başlık×3, heading×2, body×1</td></tr>
+      <tr><td><code>GET /api/semantic</code></td><td><code>?q=&amp;limit=</code></td><td>Semantik arama — all-MiniLM-L6-v2 cosine</td></tr>
+      <tr><td><code>GET /api/page/{cat}/{slug}</code></td><td>—</td><td>Tam sayfa HTML → düz metin</td></tr>
+      <tr><td><code>GET /api/categories</code></td><td>—</td><td>Kategori listesi + sayfa sayısı</td></tr>
+      <tr><td><code>GET /api/pages</code></td><td>—</td><td>Tüm index (generated + pages[])</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Semantic Search Nasıl Çalışır</h3>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+flowchart LR
+    Q["Kullanıcı sorgusu"] --> EQ["Model encode\nall-MiniLM-L6-v2\n384-dim vektör"]
+    EJ[".index/embeddings.json\n{id, embedding[]}"] --> COS["Cosine similarity\nher sayfa ile"]
+    EQ --> COS
+    COS --> FIL["score > 0.1 filtresi\nEn iyi K sırala"]
+    FIL --> ENR["pages.json'dan\nmetadata ekle"]
+    ENR --> OUT["JSON yanıt\n{id, title, score, ...}"]
+    </div>
+  </div>
+
+  <!-- Tasarım Sistemi -->
+  <h2 id="tasarim">Tasarım Sistemi</h2>
+  <table>
+    <thead><tr><th>Token</th><th>Değer</th><th>Kullanım</th></tr></thead>
+    <tbody>
+      <tr><td>bg-base</td><td><span class="swatch" style="background:#0a0a0a"></span>#0a0a0a</td><td>Sayfa arka planı</td></tr>
+      <tr><td>bg-surface</td><td><span class="swatch" style="background:#111111"></span>#111111</td><td>Kart yüzeyleri</td></tr>
+      <tr><td>bg-elevated</td><td><span class="swatch" style="background:#1a1a1a"></span>#1a1a1a</td><td>Üst katman elemanlar</td></tr>
+      <tr><td>bg-overlay</td><td><span class="swatch" style="background:#222222;border-color:#404040"></span>#222222</td><td>Modal, dropdown</td></tr>
+      <tr><td>border-subtle</td><td><span class="swatch" style="background:#2a2a2a;border-color:#404040"></span>#2a2a2a</td><td>Standart kenarlık</td></tr>
+      <tr><td>border-active</td><td><span class="swatch" style="background:#404040;border-color:#555"></span>#404040</td><td>Aktif/hover kenarlık</td></tr>
+      <tr><td>text-primary</td><td><span class="swatch" style="background:#f5f5f5"></span>#f5f5f5</td><td>Ana metin</td></tr>
+      <tr><td>text-secondary</td><td><span class="swatch" style="background:#888888"></span>#888888</td><td>İkincil metin</td></tr>
+      <tr><td>text-tertiary</td><td><span class="swatch" style="background:#555555"></span>#555555</td><td>Soluk metin</td></tr>
+      <tr><td>accent</td><td><span class="swatch" style="background:#5b8def"></span>#5b8def</td><td>Mavi vurgu</td></tr>
+      <tr><td>accent-hover</td><td><span class="swatch" style="background:#4a7de0"></span>#4a7de0</td><td>Hover durumu</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li><strong>Derinlik:</strong> Sadece border — <code>box-shadow</code> hiçbir yerde kullanılmaz</li>
+    <li><strong>Geçiş:</strong> 150ms ease-out — başka animasyon yok</li>
+    <li><strong>Font:</strong> system-ui — Google Fonts yok</li>
+    <li><strong>Köşe:</strong> Maksimum <code>rounded-lg</code> (8px)</li>
+    <li><strong>Renk:</strong> Gradient arka plan yasak</li>
+  </ul>
+
+  <!-- Sonraki Adımlar -->
+  <h2 id="sonraki">Sonraki Adımlar (Phase 3)</h2>
+  <table>
+    <thead><tr><th>Görev</th><th>Durum</th><th>Not</th></tr></thead>
+    <tbody>
+      <tr><td>Ollama tool-calling entegrasyonu</td><td><span class="badge badge-planned">PLANLI</span></td><td>ollama-tools.json hazır</td></tr>
+      <tr><td>Semantic auto-embed (indexer tetikler)</td><td><span class="badge badge-planned">PLANLI</span></td><td>tools/indexer.py'a eklenecek</td></tr>
+      <tr><td>Vault sayfa sayısını artır</td><td><span class="badge badge-active">DEVAMEDİYOR</span></td><td>Web ve Vault agent'larla birikecek</td></tr>
+      <tr><td>IDE: SentorPanel tamamlama</td><td><span class="badge badge-active">AKTİF</span></td><td>SentorPanel.tsx mevcut</td></tr>
+      <tr><td>CLI: sentor chat komutu</td><td><span class="badge badge-planned">PLANLI</span></td><td>vault memory loop terminal'den</td></tr>
+      <tr><td>Graf görünümü (backlink haritası)</td><td><span class="badge badge-planned">PLANLI</span></td><td>ide/src/modules/graph/ var</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#1a1a1a',
+        primaryTextColor: '#f5f5f5',
+        primaryBorderColor: '#404040',
+        lineColor: '#5b8def',
+        secondaryColor: '#111111',
+        tertiaryColor: '#222222',
+        background: '#0a0a0a',
+        mainBkg: '#1a1a1a',
+        nodeBorder: '#404040',
+        clusterBkg: '#111111',
+        titleColor: '#f5f5f5',
+        edgeLabelBackground: '#1a1a1a',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        fontSize: '13px',
+      },
+    });
+  </script>
+</body>
+</html>

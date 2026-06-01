@@ -1,5 +1,5 @@
 """
-Atlas OS — Shared HTML-to-text utilities.
+Sentor — Shared HTML-to-text utilities.
 """
 
 import html as _html

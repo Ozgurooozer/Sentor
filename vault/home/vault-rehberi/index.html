@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Vault Rehberi — Atlas OS</title>
+<title>Vault Rehberi — Sentor</title>
 <style>
   :root {
     --bg: #0a0a0a;
@@ -402,7 +402,7 @@
   <div class="logo">
     <div class="logo-mark">A</div>
     <div>
-      <div class="logo-text">Atlas OS</div>
+      <div class="logo-text">Sentor</div>
       <div class="logo-sub">Vault Sistemi Rehberi</div>
     </div>
   </div>
@@ -417,7 +417,7 @@
     <a href="#dizin">Dizin Yapısı</a>
     <a href="#ajanlar">Ajanlar</a>
     <a href="#a-vault" class="sub">Vault Ajanı</a>
-    <a href="#a-maker" class="sub">Atlas-Maker</a>
+    <a href="#a-maker" class="sub">Sentor-Maker</a>
     <a href="#a-coder" class="sub">Coder</a>
     <a href="#ofisler">Ajan Ofisleri</a>
     <a href="#araclar">AI Araçları</a>
@@ -437,7 +437,7 @@
 
     <div class="hero">
       <h1>Vault Rehberi</h1>
-      <p>Atlas OS'taki vault sisteminin nasıl çalıştığını, ajanların bu sistemi nasıl kullandığını
+      <p>Sentor'taki vault sisteminin nasıl çalıştığını, ajanların bu sistemi nasıl kullandığını
          ve günlük iş akışlarında nasıl yararlanabileceğinizi anlatan tam referans.</p>
       <div class="badge-row">
         <span class="badge accent">Faz 0–7 Tamamlandı</span>
@@ -451,7 +451,7 @@
     <!-- ─────────────────────────────────── -->
     <section id="vault-nedir">
       <h2>Vault Nedir?</h2>
-      <p>Vault, Atlas OS'un kalıcı bilgi tabanıdır. Her "sayfa" <code>vault/{kategori}/{slug}/index.html</code>
+      <p>Vault, Sentor'un kalıcı bilgi tabanıdır. Her "sayfa" <code>vault/{kategori}/{slug}/index.html</code>
          yolundaki tam HTML dosyasıdır. Markdown değil, tarayıcıda doğrudan açılabilen bağımsız HTML.</p>
 
       <div class="callout ok">
@@ -481,7 +481,7 @@
 ├─ <span class="n">templates/</span>     <span class="c"># şablonlar (arama ve embed dışı)</span>
 │
 └─ <span class="n">agents/</span>        <span class="c"># AJAN OFİSLERİ</span>
-   └─ <span class="n">{slug}/</span>      <span class="c"># vault / coder / atlas-maker</span>
+   └─ <span class="n">{slug}/</span>      <span class="c"># vault / coder / sentor-maker</span>
       ├─ index.html  <span class="c"># ofis kartı (hibrit: generated + user blok)</span>
       ├─ profile.md  <span class="c"># sync_profiles.py üretir — salt-okunur</span>
       ├─ state.md    <span class="c"># ajan durumu (frontmatter + agent:start/end blok)</span>
@@ -508,7 +508,7 @@
     <!-- ─────────────────────────────────── -->
     <section id="ajanlar">
       <h2>Ajanlar</h2>
-      <p>Atlas OS'ta üç built-in ajan var. Her biri farklı bir görev setine ve sistem promptuna sahip.</p>
+      <p>Sentor'ta üç built-in ajan var. Her biri farklı bir görev setine ve sistem promptuna sahip.</p>
 
       <div class="cards">
         <div class="card">
@@ -518,7 +518,7 @@
         </div>
         <div class="card">
           <div class="card-icon">◈</div>
-          <h4>Atlas-Maker <span class="agent-tag maker">writer</span></h4>
+          <h4>Sentor-Maker <span class="agent-tag maker">writer</span></h4>
           <p>Her cevabı vault HTML sayfasına dönüştürür. İkinci beynini inşa eder.</p>
         </div>
         <div class="card">
@@ -534,14 +534,14 @@
         <li><div class="step-body"><div class="step-title">Sistem bağlamı otomatik yüklenir</div><div class="step-desc">Mesajınız gönderilmeden önce, <code>readAgentSelfContext()</code> arka planda aktif ajanın ofis durumunu okur ve sistem promptuna sessizce ekler (15 sn cache).</div></div></li>
         <li><div class="step-body"><div class="step-title">vault_search çağrılır</div><div class="step-desc">Konu ile ilgili vault sayfaları aranır. Skor ≥ 6 ise <code>vault_read</code> ile tam içerik okunur.</div></div></li>
         <li><div class="step-body"><div class="step-title">Web araması (fallback)</div><div class="step-desc">Vault'ta iyi eşleşme yoksa <code>web_search</code> → <code>web_fetch</code> ile güncel bilgi alınır.</div></div></li>
-        <li><div class="step-body"><div class="step-title">Cevap üretilir</div><div class="step-desc">Kaynak belirtilerek cevap verilir. Önemli araştırma ise "Atlas-Maker'a vault sayfası yazmasını isteyin" önerisi eklenir.</div></div></li>
+        <li><div class="step-body"><div class="step-title">Cevap üretilir</div><div class="step-desc">Kaynak belirtilerek cevap verilir. Önemli araştırma ise "Sentor-Maker'a vault sayfası yazmasını isteyin" önerisi eklenir.</div></div></li>
       </ol>
 
-      <h3 id="a-maker">Atlas-Maker — Sayfa Yazma Akışı</h3>
+      <h3 id="a-maker">Sentor-Maker — Sayfa Yazma Akışı</h3>
       <ol class="steps">
         <li><div class="step-body"><div class="step-title">Mevcut sayfa kontrolü</div><div class="step-desc"><code>vault_search</code> ile skor ≥ 6 varsa kullanıcıya sorar: güncelle mi, yeni mi?</div></div></li>
         <li><div class="step-body"><div class="step-title">Web araştırması</div><div class="step-desc">Gerekiyorsa <code>web_search</code> (max 5) → <code>web_fetch</code> (top 3 URL).</div></div></li>
-        <li><div class="step-body"><div class="step-title">HTML oluşturulur</div><div class="step-desc">Atlas tasarım kurallarına uygun tam HTML belgesi hazırlanır (inline style, dark theme, Mermaid).</div></div></li>
+        <li><div class="step-body"><div class="step-title">HTML oluşturulur</div><div class="step-desc">Sentor tasarım kurallarına uygun tam HTML belgesi hazırlanır (inline style, dark theme, Mermaid).</div></div></li>
         <li><div class="step-body"><div class="step-title">vault_write onaya sunulur</div><div class="step-desc">Araç kullanıcıya önizleme gösterir. Onay sonrası yazar, indexer otomatik tetiklenir.</div></div></li>
         <li><div class="step-body"><div class="step-title">Özet verilir</div><div class="step-desc">"vault/kategori/slug'a kaydedildi" + 2 cümle özet.</div></div></li>
       </ol>
@@ -613,7 +613,7 @@ Ajanın kendi notları burada. Indexer'ın görmediği serbest alan.
       <p><code>vault/{category}/{slug}/index.html</code> dosyası oluşturur veya günceller. Yazdıktan sonra Python indexer ve embedder otomatik tetiklenir.</p>
       <div class="callout warn">
         <strong>Onay gerektirir:</strong> Bu araç yazma işlemi öncesinde kullanıcıya önizleme gösterir.
-        Yalnızca Atlas-Maker kullanmalıdır; Coder bu aracı çağırmaz.
+        Yalnızca Sentor-Maker kullanmalıdır; Coder bu aracı çağırmaz.
       </div>
 
       <h3 id="arac-log">vault_agent_log</h3>
@@ -621,7 +621,7 @@ Ajanın kendi notları burada. Indexer'ın görmediği serbest alan.
       <div class="table-wrap">
         <table>
           <tr><th>Parametre</th><th>Açıklama</th></tr>
-          <tr><td><code>slug</code></td><td>Ajan klasörü (<code>vault</code>, <code>coder</code>, <code>atlas-maker</code>)</td></tr>
+          <tr><td><code>slug</code></td><td>Ajan klasörü (<code>vault</code>, <code>coder</code>, <code>sentor-maker</code>)</td></tr>
           <tr><td><code>event</code></td><td><code>note</code>, <code>progress</code>, <code>decision</code>, <code>error</code>, <code>meeting</code></td></tr>
           <tr><td><code>msg</code></td><td>Log mesajı (secret içermemeli)</td></tr>
         </table>
@@ -659,7 +659,7 @@ Ajanın kendi notları burada. Indexer'ın görmediği serbest alan.
           </tr>
           <tr>
             <td><span class="slash">/init</span></td>
-            <td>Workspace'i tarar, <code>ATLAS.md</code> oluşturur: proje açıklaması, komutlar, mimari, giriş noktaları.</td>
+            <td>Workspace'i tarar, <code>SENTOR.md</code> oluşturur: proje açıklaması, komutlar, mimari, giriş noktaları.</td>
           </tr>
           <tr>
             <td><span class="slash">/decision {mesaj}</span></td>
@@ -690,7 +690,7 @@ flowchart LR
     VS -->|score < 6| WS[web_search + web_fetch]
     VR --> ANS([Cevap])
     WS --> ANS
-    ANS -->|önemli bilgi| AM[Atlas-Maker'a yönlendir]
+    ANS -->|önemli bilgi| AM[Sentor-Maker'a yönlendir]
     AM --> VW[vault_write → yeni sayfa]
       </div>
 
@@ -708,7 +708,7 @@ flowchart LR
       <div class="mermaid">
 flowchart LR
     M(["/meeting canvas review"]) --> PR[Yapılandırılmış prompt]
-    PR --> AG[Vault + Atlas-Maker]
+    PR --> AG[Vault + Sentor-Maker]
     AG --> AL[vault_agent_log\nevent=meeting]
     AG --> VW[vault_write\nmeetings/2026-05-19-canvas-review]
     VW --> IDX[Indexer + Embedder\notomatik tetiklenir]

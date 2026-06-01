@@ -1,8 +1,8 @@
-# Atlas OS — Security Model
+# Sentor — Security Model
 
 ## Threat Model
 
-Atlas OS is a local-only desktop application. It does not send data to the internet except when you explicitly use web search or web fetch. The primary threat vectors are:
+Sentor is a local-only desktop application. It does not send data to the internet except when you explicitly use web search or web fetch. The primary threat vectors are:
 
 1. **Local network attackers** — other processes or web pages that try to abuse the local REST/MCP APIs
 2. **Malicious vault pages** — crafted HTML that tries to escape the vault iframe into the host webview
@@ -19,7 +19,7 @@ Authorization: Bearer <token>
 The token is generated with `secrets.token_hex(32)` (256 bits of entropy) on first launch and stored at:
 
 ```
-~/.atlas/api-token
+~/.sentor/api-token
 ```
 
 File permissions are set to `0600` (owner read/write only). The Tauri frontend reads the token via the OS keychain.
@@ -57,9 +57,9 @@ frame-src asset: https:;
 ## Asset Protocol Scope
 
 `asset://` serves files only from:
-- `$HOME/Atlas OS/**`
-- `$HOME/.atlas/**`
-- `$APPDATA/atlas/**`
+- `$HOME/Sentor/**`
+- `$HOME/.sentor/**`
+- `$APPDATA/sentor/**`
 
 Arbitrary disk access via `asset://localhost/C:/Windows/...` is blocked.
 

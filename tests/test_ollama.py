@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Atlas OS — Ollama agent integration test.
+Sentor — Ollama agent integration test.
 Full loop: API reachable -> Ollama reachable -> tool call -> result -> final answer.
 Run: python tools/test_ollama.py
-Requires: ollama (pip install ollama), Ollama running, atlas serve running.
+Requires: ollama (pip install ollama), Ollama running, sentor serve running.
 """
 
 import json
@@ -62,7 +62,7 @@ def _get_json(url: str, timeout: float = 5.0):
 
 
 def _call_tool(name: str, args: dict):
-    """Execute a tool call against the Atlas OS API."""
+    """Execute a tool call against the Sentor API."""
     if name == 'search_knowledge':
         query    = args.get('query', '')
         limit    = args.get('limit', 5)
@@ -101,12 +101,12 @@ def _run_tool_calls(tool_calls, messages: list) -> dict:
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 def main():
-    print(f'\n  Atlas OS - Ollama Integration Test\n')
+    print(f'\n  Sentor - Ollama Integration Test\n')
 
     # [1] API reachable
     data, err = _get_json(f'{API_BASE}/api/categories')
     if not step('API reachable', data is not None, err or ''):
-        print('\n  Start the API first:  atlas serve\n')
+        print('\n  Start the API first:  sentor serve\n')
         sys.exit(1)
 
     # [2] Ollama reachable

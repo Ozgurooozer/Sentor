@@ -1,0 +1,15 @@
+# Ses yakalama
+pyaudio>=0.2.13
+
+# Ses → metin
+faster-whisper>=1.0.0
+
+# Ekran yakalama
+mss>=9.0.0
+numpy>=1.24.0
+
+# Video yazma (sistem paketi olarak kur)
+# sudo apt install ffmpeg
+
+# Pencere seçimi (sistem paketi olarak kur)
+# sudo apt install xdotool wmctrl

@@ -1,4 +1,4 @@
-# atlas-shell-integration (bashrc)
+# sentor-shell-integration (bashrc)
 #
 # Differences vs zsh integration:
 # - We emulate login-shell init manually (/etc/profile, profile files) because
@@ -7,8 +7,8 @@
 #   skip it — a fragile DEBUG-trap alternative would clobber the user's own
 #   traps and interact badly with debuggers.
 
-if [ -z "$__ATLAS_HOOKS_LOADED" ]; then
-  __ATLAS_HOOKS_LOADED=1
+if [ -z "$__SENTOR_HOOKS_LOADED" ]; then
+  __SENTOR_HOOKS_LOADED=1
 
   [ -f /etc/profile ] && source /etc/profile
   [ -f /etc/bashrc ] && source /etc/bashrc
@@ -24,7 +24,7 @@ if [ -z "$__ATLAS_HOOKS_LOADED" ]; then
   # on reload, guard with a flag.
   [ -f "$HOME/.bashrc" ] && source "$HOME/.bashrc"
 
-  _atlas_urlencode() {
+  _sentor_urlencode() {
     local LC_ALL=C s="$1" i c
     for (( i=0; i<${#s}; i++ )); do
       c="${s:i:1}"
@@ -35,20 +35,20 @@ if [ -z "$__ATLAS_HOOKS_LOADED" ]; then
     done
   }
 
-  _atlas_precmd() {
-    local _atlas_ret=$?
-    printf '\e]133;D;%s\e\\' "$_atlas_ret"
-    printf '\e]7;file://%s%s\e\\' "${HOSTNAME:-$(uname -n 2>/dev/null)}" "$(_atlas_urlencode "$PWD")"
-    if [ -z "$__ATLAS_PS1_INJECTED" ]; then
+  _sentor_precmd() {
+    local _sentor_ret=$?
+    printf '\e]133;D;%s\e\\' "$_sentor_ret"
+    printf '\e]7;file://%s%s\e\\' "${HOSTNAME:-$(uname -n 2>/dev/null)}" "$(_sentor_urlencode "$PWD")"
+    if [ -z "$__SENTOR_PS1_INJECTED" ]; then
       PS1='\[\e]133;B\e\\\]'"$PS1"
-      __ATLAS_PS1_INJECTED=1
+      __SENTOR_PS1_INJECTED=1
     fi
     printf '\e]133;A\e\\'
   }
 
   case ":${PROMPT_COMMAND:-}:" in
-    *":_atlas_precmd:"*) ;;
-    *) PROMPT_COMMAND="_atlas_precmd${PROMPT_COMMAND:+;$PROMPT_COMMAND}" ;;
+    *":_sentor_precmd:"*) ;;
+    *) PROMPT_COMMAND="_sentor_precmd${PROMPT_COMMAND:+;$PROMPT_COMMAND}" ;;
   esac
 
   # Pre-exec marker via PS0 (bash 4.4+). PS0 is expanded just before a command
@@ -59,13 +59,13 @@ if [ -z "$__ATLAS_HOOKS_LOADED" ]; then
     PS0='\[\e]133;C\e\\\]'"${PS0:-}"
   fi
 
-  # atlas_open: open file in editor tab via OSC 8888.
-  # Usage: atlas_open <file>
-  atlas_open() {
+  # sentor_open: open file in editor tab via OSC 8888.
+  # Usage: sentor_open <file>
+  sentor_open() {
     local file="$1"
 
     if [ -z "$file" ]; then
-      printf "usage: atlas_open <file>\n" >&2
+      printf "usage: sentor_open <file>\n" >&2
       return 1
     fi
 
@@ -76,17 +76,17 @@ if [ -z "$__ATLAS_HOOKS_LOADED" ]; then
 
     # Check that the path exists and is a regular file.
     if [ ! -f "$file" ]; then
-      printf "atlas_open: not a file: %s\n" "$file" >&2
+      printf "sentor_open: not a file: %s\n" "$file" >&2
       return 1
     fi
 
     # Emit OSC 8888 with URL-encoded file path.
-    printf '\e]8888;file=%s\e\\' "$(_atlas_urlencode "$file")"
+    printf '\e]8888;file=%s\e\\' "$(_sentor_urlencode "$file")"
   }
 
   # Shorthand alias.
-  alias tp='atlas_open'
+  alias tp='sentor_open'
 
-  _atlas_precmd
+  _sentor_precmd
 fi
 :

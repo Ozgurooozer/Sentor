@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Atlas OS — MCP stdio server  (vault + canvas control + screenshot)
+Sentor — MCP stdio server  (vault + canvas control + screenshot)
 
-Exposes the Atlas vault and the running IDE canvas as a Model Context
+Exposes the Sentor vault and the running IDE canvas as a Model Context
 Protocol server that any MCP-compatible client can connect to over stdio:
 Claude Code, Cursor, Continue, Cline, VS Code MCP extension, etc.
 
@@ -30,16 +30,16 @@ TOOLS
 REGISTER WITH CLAUDE CODE (.mcp.json or global config):
   {
     "mcpServers": {
-      "atlas": {
+      "sentor": {
         "command": "python",
-        "args": ["C:/Atlas OS/tools/mcp_server.py"],
-        "env": { "ATLAS_VAULT_ROOT": "C:/Atlas OS" }
+        "args": ["C:/Sentor/tools/mcp_server.py"],
+        "env": { "SENTOR_VAULT_ROOT": "C:/Sentor" }
       }
     }
   }
 
 REGISTER WITH CURSOR / CONTINUE / CLINE:
-  Identical — point "command" at this file with ATLAS_VAULT_ROOT set.
+  Identical — point "command" at this file with SENTOR_VAULT_ROOT set.
 """
 
 import base64
@@ -61,7 +61,7 @@ if hasattr(sys.stderr, "reconfigure"):
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 ROOT = Path(
-    os.environ.get("ATLAS_VAULT_ROOT")
+    os.environ.get("SENTOR_VAULT_ROOT")
     or Path(__file__).resolve().parent.parent
 )
 INDEX_FILE  = ROOT / ".index"  / "pages.json"
@@ -85,7 +85,7 @@ def reply_error(req_id, code: int, message: str) -> None:
     send({"jsonrpc": "2.0", "id": req_id, "error": {"code": code, "message": message}})
 
 def log(msg: str) -> None:
-    sys.stderr.write(f"[atlas-mcp] {msg}\n")
+    sys.stderr.write(f"[sentor-mcp] {msg}\n")
     sys.stderr.flush()
 
 
@@ -96,7 +96,7 @@ TOOLS = [
     {
         "name": "vault_search",
         "description": (
-            "Keyword search across the Atlas vault. Returns top-N pages with "
+            "Keyword search across the Sentor vault. Returns top-N pages with "
             "score, title, category, slug. Use before answering from scratch."
         ),
         "inputSchema": {
@@ -586,7 +586,7 @@ def handle(req: dict) -> None:
     if method == "initialize":
         reply(req_id, {
             "protocolVersion": "2024-11-05",
-            "serverInfo": {"name": "atlas-os", "version": "0.8.0"},
+            "serverInfo": {"name": "sentor", "version": "0.8.0"},
             "capabilities": {"tools": {}},
         })
         return

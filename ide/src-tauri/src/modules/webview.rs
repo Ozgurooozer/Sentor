@@ -108,11 +108,7 @@ pub async fn web_set_bounds(
 }
 
 #[tauri::command]
-pub async fn web_set_visible(
-    app: AppHandle,
-    label: String,
-    visible: bool,
-) -> Result<(), String> {
+pub async fn web_set_visible(app: AppHandle, label: String, visible: bool) -> Result<(), String> {
     let wv = app
         .get_webview(&label)
         .ok_or_else(|| format!("webview '{label}' not found"))?;

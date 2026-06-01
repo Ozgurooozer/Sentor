@@ -3,6 +3,6 @@
 <plist version="1.0">
 <dict>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Atlas uses your microphone for AI voice input.</string>
+	<string>Sentor uses your microphone for AI voice input.</string>
 </dict>
 </plist>

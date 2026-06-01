@@ -23,7 +23,7 @@ const LABELS: Record<string, string> = {
   checklist: "checklist", gallery: "gallery", input: "input",
   pipeline: "pipeline", codegraph: "codegraph", sketch: "sketch",
   note: "note", tool: "tool", filebrowser: "files", pipe: "pipe",
-  stickman: "atlasbot",
+  stickman: "sentorbot",
   "canvas-3d": "3d canvas",
   logs: "logs",
 };

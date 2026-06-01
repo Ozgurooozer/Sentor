@@ -42,9 +42,10 @@ fn run_watcher(app: AppHandle, root: PathBuf, vault_dir: PathBuf) -> Result<(), 
     let pending_tx = Arc::clone(&pending);
     let (tx, rx) = std::sync::mpsc::channel::<Result<Event, notify::Error>>();
 
-    let mut watcher: RecommendedWatcher =
-        notify::recommended_watcher(move |ev| { let _ = tx.send(ev); })
-            .map_err(|e| format!("create watcher: {e}"))?;
+    let mut watcher: RecommendedWatcher = notify::recommended_watcher(move |ev| {
+        let _ = tx.send(ev);
+    })
+    .map_err(|e| format!("create watcher: {e}"))?;
 
     watcher
         .watch(&vault_dir, RecursiveMode::Recursive)
@@ -114,7 +115,10 @@ fn trigger_reindex(app: &AppHandle, root: &Path, paths: Vec<PathBuf>) {
         })
         .collect();
 
-    log::info!("[watcher] reindex triggered for {} file(s)", rel_paths.len());
+    log::info!(
+        "[watcher] reindex triggered for {} file(s)",
+        rel_paths.len()
+    );
 
     let changed_arg = rel_paths.join(",");
     let root = root.to_path_buf();

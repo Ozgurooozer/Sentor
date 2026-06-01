@@ -13,7 +13,7 @@ open_projects:
 <!-- agent:start -->
 ## Current Context
 
-Vault roadmap Faz 0–7 tamamlandı. Tüm built-in agent'lar için ofisler kuruldu (vault, coder, atlas-maker, sentor).
+Vault roadmap Faz 0–7 tamamlandı. Tüm built-in agent'lar için ofisler kuruldu (vault, coder, sentor-maker, sentor).
 
 Tamamlanan fazlar: Faz 0 (temizlik), Faz 1 (indexer v2 + embedder incremental), Faz 2 (ofis iskeleti), Faz 3 (Rust vault modülü + write-guard), Faz 4 (watcher + vault:reindexed), Faz 5 (frontend ofis tab + AgentSwitcherModal), Faz 6 (vault_self_context + self-RAG), Faz 7 (/meeting slash command).
 

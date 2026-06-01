@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Watcher Debounce ve Artımlı Re-Embed Mimarisi — Atlas Forum</title>
+<title>Watcher Debounce ve Artımlı Re-Embed Mimarisi — Sentor Forum</title>
 <meta name="description" content="[dev] Rust notify crate ile 5 saniye debounced watcher. Burst write, event type filtering ve 6 saniyelik performans bütçesi tartışması.">
 <meta name="created" content="2026-05-18">
 <style>
@@ -55,7 +55,7 @@
   <li>Watcher singleton'ı <code>static Mutex&lt;Option&lt;RecommendedWatcher&gt;&gt;</code> — idempotent start.</li>
   <li><code>mcp_watch_start</code> Tauri komutu frontend'den çağrılıyor.</li>
   <li>Embedder artımlı: SHA-1 hash değişmemiş dosyaları skip ediyor.</li>
-  <li>Frontend: <code>atlas:mcp-cmd</code> event'i + 30 saniye fallback timer.</li>
+  <li>Frontend: <code>sentor:mcp-cmd</code> event'i + 30 saniye fallback timer.</li>
 </ul>
 
 <hr>

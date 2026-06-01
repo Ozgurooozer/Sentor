@@ -4,12 +4,12 @@ Tarih: 2026-05-27
 Yazar: Otomatik rapor (Copilot)
 
 Özet
-- `ide/src/modules/ai/lib/agents.ts` içindeki yerleşik ajan talimatları (Vault, Atlas-Maker, Coder, Sentor, Orkestra, Vault-Exporter) sadeleştirildi.
+- `ide/src/modules/ai/lib/agents.ts` içindeki yerleşik ajan talimatları (Vault, Sentor-Maker, Coder, Sentor, Orkestra, Vault-Exporter) sadeleştirildi.
 - Amaç: token kullanımını azaltmak, ajanların davranışını netleştirmek ve gereksiz uzun yönergelerden kaçınmak.
 
 Yapılan değişiklikler (kısa)
 - Vault: Arama → okuma → web fallback akışı netleştirildi. `vault_write` çağrısı yasaklandı; kod soruları için `code_status` önerildi.
-- Atlas-Maker: Yazma akışı kısaltıldı; HTML kuralları korundu fakat talimatlar daha özlü hale getirildi. `vault_write` yalnızca kullanıcı isteğiyle kullanılmalı.
+- Sentor-Maker: Yazma akışı kısaltıldı; HTML kuralları korundu fakat talimatlar daha özlü hale getirildi. `vault_write` yalnızca kullanıcı isteğiyle kullanılmalı.
 - Coder: Kod graph (CodeGraph) önceliği, `code_status` kontrolü ve küçük, güvenli diff ilkesi vurgulandı. Tür denetimi sonrası doğrulama eklendi.
 - Sentor: Ajan oluşturma protokolü korundu ama YAML örneği ve uzun açıklamalar kısaltıldı; onay akışı netleştirildi.
 - Orkestra: Yönlendirme kuralları sadeleştirildi; read-only görevler için `agent_invoke`, mutasyonlar için kullanıcı yönlendirmesi belirtildi.

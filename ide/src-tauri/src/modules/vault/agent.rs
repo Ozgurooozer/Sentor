@@ -102,7 +102,9 @@ fn append_decision(dir: &PathBuf, msg: &str) -> Result<(), String> {
     if !body.is_empty() {
         block.push_str(&format!("**Detail:** {}\n", body));
     }
-    block.push_str("**Reason:** (eklenecek)\n**Alternatives:** (eklenecek)\n**Impact:** (eklenecek)\n");
+    block.push_str(
+        "**Reason:** (eklenecek)\n**Alternatives:** (eklenecek)\n**Impact:** (eklenecek)\n",
+    );
 
     let mut f = OpenOptions::new()
         .create(true)
@@ -174,10 +176,7 @@ pub async fn vault_agent_state_update(slug: String, patch: StatePatch) -> Result
     }
     // Always bump updated
     if let serde_json::Value::Object(obj) = &mut fm_obj {
-        obj.insert(
-            "updated".to_string(),
-            serde_json::Value::String(now_iso()),
-        );
+        obj.insert("updated".to_string(), serde_json::Value::String(now_iso()));
     }
 
     let mut new_body = body;
@@ -186,11 +185,7 @@ pub async fn vault_agent_state_update(slug: String, patch: StatePatch) -> Result
         new_body = replace_agent_block(&new_body, &new_block);
     }
 
-    let combined = format!(
-        "---\n{}---\n{}",
-        serialize_yaml_lite(&fm_obj),
-        new_body
-    );
+    let combined = format!("---\n{}---\n{}", serialize_yaml_lite(&fm_obj), new_body);
     check_no_secrets(&combined)?;
     let rel = format!("agents/{}/state.md", slug);
     check_writable_path(&rel)?;
@@ -246,10 +241,7 @@ fn serialize_yaml_lite(v: &serde_json::Value) -> String {
 }
 
 fn replace_agent_block(body: &str, new_inner: &str) -> String {
-    let re = Regex::new(
-        r"(?s)(<!--\s*agent:start\s*-->)(.*?)(<!--\s*agent:end\s*-->)",
-    )
-    .unwrap();
+    let re = Regex::new(r"(?s)(<!--\s*agent:start\s*-->)(.*?)(<!--\s*agent:end\s*-->)").unwrap();
     if re.is_match(body) {
         re.replace(body, |caps: &regex::Captures| {
             format!("{}\n{}\n{}", &caps[1], new_inner.trim(), &caps[3])

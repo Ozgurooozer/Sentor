@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Atlas OS Indexer (v2 — flexible depth, type/scope, markdown support)
+Sentor Indexer (v2 — flexible depth, type/scope, markdown support)
 
 Scans vault/ and writes:
   .index/pages.json  — for CLI and API
@@ -8,7 +8,7 @@ Scans vault/ and writes:
 
 Usage:
     python tools/indexer.py
-    python tools/indexer.py --changed-files vault/home/atlas-os/index.html,vault/agents/vault/log.md
+    python tools/indexer.py --changed-files vault/home/sentor/index.html,vault/agents/vault/log.md
 """
 
 import argparse
@@ -493,7 +493,7 @@ def write_index(pages: list[dict]) -> None:
         encoding="utf-8",
     )
     (INDEX_DIR / "pages.js").write_text(
-        "window.ATLAS_INDEX = "
+        "window.SENTOR_INDEX = "
         + json.dumps(index, ensure_ascii=False, separators=(",", ":"))
         + ";\n",
         encoding="utf-8",
@@ -516,7 +516,7 @@ def run(changed_files: list[str] | None = None) -> None:
 
 
 def _parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Atlas OS indexer")
+    p = argparse.ArgumentParser(description="Sentor indexer")
     p.add_argument(
         "--changed-files",
         help="Comma-separated paths to re-parse incrementally (relative to repo root or absolute)",

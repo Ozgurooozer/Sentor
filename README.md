@@ -50,7 +50,7 @@ cd ide && pnpm install && cd ..
 python tools/indexer.py
 
 # 4 — Launch (Windows)
-atlas-ide.bat
+sentor.bat
 ```
 
 Or run the IDE directly in dev mode:
@@ -77,7 +77,7 @@ docker run -d -p 8888:8080 --name searxng searxng/searxng
 
 | Feature | Description |
 |---|---|
-| **AI Chat** | Five agents: Vault (research), Atlas-Maker (writes vault pages), Coder (edits source files), Orkestra (coordinator), Vault-Exporter |
+| **AI Chat** | Five agents: Vault (research), Sentor-Maker (writes vault pages), Coder (edits source files), Orkestra (coordinator), Vault-Exporter |
 | **Web tab** | Real browser using native WebView — no iframe X-Frame-Options limits |
 | **Vault tab** | Local `asset://` vault pages in iframe — fast, same-origin |
 | **Vault Home** | Startup search UI over your own knowledge base |
@@ -102,11 +102,11 @@ python tools/embedder.py
 ## CLI
 
 ```bash
-python cli/atlas.py search "query"
-python cli/atlas.py list [category]
-python cli/atlas.py open category/slug
-python cli/atlas.py serve [port]          # REST API on port 4242
-python cli/atlas.py chat                  # terminal agent loop
+python cli/main.py search "query"
+python cli/main.py list [category]
+python cli/main.py open category/slug
+python cli/main.py serve [port]          # REST API on port 4242
+python cli/main.py chat                  # terminal agent loop
 ```
 
 ## REST API
@@ -133,10 +133,10 @@ Register in your client's MCP config (e.g. `.mcp.json` for Claude Code):
 ```json
 {
   "mcpServers": {
-    "atlas": {
+    "sentor": {
       "command": "python",
-      "args": ["C:/Atlas OS/tools/mcp_server.py"],
-      "env": { "ATLAS_VAULT_ROOT": "C:/Atlas OS" }
+      "args": ["C:/Sentor/tools/mcp_server.py"],
+      "env": { "SENTOR_VAULT_ROOT": "C:/Sentor" }
     }
   }
 }
@@ -147,7 +147,7 @@ graph index lives in the Tauri process. Use the in-IDE chat for those.
 
 ## Browser Search UI
 
-Open `ui/index.html` directly — no server needed. Loads `window.ATLAS_INDEX` from `.index/pages.js`.
+Open `ui/index.html` directly — no server needed. Loads `window.SENTOR_INDEX` from `.index/pages.js`.
 
 ## Settings
 
@@ -168,7 +168,7 @@ tools/embedder.py                    ← 384-dim vectors
 .index/embeddings.json               ← semantic search
          │
 api/server.py                        ← REST API (stdlib, port 4242)
-cli/atlas.py                         ← terminal CLI
+cli/main.py                         ← terminal CLI
 ui/index.html                        ← browser search (Fuse.js, standalone)
 ide/                                 ← Tauri v2 desktop app
   src-tauri/src/modules/
@@ -201,7 +201,7 @@ ide/                                 ← Tauri v2 desktop app
 |---|---|
 | "Ollama not found" | Install from [ollama.com/download/windows](https://ollama.com/download/windows), then `ollama pull all-minilm` |
 | API server won't start | Check port 4242 isn't already used: `netstat -an \| findstr 4242` |
-| Blank screen on launch | Check `~/.atlas/logs/` for errors; try Settings → Reset Window |
+| Blank screen on launch | Check `~/.sentor/logs/` for errors; try Settings → Reset Window |
 | Search returns no results | Run `python tools/indexer.py` to re-index the vault |
 | Semantic search empty | Run `python tools/embedder.py` (requires Ollama) |
 | SmartScreen warning on install | Click "More info" → "Run anyway" (installer is unsigned in early releases) |
@@ -211,7 +211,7 @@ ide/                                 ← Tauri v2 desktop app
 ## Security
 
 - The REST API (`localhost:4242`) and MCP server (`localhost:4244`) are **loopback-only** and require a Bearer token.
-- The token is generated on first launch and stored at `~/.atlas/api-token` (permissions: 600).
+- The token is generated on first launch and stored at `~/.sentor/api-token` (permissions: 600).
 - See [docs/security.md](docs/security.md) for the full threat model.
 
 ## License

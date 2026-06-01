@@ -1,5 +1,5 @@
 @echo off
-title Atlas Transcribe
+title Sentor Transcribe
 cd /d "%~dp0"
 set WHISPER_MODEL=small
 set WHISPER_DEVICE=cpu

@@ -274,7 +274,7 @@ export function V3WireLayer({ panels, connections, viewport, canvasRect, pending
               strokeWidth={isTrigger ? 2 : 1.5}
               strokeOpacity={isHov ? 0.75 : 0.35}
               strokeDasharray={isTrigger ? undefined : "5 4"}
-              className={wireAnim === "flow" ? "atlas-wire-flow" : wireAnim === "pulse" ? "atlas-wire-pulse" : undefined}
+              className={wireAnim === "flow" ? "sentor-wire-flow" : wireAnim === "pulse" ? "sentor-wire-pulse" : undefined}
               style={{ transition: "stroke-opacity 150ms ease-out" }}
             />
             {/* Midpoint controls — only on hover */}

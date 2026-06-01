@@ -56,14 +56,14 @@ pub fn parse_yaml_lite(block: &str) -> serde_json::Value {
 
 /// Returns the vault root for the running Tauri app.
 /// Resolution order:
-///   1. ATLAS_VAULT env var
-///   2. <current_exe_dir>/../../../vault  (dev mode: ide/src-tauri/target/debug/atlas.exe → repo)
+///   1. SENTOR_VAULT env var
+///   2. <current_exe_dir>/../../../vault  (dev mode: ide/src-tauri/target/debug/sentor.exe → repo)
 ///   3. <cwd>/vault                       (running from repo root)
 pub fn vault_root() -> PathBuf {
     static CACHE: OnceLock<PathBuf> = OnceLock::new();
     CACHE
         .get_or_init(|| {
-            if let Ok(env) = std::env::var("ATLAS_VAULT") {
+            if let Ok(env) = std::env::var("SENTOR_VAULT") {
                 let p = PathBuf::from(env);
                 if p.is_dir() {
                     return p;

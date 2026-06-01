@@ -40,7 +40,7 @@
 
 **Decided:** `tools/mcp_server.py` (stdio) lets Claude Code, Cursor, Continue, Cline browse vault + manipulate canvas.
 
-**Rationale:** Atlas IDE can't be everywhere. MCP is the bridge. External assistants read-only access vault, queue canvas commands, wait for IDE to process.
+**Rationale:** Sentor IDE can't be everywhere. MCP is the bridge. External assistants read-only access vault, queue canvas commands, wait for IDE to process.
 
 ---
 

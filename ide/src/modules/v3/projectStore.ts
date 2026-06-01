@@ -14,12 +14,12 @@ export type Project = {
   lastOpened: number;
 };
 
-// Atlas OS kendi standart vault'u
-export const ATLAS_DEFAULT_PROJECT: Project = {
-  id: "atlas-default",
-  name: "Atlas OS",
-  path: "C:/Atlas OS",
-  vaultPath: "C:/Atlas OS/vault",
+// Sentor kendi standart vault'u
+export const SENTOR_DEFAULT_PROJECT: Project = {
+  id: "sentor-default",
+  name: "Sentor",
+  path: "C:/Sentor",
+  vaultPath: "C:/Sentor/vault",
   color: "#5b8def",
   created: 0,
   lastOpened: Date.now(),
@@ -37,8 +37,8 @@ type ProjectState = {
 };
 
 export const useProjectStore = create<ProjectState>((set, get) => ({
-  projects: [ATLAS_DEFAULT_PROJECT],
-  activeId: ATLAS_DEFAULT_PROJECT.id,
+  projects: [SENTOR_DEFAULT_PROJECT],
+  activeId: SENTOR_DEFAULT_PROJECT.id,
   hydrated: false,
 
   hydrate: async () => {
@@ -47,11 +47,11 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       const saved = await store.get<Project[]>("projects");
       const activeId = await store.get<string>("activeId");
       if (saved && saved.length > 0) {
-        // Atlas default her zaman başta
-        const withDefault = saved.find(p => p.id === ATLAS_DEFAULT_PROJECT.id)
+        // Sentor default her zaman başta
+        const withDefault = saved.find(p => p.id === SENTOR_DEFAULT_PROJECT.id)
           ? saved
-          : [ATLAS_DEFAULT_PROJECT, ...saved];
-        const resolvedId = activeId ?? ATLAS_DEFAULT_PROJECT.id;
+          : [SENTOR_DEFAULT_PROJECT, ...saved];
+        const resolvedId = activeId ?? SENTOR_DEFAULT_PROJECT.id;
         set({ projects: withDefault, activeId: resolvedId, hydrated: true });
         // Workspace root'u aktif projeye göre ayarla
         const active = withDefault.find(p => p.id === resolvedId);
@@ -79,12 +79,12 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   },
 
   removeProject: async (id) => {
-    if (id === ATLAS_DEFAULT_PROJECT.id) return;
+    if (id === SENTOR_DEFAULT_PROJECT.id) return;
     const next = get().projects.filter(p => p.id !== id);
     set({ projects: next });
     if (get().activeId === id) {
-      set({ activeId: ATLAS_DEFAULT_PROJECT.id });
-      await store.set("activeId", ATLAS_DEFAULT_PROJECT.id);
+      set({ activeId: SENTOR_DEFAULT_PROJECT.id });
+      await store.set("activeId", SENTOR_DEFAULT_PROJECT.id);
     }
     await store.set("projects", next);
     await store.save();
@@ -106,6 +106,6 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
   getActive: () => {
     const { projects, activeId } = get();
-    return projects.find(p => p.id === activeId) ?? ATLAS_DEFAULT_PROJECT;
+    return projects.find(p => p.id === activeId) ?? SENTOR_DEFAULT_PROJECT;
   },
 }));

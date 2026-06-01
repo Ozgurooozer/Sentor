@@ -146,7 +146,7 @@ export function installLogInterceptor() {
     add("error", `[promise] ${msg}`);
   });
 
-  add("system", "Atlas OS — log stream started");
+  add("system", "Sentor — log stream started");
 }
 
 // ── Agent log helper (called from agent runner) ───────────────────────────────

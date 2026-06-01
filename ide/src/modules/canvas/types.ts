@@ -58,7 +58,7 @@ export interface CanvasPanelNode {
   children?: CanvasPanelNode[];
   /**
    * When set, output data from this panel is forwarded to the named V3 floating
-   * window via Tauri emitTo(windowLabel, "atlas:wire-data", { panelId, data }).
+   * window via Tauri emitTo(windowLabel, "sentor:wire-data", { panelId, data }).
    * Example: "v3-output" links this panel as a context source for the V3 chat.
    */
   windowLabel?: string;

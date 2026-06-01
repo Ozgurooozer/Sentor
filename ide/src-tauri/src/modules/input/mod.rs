@@ -1,4 +1,4 @@
-//! Native Input Core — the lowest layer of the Atlas focused-mode runtime.
+//! Native Input Core — the lowest layer of the Sentor focused-mode runtime.
 //!
 //! Public surface:
 //!   • [`InputState`] — Tauri-managed state holding the hit-bitmap.

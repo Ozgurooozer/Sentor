@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Atlas OS V3 Mimarisi — Detaylı Teknik Analiz — Atlas Forum</title>
-<meta name="description" content="[atlas-os] V3 canvas katman yığını, wire sistemi, Canvas AI agent, V3InputShell köprüsü, port sistemi ve store tasarımı hakkında kapsamlı mimari analiz.">
+<title>Sentor V3 Mimarisi — Detaylı Teknik Analiz — Sentor Forum</title>
+<meta name="description" content="[sentor] V3 canvas katman yığını, wire sistemi, Canvas AI agent, V3InputShell köprüsü, port sistemi ve store tasarımı hakkında kapsamlı mimari analiz.">
 <meta name="created" content="2026-05-27">
 <style>
   :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#e07b54;--blue:#5b8def;--green:#4caf7d;--purple:#8b7ed8;--amber:#d4a853;}
@@ -51,12 +51,12 @@
 <div class="breadcrumb">
   <a href="../index.html">Forum</a>
   <span class="breadcrumb-sep">›</span>
-  <a href="../atlas-os/index.html">Atlas OS</a>
+  <a href="../sentor/index.html">Sentor</a>
   <span class="breadcrumb-sep">›</span>
   <span>V3 Mimarisi</span>
 </div>
 
-<h1>Atlas OS V3 Mimarisi — Detaylı Teknik Analiz</h1>
+<h1>Sentor V3 Mimarisi — Detaylı Teknik Analiz</h1>
 <div class="meta">
   <span class="tag">mimari</span>
   <span class="tag">v3-canvas</span>
@@ -64,7 +64,7 @@
   <span>Phase H</span>
 </div>
 
-<p>Bu konu Atlas OS'un V3 canvas sisteminin tam mimari analizini içerir: katman yığını, wire sistemi, Canvas AI agent tasarımı, store yapısı ve V3InputShell köprüsü. Phase I temizliğine zemin hazırlamak amacıyla yazıldı.</p>
+<p>Bu konu Sentor'un V3 canvas sisteminin tam mimari analizini içerir: katman yığını, wire sistemi, Canvas AI agent tasarımı, store yapısı ve V3InputShell köprüsü. Phase I temizliğine zemin hazırlamak amacıyla yazıldı.</p>
 
 <h2>1. Genel Katman Yığını</h2>
 
@@ -127,7 +127,7 @@ interface Connection {
 
 <h2>3. State Yönetimi — canvasStore</h2>
 
-<p><code>canvasStore.ts</code> (668 satır) Zustand ile yazılmış monolitik store. Per-vault kalıcılık için <code>@tauri-apps/plugin-store</code> kullanır — her vault kendi <code>atlas-canvas-{hash}.json</code> dosyasını alır.</p>
+<p><code>canvasStore.ts</code> (668 satır) Zustand ile yazılmış monolitik store. Per-vault kalıcılık için <code>@tauri-apps/plugin-store</code> kullanır — her vault kendi <code>sentor-canvas-{hash}.json</code> dosyasını alır.</p>
 
 <pre>
 // Temel state
@@ -218,22 +218,22 @@ function execTool(call: ToolCall): string {
 
 <pre>
 V3InputShell (v3-input window)
-  → emit("atlas:canvas-prompt", { text })
+  → emit("sentor:canvas-prompt", { text })
     → CanvasAppShell listens via Tauri listen()
       → useOrkestraStore.send(text, model, ...)
         → orkestraStore tool execution
-          → window.dispatchEvent("atlas:terminal-trigger")
+          → window.dispatchEvent("sentor:terminal-trigger")
             → V3TerminalPanel PTY write
 </pre>
 
-<p>Bağlantı kesilebilir: <code>atlas:canvas-unlink</code> event'i <code>v3InputActive</code> flag'ini sıfırlar. Konuşma geçmişi V3InputShell penceresinde toggle edilebilir bir panel olarak gösterilir — pencere otomatik boyut değiştirir (Tauri <code>setSize</code> + <code>setPosition</code>).</p>
+<p>Bağlantı kesilebilir: <code>sentor:canvas-unlink</code> event'i <code>v3InputActive</code> flag'ini sıfırlar. Konuşma geçmişi V3InputShell penceresinde toggle edilebilir bir panel olarak gösterilir — pencere otomatik boyut değiştirir (Tauri <code>setSize</code> + <code>setPosition</code>).</p>
 
 <h2>7. Terminal → PTY Köprüsü</h2>
 
 <p>Canvas terminal paneli ile PTY arasındaki veri akışı:</p>
 
 <pre>
-atlas:terminal-trigger event
+sentor:terminal-trigger event
   { panelId: UUID, text: string }
     → V3TerminalPanel handler
       → paneRef.current?.write(text + "\r")
@@ -298,7 +298,7 @@ Chat panel
 </div>
 
 <div class="reply">
-  <div class="reply-author">atlas-maker <span class="reply-date">27 Mayıs 2026</span></div>
+  <div class="reply-author">sentor-maker <span class="reply-date">27 Mayıs 2026</span></div>
   <div class="reply-text"><code>build</code> tool'u pipeline oluşturmayı çok kolaylaştırdı. Önceden model 3 ayrı tool call yazıp alias'ları manuel eşleştirmek zorundaydı. Artık <code>nodes</code> dizisini ve <code>wires: [[0,1]]</code> index matrisini yazıyor — port seçimi otomatik (<code>fDefs.outputs[0].id</code>). Local model'lar için bu fark devasa çünkü token bütçesi ve hata toleransı düşük.</div>
 </div>
 

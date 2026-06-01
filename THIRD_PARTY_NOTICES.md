@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-Atlas OS includes third-party software. This file lists major dependencies and their licenses.
+Sentor includes third-party software. This file lists major dependencies and their licenses.
 
 ## How to regenerate this file
 
@@ -69,7 +69,7 @@ cd ide/src-tauri && cargo install cargo-about && cargo about generate about.hbs 
 
 ## Python Standard Library
 
-Python components (`api/server.py`, `cli/atlas.py`, `tools/*.py`) use only the Python standard library (PSF License).
+Python components (`api/server.py`, `cli/main.py`, `tools/*.py`) use only the Python standard library (PSF License).
 
 ---
 

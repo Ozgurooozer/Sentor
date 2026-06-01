@@ -15,9 +15,9 @@ function StepWelcome({ onNext, onSkip }: StepProps) {
   return (
     <div style={styles.card}>
       <div style={styles.logo}>◈</div>
-      <h1 style={styles.title}>Welcome to Atlas OS</h1>
+      <h1 style={styles.title}>Welcome to Sentor</h1>
       <p style={styles.body}>
-        Atlas OS is your local-first second brain — a personal knowledge base,
+        Sentor is your local-first second brain — a personal knowledge base,
         AI IDE, and web browser in one desktop app. Everything stays on your
         machine. No cloud, no subscriptions.
       </p>
@@ -60,7 +60,7 @@ function StepVault({ onNext, onSkip }: StepProps) {
       <div style={styles.step}>Step 1 of 4</div>
       <h2 style={styles.title}>Choose your vault folder</h2>
       <p style={styles.body}>
-        Atlas stores your knowledge as HTML pages inside a vault folder. Pick an
+        Sentor stores your knowledge as HTML pages inside a vault folder. Pick an
         existing folder or create a new one — anywhere on your machine.
       </p>
       <div style={styles.pathBox} onClick={pickFolder}>
@@ -168,7 +168,7 @@ function StepProvider({ onNext, onSkip }: StepProps) {
       <div style={styles.step}>Step 2 of 4</div>
       <h2 style={styles.title}>Local AI provider</h2>
       <p style={styles.body}>
-        Atlas works with LM Studio or Ollama — local AI that runs entirely on
+        Sentor works with LM Studio or Ollama — local AI that runs entirely on
         your hardware.
       </p>
 
@@ -319,7 +319,7 @@ function StepIndex({ onNext, onSkip }: StepProps) {
       <div style={styles.step}>Step 3 of 4</div>
       <h2 style={styles.title}>Vault search index</h2>
       <p style={styles.body}>
-        Atlas keeps a small JSON index of your vault pages for instant search.
+        Sentor keeps a small JSON index of your vault pages for instant search.
         It's rebuilt automatically as you write — but it needs an initial build.
       </p>
 
@@ -371,7 +371,7 @@ function StepSearch({ onNext, onSkip }: StepProps) {
   }, []);
 
   const dockerCmd =
-    "docker run -d -p 8888:8080 --name searxng -e SEARXNG_SECRET=atlas searxng/searxng";
+    "docker run -d -p 8888:8080 --name searxng -e SEARXNG_SECRET=sentor searxng/searxng";
 
   const copyCmd = () => {
     void navigator.clipboard.writeText(dockerCmd);
@@ -382,7 +382,7 @@ function StepSearch({ onNext, onSkip }: StepProps) {
       <div style={styles.step}>Step 4 of 4</div>
       <h2 style={styles.title}>Web search (optional)</h2>
       <p style={styles.body}>
-        Atlas can search the web through SearXNG — a self-hosted, private
+        Sentor can search the web through SearXNG — a self-hosted, private
         search engine. Entirely optional; all other features work without it.
       </p>
 
@@ -442,12 +442,12 @@ function StepDone({ onFinish }: { onFinish: () => void }) {
       <div style={styles.logo}>✓</div>
       <h2 style={styles.title}>You're all set!</h2>
       <p style={styles.body}>
-        Atlas OS is ready. Your vault is indexed, the AI chat is active. Open a
+        Sentor is ready. Your vault is indexed, the AI chat is active. Open a
         file to edit, search your vault, or ask the AI anything.
       </p>
       <div style={styles.row}>
         <button style={styles.btnPrimary} onClick={onFinish}>
-          Open Atlas OS
+          Open Sentor
         </button>
       </div>
     </div>

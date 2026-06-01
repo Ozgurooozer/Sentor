@@ -1,6 +1,6 @@
-# Atlas Infinite Canvas — Implementation Plan
+# Sentor Infinite Canvas — Implementation Plan
 
-> **Vision:** Atlas focused mode is not a window — it's a *semantic input compositor + infinite working surface + native passthrough overlay*. Every pixel on screen is semantically classified; mouse events are routed to the right consumer (desktop, canvas, panel, bar) at the OS level. On top of that runs an infinite canvas where users spawn floating tool panels (Terminal, Editor, Preview, Vault Home, Web) and wire them together like a node graph.
+> **Vision:** Sentor focused mode is not a window — it's a *semantic input compositor + infinite working surface + native passthrough overlay*. Every pixel on screen is semantically classified; mouse events are routed to the right consumer (desktop, canvas, panel, bar) at the OS level. On top of that runs an infinite canvas where users spawn floating tool panels (Terminal, Editor, Preview, Vault Home, Web) and wire them together like a node graph.
 
 ---
 

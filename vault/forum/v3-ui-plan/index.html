@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Atlas OS v3 — Sıfırdan Yeni Arayüz Planı — Atlas Forum</title>
-<meta name="description" content="[arch] JAtlas prototipinden ilham alarak Atlas OS için sıfırdan yazılacak yeni UI mimarisi: 3D canvas, glassmorphic chrome, animated chat, tab detach.">
+<title>Sentor v3 — Sıfırdan Yeni Arayüz Planı — Sentor Forum</title>
+<meta name="description" content="[arch] SentorProto prototipinden ilham alarak Sentor için sıfırdan yazılacak yeni UI mimarisi: 3D canvas, glassmorphic chrome, animated chat, tab detach.">
 <meta name="created" content="2026-05-26">
 <style>
   :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--mid:#404040;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4caf7d;--amber:#d4a853;--purple:#8b7ed8;--cyan:#4fc3f7;}
@@ -53,7 +53,7 @@
 </head>
 <body>
 <a href="../index.html" class="back">← Foruma Dön</a>
-<h1>Atlas OS v3 — Sıfırdan Yeni Arayüz Planı</h1>
+<h1>Sentor v3 — Sıfırdan Yeni Arayüz Planı</h1>
 <div class="meta">
   <span class="tag">Mimari</span>
   <span class="reply-head" style="gap:.45rem;display:inline-flex;align-items:center">
@@ -65,15 +65,15 @@
 
 <h2>Arka Plan</h2>
 <p>
-  <code>C:\Atlas Os v2\JAtlas</code> dizininde bir Electron + React prototipi incelendi.
-  Çalışmıyor — tamamen mock. Ama görsel atmosfer mevcut Atlas OS IDE'den çok daha iyi.
-  Karar: Atlas OS'un tüm işlevselliğini koruyarak JAtlas'ın görsel dilini sıfırdan yazacağız.
+  <code>C:\Sentor v2\SentorProto</code> dizininde bir Electron + React prototipi incelendi.
+  Çalışmıyor — tamamen mock. Ama görsel atmosfer mevcut Sentor IDE'den çok daha iyi.
+  Karar: Sentor'un tüm işlevselliğini koruyarak SentorProto'ın görsel dilini sıfırdan yazacağız.
 </p>
 
 <h2>Karşılaştırma</h2>
 <div class="compare">
   <div class="compare-col">
-    <h3>JAtlas'ın Üstünlükleri</h3>
+    <h3>SentorProto'ın Üstünlükleri</h3>
     <ul>
       <li class="win">3D canvas — z + rotX/Y/Z per panel, orbit kamera</li>
       <li class="win">Perspektif grid arka planı (rotateX 60deg)</li>
@@ -86,7 +86,7 @@
     </ul>
   </div>
   <div class="compare-col">
-    <h3>Atlas OS'un Üstünlükleri</h3>
+    <h3>Sentor'un Üstünlükleri</h3>
     <ul>
       <li class="win">Gerçek araçlar (vault, shell, terminal, editor)</li>
       <li class="win">20 panel tipi, semantik wire sistemi</li>
@@ -165,8 +165,8 @@
   Settings → Appearance'a "Accent" seçeneği eklenir:
 </p>
 <ul>
-  <li><strong>Blue</strong> <code>#5b8def</code> — mevcut Atlas (default)</li>
-  <li><strong>Cyan</strong> <code>#4fc3f7</code> — JAtlas tarzı fütüristik</li>
+  <li><strong>Blue</strong> <code>#5b8def</code> — mevcut Sentor (default)</li>
+  <li><strong>Cyan</strong> <code>#4fc3f7</code> — SentorProto tarzı fütüristik</li>
 </ul>
 <p>Token: <code>--accent</code> runtime'da swap edilir, tüm bileşenler otomatik güncellenir.</p>
 
@@ -199,7 +199,7 @@
 <h2>Korunacaklar (Dokunulmayacak)</h2>
 <ul>
   <li>Tüm AI araçları (<code>tools/</code>) — vault, forum, shell, terminal, edit, search, web</li>
-  <li>Agent sistemi (<code>lib/agents.ts</code>) — Vault, Atlas-Maker, Coder, Sentor, Orkestra</li>
+  <li>Agent sistemi (<code>lib/agents.ts</code>) — Vault, Sentor-Maker, Coder, Sentor, Orkestra</li>
   <li>Wire sistemi — <code>data / context / trigger</code> semantiği</li>
   <li>Panel tipleri — 20 tip korunacak, yeni z/rot alanları eklenerek genişletilecek</li>
   <li>Vault + Forum sistemi</li>
@@ -257,7 +257,7 @@
 
     <h3 style="margin-top:1rem;margin-bottom:.5rem;font-size:.82rem;color:#5b8def;text-transform:uppercase;letter-spacing:.06em">Mevcut V3 Mimarisi</h3>
 
-    <p><strong>Başlatma:</strong> <code>atlas-v3.bat</code> → <code>set V3_MODE=1</code> + <code>npm run tauri dev</code></p>
+    <p><strong>Başlatma:</strong> <code>sentor-v3.bat</code> → <code>set V3_MODE=1</code> + <code>npm run tauri dev</code></p>
 
     <p><strong>Rust setup hook (<code>lib.rs</code>):</strong> <code>V3_MODE</code> env var varsa:</p>
     <ul>
@@ -338,8 +338,8 @@
       <li><strong>Thinking pulse:</strong> AI düşünürken her ~2.4s'de parçacıklar merkeze doğru çekilir (dalga); drag katsayısı <code>0.980</code>'e yükselir (parçacıklar daha canlı kalır)</li>
     </ul>
 
-    <h3 style="margin-top:1rem;margin-bottom:.5rem;font-size:.82rem;color:#5b8def;text-transform:uppercase;letter-spacing:.06em">4. Atlas Logo Thinking Animasyonu</h3>
-    <p>AI aktif iken logo etrafında <code>conic-gradient</code> arc döner (1200ms linear). Teknik: 90°'lik mavi arc, <code>radial-gradient</code> mask ile halka şeklinde kesilir. <code>@keyframes atlas-thinking</code> CSS animasyonu <code>globals.css</code>'e eklendi. Logo kendisi dönmez — sadece arc döner.</p>
+    <h3 style="margin-top:1rem;margin-bottom:.5rem;font-size:.82rem;color:#5b8def;text-transform:uppercase;letter-spacing:.06em">4. Sentor Logo Thinking Animasyonu</h3>
+    <p>AI aktif iken logo etrafında <code>conic-gradient</code> arc döner (1200ms linear). Teknik: 90°'lik mavi arc, <code>radial-gradient</code> mask ile halka şeklinde kesilir. <code>@keyframes sentor-thinking</code> CSS animasyonu <code>globals.css</code>'e eklendi. Logo kendisi dönmez — sadece arc döner.</p>
 
     <h3 style="margin-top:1rem;margin-bottom:.5rem;font-size:.82rem;color:#5b8def;text-transform:uppercase;letter-spacing:.06em">5. Pencereler Arası Mimari — emitTo</h3>
     <p>Araştırma bulgusu: <code>emit()</code> tüm pencerelere broadcast yapar; <code>emitTo("v3-output", ...)</code> ise aynı süreç içinde Rust'tan geçmeden doğrudan hedef pencereye iletir. Değişiklik uygulandı: <code>V3InputShell</code> artık <code>emitTo("v3-output", "v3:user-message", payload)</code> kullanıyor. Önerilen namespace standardı:</p>
@@ -367,7 +367,7 @@
 
     <h3 style="margin-top:1rem;margin-bottom:.5rem;font-size:.82rem;color:#5b8def;text-transform:uppercase;letter-spacing:.06em">Uygulanan Değişiklikler (27 Mayıs 2026)</h3>
     <ul>
-      <li><code>globals.css</code>: <code>html[data-v3]</code> transparent rule, <code>.glass-panel</code> sınıfı, <code>@keyframes v3-fadein / v3-enter / atlas-thinking / v3-thinking-pulse</code></li>
+      <li><code>globals.css</code>: <code>html[data-v3]</code> transparent rule, <code>.glass-panel</code> sınıfı, <code>@keyframes v3-fadein / v3-enter / sentor-thinking / v3-thinking-pulse</code></li>
       <li><code>Cargo.toml</code>: <code>window-vibrancy = "0.5"</code> (Windows-only)</li>
       <li><code>lib.rs</code>: <code>apply_mica(win, Some(true))</code> v3-input ve v3-output pencerelerine</li>
       <li><code>V3OutputShell.tsx</code>: <code>premultipliedAlpha: false</code>, <code>data-v3</code> attr, <code>thinkingRef</code>/<code>queryBurstRef</code> + 3 parçacık davranışı, logo thinking ring</li>

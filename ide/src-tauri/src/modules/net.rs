@@ -35,7 +35,11 @@ pub async fn http_get_json(url: String, bearer: Option<String>) -> Result<String
     let status = resp.status().as_u16();
     let body = resp.text().await.map_err(|e| e.to_string())?;
     if status >= 400 {
-        return Err(format!("HTTP {}: {}", status, body.chars().take(200).collect::<String>()));
+        return Err(format!(
+            "HTTP {}: {}",
+            status,
+            body.chars().take(200).collect::<String>()
+        ));
     }
     Ok(body)
 }

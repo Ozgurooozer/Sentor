@@ -1,8 +1,8 @@
 /* ============================================================
-   Atlas OS — UI Design System
+   Sentor — UI Design System
    Colors, typography, and spacing follow system.md exactly.
    Tailwind CDN handles layout utilities (flex, grid, spacing).
-   This file owns: global resets, atlas-* components, .hidden.
+   This file owns: global resets, sentor-* components, .hidden.
    ============================================================ */
 
 
@@ -44,7 +44,7 @@ body {
          focus ring allowed as the one box-shadow exception.
    ══════════════════════════════════════════════════════════════════════ */
 
-.atlas-search-input {
+.sentor-search-input {
   width: 100%;
   background: #111111;
   border: 1px solid #2a2a2a;
@@ -57,19 +57,19 @@ body {
   transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
 }
 
-.atlas-search-input::placeholder {
+.sentor-search-input::placeholder {
   color: #555555;
 }
 
-.atlas-search-input:focus {
+.sentor-search-input:focus {
   border-color: #5b8def;
   box-shadow: 0 0 0 2px rgba(91, 141, 239, 0.2);
 }
 
 /* Strip browser chrome from type="search" */
-.atlas-search-input::-webkit-search-decoration,
-.atlas-search-input::-webkit-search-cancel-button,
-.atlas-search-input::-webkit-search-results-button {
+.sentor-search-input::-webkit-search-decoration,
+.sentor-search-input::-webkit-search-cancel-button,
+.sentor-search-input::-webkit-search-results-button {
   -webkit-appearance: none;
 }
 
@@ -79,7 +79,7 @@ body {
    flex + gap applied here so app.js only needs classList.remove('hidden')
    ══════════════════════════════════════════════════════════════════════ */
 
-.atlas-results-list {
+.sentor-results-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -93,11 +93,11 @@ body {
          p-4, transition 150ms. No box-shadow.
    ══════════════════════════════════════════════════════════════════════ */
 
-.atlas-card {
+.sentor-card {
   list-style: none;
 }
 
-.atlas-card-link {
+.sentor-card-link {
   display: block;
   background: #111111;
   border: 1px solid #2a2a2a;
@@ -108,19 +108,19 @@ body {
   transition: border-color 150ms ease-out;
 }
 
-.atlas-card-link:hover {
+.sentor-card-link:hover {
   border-color: #404040;
 }
 
 /* Title row: title left, badge right, aligned to first line */
-.atlas-card-title-row {
+.sentor-card-title-row {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
 
-.atlas-card-title {
+.sentor-card-title {
   font-size: 0.9375rem;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -129,7 +129,7 @@ body {
 }
 
 /* Category badge — neutral variant from spec */
-.atlas-badge {
+.sentor-badge {
   flex-shrink: 0;
   display: inline-block;
   background: #1a1a1a;
@@ -144,7 +144,7 @@ body {
 }
 
 /* Description — secondary text, 2-line clamp for long descriptions */
-.atlas-card-desc {
+.sentor-card-desc {
   margin-top: 6px;
   font-size: 0.8125rem;
   color: #888888;
@@ -156,7 +156,7 @@ body {
 }
 
 /* Matched headings — tertiary, bullet-separated, rendered as a single line */
-.atlas-card-headings {
+.sentor-card-headings {
   margin-top: 10px;
   font-size: 0.75rem;
   letter-spacing: 0.01em;
@@ -168,7 +168,7 @@ body {
 }
 
 /* Modified date — mono, sub-small, tertiary */
-.atlas-card-meta {
+.sentor-card-meta {
   margin-top: 10px;
   font-size: 0.6875rem;
   font-family: 'SF Mono', 'Fira Code', monospace;
@@ -182,7 +182,7 @@ body {
    Spec: ghost button variant, accent/10 bg when active.
    ══════════════════════════════════════════════════════════════════════ */
 
-.atlas-cat-btn {
+.sentor-cat-btn {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -200,22 +200,22 @@ body {
   transition: background 150ms ease-out, color 150ms ease-out;
 }
 
-.atlas-cat-btn:hover {
+.sentor-cat-btn:hover {
   background: #1a1a1a;
   color: #f5f5f5;
 }
 
-.atlas-cat-btn--active {
+.sentor-cat-btn--active {
   background: rgba(91, 141, 239, 0.1);
   color: #5b8def;
 }
 
-.atlas-cat-btn--active:hover {
+.sentor-cat-btn--active:hover {
   background: rgba(91, 141, 239, 0.14);
   color: #5b8def;
 }
 
-.atlas-cat-label {
+.sentor-cat-label {
   flex: 1;
   text-align: left;
   overflow: hidden;
@@ -223,7 +223,7 @@ body {
   white-space: nowrap;
 }
 
-.atlas-cat-count {
+.sentor-cat-count {
   flex-shrink: 0;
   font-size: 0.6875rem;
   font-family: 'SF Mono', 'Fira Code', monospace;
@@ -232,6 +232,6 @@ body {
   text-align: right;
 }
 
-.atlas-cat-btn--active .atlas-cat-count {
+.sentor-cat-btn--active .sentor-cat-count {
   color: rgba(91, 141, 239, 0.6);
 }

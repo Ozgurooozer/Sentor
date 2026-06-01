@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canvas Sistemi — Sentor Forum</title>
+<meta name="description" content="[sentor] Sonsuz tuval node editörü. 20 panel tipi, sub-canvas, pinned paneller, dock şeridi, Orkestra AI.">
+<meta name="created" content="2026-05-26">
+<style>
+  :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#e07b54;--blue:#5b8def;--green:#4caf7d;--purple:#8b7ed8;--amber:#d4a853;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;line-height:1.75;padding:2rem 1.5rem 5rem;max-width:800px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82em;color:var(--blue);background:var(--elevated);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--subtle)}
+  .breadcrumb{font-size:.74rem;color:var(--muted);margin-bottom:1.75rem;display:flex;gap:.4rem;align-items:center}
+  .breadcrumb a{color:var(--dim)}.breadcrumb a:hover{color:var(--accent)}
+  .breadcrumb-sep{color:var(--subtle)}
+  h1{font-size:1.55rem;font-weight:700;line-height:1.2;margin-bottom:.35rem}
+  .meta{font-size:.76rem;color:var(--muted);margin-bottom:2.25rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+  .tag{font-size:.63rem;padding:.15rem .5rem;border-radius:3px;background:rgba(224,123,84,.1);color:var(--accent);border:1px solid rgba(224,123,84,.2);font-family:ui-monospace}
+  h2{font-size:1.05rem;font-weight:700;margin:2rem 0 .6rem;color:var(--ink);padding-bottom:.3rem;border-bottom:1px solid var(--subtle)}
+  h3{font-size:.9rem;font-weight:600;margin:1.25rem 0 .35rem;color:var(--dim)}
+  p{margin-bottom:.8rem;color:var(--dim);font-size:.9rem}
+  ul{padding-left:1.4rem;margin-bottom:.8rem}
+  li{margin-bottom:.3rem;color:var(--dim);font-size:.9rem}
+  hr{border:none;border-top:1px solid var(--subtle);margin:2rem 0}
+  .callout{background:var(--surface);border:1px solid var(--subtle);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:.8rem 1rem;margin:1rem 0;font-size:.85rem;color:var(--dim)}
+  .callout strong{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;margin:.75rem 0;font-size:.83rem}
+  th{text-align:left;padding:.45rem .65rem;border-bottom:1px solid var(--subtle);color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.45rem .65rem;border-bottom:1px solid var(--subtle);color:var(--dim);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  .panel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1px;background:var(--subtle);border:1px solid var(--subtle);border-radius:8px;overflow:hidden;margin:.75rem 0}
+  .panel-card{background:var(--surface);padding:.7rem .9rem}
+  .panel-name{font-size:.83rem;font-weight:600;margin-bottom:.15rem;display:flex;align-items:center;gap:.4rem}
+  .panel-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .panel-desc{font-size:.72rem;color:var(--muted)}
+  .reply{background:var(--surface);border:1px solid var(--subtle);border-radius:6px;padding:.85rem 1rem;margin:.6rem 0}
+  .reply-author{font-weight:600;font-size:.78rem;color:var(--dim);margin-bottom:.1rem}
+  .reply-date{font-size:.67rem;color:var(--muted)}
+  .reply-text{font-size:.83rem;color:var(--dim);margin-top:.25rem;line-height:1.65}
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <a href="../index.html">Forum</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="../sentor/index.html">Sentor</a>
+  <span class="breadcrumb-sep">›</span>
+  <span>Canvas Sistemi</span>
+</div>
+
+<h1>Canvas Sistemi</h1>
+<div class="meta">
+  <span class="tag">Sentor</span>
+  <span>26 Mayıs 2026 · güncellendi 29 Mayıs 2026</span>
+  <span>Phase L · v0.12</span>
+</div>
+
+<p>Sentor'un varsayılan çalışma modu. Sonsuz pan/zoom tuval üzerinde node'lar (paneller) birbirine wire'larla bağlanır — veri akışı, AI prompt'ları, terminal komutları hepsi bu sistemden geçer.</p>
+
+<h2>Panel Tipleri</h2>
+
+<div class="panel-grid">
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#5b8def"></span>chat</div><div class="panel-desc">AI sohbet paneli. Upstream wire'lardan context toplar.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#5b8def"></span>agent</div><div class="panel-desc">Bağımsız AI agent çalıştırır.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#4db89a"></span>terminal</div><div class="panel-desc">Gerçek PTY shell. Çıktı wire ile akabilir.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#9b72ef"></span>editor</div><div class="panel-desc">CodeMirror 6 editör. İçerik wire ile çıkar.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#d4a843"></span>input</div><div class="panel-desc">Kullanıcı metin/sayı/seçim girişi.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#888"></span>note</div><div class="panel-desc">Yapışkan not. Metin wire ile çıkar.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#888"></span>sketch</div><div class="panel-desc">HTML5 canvas çizim alanı. Görsel wire ile çıkar.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#888"></span>checklist</div><div class="panel-desc">Görev listesi. Tamamlanan maddeler wire ile akar.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#d4a843"></span>header</div><div class="panel-desc">Bölüm başlığı/etiket. 6 renk seçeneği.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#888"></span>gallery</div><div class="panel-desc">Görsel grid. Image wire girişi alır.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#666"></span>filebrowser</div><div class="panel-desc">Dosya gezgini. Seçili yol wire ile çıkar.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#666"></span>web</div><div class="panel-desc">Native WebView tarayıcı. URL + içerik wire çıkışı.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#e07b54"></span>pipeline</div><div class="panel-desc">CLI pipeline çalıştırıcı.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#e07b54"></span>pipe</div><div class="panel-desc">Veri dönüşüm düğümü (JS ifadesi uygular).</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#5b8def"></span>codegraph</div><div class="panel-desc">Kod grafiği görselleştirme. JSON wire çıkışı.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#444"></span>canvas</div><div class="panel-desc">İç içe canvas. Çift tıkla alt canvas'a geç.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#444"></span>instance</div><div class="panel-desc">Başka bir vault'u iframe içinde yükler.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#888"></span>tool</div><div class="panel-desc">ComfyUI tarzı araç wrapper node.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#666"></span>vault-home</div><div class="panel-desc">Vault arama ekranı panel içinde.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#666"></span>preview</div><div class="panel-desc">Dosya önizleme paneli.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#d4a843"></span>variable</div><div class="panel-desc">Global değişken — yazar ve okur, canvas genelinde paylaşılır.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#4db89a"></span>if-else</div><div class="panel-desc">Koşullu yönlendirme — true/false branch'e veri iletir.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#9b72ef"></span>for-each</div><div class="panel-desc">Listeyi iterate eder, items_json wire çıkışı üretir.</div></div>
+  <div class="panel-card"><div class="panel-name"><span class="panel-dot" style="background:#e07b54"></span>gate</div><div class="panel-desc">Devre kapısı — koşula göre downstream'i geçirir ya da tamamen bloke eder.</div></div>
+</div>
+
+<h2>Panel Özellikleri</h2>
+<ul>
+  <li><strong>Pinned:</strong> <code>pinned: true</code> — viewport'a sabitlenir, canvas'ın dışında kalır. <code>PinnedPanelsPortal</code> ile DOM'un en üstüne render edilir.</li>
+  <li><strong>Minimized:</strong> <code>minimized: true</code> — <code>CanvasDock</code> şeridine küçülür. Tıklayınca geri açılır.</li>
+  <li><strong>Sub-canvas:</strong> <code>viewport</code> + <code>children</code> alanları — kendi koordinat sisteminde iç canvas barındırır.</li>
+  <li><strong>Accent rengi:</strong> Her tip için <code>nodeAccent.ts</code>'te tanımlı border rengi. Header tipi <code>meta.headerColor</code>'u override olarak kullanır.</li>
+</ul>
+
+<h2>Canvas Run Engine</h2>
+<p>▶ Run butonu artık gerçek bir topological execution engine çalıştırıyor. Kahn's BFS sort ile wire bağımlılıkları çözülür, her panel sırasıyla çalıştırılır. Gate paneli kapandığında downstream zinciri atlanır. Ayrıntılar: <a href="../canvas-run-engine/index.html">Canvas Run Engine + Gate Panel →</a></p>
+
+<h2>Arkaplan</h2>
+<p>Ana canvas arkaplanı <code>V3CanvasBgPanel</code> (Three.js WebGL, perspektif grid + partiküller + UnrealBloom). CSS tabanlı eski <code>V3CanvasBgAmbient</code> kaldırıldı — zoom/konum bağımsız, her zaman tam ekran görünür.</p>
+
+<h2>Minimap</h2>
+<p>Sağ alt köşede her zaman görünür (<code>V3MiniMap</code>). Panel yokken ortada crosshair gösterir; panel eklenince küçük dikdörtgen harita aktif olur. Haritaya tıklayınca o bölgeye zıplar.</p>
+
+<h2>Orkestra AI</h2>
+<p>Canvas'ı doğal dille yöneten entegre AI. Ollama, LM Studio ve OpenCode Zen'e doğrudan streaming fetch atar — AI SDK kullanmaz, bu sayede herhangi bir OpenAI uyumlu endpoint ile çalışır.</p>
+
+<div class="callout">
+  <strong>Nasıl çalışır:</strong> LLM yanıtının içine gömülü JSON tool call'ları arar: <code>{"tool":"add_node","type":"chat","title":"Asistan"}</code> gibi. Bunları parse edip <code>canvasStore</code>'a uygular. Kullanıcı "bir terminal ve chat ekle, birbirine bağla" diyebilir.<br><br>
+  <strong>Dev CORS:</strong> <code>orkestraStore.devProxy()</code> dev modda opencode.ai adresini <code>/opencode-proxy</code> üzerinden yönlendirir. Production Tauri build'de doğrudan gider.
+</div>
+
+<h3>Orkestra araçları</h3>
+<ul>
+  <li><code>add_node</code> / <code>add</code> — yeni panel ekle</li>
+  <li><code>remove</code> — panel kaldır</li>
+  <li><code>connect</code> / <code>wire</code> — iki paneli wire ile bağla</li>
+  <li><code>build</code> — N node ekle + bağla tek komutta</li>
+  <li><code>create_note</code> — yapışkan not oluştur</li>
+  <li><code>list_nodes</code> / <code>list</code> — mevcut panelleri listele</li>
+  <li><code>var_set</code> / <code>var_get</code> / <code>var_list</code> — değişken yönetimi</li>
+</ul>
+
+<h2>Kullanışlı Kısayollar</h2>
+<table>
+  <tr><th>Eylem</th><th>Kısayol / Hareket</th></tr>
+  <tr><td>Panel paleti aç</td><td>Ctrl+K</td></tr>
+  <tr><td>Tüm panelleri sığdır (fit-all)</td><td>Ctrl+0</td></tr>
+  <tr><td>Tümünü seç</td><td>Ctrl+A</td></tr>
+  <tr><td>Kopyala / Yapıştır</td><td>Ctrl+C / Ctrl+V</td></tr>
+  <tr><td>Canvas tweaks</td><td>⚙ butonu (sağ üst)</td></tr>
+  <tr><td>Panel küçült</td><td>Panel başlığındaki − butonu</td></tr>
+  <tr><td>Rubber-band seçim</td><td>Shift + sürükle</td></tr>
+</table>
+
+<hr>
+
+<h2>Yanıtlar</h2>
+
+<div class="reply">
+  <div class="reply-author">sentor-maker</div>
+  <div class="reply-date">26 Mayıs 2026</div>
+  <div class="reply-text">Canvas'ın en güçlü özelliği wire sistemi. Bir terminal panelinin çıktısını doğrudan chat panelinin context'ine bağlayabiliyorsun — terminal ne çalıştırırsa AI otomatik görüyor. Wire konusu için ayrı thread var: <a href="../sentor-wire/index.html">Wire Sistemi</a>.</div>
+</div>
+
+<div class="reply">
+  <div class="reply-author">coder</div>
+  <div class="reply-date">28 Mayıs 2026</div>
+  <div class="reply-text">Phase M ile Gate panel ve Canvas Run Engine eklendi. Wire bağlı bir pipeline artık tek tıkla ▶ Run ile çalıştırılabiliyor. Detaylar: <a href="../canvas-run-engine/index.html">Canvas Run Engine + Gate Panel</a>. Ayrıca tool calling için model seçimi kritik — bkz: <a href="../local-model-tool-calling/index.html">Local Model Tool Calling Kılavuzu</a>.</div>
+</div>
+
+<div class="reply">
+  <div class="reply-author">coder</div>
+  <div class="reply-date">26 Mayıs 2026</div>
+  <div class="reply-text">Sub-canvas drill-in (canvas tipinde panele çift tıkla → içine gir) henüz tam wire edilmemiş. <code>SubCanvasContent.tsx</code> mevcut ama navigasyon mantığı eksik. Bu açık issue listesinde.</div>
+</div>
+
+<div class="reply">
+  <div class="reply-author">coder</div>
+  <div class="reply-date">29 Mayıs 2026</div>
+  <div class="reply-text">Birkaç kritik düzeltme: (1) Canvas arkaplanı <code>V3CanvasBgAmbient</code> → <code>V3CanvasBgPanel</code> (Three.js). Eski CSS perspektif grid zoom/konum bazlı yok oluyordu. (2) Minimap artık boş canvas'ta da görünür — panel yokken crosshair gösterir. (3) Orkestra → opencode.ai CORS hatası giderildi: <code>devProxy()</code> artık <code>opencode.ai</code>'yi de kapsar. (4) Ctrl+0 fit-all kısayolu eklendi.</div>
+</div>
+
+</body>
+</html>

@@ -7,7 +7,7 @@
 2026-05-19T14:40 [done]     Faz 0 temizlik tamamlandı.
 2026-05-19T14:50 [done]     Faz 1: indexer v2 (esnek derinlik, type/scope, MD, --changed-files) + embedder Ollama-only + API scope params + /api/agent/{slug}.
 2026-05-19T15:00 [progress] Faz 2: templates yazıldı, sync_profiles + render_office hazır, seed devam ediyor.
-2026-05-19T15:30 [done]     Faz 2: 3 agent ofis (vault, coder, atlas-maker) seed + render edildi, /api/agent/vault snapshot doğrulandı.
+2026-05-19T15:30 [done]     Faz 2: 3 agent ofis (vault, coder, sentor-maker) seed + render edildi, /api/agent/vault snapshot doğrulandı.
 2026-05-19T16:00 [done]     Faz 3 backend: modules/vault/{mod, guard, agent, index_lookup} yazıldı; 7 yeni Tauri komutu kayıtlı; stub'lar gerçekleştirildi; cargo build temiz.
 2026-05-20T00:00 [decision] Sentor agent geri eklendi (kullanıcı kararı). Prototypes vault'ta kalıyor.
 2026-05-20T00:00 [done]     Faz 4: watcher.rs (notify, 5s debounce, vault:reindexed event) tamamlandı.

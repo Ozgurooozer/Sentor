@@ -8,7 +8,7 @@ import type { ToolContext } from "./context";
 // Agent persona map — short ID → display name, avatar letter, CSS class
 const PERSONAS: Record<string, { label: string; avatar: string; cls: string }> = {
   vault:        { label: "Vault Agent",  avatar: "V", cls: "av-vault"  },
-  "atlas-maker":{ label: "Atlas-Maker", avatar: "A", cls: "av-maker"  },
+  "sentor-maker":{ label: "Sentor-Maker", avatar: "A", cls: "av-maker"  },
   coder:        { label: "Coder",        avatar: "C", cls: "av-coder"  },
   sentor:       { label: "Sentor",       avatar: "S", cls: "av-sentor" },
   user:         { label: "User",         avatar: "U", cls: "av-user"   },
@@ -65,7 +65,7 @@ function threadTemplate(opts: {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escHtml(title)} — Atlas Forum</title>
+<title>${escHtml(title)} — Sentor Forum</title>
 <meta name="description" content="[${category}] ${escHtml(description)}">
 <meta name="created" content="${date}">
 <style>
@@ -124,7 +124,7 @@ ${body}
 export function buildForumTools(ctx: ToolContext) {
   return {
     forum_search: tool({
-      description: `Search Atlas Forum threads. Use this to find existing discussions before opening a new topic. Returns thread titles, categories, descriptions, and IDs. Read-only — auto-executes.`,
+      description: `Search Sentor Forum threads. Use this to find existing discussions before opening a new topic. Returns thread titles, categories, descriptions, and IDs. Read-only — auto-executes.`,
       inputSchema: z.object({
         query: z.string().describe("Search query — topic, keyword, or question"),
         category: z.enum(["arch", "codeq", "feature", "dev", "sohbet"]).optional()
@@ -199,11 +199,11 @@ export function buildForumTools(ctx: ToolContext) {
     }),
 
     forum_reply: tool({
-      description: `Add a reply to an existing forum thread using your agent persona. The reply is appended to the thread's vault HTML file and re-indexed so it appears immediately. Use your agent name as 'author' (vault, atlas-maker, coder, sentor) so your identity shows correctly. Requires approval — modifies a vault file.`,
+      description: `Add a reply to an existing forum thread using your agent persona. The reply is appended to the thread's vault HTML file and re-indexed so it appears immediately. Use your agent name as 'author' (vault, sentor-maker, coder, sentor) so your identity shows correctly. Requires approval — modifies a vault file.`,
       inputSchema: z.object({
         slug: z.string().describe("Forum thread slug to reply to, e.g. 'plain-html-vs-db'"),
         text: z.string().min(10).describe("Your reply text. Plain text; line breaks become paragraphs."),
-        author: z.string().default("vault").describe("Your agent persona ID: vault | atlas-maker | coder | sentor | user"),
+        author: z.string().default("vault").describe("Your agent persona ID: vault | sentor-maker | coder | sentor | user"),
       }),
       execute: async ({ slug, text, author }) => {
         const root = ctx.getWorkspaceRoot();
@@ -244,7 +244,7 @@ export function buildForumTools(ctx: ToolContext) {
         category: z.enum(["arch", "codeq", "feature", "dev", "sohbet"]).describe("Forum category"),
         description: z.string().describe("One-sentence summary shown in the forum listing"),
         body: z.string().describe("Thread body as HTML. Use <h2>, <p>, <ul>, <li>, <code> tags. Start with a problem/context section."),
-        author: z.string().default("vault").describe("Your agent persona: vault | atlas-maker | coder | sentor | user"),
+        author: z.string().default("vault").describe("Your agent persona: vault | sentor-maker | coder | sentor | user"),
       }),
       execute: async ({ slug, title, category, description, body, author }) => {
         const root = ctx.getWorkspaceRoot();

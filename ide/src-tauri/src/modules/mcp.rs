@@ -9,7 +9,7 @@ pub struct McpState(pub Mutex<Option<RecommendedWatcher>>);
 /// Read and atomically clear the MCP command queue.
 /// External tools (Python MCP server, REST API) write commands to
 /// ROOT/.mcp-queue.json; the frontend drains this whenever it gets an
-/// `atlas:mcp-cmd` event from the file watcher, plus on startup and a slow
+/// `sentor:mcp-cmd` event from the file watcher, plus on startup and a slow
 /// (30s) polling fallback for safety.
 #[tauri::command]
 pub async fn mcp_dequeue(root: String) -> Vec<serde_json::Value> {
@@ -49,7 +49,7 @@ pub async fn mcp_export_state(root: String, state: String) -> Result<(), String>
 }
 
 /// Start a filesystem watcher on ROOT/.mcp-queue.json. When the queue file
-/// is created or modified by an external tool, emit `atlas:mcp-cmd` on the
+/// is created or modified by an external tool, emit `sentor:mcp-cmd` on the
 /// app event bus so the frontend can drain the queue immediately instead of
 /// waiting for the next polling tick.
 ///
@@ -91,7 +91,7 @@ pub fn mcp_watch_start(
             .iter()
             .any(|p| p.file_name() == Some(queue_name.as_os_str()))
         {
-            let _ = app_handle.emit("atlas:mcp-cmd", ());
+            let _ = app_handle.emit("sentor:mcp-cmd", ());
         }
     })
     .map_err(|e| e.to_string())?;

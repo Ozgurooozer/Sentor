@@ -30,7 +30,7 @@ function resolveInput(input: string): { kind: "url" | "search" | "asset"; value:
   return { kind: "search", value: s };
 }
 
-const webLabel = (id: number) => `atlas-web-${id}`;
+const webLabel = (id: number) => `sentor-web-${id}`;
 
 export function WebBrowserPane({
   tab,

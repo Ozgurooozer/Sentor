@@ -1,12 +1,12 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "atlas": {
+    "sentor": {
       "type": "local",
-      "command": ["python", "C:/Atlas OS/tools/mcp_server.py"],
+      "command": ["python", "C:/Sentor/tools/mcp_server.py"],
       "enabled": true,
       "env": {
-        "ATLAS_VAULT_ROOT": "C:/Atlas OS"
+        "SENTOR_VAULT_ROOT": "C:/Sentor"
       }
     }
   }

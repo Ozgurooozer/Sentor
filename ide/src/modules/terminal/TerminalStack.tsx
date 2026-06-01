@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { PaneTreeView } from "./PaneTreeView";
 import type { TerminalPaneHandle } from "./TerminalPane";
 import { leafIds } from "./lib/panes";
-import { type AtlasOpenInput } from "./lib/useTerminalSession";
+import { type SentorOpenInput } from "./lib/useTerminalSession";
 
 type Props = {
   tabs: Tab[];
@@ -15,7 +15,7 @@ type Props = {
   onCwd: (leafId: number, cwd: string) => void;
   onDetectedLocalUrl: (leafId: number, url: string) => void;
   onExit: (leafId: number, code: number) => void;
-  onAtlasOpen?: (leafId: number, input: AtlasOpenInput) => void;
+  onSentorOpen?: (leafId: number, input: SentorOpenInput) => void;
   onFocusLeaf: (tabId: number, leafId: number) => void;
 };
 
@@ -25,7 +25,7 @@ type Bundle = {
   onCwd: (cwd: string) => void;
   onDetectedUrl: (url: string) => void;
   onExit: (code: number) => void;
-  onAtlasOpen: (input: AtlasOpenInput) => void;
+  onSentorOpen: (input: SentorOpenInput) => void;
 };
 
 export function TerminalStack({
@@ -36,7 +36,7 @@ export function TerminalStack({
   onCwd,
   onDetectedLocalUrl,
   onExit,
-  onAtlasOpen,
+  onSentorOpen,
   onFocusLeaf,
 }: Props) {
   const terminals = tabs.filter((t) => t.kind === "terminal");
@@ -46,7 +46,7 @@ export function TerminalStack({
   const cwdRef = useRef(onCwd);
   const detectedUrlRef = useRef(onDetectedLocalUrl);
   const exitRef = useRef(onExit);
-  const atlasOpenRef = useRef(onAtlasOpen);
+  const sentorOpenRef = useRef(onSentorOpen);
   useEffect(() => {
     registerRef.current = registerHandle;
   }, [registerHandle]);
@@ -63,8 +63,8 @@ export function TerminalStack({
     exitRef.current = onExit;
   }, [onExit]);
   useEffect(() => {
-    atlasOpenRef.current = onAtlasOpen;
-  }, [onAtlasOpen]);
+    sentorOpenRef.current = onSentorOpen;
+  }, [onSentorOpen]);
 
   const bundles = useRef(new Map<number, Bundle>());
   const getBundle = (leafId: number): Bundle => {
@@ -76,7 +76,7 @@ export function TerminalStack({
         onCwd: (cwd) => cwdRef.current(leafId, cwd),
         onDetectedUrl: (url) => detectedUrlRef.current(leafId, url),
         onExit: (code) => exitRef.current(leafId, code),
-        onAtlasOpen: (input) => atlasOpenRef.current?.(leafId, input),
+        onSentorOpen: (input) => sentorOpenRef.current?.(leafId, input),
       };
       bundles.current.set(leafId, b);
     }

@@ -1,10 +1,10 @@
 {
   "mcpServers": {
-    "atlas": {
+    "sentor": {
       "command": "python",
-      "args": ["C:/Atlas OS/tools/mcp_server.py"],
+      "args": ["C:/Sentor/tools/mcp_server.py"],
       "env": {
-        "ATLAS_VAULT_ROOT": "C:/Atlas OS"
+        "SENTOR_VAULT_ROOT": "C:/Sentor"
       }
     }
   }

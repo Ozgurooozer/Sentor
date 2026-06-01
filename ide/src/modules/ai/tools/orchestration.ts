@@ -41,7 +41,7 @@ export function buildOrchestrationTools(ctx: ToolContext) {
 
 Important constraints:
 - Only read-only tools are available inside the invoked agent (vault_search, vault_read, web_search, web_fetch, read_file, list_directory, grep, glob, canvas_read_state).
-- Do NOT invoke Atlas-Maker or Coder this way — they need user interaction. Instead, describe the plan and tell the user to switch agents.
+- Do NOT invoke Sentor-Maker or Coder this way — they need user interaction. Instead, describe the plan and tell the user to switch agents.
 - The invoked agent has no memory of the current conversation — include all relevant context in the task.
 
 Auto-executes (no approval needed).`,

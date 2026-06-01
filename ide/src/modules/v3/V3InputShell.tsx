@@ -84,10 +84,10 @@ export function V3InputShell() {
   // ── Canvas list from main window ─────────────────────────────────────────
   useEffect(() => {
     const unsubP = listen<{ canvases: { id: string; title: string }[] }>(
-      "atlas:canvas-list",
+      "sentor:canvas-list",
       ({ payload }) => setCanvasList(payload.canvases),
     );
-    void emit("atlas:request-canvases", {}).catch(() => {});
+    void emit("sentor:request-canvases", {}).catch(() => {});
     return () => { void unsubP.then(fn => fn()); };
   }, []);
 
@@ -168,14 +168,14 @@ export function V3InputShell() {
   const sendText = useCallback(async (text: string) => {
     if (!text || busy || orkLoading) return;
     if (linkedCanvasId !== null) {
-      await emit("atlas:canvas-prompt", { text }).catch((err) => {
+      await emit("sentor:canvas-prompt", { text }).catch((err) => {
         console.error("[V3:INPUT] canvas emit failed:", err);
       });
     } else {
       setBusy(true);
       try {
         await invoke("v3_show_output", { visible: true }).catch(() => {});
-        const event = vaultRoute ? "atlas:v3-vault-message" : "atlas:v3-message";
+        const event = vaultRoute ? "sentor:v3-vault-message" : "sentor:v3-message";
         await emitTo("v3-output", event, { text });
       } finally {
         setBusy(false);
@@ -284,7 +284,7 @@ export function V3InputShell() {
     setPickerOpen(opening);
     if (opening) {
       setHistoryOpen(false);
-      void emit("atlas:request-canvases", {}).catch(() => {});
+      void emit("sentor:request-canvases", {}).catch(() => {});
     }
     await resizeTo(BASE_H + (opening ? PICKER_H : 0));
   }, [pickerOpen, resizeTo]);
@@ -293,7 +293,7 @@ export function V3InputShell() {
     setLinkedCanvasId(id);
     localStorage.setItem("v3-linked-canvas-id", id);
     setPickerOpen(false);
-    void emit("atlas:canvas-switch", { id }).catch(() => {});
+    void emit("sentor:canvas-switch", { id }).catch(() => {});
     await resizeTo(BASE_H + (historyOpen ? HISTORY_H : 0));
   }, [historyOpen, resizeTo]);
 
@@ -302,7 +302,7 @@ export function V3InputShell() {
     localStorage.removeItem("v3-linked-canvas-id");
     setPickerOpen(false);
     setHistoryOpen(false);
-    void emit("atlas:canvas-unlink", {}).catch(() => {});
+    void emit("sentor:canvas-unlink", {}).catch(() => {});
     await resizeTo(BASE_H);
   }, [resizeTo]);
 
@@ -379,7 +379,7 @@ export function V3InputShell() {
                   fontFamily: "monospace", fontSize: 9, letterSpacing: "0.05em",
                   color: msg.role === "user" ? "rgba(91,141,239,0.55)" : "rgba(77,184,154,0.45)",
                 }}>
-                  {msg.role === "user" ? "▸ sen" : "◂ atlas"}
+                  {msg.role === "user" ? "▸ sen" : "◂ sentor"}
                 </span>
                 {msg.content && (
                   <div style={{
@@ -414,7 +414,7 @@ export function V3InputShell() {
                   <span key={i} style={{
                     width: 4, height: 4, borderRadius: "50%",
                     background: "rgba(91,141,239,0.45)",
-                    animation: `atlas-pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
+                    animation: `sentor-pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
                   }} />
                 ))}
               </div>
@@ -471,7 +471,7 @@ export function V3InputShell() {
               value={val}
               onChange={e => setVal(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") void send(); }}
-              placeholder={linkedCanvasId !== null ? "Canvas'ı yönet — node ekle, bağla, çalıştır…" : vaultRoute ? "Vault'a yaz — Atlas-Maker sayfa oluşturacak…" : "Atlas'a bir şey sor…"}
+              placeholder={linkedCanvasId !== null ? "Canvas'ı yönet — node ekle, bağla, çalıştır…" : vaultRoute ? "Vault'a yaz — Sentor-Maker sayfa oluşturacak…" : "Sentor'a bir şey sor…"}
               autoFocus
               className="min-w-0 flex-1 bg-transparent text-[13.5px] text-[#e8e8ec] outline-none placeholder:text-[#2e2e3a]"
               style={{ caretColor: "#5b8def" }}
@@ -573,7 +573,7 @@ export function V3InputShell() {
               )}
               {micState === "transcribing" ? (
                 <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                  <path d="M8 2v4M8 10v4M2 8h4M10 8h4" style={{ animation: "atlas-pulse 1s ease-in-out infinite" }}/>
+                  <path d="M8 2v4M8 10v4M2 8h4M10 8h4" style={{ animation: "sentor-pulse 1s ease-in-out infinite" }}/>
                 </svg>
               ) : (
                 <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

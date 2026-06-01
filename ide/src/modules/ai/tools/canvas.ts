@@ -70,7 +70,7 @@ p{color:var(--dim);margin-top:12px;font-size:13px}
   <h1>${name}</h1>
   <div class="meta">
     <span class="badge">blueprint</span>
-    <span class="badge">atlas-blueprint-v1</span>
+    <span class="badge">sentor-blueprint-v1</span>
     ${created}
   </div>
 </header>
@@ -316,7 +316,7 @@ export function buildCanvasTools(ctx: ToolContext) {
         const created = new Date().toISOString();
 
         const blueprint = {
-          $schema: "atlas-blueprint-v1",
+          $schema: "sentor-blueprint-v1",
           slug,
           name,
           version: 1,

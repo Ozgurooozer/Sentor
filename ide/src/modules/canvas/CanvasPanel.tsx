@@ -38,7 +38,7 @@ const PANEL_LABELS: Record<string, string> = {
   preview: "preview",
   "vault-home": "vault",
   web: "web",
-  chat: "atlas chat",
+  chat: "sentor chat",
   canvas: "canvas",
   agent: "agent",
   instance: "instance",

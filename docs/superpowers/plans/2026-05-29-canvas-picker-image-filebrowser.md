@@ -14,7 +14,7 @@
 
 | File | Change |
 |---|---|
-| `ide/src/app/CanvasAppShell.tsx` | Add 2 event listeners: `atlas:request-canvases` → reply with canvas list; `atlas:canvas-switch` → switchCanvas + reply |
+| `ide/src/app/CanvasAppShell.tsx` | Add 2 event listeners: `sentor:request-canvases` → reply with canvas list; `sentor:canvas-switch` → switchCanvas + reply |
 | `ide/src/modules/v3/V3InputShell.tsx` | Replace `canvasLinked: boolean` with `linkedCanvasId: string \| null`; add `canvasList`, `pickerOpen` state; replace `resizeWindow` with `resizeTo`; add `CanvasPicker` component; replace canvas `IBtn` |
 | `ide/src/modules/canvas/CanvasPanelContent.tsx` | Add `isImagePath()` helper; modify `CanvasPreview` to render `<img>` when path is an image extension |
 | `ide/src/modules/canvas/FileBrowserPanel.tsx` | (a) Change double-click to open preview panel for images. (b) Add `viewMode`/`sortField`/`sortDir` state; add toolbar; add sort logic; add grid rendering |
@@ -42,14 +42,14 @@ Then inside `CanvasAppShellInner`, add this `useEffect` after the existing `useE
 ```typescript
 // ── Canvas IPC for V3InputShell (separate window) ──────────────────────
 useEffect(() => {
-  const reqP = listen("atlas:request-canvases", async () => {
+  const reqP = listen("sentor:request-canvases", async () => {
     const { canvases, activeCanvasId } = useCanvasStore.getState();
-    await emitTo("v3-input", "atlas:canvas-list", { canvases, activeCanvasId }).catch(() => {});
+    await emitTo("v3-input", "sentor:canvas-list", { canvases, activeCanvasId }).catch(() => {});
   });
-  const switchP = listen<{ id: string }>("atlas:canvas-switch", async ({ payload }) => {
+  const switchP = listen<{ id: string }>("sentor:canvas-switch", async ({ payload }) => {
     await useCanvasStore.getState().switchCanvas(payload.id);
     const { canvases, activeCanvasId } = useCanvasStore.getState();
-    await emitTo("v3-input", "atlas:canvas-list", { canvases, activeCanvasId }).catch(() => {});
+    await emitTo("v3-input", "sentor:canvas-list", { canvases, activeCanvasId }).catch(() => {});
   });
   return () => {
     void reqP.then(fn => fn());
@@ -123,11 +123,11 @@ Add this `useEffect` after the existing TTS effect (after the `prevLoadingRef` e
 // ── Canvas list sync from main window ────────────────────────────────────
 useEffect(() => {
   const unsubP = listen<{ canvases: { id: string; title: string }[] }>(
-    "atlas:canvas-list",
+    "sentor:canvas-list",
     ({ payload }) => setCanvasList(payload.canvases),
   );
   // Request initial list
-  void emit("atlas:request-canvases", {}).catch(() => {});
+  void emit("sentor:request-canvases", {}).catch(() => {});
   return () => { void unsubP.then(fn => fn()); };
 }, []);
 ```
@@ -181,7 +181,7 @@ const toggleHistory = useCallback(async () => {
 const togglePicker = useCallback(async () => {
   const opening = !pickerOpen;
   setPickerOpen(opening);
-  if (opening) void emit("atlas:request-canvases", {}).catch(() => {});
+  if (opening) void emit("sentor:request-canvases", {}).catch(() => {});
   await resizeTo(BASE_H + (opening ? PICKER_H : 0) + (historyOpen ? HISTORY_H : 0));
 }, [pickerOpen, historyOpen, resizeTo]);
 
@@ -189,7 +189,7 @@ const handleSelectCanvas = useCallback(async (id: string) => {
   setLinkedCanvasId(id);
   localStorage.setItem("v3-linked-canvas-id", id);
   setPickerOpen(false);
-  void emit("atlas:canvas-switch", { id }).catch(() => {});
+  void emit("sentor:canvas-switch", { id }).catch(() => {});
   await resizeTo(BASE_H + (historyOpen ? HISTORY_H : 0));
 }, [historyOpen, resizeTo]);
 
@@ -198,7 +198,7 @@ const handleDisconnect = useCallback(async () => {
   localStorage.removeItem("v3-linked-canvas-id");
   setPickerOpen(false);
   setHistoryOpen(false);
-  void emit("atlas:canvas-unlink", {}).catch(() => {});
+  void emit("sentor:canvas-unlink", {}).catch(() => {});
   await resizeTo(BASE_H);
 }, [resizeTo]);
 ```
@@ -217,7 +217,7 @@ Find and replace every occurrence of `canvasLinked` in the render/JSX section:
 | `canvasLinked ? "rgba(77,184,154,0.20)"` | `linkedCanvasId !== null ? "rgba(77,184,154,0.20)"` |
 | `canvasLinked ? "#4db89a"` | `linkedCanvasId !== null ? "#4db89a"` |
 | `canvasLinked ? "rgba(77,184,154,0.35)"` | `linkedCanvasId !== null ? "rgba(77,184,154,0.35)"` |
-| `canvasLinked ? "atlas-pulse…"` (busy span bg) | `linkedCanvasId !== null ? "#4db89a"` |
+| `canvasLinked ? "sentor-pulse…"` (busy span bg) | `linkedCanvasId !== null ? "#4db89a"` |
 
 Also update the auto-open history `useEffect`:
 ```typescript
@@ -810,4 +810,4 @@ git commit -m "feat(filebrowser): sort toolbar + 3 view modes (list/small/large 
 - [x] **Spec coverage:** Canvas picker ✓, height bug fix ✓, image preview (CanvasPreview + FileBrowser double-click) ✓, 3 view modes ✓, sort ✓
 - [x] **Placeholder scan:** No TBDs, all code blocks complete
 - [x] **Type consistency:** `SortField`/`SortDir`/`ViewMode` defined in Task 5 Step 1, used in Steps 2–5. `linkedCanvasId`/`canvasList`/`pickerOpen` defined in Task 2 Step 2, used throughout. `IMAGE_EXTS` defined in Task 3 and Task 4 independently (each file owns its own).
-- [x] **Cross-window IPC:** `CanvasAppShell` handles `atlas:request-canvases` and `atlas:canvas-switch` (Task 1); `V3InputShell` emits both and listens for `atlas:canvas-list` (Task 2). Events match.
+- [x] **Cross-window IPC:** `CanvasAppShell` handles `sentor:request-canvases` and `sentor:canvas-switch` (Task 1); `V3InputShell` emits both and listens for `sentor:canvas-list` (Task 2). Events match.

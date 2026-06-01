@@ -32,7 +32,7 @@ async fn open_settings_window(app: tauri::AppHandle, tab: Option<String>) -> Res
     if let Some(window) = app.get_webview_window("settings") {
         let _ = window.set_focus();
         if let Some(t) = tab.as_deref().filter(|s| !s.is_empty()) {
-            let _ = window.emit("atlas:settings-tab", t);
+            let _ = window.emit("sentor:settings-tab", t);
         }
         return Ok(());
     }
@@ -166,7 +166,7 @@ async fn set_click_through(
 
 /// System tray icon — provides quick access to the main window when the app
 /// is running invisibly in focused overlay mode. Emits events the frontend
-/// listens for via `atlas://tray-*` channels.
+/// listens for via `sentor://tray-*` channels.
 fn init_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
     let show = MenuItem::with_id(app, "tray.show", "Show window", true, None::<&str>)?;
     let toggle_focused = MenuItem::with_id(
@@ -184,19 +184,19 @@ fn init_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
         None::<&str>,
     )?;
     let sep = PredefinedMenuItem::separator(app)?;
-    let quit = MenuItem::with_id(app, "tray.quit", "Quit Atlas", true, None::<&str>)?;
+    let quit = MenuItem::with_id(app, "tray.quit", "Quit Sentor", true, None::<&str>)?;
     let menu = Menu::with_items(
         app,
         &[&show, &toggle_focused, &toggle_click_through, &sep, &quit],
     )?;
 
-    let _tray = TrayIconBuilder::with_id("atlas-tray")
+    let _tray = TrayIconBuilder::with_id("sentor-tray")
         .icon(
             app.default_window_icon()
                 .cloned()
                 .ok_or_else(|| tauri::Error::AssetNotFound("default window icon".into()))?,
         )
-        .tooltip("Atlas — click to show window")
+        .tooltip("Sentor — click to show window")
         .menu(&menu)
         .show_menu_on_left_click(false)
         .on_menu_event(|app, event| {
@@ -204,11 +204,11 @@ fn init_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
             match id {
                 "tray.show" => show_main(app),
                 "tray.toggle-focused" => {
-                    let _ = app.emit("atlas://tray-toggle-focused", ());
+                    let _ = app.emit("sentor://tray-toggle-focused", ());
                     show_main(app);
                 }
                 "tray.toggle-click-through" => {
-                    let _ = app.emit("atlas://tray-toggle-click-through", ());
+                    let _ = app.emit("sentor://tray-toggle-click-through", ());
                 }
                 "tray.quit" => app.exit(0),
                 _ => {}
@@ -303,7 +303,7 @@ fn v3_show_input(app: tauri::AppHandle) {
     let bar_y = wa_y + wa_h - V3_BAR_H - 8.0;
 
     let result = WebviewWindowBuilder::new(&app, "v3-input", v3_url("v3-input"))
-        .title("Atlas")
+        .title("Sentor")
         .inner_size(bar_w, V3_BAR_H)
         .position(bar_x, bar_y)
         .decorations(false)
@@ -393,7 +393,7 @@ fn setup_v3_windows(app: &tauri::App) -> tauri::Result<()> {
     }
 
     let v3_launcher = WebviewWindowBuilder::new(&app_handle, "v3-launcher", v3_url("v3-launcher"))
-        .title("Atlas OS")
+        .title("Sentor")
         .inner_size(V3_LAUNCHER_W, V3_LAUNCHER_H)
         .position(launcher_x, launcher_y)
         .decorations(false)
@@ -410,7 +410,7 @@ fn setup_v3_windows(app: &tauri::App) -> tauri::Result<()> {
     let _ = v3_launcher.set_focus();
 
     let v3_input = WebviewWindowBuilder::new(&app_handle, "v3-input", v3_url("v3-input"))
-        .title("Atlas")
+        .title("Sentor")
         .inner_size(bar_w, V3_BAR_H)
         .position(bar_x, bar_y)
         .decorations(false)
@@ -427,7 +427,7 @@ fn setup_v3_windows(app: &tauri::App) -> tauri::Result<()> {
     register_input_close_handler(v3_input);
 
     let v3_output = WebviewWindowBuilder::new(&app_handle, "v3-output", v3_url("v3-output"))
-        .title("Atlas — Yanıt")
+        .title("Sentor — Yanıt")
         .inner_size(V3_OUT_W, out_h)
         .position(out_x, out_y)
         .decorations(false)

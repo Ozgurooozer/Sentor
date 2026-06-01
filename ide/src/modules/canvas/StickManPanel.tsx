@@ -13,7 +13,7 @@ const ANIMS = [
 ];
 
 // Absolute path to the self-contained prototype HTML (no npm dep needed)
-const PROTO_PATH = "C:\\Atlas OS\\prototypes\\stickman\\index.html";
+const PROTO_PATH = "C:\\Sentor\\prototypes\\stickman\\index.html";
 
 export function StickManPanel({ panel }: { panel: CanvasPanelNode }) {
   const updatePanel = useCanvasStore((s) => s.updatePanel);
@@ -54,7 +54,7 @@ export function StickManPanel({ panel }: { panel: CanvasPanelNode }) {
       // trigger browser download
       const a = document.createElement("a");
       a.href = dataUrl;
-      a.download = `atlasbot-${anim}-${Date.now()}.png`;
+      a.download = `sentorbot-${anim}-${Date.now()}.png`;
       a.click();
       setCapturing(false);
     };
@@ -88,7 +88,7 @@ export function StickManPanel({ panel }: { panel: CanvasPanelNode }) {
         <iframe
           ref={iframeRef}
           src={src}
-          title="AtlasBot"
+          title="SentorBot"
           onLoad={handleLoad}
           className="absolute inset-0 w-full h-full border-0"
           // hide the prototype's own side-panel; we provide our own controls

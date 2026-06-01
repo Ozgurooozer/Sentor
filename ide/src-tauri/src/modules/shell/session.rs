@@ -35,7 +35,7 @@ pub struct SessionRunOutput {
 /// Sentinel emitted on stdout immediately before the command exits, so we can
 /// recover the post-command cwd. Picks an unlikely literal — collisions with
 /// real command output would corrupt cwd tracking.
-const CWD_SENTINEL: &str = "__ATLAS_CWD__";
+const CWD_SENTINEL: &str = "__SENTOR_CWD__";
 
 impl ShellSession {
     pub fn new(initial_cwd: PathBuf) -> Self {
@@ -106,14 +106,14 @@ impl ShellSession {
 #[cfg(unix)]
 fn wrap_with_sentinel(command: &str) -> String {
     format!(
-        "{command}\n__atlas_rc=$?\nprintf '\\n%s%s\\n' '{CWD_SENTINEL}' \"$(pwd)\"\nexit $__atlas_rc\n",
+        "{command}\n__sentor_rc=$?\nprintf '\\n%s%s\\n' '{CWD_SENTINEL}' \"$(pwd)\"\nexit $__sentor_rc\n",
     )
 }
 
 #[cfg(windows)]
 fn wrap_with_sentinel(command: &str) -> String {
     format!(
-        "{command}\n$__atlas_rc = if ($null -ne $LASTEXITCODE) {{ $LASTEXITCODE }} elseif ($?) {{ 0 }} else {{ 1 }}\n\"`n{CWD_SENTINEL}$($PWD.Path)\"\nexit $__atlas_rc\n",
+        "{command}\n$__sentor_rc = if ($null -ne $LASTEXITCODE) {{ $LASTEXITCODE }} elseif ($?) {{ 0 }} else {{ 1 }}\n\"`n{CWD_SENTINEL}$($PWD.Path)\"\nexit $__sentor_rc\n",
     )
 }
 

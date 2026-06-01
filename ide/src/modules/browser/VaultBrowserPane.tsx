@@ -9,7 +9,7 @@ import { loadBookmarks, toggleBookmark } from "./bookmarks";
 
 const isAssetUrl = (url: string) => /^asset:\/\//i.test(url);
 
-/** Extract vault page ID from an asset:// URL, e.g. "home/atlas-os" */
+/** Extract vault page ID from an asset:// URL, e.g. "home/sentor" */
 function pageIdFromAssetUrl(url: string): string | null {
   const marker = "/vault/";
   const idx = url.indexOf(marker);

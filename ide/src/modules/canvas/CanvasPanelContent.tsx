@@ -314,7 +314,7 @@ function V3TerminalPanel({ panel }: { panel: CanvasPanelNode }) {
   const initCmd = (panel.meta?.initCmd as string | undefined) || undefined;
   const paneRef = useRef<TerminalPaneHandle>(null);
   const setOutputData = useCanvasStore((s) => s.setOutputData);
-  const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot) ?? "C:\\Atlas OS";
+  const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot) ?? "C:\\Sentor";
 
   const [mode, setMode]         = useState<"sh" | "js">("sh");
   const [jsInput, setJsInput]   = useState("");
@@ -823,7 +823,7 @@ function CanvasVaultHome({ panel }: { panel: CanvasPanelNode }) {
 }
 
 /**
- * CanvasInstance — dedicated panel for a packaged Atlas OS build.
+ * CanvasInstance — dedicated panel for a packaged Sentor build.
  *
  * Config state  (meta.vaultRoot not set):
  *   Name + vault-root folder picker → "Bağlan" writes meta.vaultRoot.
@@ -850,7 +850,7 @@ function CanvasInstance({ panel }: { panel: CanvasPanelNode }) {
   const connect = () => {
     const root = inputRoot.trim();
     if (!root) return;
-    const name = inputName.trim() || root.split("\\").pop() || "Atlas";
+    const name = inputName.trim() || root.split("\\").pop() || "Sentor";
     updatePanel(panel.id, {
       title: name,
       meta: { ...panel.meta, vaultRoot: root },
@@ -862,9 +862,9 @@ function CanvasInstance({ panel }: { panel: CanvasPanelNode }) {
     return (
       <div className="flex h-full flex-col gap-4 overflow-auto p-5">
         <div className="flex flex-col gap-0.5">
-          <div className="text-[12px] font-medium text-[#f0f0f0]">Atlas Vault Bağlantısı</div>
+          <div className="text-[12px] font-medium text-[#f0f0f0]">Sentor Vault Bağlantısı</div>
           <div className="text-[10px] text-[#555]">
-            Bir Atlas kurulumunun kök klasörünü seç — vault, .index ve ui klasörlerini içermeli.
+            Bir Sentor kurulumunun kök klasörünü seç — vault, .index ve ui klasörlerini içermeli.
           </div>
         </div>
 
@@ -886,7 +886,7 @@ function CanvasInstance({ panel }: { panel: CanvasPanelNode }) {
               value={inputRoot}
               onChange={(e) => setInputRoot(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") connect(); }}
-              placeholder="C:\Atlas OS"
+              placeholder="C:\Sentor"
               className="h-6 min-w-0 flex-1 rounded bg-[#1a1a1a] px-2 text-[10px] text-[#f5f5f5] outline-none focus:bg-[#222]"
             />
             <button

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Atlas OS — Ollama multi-turn conversation test.
+Sentor — Ollama multi-turn conversation test.
 Three turns, each building on the last. Validates context is maintained.
 Run: python tools/test_multiturn.py
-Requires: ollama (pip install ollama), Ollama running, atlas serve running.
+Requires: ollama (pip install ollama), Ollama running, sentor serve running.
 """
 
 import json
@@ -121,7 +121,7 @@ def _drain_tools(ollama_mod, model: str, messages: list, tools) -> str:
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 def main():
-    print(f'\n  Atlas OS - Multi-Turn Conversation Test\n')
+    print(f'\n  Sentor - Multi-Turn Conversation Test\n')
     print(f'  Turn 1: {TURN_1}')
     print(f'  Turn 2: {TURN_2}')
     print(f'  Turn 3: {TURN_3}\n')
@@ -129,7 +129,7 @@ def main():
     # [1] API reachable
     data, err = _get_json(f'{API_BASE}/api/categories')
     if not step('API reachable', data is not None, err or ''):
-        print('\n  atlas serve\n')
+        print('\n  sentor serve\n')
         sys.exit(1)
 
     # [2] Ollama reachable

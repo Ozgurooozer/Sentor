@@ -1,0 +1,13 @@
+graph TD
+    Vault["vault/"] --> Indexer["indexer.py"]
+    Indexer --> PagesJSON[".index/pages.json"]
+    Indexer --> Embedder["embedder.py"]
+    Embedder --> EmbJSON[".index/embeddings.json"]
+    PagesJSON --> API["api/server.py :4242"]
+    PagesJSON --> VaultHome["Vault Home"]
+    EmbJSON --> API
+    API --> IDE["IDE (Tauri + React)"]
+    VaultHome --> IDE
+    IDE --> AgentOffice["vault/agents/{slug}/"]
+    AgentOffice --> SelfRAG["vault_self_context()"]
+    SelfRAG --> Agents["Vault / Coder / Sentor-Maker / Sentor"]

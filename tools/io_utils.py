@@ -1,12 +1,12 @@
-"""Shared I/O utilities for Atlas OS Python components."""
+"""Shared I/O utilities for Sentor Python components."""
 
 import os
 import secrets
 import tempfile
 from pathlib import Path
 
-ATLAS_DIR = Path.home() / ".atlas"
-TOKEN_FILE = ATLAS_DIR / "api-token"
+SENTOR_DIR = Path.home() / ".sentor"
+TOKEN_FILE = SENTOR_DIR / "api-token"
 
 
 def write_atomic(path: Path, text: str, encoding: str = "utf-8") -> None:
@@ -27,7 +27,7 @@ def write_atomic(path: Path, text: str, encoding: str = "utf-8") -> None:
 
 def get_or_create_token() -> str:
     """Return the API token, generating one on first call."""
-    ATLAS_DIR.mkdir(parents=True, exist_ok=True)
+    SENTOR_DIR.mkdir(parents=True, exist_ok=True)
     if TOKEN_FILE.exists():
         token = TOKEN_FILE.read_text(encoding="utf-8").strip()
         if token:

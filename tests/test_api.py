@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Atlas OS API test suite.
+Sentor API test suite.
 Starts a temporary server in a background thread — no running instance needed.
 Run: python tools/test_api.py
 """
@@ -355,7 +355,7 @@ def main() -> None:
         print(f'\n  Server did not start on port {TEST_PORT}\n')
         sys.exit(1)
 
-    print(f'\n  Atlas OS API — {BASE}\n')
+    print(f'\n  Sentor API — {BASE}\n')
 
     test('GET /api/categories              returns list[{name, count}]', test_categories)
     test('GET /api/pages                   returns full index object',    test_pages_index)

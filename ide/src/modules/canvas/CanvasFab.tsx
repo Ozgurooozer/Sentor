@@ -35,7 +35,7 @@ const iconBtn = (
 
 export function CanvasFab({ onSketch, onOpenAddPanel, onOpenTweaks, tweaksActive }: Props) {
   const addPanel = useCanvasStore((s) => s.addPanel);
-  const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot) ?? "C:\\Atlas OS";
+  const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot) ?? "C:\\Sentor";
 
   return (
     <div className="canvas-chrome absolute left-3.5 top-1/2 z-[60] flex -translate-y-1/2 flex-col items-center gap-1.5 rounded-[14px] border p-1.5" style={{ background: "color-mix(in oklab, #111111 80%, transparent)", borderColor: "#2e2e2e", boxShadow: "0 10px 32px rgba(0,0,0,.4)" }} onPointerDown={(e) => e.stopPropagation()}>
@@ -104,10 +104,10 @@ export function CanvasFab({ onSketch, onOpenAddPanel, onOpenTweaks, tweaksActive
         </svg>
       ))}
 
-      {/* Atlas0fis Office */}
-      {iconBtn("Atlas0fis Ofis", () => {
+      {/* Sentor0fis Office */}
+      {iconBtn("Sentor0fis Ofis", () => {
         const root = workspaceRoot.replace(/\\/g, "/");
-        const url = convertFileSrc(`${root}/vault/forum/atlas0fis/index.html`);
+        const url = convertFileSrc(`${root}/vault/forum/sentor0fis/index.html`);
         addPanel("web", undefined, { url });
       }, (
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

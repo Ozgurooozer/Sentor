@@ -1,4 +1,4 @@
-# Atlas OS — Phase G: Nested Canvas + Chat Redesign
+# Sentor — Phase G: Nested Canvas + Chat Redesign
 
 ## Mevcut Durum Raporu
 

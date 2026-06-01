@@ -2,7 +2,7 @@ import { relaunch } from "@tauri-apps/plugin-process";
 import { check, type Update } from "@tauri-apps/plugin-updater";
 import { useCallback, useEffect, useState } from "react";
 
-const LAST_CHECK_KEY = "atlas:updater:last-check";
+const LAST_CHECK_KEY = "sentor:updater:last-check";
 const CHECK_INTERVAL_MS = 30 * 60 * 1000;
 
 export type UpdaterStatus =

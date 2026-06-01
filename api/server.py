@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Atlas OS — Local Knowledge API
+Sentor — Local Knowledge API
   GET /api/search?q=&limit=&category=&scope=&include=
   GET /api/semantic?q=&limit=&scope=
   GET /api/page/{*path}                  (flexible depth, slash-joined ID)
@@ -9,7 +9,7 @@ Atlas OS — Local Knowledge API
   GET /api/pages
 
 Run standalone:  python api/server.py [port]
-Via CLI:         atlas serve [port]            (default port: 4242)
+Via CLI:         sentor serve [port]            (default port: 4242)
 """
 
 import json
@@ -50,7 +50,7 @@ _MUTATION_METHODS = frozenset({"POST", "PUT", "PATCH", "DELETE"})
 VAULT_DIR    = ROOT / "vault"
 INDEX_FILE   = ROOT / ".index" / "pages.json"
 EMBED_FILE   = ROOT / ".index" / "embeddings.json"
-CONFIG_FILE  = ROOT / ".atlas-embed.json"
+CONFIG_FILE  = ROOT / ".sentor-embed.json"
 QUEUE_FILE   = ROOT / ".mcp-queue.json"
 STATE_FILE   = ROOT / ".ide-state.json"
 DEFAULT_PORT = 4242
@@ -78,7 +78,7 @@ def _embed_config() -> dict:
     return {}
 
 
-# ── Search scoring (shared with cli/atlas.py via tools/scoring.py) ─────────────
+# ── Search scoring (shared with cli/main.py via tools/scoring.py) ─────────────
 
 from scoring import (  # noqa: E402  — sys.path already includes tools/
     DEFAULT_EXCLUDE_TYPES,
@@ -195,7 +195,7 @@ class _Handler(BaseHTTPRequestHandler):
         auth = self.headers.get("Authorization", "")
         if auth == f"Bearer {_API_TOKEN}":
             return True
-        token_header = self.headers.get("X-Atlas-Token", "")
+        token_header = self.headers.get("X-Sentor-Token", "")
         if token_header == _API_TOKEN:
             return True
         body = json.dumps({"error": "Unauthorised — include Authorization: Bearer <token>"}).encode()
@@ -218,7 +218,7 @@ class _Handler(BaseHTTPRequestHandler):
 
         if path in ('', '/api'):
             self._json({
-                'name': 'Atlas OS API',
+                'name': 'Sentor API',
                 'endpoints': [
                     '/api/search?q=&limit=&category=&scope=&include=',
                     '/api/semantic?q=&limit=&scope=',
@@ -277,6 +277,13 @@ class _Handler(BaseHTTPRequestHandler):
         body   = {}
         if length:
             if length > 1_048_576:  # 1 MB
+                # Drain upload body so clients don't hit Broken pipe after 413.
+                remaining = length
+                while remaining > 0:
+                    chunk = self.rfile.read(min(remaining, 65536))
+                    if not chunk:
+                        break
+                    remaining -= len(chunk)
                 self._error(413, 'request body too large (max 1 MB)')
                 return
             try:
@@ -323,7 +330,7 @@ class _Handler(BaseHTTPRequestHandler):
         self.send_response(204)
         self.send_header('Access-Control-Allow-Origin',  self._cors_origin())
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Authorization, X-Atlas-Token, Content-Type')
+        self.send_header('Access-Control-Allow-Headers', 'Authorization, X-Sentor-Token, Content-Type')
         self.end_headers()
 
     # ── Endpoints ──────────────────────────────────────────────────────────────
@@ -635,7 +642,7 @@ class _Handler(BaseHTTPRequestHandler):
             except Exception:
                 queue_len = 0
         self._json({
-            'name': 'Atlas OS IDE',
+            'name': 'Sentor IDE',
             'mcp_version': '2024-11-05',
             'ide_running': STATE_FILE.exists(),
             'vault_pages': len(_cache.pages()),
@@ -923,14 +930,14 @@ class _Handler(BaseHTTPRequestHandler):
         print(f'  {self.command:<7} {self.path:<45}  {args[1]}')
 
 
-# ── Public entry point (called by atlas serve or directly) ────────────────────
+# ── Public entry point (called by sentor serve or directly) ────────────────────
 
 def serve(port: int = DEFAULT_PORT) -> None:
     ThreadingHTTPServer.allow_reuse_address = True
     server = ThreadingHTTPServer(('127.0.0.1', port), _Handler)
     base   = f'http://localhost:{port}'
-    print(f'\n  Atlas OS API  —  {base}')
-    print(f'  Token:      see ~/.atlas/api-token  ({_API_TOKEN[:8]}…)')
+    print(f'\n  Sentor API  —  {base}')
+    print(f'  Token:      see ~/.sentor/api-token  ({_API_TOKEN[:8]}…)')
     print(f'  {base}/api/search?q=...')
     print(f'  {base}/api/semantic?q=...')
     print(f'  {base}/api/hybrid?q=...&alpha=0.6')

@@ -113,7 +113,7 @@ function execTool(call: ToolCall): string {
       const type = (call.type as PanelType) ?? "note";
       const at   = call.x != null ? { x: Number(call.x), y: Number(call.y ?? 200) } : undefined;
       const initMeta = type === "terminal"
-        ? { cwd: usePreferencesStore.getState().workspaceRoot ?? "C:\\Atlas OS" }
+        ? { cwd: usePreferencesStore.getState().workspaceRoot ?? "C:\\Sentor" }
         : undefined;
       const id = s.addPanel(type, at, initMeta);
       if (call.title) s.updatePanel(id, { title: String(call.title) });
@@ -168,7 +168,7 @@ function execTool(call: ToolCall): string {
       const ids: string[] = [];
       const step = 280;
       const baseX = 120, baseY = 260;
-      const termRoot = usePreferencesStore.getState().workspaceRoot ?? "C:\\Atlas OS";
+      const termRoot = usePreferencesStore.getState().workspaceRoot ?? "C:\\Sentor";
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
         const initMeta = n.type === "terminal" ? { cwd: termRoot } : undefined;
@@ -301,7 +301,7 @@ function execTool(call: ToolCall): string {
 
 function buildSystem(): string {
   const { panels, connections } = useCanvasStore.getState();
-  const workspaceRoot = usePreferencesStore.getState().workspaceRoot ?? "C:\\Atlas OS";
+  const workspaceRoot = usePreferencesStore.getState().workspaceRoot ?? "C:\\Sentor";
 
   // Build alias map: n1, n2, n3… → real UUIDs
   _aliasToId = {};

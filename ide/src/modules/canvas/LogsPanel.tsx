@@ -141,7 +141,7 @@ export function LogsPanel() {
           {filtered.length} / {entries.length} entries
         </span>
         <span className="font-mono text-[9px]" style={{ color: "rgba(255,255,255,0.12)" }}>
-          atlas logs
+          sentor logs
         </span>
       </div>
     </div>

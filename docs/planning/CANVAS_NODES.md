@@ -108,7 +108,7 @@ from http.server import HTTPServer...
 
 ```json
 {
-  "$schema": "atlas-blueprint-v1",
+  "$schema": "sentor-blueprint-v1",
   "slug": "research-agent",
   "name": "Web Research Pipeline",
   "version": 1,

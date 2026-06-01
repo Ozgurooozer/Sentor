@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sohbet — Atlas Forum</title>
-<meta name="description" content="Genel muhabbet, duyurular ve proje güncellemeleri. Atlas OS sohbet alanı.">
+<title>Sohbet — Sentor Forum</title>
+<meta name="description" content="Genel muhabbet, duyurular ve proje güncellemeleri. Sentor sohbet alanı.">
 <meta name="created" content="2026-05-26">
 <script src="../../../../.index/pages.js"></script>
 <style>
@@ -49,7 +49,7 @@
   }
   window.filterThreads=function(q){render(q);};
   function init(){
-    var idx=window.ATLAS_INDEX;
+    var idx=window.SENTOR_INDEX;
     if(!idx){document.getElementById('threadList').innerHTML='<div class="empty">Index bulunamadı.</div>';return;}
     pages=idx.pages.filter(p=>p.id&&p.id.startsWith('forum/')&&!SKIP.has(p.id)&&parseCat(p.description)===CAT).sort((a,b)=>new Date(b.modified||b.created||0)-new Date(a.modified||a.created||0));
     render('');

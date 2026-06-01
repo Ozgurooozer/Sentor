@@ -16,7 +16,7 @@ pub fn build_command(cwd: Option<String>) -> Result<CommandBuilder, String> {
 fn apply_common(cmd: &mut CommandBuilder, cwd: Option<String>) {
     cmd.env("TERM", "xterm-256color");
     cmd.env("COLORTERM", "truecolor");
-    cmd.env("ATLAS_TERMINAL", "1");
+    cmd.env("SENTOR_TERMINAL", "1");
 
     let resolved_cwd = cwd
         .map(PathBuf::from)
@@ -79,7 +79,7 @@ mod unix {
                 match prepare_zdotdir() {
                     Ok(zdotdir) => {
                         if let Ok(user_zd) = std::env::var("ZDOTDIR") {
-                            cmd.env("ATLAS_USER_ZDOTDIR", user_zd);
+                            cmd.env("SENTOR_USER_ZDOTDIR", user_zd);
                         }
                         cmd.env("ZDOTDIR", zdotdir);
                     }
@@ -134,7 +134,7 @@ mod unix {
 
     fn integration_root() -> Result<PathBuf, String> {
         let home = dirs::home_dir().ok_or_else(|| "could not resolve home dir".to_string())?;
-        let root = home.join(".cache").join("atlas").join("shell-integration");
+        let root = home.join(".cache").join("sentor").join("shell-integration");
         fs::create_dir_all(&root).map_err(|e| format!("create {}: {e}", root.display()))?;
         Ok(root)
     }
@@ -173,7 +173,7 @@ mod unix {
         }
         // Atomic replace: a parallel shell startup must never source a half-written file.
         let mut tmp: OsString = path.as_os_str().to_owned();
-        tmp.push(".__atlas_tmp__");
+        tmp.push(".__sentor_tmp__");
         let tmp = PathBuf::from(tmp);
         fs::write(&tmp, content).map_err(|e| format!("write {}: {e}", tmp.display()))?;
         fs::rename(&tmp, path).map_err(|e| {
@@ -229,7 +229,7 @@ mod windows {
 
     fn integration_root() -> Result<PathBuf, String> {
         let home = dirs::home_dir().ok_or_else(|| "could not resolve home dir".to_string())?;
-        let root = home.join(".cache").join("atlas").join("shell-integration");
+        let root = home.join(".cache").join("sentor").join("shell-integration");
         fs::create_dir_all(&root).map_err(|e| format!("create {}: {e}", root.display()))?;
         Ok(root)
     }
@@ -249,7 +249,7 @@ mod windows {
             }
         }
         let mut tmp: OsString = path.as_os_str().to_owned();
-        tmp.push(".__atlas_tmp__");
+        tmp.push(".__sentor_tmp__");
         let tmp = PathBuf::from(tmp);
         fs::write(&tmp, content).map_err(|e| format!("write {}: {e}", tmp.display()))?;
         fs::rename(&tmp, path).map_err(|e| {

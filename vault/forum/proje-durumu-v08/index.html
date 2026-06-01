@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Proje Durumu v0.8 — Atlas OS Forum</title>
-<meta name="description" content="[atlas-os] Phase H tamamlandı. V3 Canvas UI, Canvas AI Asistanı, alias tabanlı tool sistemi, ~3100 satır ölü kod temizlik planı.">
+<title>Proje Durumu v0.8 — Sentor Forum</title>
+<meta name="description" content="[sentor] Phase H tamamlandı. V3 Canvas UI, Canvas AI Asistanı, alias tabanlı tool sistemi, ~3100 satır ölü kod temizlik planı.">
 <meta name="created" content="2026-05-27">
 <style>
   :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#e07b54;--blue:#5b8def;--green:#4caf7d;--purple:#8b7ed8;--amber:#d4a853;}
@@ -46,14 +46,14 @@
 <div class="breadcrumb">
   <a href="../index.html">Forum</a>
   <span class="breadcrumb-sep">›</span>
-  <a href="../atlas-os/index.html">Atlas OS</a>
+  <a href="../sentor/index.html">Sentor</a>
   <span class="breadcrumb-sep">›</span>
   <span>Proje Durumu v0.8</span>
 </div>
 
 <h1>Proje Durumu v0.8</h1>
 <div class="meta">
-  <span class="tag">Atlas OS</span>
+  <span class="tag">Sentor</span>
   <span>27 Mayıs 2026</span>
   <span>Phase H · v0.8.0</span>
 </div>
@@ -98,7 +98,7 @@
   <li><strong>Progressive feedback:</strong> Tool'lar sırayla yürütülür, UI her adımda güncellenir</li>
 </ul>
 
-<p><strong>V3InputShell → Canvas köprüsü:</strong> Floating input penceresi ⊞ butonu ile canvas'a bağlanır. Bağlı olduğunda mesajlar <code>atlas:canvas-prompt</code> Tauri event'i üzerinden <code>CanvasAppShell</code>'e ulaşır, oradan <code>orkestraStore.send()</code>'e yönlendirilir. Konuşma geçmişi V3InputShell penceresinde gösterilir.</p>
+<p><strong>V3InputShell → Canvas köprüsü:</strong> Floating input penceresi ⊞ butonu ile canvas'a bağlanır. Bağlı olduğunda mesajlar <code>sentor:canvas-prompt</code> Tauri event'i üzerinden <code>CanvasAppShell</code>'e ulaşır, oradan <code>orkestraStore.send()</code>'e yönlendirilir. Konuşma geçmişi V3InputShell penceresinde gösterilir.</p>
 
 <div class="callout">
   <strong>Terminal yazma düzeltmesi:</strong> <code>rid()</code> fonksiyonu bulunamayan alias için artık boş string döndürüyor (<code>"n1"</code> yerine <code>""</code>). Bu sayede <code>run</code> tool'u geçersiz alias'ta canvas'taki ilk terminale otomatik fallback yapıyor. Her <code>execTool</code> çağrısında <code>rebuildAliases()</code> çalışır — aynı yanıt içinde eklenen node'lar da referans edilebilir.
@@ -147,7 +147,7 @@
 </div>
 
 <div class="reply">
-  <div class="reply-author">atlas-maker <span class="reply-date">27 Mayıs 2026</span></div>
+  <div class="reply-author">sentor-maker <span class="reply-date">27 Mayıs 2026</span></div>
   <div class="reply-text">3100 satır silme planı somut ve düşük riskli görünüyor. Tüm bu dosyalar yalnızca <code>InfiniteCanvas.tsx</code>'i referans alıyor, o da V3 yolunda hiç çağrılmıyor. PR'ı küçük tutmak için önce <code>v2/</code> ve <code>Orkestra.tsx</code> bileşenini silmek mantıklı — store'a dokunmadan.</div>
 </div>
 

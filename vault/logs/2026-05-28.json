@@ -3,25 +3,25 @@
     "id": 1,
     "ts": 1779946850873,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1779965069274,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1779965717208,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1779967051084,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -267,7 +267,7 @@
     "id": 1,
     "ts": 1779967783277,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -297,7 +297,7 @@
     "id": 1,
     "ts": 1779968484223,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 3,
@@ -315,13 +315,13 @@
     "id": 1,
     "ts": 1779979286958,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1779979549449,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 5,
@@ -375,7 +375,7 @@
     "id": 1,
     "ts": 1779980816650,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -753,7 +753,7 @@
     "id": 1,
     "ts": 1779981076244,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -1041,13 +1041,13 @@
     "id": 1,
     "ts": 1779985158406,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1779986087359,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -4443,13 +4443,13 @@
     "id": 1,
     "ts": 1779986648633,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1779986893209,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -4485,31 +4485,31 @@
     "id": 1,
     "ts": 1779987491431,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1779987577618,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1779987807836,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1779988036692,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1779988062698,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -4527,7 +4527,7 @@
     "id": 1,
     "ts": 1779988533704,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -4557,19 +4557,19 @@
     "id": 1,
     "ts": 1779989931370,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1779989970658,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1779991232453,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -4587,13 +4587,13 @@
     "id": 1,
     "ts": 1779991423396,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1779991937189,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 3,
@@ -4617,7 +4617,7 @@
     "id": 1,
     "ts": 1779992258848,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 3,
@@ -4629,7 +4629,7 @@
     "id": 1,
     "ts": 1779992652213,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -7413,19 +7413,19 @@
     "id": 1,
     "ts": 1779995249837,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1780005259805,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1780005705164,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -7899,7 +7899,7 @@
     "id": 1,
     "ts": 1780006305373,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -7911,7 +7911,7 @@
     "id": 1,
     "ts": 1780006769906,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -7929,7 +7929,7 @@
     "id": 1,
     "ts": 1780008504903,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -8001,19 +8001,19 @@
     "id": 1,
     "ts": 1780008557889,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1780008565192,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 1,
     "ts": 1780009244680,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,
@@ -8025,7 +8025,7 @@
     "id": 1,
     "ts": 1780010887208,
     "level": "system",
-    "message": "Atlas OS — log stream started"
+    "message": "Sentor — log stream started"
   },
   {
     "id": 2,

@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { useProjectStore, ATLAS_DEFAULT_PROJECT } from "./projectStore";
+import { useProjectStore, SENTOR_DEFAULT_PROJECT } from "./projectStore";
 
 const PROJECT_COLORS = ["#5b8def", "#4caf7d", "#d4a853", "#9b72ef", "#4fc3f7", "#ef5b5b"];
 
@@ -10,7 +10,7 @@ async function scaffoldProject(path: string, name: string): Promise<void> {
   // Dizinler
   await invoke("fs_create_dir", { path: `${norm}/vault` });
   await invoke("fs_create_dir", { path: `${norm}/vault/notes` });
-  await invoke("fs_create_dir", { path: `${norm}/.atlas` });
+  await invoke("fs_create_dir", { path: `${norm}/.sentor` });
 
   // Vault ana sayfası
   const vaultHome = `<!DOCTYPE html>
@@ -23,14 +23,14 @@ async function scaffoldProject(path: string, name: string): Promise<void> {
 </head>
 <body>
 <h1>${name}</h1>
-<p>Bu proje vault'unun ana sayfası. Atlas-Maker ajanını kullanarak sayfa ekleyebilirsin.</p>
+<p>Bu proje vault'unun ana sayfası. Sentor-Maker ajanını kullanarak sayfa ekleyebilirsin.</p>
 </body>
 </html>`;
   await invoke("fs_write_file", { path: `${norm}/vault/index.html`, content: vaultHome });
 
-  // .atlas/config.json
+  // .sentor/config.json
   const config = JSON.stringify({ name, created: new Date().toISOString(), version: "1" }, null, 2);
-  await invoke("fs_write_file", { path: `${norm}/.atlas/config.json`, content: config });
+  await invoke("fs_write_file", { path: `${norm}/.sentor/config.json`, content: config });
 }
 
 interface Props {
@@ -193,7 +193,7 @@ export function V3ProjectPanel({ onClose }: Props) {
               </div>
 
               {/* Sil (default proje silinemez) */}
-              {proj.id !== ATLAS_DEFAULT_PROJECT.id && (
+              {proj.id !== SENTOR_DEFAULT_PROJECT.id && (
                 <button
                   type="button"
                   onMouseDown={e => e.stopPropagation()}

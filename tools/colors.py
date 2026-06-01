@@ -1,5 +1,5 @@
 """
-Atlas OS — Shared ANSI color helpers for CLI output.
+Sentor — Shared ANSI color helpers for CLI output.
 
 Usage:
     from tools.colors import accent, dim, ok, err

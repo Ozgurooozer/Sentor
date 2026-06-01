@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-atlas flow — named multi-node flows (CLI version of canvas wire connections).
+sentor flow — named multi-node flows (CLI version of canvas wire connections).
 
-  atlas flow list                        list all saved flows
-  atlas flow new <id> [--name "..."]     create a new empty flow
-  atlas flow show <id>                   print flow JSON
-  atlas flow add-step <flow-id> <node-id> [key=value]  append a node step
-  atlas flow run <id> [key=value]        run all steps in order
-  atlas flow delete <id>                 delete a flow
+  sentor flow list                        list all saved flows
+  sentor flow new <id> [--name "..."]     create a new empty flow
+  sentor flow show <id>                   print flow JSON
+  sentor flow add-step <flow-id> <node-id> [key=value]  append a node step
+  sentor flow run <id> [key=value]        run all steps in order
+  sentor flow delete <id>                 delete a flow
 """
 
 import json
@@ -53,7 +53,7 @@ def list_flows():
     files = sorted(FLOWS_DIR.glob('*.json'))
     print()
     if not files:
-        print(f'  {dim("no flows yet. create one: atlas flow new <id>")}\n')
+        print(f'  {dim("no flows yet. create one: sentor flow new <id>")}\n')
         return
     print(f'  {len(files)} flow{"s" if len(files) != 1 else ""}\n')
     for f in files:
@@ -91,8 +91,8 @@ def new_flow(flow_id: str | None = None, name: str | None = None):
     }
     _save(fl)
     print(f'\n  {ok("created")}  {dim(str(p))}')
-    print(f'  add steps:    {acc(f"atlas flow add-step {flow_id} <node-id>")}')
-    print(f'  run it:       {acc(f"atlas flow run {flow_id}")}\n')
+    print(f'  add steps:    {acc(f"sentor flow add-step {flow_id} <node-id>")}')
+    print(f'  run it:       {acc(f"sentor flow run {flow_id}")}\n')
 
 
 def add_step(flow_id: str, node_id: str, ctx: dict | None = None):

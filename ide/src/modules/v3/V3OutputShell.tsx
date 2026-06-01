@@ -293,7 +293,7 @@ function MessageContent({ parts }: { parts: UIMessage["parts"] }) {
 // ─── Agent seçici — şık yatay pill'ler + tooltip ─────────────────────────
 const AGENT_ICONS: Record<string, string> = {
   "builtin:vault":        "◈",
-  "builtin:atlas-maker":  "✦",
+  "builtin:sentor-maker":  "✦",
   "builtin:coder":        "⟨/⟩",
 };
 
@@ -493,7 +493,7 @@ export function V3OutputShell() {
   const helpers = useChat<UIMessage>({ chat });
 
   useEffect(() => {
-    const unsub = listen<{ text: string }>("atlas:v3-message", (ev) => {
+    const unsub = listen<{ text: string }>("sentor:v3-message", (ev) => {
       queryBurstRef.current++;  // trigger particle burst in Three.js
       void chat.sendMessage({
         role: "user",
@@ -503,12 +503,12 @@ export function V3OutputShell() {
     return () => { unsub.then(fn => fn()); };
   }, [chat]);
 
-  // Voice-to-vault: switch to Atlas-Maker, send, restore previous agent
+  // Voice-to-vault: switch to Sentor-Maker, send, restore previous agent
   useEffect(() => {
-    const unsub = listen<{ text: string }>("atlas:v3-vault-message", (ev) => {
+    const unsub = listen<{ text: string }>("sentor:v3-vault-message", (ev) => {
       queryBurstRef.current++;
       const prev = useAgentsStore.getState().activeId;
-      useAgentsStore.getState().setActiveId("builtin:atlas-maker");
+      useAgentsStore.getState().setActiveId("builtin:sentor-maker");
       void chat.sendMessage({
         role: "user",
         parts: [{ type: "text", text: ev.payload.text }],
@@ -522,7 +522,7 @@ export function V3OutputShell() {
 
   // Canvas → V3 wire: inject context from linked canvas panels
   useEffect(() => {
-    const unsub = listen<{ panelId: string; data: string }>("atlas:wire-data", (ev) => {
+    const unsub = listen<{ panelId: string; data: string }>("sentor:wire-data", (ev) => {
       // Silently prepend as system context — does not send a new user message
       useChatStore.getState().setLive({
         ...useChatStore.getState().live!,
@@ -585,7 +585,7 @@ export function V3OutputShell() {
       >
         {/* Sol: logo + agent seçici */}
         <div className="flex items-center gap-2">
-          {/* Atlas logo — thinking ring via conic-gradient pseudo overlay */}
+          {/* Sentor logo — thinking ring via conic-gradient pseudo overlay */}
           <div className="relative flex h-[20px] w-[20px] shrink-0 items-center justify-center">
             <div
               className="flex h-full w-full items-center justify-center rounded-[5px] text-[9px] font-bold text-white"
@@ -601,7 +601,7 @@ export function V3OutputShell() {
                   background: "conic-gradient(#5b8def 0deg 90deg, transparent 90deg 360deg)",
                   WebkitMask: "radial-gradient(transparent 60%, black 61%)",
                   mask: "radial-gradient(transparent 60%, black 61%)",
-                  animation: "atlas-thinking 1200ms linear infinite",
+                  animation: "sentor-thinking 1200ms linear infinite",
                 }}
               />
             )}

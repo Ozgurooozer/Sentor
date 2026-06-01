@@ -70,7 +70,7 @@ export type Preferences = {
   opencodeChatModelId: string;
 };
 
-const STORE_PATH = "atlas-settings.json";
+const STORE_PATH = "sentor-settings.json";
 const KEY_THEME = "theme";
 const KEY_DEFAULT_MODEL = "defaultModelId";
 const KEY_EDITOR_THEME = "editorTheme";
@@ -125,7 +125,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
 
 const store = new LazyStore(STORE_PATH, { defaults: {}, autoSave: 200 });
 
-const PREFS_CHANGED_EVENT = "atlas://prefs-changed";
+const PREFS_CHANGED_EVENT = "sentor://prefs-changed";
 
 async function writePref<T>(key: string, value: T): Promise<void> {
   await store.set(key, value);
@@ -346,7 +346,7 @@ export async function onPreferencesChange(
   };
 }
 
-const KEYS_CHANGED_EVENT = "atlas://ai-keys-changed";
+const KEYS_CHANGED_EVENT = "sentor://ai-keys-changed";
 
 export async function emitKeysChanged(): Promise<void> {
   await emit(KEYS_CHANGED_EVENT);

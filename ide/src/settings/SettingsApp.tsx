@@ -74,7 +74,7 @@ export function SettingsApp() {
       }
     };
     const unlistenPromise = getCurrentWebviewWindow().listen<string>(
-      "atlas:settings-tab",
+      "sentor:settings-tab",
       (e) => apply(e.payload),
     );
     return () => {

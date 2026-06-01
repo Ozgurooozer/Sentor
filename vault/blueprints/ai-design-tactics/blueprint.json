@@ -1,5 +1,5 @@
 {
-  "$schema": "atlas-blueprint-v1",
+  "$schema": "sentor-blueprint-v1",
   "slug": "ai-design-tactics",
   "name": "Yapay Zeka ile Tasarım Taktikleri",
   "description": "Tek ajan loop vs sıralı çok ajan mimarisi — vault notları, chat, gallery, checklist, sketch ve terminal bağlı canvas.",
@@ -26,7 +26,7 @@
       "zIndex": 2,
       "title": "Genel Bakış",
       "meta": {
-        "path": "C:\\Atlas OS\\vault\\ai-design\\overview\\index.html"
+        "path": "C:\\Sentor\\vault\\ai-design\\overview\\index.html"
       }
     },
     {
@@ -39,7 +39,7 @@
       "zIndex": 3,
       "title": "Tek Ajan Loop",
       "meta": {
-        "path": "C:\\Atlas OS\\vault\\ai-design\\single-agent-loop\\index.html"
+        "path": "C:\\Sentor\\vault\\ai-design\\single-agent-loop\\index.html"
       }
     },
     {
@@ -52,7 +52,7 @@
       "zIndex": 4,
       "title": "Sıralı Çok Ajan",
       "meta": {
-        "path": "C:\\Atlas OS\\vault\\ai-design\\sequential-multi-agent\\index.html"
+        "path": "C:\\Sentor\\vault\\ai-design\\sequential-multi-agent\\index.html"
       }
     },
     {
@@ -113,7 +113,7 @@
       "zIndex": 8,
       "title": "Diyagramlar",
       "meta": {
-        "dir": "C:\\Atlas OS\\vault\\ai-design\\assets"
+        "dir": "C:\\Sentor\\vault\\ai-design\\assets"
       }
     },
     {
@@ -124,7 +124,7 @@
       "width": 420,
       "height": 700,
       "zIndex": 9,
-      "title": "Atlas AI — Tasarım Danışmanı",
+      "title": "Sentor AI — Tasarım Danışmanı",
       "meta": {}
     },
     {
@@ -148,7 +148,7 @@
       "zIndex": 11,
       "title": "Terminal",
       "meta": {
-        "initCmd": "echo 'Atlas AI Design Tactics — Vault hazır'"
+        "initCmd": "echo 'Sentor AI Design Tactics — Vault hazır'"
       }
     },
     {

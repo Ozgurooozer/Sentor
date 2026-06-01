@@ -57,8 +57,8 @@ FORUM: Use forum_search before making a new thread. Use forum_reply/forum_new_th
 CODE QUESTIONS: Use code_status first. If the CodeGraph bridge is ready, prefer code_search/code_explore over vault_search.`,
   },
   {
-    id: "builtin:atlas-maker",
-    name: "Atlas-Maker",
+    id: "builtin:sentor-maker",
+    name: "Sentor-Maker",
     description: "Every answer becomes a vault HTML page with diagrams. Builds your second brain.",
     icon: "designer",
     builtIn: true,
@@ -68,7 +68,7 @@ CODE QUESTIONS: Use code_status first. If the CodeGraph bridge is ready, prefer 
       "forum_search", "forum_read", "forum_new_thread", "forum_reply",
       "read_file", "todo_write",
     ],
-    instructions: `ATLAS-MAKER
+    instructions: `SENTOR-MAKER
 1. Start with vault_search. If a strong page exists, summarize it and ask whether to update it or write a new one.
 2. Use web_search/web_fetch only when needed.
 3. When writing, produce a standalone HTML page with inline <style> only, dark theme vars, system-ui, border-only layout, and no external CSS.
@@ -107,7 +107,7 @@ Use CodeGraph tools first when available; only fall back to grep/read_file when 
     icon: "orkestra",
     builtIn: true,
     instructions: `ORKESTRA — COORDINATOR
-1. Route tasks to the right agent: Vault for research, Atlas-Maker for pages, Coder for code.
+1. Route tasks to the right agent: Vault for research, Sentor-Maker for pages, Coder for code.
 2. Use agent_invoke for read-only work and return a summary.
 3. For code intelligence, call code_status first and use code_search/code_explore/code_callers/code_callees/code_impact if ready.
 4. Do not do deep research or code edits yourself.
@@ -121,7 +121,7 @@ Use CodeGraph tools first when available; only fall back to grep/read_file when 
     builtIn: true,
     instructions: `VAULT-EXPORTER
 1. Call canvas_read_state and inspect the current panels.
-2. Convert the canvas into a standalone HTML page using Atlas-Maker HTML rules.
+2. Convert the canvas into a standalone HTML page using Sentor-Maker HTML rules.
 3. Call vault_write with category="projects" and a slug based on the canvas title.
 4. Reply with: "Exported to vault/projects/<slug> — open it in the Vault browser to review."
 
@@ -129,7 +129,7 @@ If the canvas has no useful content, say: "Canvas appears empty. Add content fir
   },
 ] as const;
 
-const STORE_PATH = "atlas-ai-agents.json";
+const STORE_PATH = "sentor-ai-agents.json";
 const KEY_CUSTOM = "customAgents";
 const KEY_ACTIVE = "activeAgentId";
 const KEY_CONFIGS = "agentConfigs";

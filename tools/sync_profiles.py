@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Atlas OS — Profile Sync
+Sentor — Profile Sync
 
 Parses ide/src/modules/ai/lib/agents.ts and writes each built-in agent's
 persona into vault/agents/{slug}/profile.md. The TS file is the single

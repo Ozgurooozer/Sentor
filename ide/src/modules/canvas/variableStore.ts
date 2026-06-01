@@ -23,7 +23,7 @@ interface VariableActions {
   hydrate(): Promise<void>;
 }
 
-const _store = new LazyStore("atlas-variables.json", { defaults: {}, autoSave: 400 });
+const _store = new LazyStore("sentor-variables.json", { defaults: {}, autoSave: 400 });
 
 let _saveTimer: ReturnType<typeof setTimeout> | null = null;
 

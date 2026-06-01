@@ -7,7 +7,7 @@ import {
   type Snippet,
 } from "../lib/snippets";
 
-const CHANGED_EVENT = "atlas://ai-snippets-changed";
+const CHANGED_EVENT = "sentor://ai-snippets-changed";
 
 type State = {
   hydrated: boolean;

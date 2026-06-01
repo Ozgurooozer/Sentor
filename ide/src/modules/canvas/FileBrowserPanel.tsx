@@ -39,7 +39,7 @@ type SortDir   = "asc" | "desc";
 type ViewMode  = "list" | "small" | "large";
 
 export function FileBrowserPanel({ panel }: { panel: CanvasPanelNode }) {
-  const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot) ?? "c:\\Atlas OS";
+  const workspaceRoot = usePreferencesStore((s) => s.workspaceRoot) ?? "c:\\Sentor";
   const addPanel      = useCanvasStore((s) => s.addPanel);
   const updatePanel   = useCanvasStore((s) => s.updatePanel);
   const setOutputData = useCanvasStore((s) => s.setOutputData);

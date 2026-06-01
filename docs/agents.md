@@ -1,6 +1,6 @@
-# Atlas OS — AI Agents
+# Sentor — AI Agents
 
-Atlas OS ships with five built-in agents. Each has a specific role and a set of tools.
+Sentor ships with five built-in agents. Each has a specific role and a set of tools.
 
 ## Vault Agent (default)
 
@@ -16,7 +16,7 @@ Atlas OS ships with five built-in agents. Each has a specific role and a set of 
 
 ---
 
-## Atlas-Maker
+## Sentor-Maker
 
 **Purpose:** Writes new vault pages from conversations, voice notes, or research.
 
@@ -27,7 +27,7 @@ Atlas OS ships with five built-in agents. Each has a specific role and a set of 
 
 **Best for:** "Create a page about X", "Write a meeting note for today", voice-to-vault transcription
 
-**Tip:** After Atlas-Maker writes a page, the vault re-indexes automatically. You can search for it immediately.
+**Tip:** After Sentor-Maker writes a page, the vault re-indexes automatically. You can search for it immediately.
 
 ---
 
@@ -88,4 +88,4 @@ Type `/` in the chat input to see available slash commands:
 | `/search {query}` | Instant vault search without an LLM turn |
 | `/decision {text}` | Log a decision to the active agent's log |
 | `/meeting {topic}` | Generate a meeting note |
-| `/voice {transcript}` | Send voice transcript to Atlas-Maker |
+| `/voice {transcript}` | Send voice transcript to Sentor-Maker |

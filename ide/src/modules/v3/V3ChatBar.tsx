@@ -43,7 +43,7 @@ export function V3ChatBar() {
         onKeyDown={(e) => {
           if (e.key === "Enter") send();
         }}
-        placeholder="Atlas'a bir şey sor…"
+        placeholder="Sentor'a bir şey sor…"
         className="min-w-0 flex-1 bg-transparent text-[13.5px] text-[#e8e8ec] outline-none"
         style={{ caretColor: "#5b8def" }}
       />

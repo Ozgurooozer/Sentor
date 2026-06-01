@@ -190,8 +190,8 @@ html[data-v3="true"] body {
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* Atlas logo thinking ring: conic-gradient arc rotates clockwise */
-@keyframes atlas-thinking {
+/* Sentor logo thinking ring: conic-gradient arc rotates clockwise */
+@keyframes sentor-thinking {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
@@ -313,28 +313,28 @@ html[data-chrome="borderless"] *::-webkit-scrollbar {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes atlasShimmer {
+@keyframes sentorShimmer {
   from { background-position: 100% center; }
   to   { background-position: 0% center; }
 }
 
-.atlas-shimmer {
-  animation: atlasShimmer var(--atlas-shimmer-duration, 2s) linear infinite;
+.sentor-shimmer {
+  animation: sentorShimmer var(--sentor-shimmer-duration, 2s) linear infinite;
 }
 
-@keyframes atlas-wire-flow {
+@keyframes sentor-wire-flow {
   from { stroke-dashoffset: 24; }
   to   { stroke-dashoffset: 0; }
 }
-@keyframes atlas-wire-pulse {
+@keyframes sentor-wire-pulse {
   0%, 100% { stroke-opacity: 0.4; }
   50%       { stroke-opacity: 0.9; }
 }
-.atlas-wire-flow {
-  animation: atlas-wire-flow 0.8s linear infinite;
+.sentor-wire-flow {
+  animation: sentor-wire-flow 0.8s linear infinite;
 }
-.atlas-wire-pulse {
-  animation: atlas-wire-pulse 1.4s ease-in-out infinite;
+.sentor-wire-pulse {
+  animation: sentor-wire-pulse 1.4s ease-in-out infinite;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -470,11 +470,11 @@ html[data-chrome="borderless"] *::-webkit-scrollbar {
 }
 
 /* ── Canvas 3D perspective grid scroll ───────────────────────────────────── */
-@keyframes atlas-grid-scroll {
+@keyframes sentor-grid-scroll {
   from { background-position: 0 0; }
   to   { background-position: 0 80px; }
 }
-@keyframes atlas-orb-pulse {
+@keyframes sentor-orb-pulse {
   0%   { opacity: 0.7; transform: scale(1.00); }
   100% { opacity: 1.0; transform: scale(1.06); }
 }

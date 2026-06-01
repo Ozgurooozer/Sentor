@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Atlas OS — Semantic Embedder (v2 — Ollama-only, incremental, scope-aware)
+Sentor — Semantic Embedder (v2 — Ollama-only, incremental, scope-aware)
 
 Reads .index/pages.json, embeds every page, writes .index/embeddings.json.
 Ollama is the only backend. If Ollama is unavailable the embedder degrades
 to a no-op and prints a one-line install hint — search will fall back to
 keyword scoring at the API layer.
 
-Config (.atlas-embed.json, optional):
+Config (.sentor-embed.json, optional):
   { "ollamaUrl": "http://localhost:11434", "ollamaModel": "all-minilm" }
 
 Usage:
@@ -27,7 +27,7 @@ from pathlib import Path
 ROOT        = Path(__file__).resolve().parent.parent
 INDEX_FILE  = ROOT / ".index" / "pages.json"
 EMBED_FILE  = ROOT / ".index" / "embeddings.json"
-CONFIG_FILE = ROOT / ".atlas-embed.json"
+CONFIG_FILE = ROOT / ".sentor-embed.json"
 
 DEFAULT_URL = "http://localhost:11434"
 DEFAULT_MODEL = "all-minilm"
@@ -237,7 +237,7 @@ def search(
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 def _parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Atlas OS embedder (Ollama-only)")
+    p = argparse.ArgumentParser(description="Sentor embedder (Ollama-only)")
     p.add_argument("--check", action="store_true",
                    help="Report backend status, no embedding")
     p.add_argument("--force", action="store_true",

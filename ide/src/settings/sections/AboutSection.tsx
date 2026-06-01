@@ -8,8 +8,8 @@ import { arch, platform } from "@tauri-apps/plugin-os";
 import { useEffect, useState } from "react";
 import { SectionHeader } from "../components/SectionHeader";
 
-const REPO_URL = "https://github.com/atlas-ide/atlas";
-const WEBSITE = "https://atlas-ide.io";
+const REPO_URL = "https://github.com/Ozgurooozer/Sentor";
+const WEBSITE = "https://sentor.dev";
 
 const PLATFORM_LABEL: Record<string, string> = {
   macos: "macOS",
@@ -22,7 +22,7 @@ const PLATFORM_LABEL: Record<string, string> = {
 
 export function AboutSection() {
   const [version, setVersion] = useState("");
-  const [name, setName] = useState("Atlas");
+  const [name, setName] = useState("Sentor");
   const [build, setBuild] = useState("");
   const { status, check, install } = useUpdater({ autoCheck: false });
   const checking = status.kind === "checking";
@@ -87,7 +87,7 @@ export function AboutSection() {
         </dd>
 
         <dt className="text-muted-foreground">Bundle ID</dt>
-        <dd className="font-mono text-[11.5px]">app.atlas.ide</dd>
+        <dd className="font-mono text-[11.5px]">app.sentor.ide</dd>
 
         <dt className="text-muted-foreground">License</dt>
         <dd>Apache 2.0</dd>
@@ -100,7 +100,7 @@ export function AboutSection() {
             className="inline-flex items-center gap-1.5 rounded-md text-[12px] underline-offset-2 hover:text-foreground hover:underline"
           >
             <HugeiconsIcon icon={GithubIcon} size={12} strokeWidth={1.75} />
-            atlas-ide/atlas
+            sentor-ide/sentor
           </button>
         </dd>
         <dt className="text-muted-foreground">Website</dt>
@@ -111,7 +111,7 @@ export function AboutSection() {
             className="inline-flex items-center gap-1.5 rounded-md text-[12px] underline-offset-2 hover:text-foreground hover:underline"
           >
             <HugeiconsIcon icon={Globe02Icon} size={12} strokeWidth={1.75} />
-            atlas-ide.io
+            sentor.dev
           </button>
         </dd>
       </dl>

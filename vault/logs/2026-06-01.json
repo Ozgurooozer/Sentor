@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "ts": 1780342193823,
+    "level": "system",
+    "message": "Sentor — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780342674172,
+    "level": "system",
+    "message": "Sentor — log stream started"
+  },
+  {
+    "id": 1,
+    "ts": 1780342704620,
+    "level": "system",
+    "message": "Sentor — log stream started"
+  }
+]

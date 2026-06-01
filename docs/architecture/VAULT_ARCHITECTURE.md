@@ -27,7 +27,7 @@ vault/
 │  │     └─ {YYYY-MM-DD}-{slug}/
 │  │        └─ index.html
 │  ├─ coder/
-│  ├─ atlas-maker/
+│  ├─ sentor-maker/
 │  └─ sentor/
 │
 ├─ meetings/                   # NEW — global meetings (outside agent office)

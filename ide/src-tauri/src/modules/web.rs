@@ -23,7 +23,7 @@ pub struct FetchResult {
 fn make_client() -> Result<Client, String> {
     Client::builder()
         .timeout(Duration::from_secs(8))
-        .user_agent("Mozilla/5.0 (compatible; AtlasOS/1.0)")
+        .user_agent("Mozilla/5.0 (compatible; SentorOS/1.0)")
         .build()
         .map_err(|e| e.to_string())
 }
@@ -101,8 +101,7 @@ pub async fn web_fetch(url: String) -> Result<FetchResult, String> {
         .next()
         .map(|e| e.text().collect::<String>().trim().to_string());
 
-    let strip_sel =
-        Selector::parse("script,style,nav,footer,header,aside,noscript").unwrap();
+    let strip_sel = Selector::parse("script,style,nav,footer,header,aside,noscript").unwrap();
     let body_sel = Selector::parse("body").unwrap();
     let mut text = String::new();
     if let Some(body) = document.select(&body_sel).next() {
@@ -129,5 +128,11 @@ pub async fn web_fetch(url: String) -> Result<FetchResult, String> {
     } else {
         text
     };
-    Ok(FetchResult { url: final_url, title, text, html_len, truncated })
+    Ok(FetchResult {
+        url: final_url,
+        title,
+        text,
+        html_len,
+        truncated,
+    })
 }

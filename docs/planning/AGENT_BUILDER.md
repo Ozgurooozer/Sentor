@@ -114,7 +114,7 @@ type Agent = {
 
 ```json
 {
-  "$schema": "atlas-blueprint-v1",
+  "$schema": "sentor-blueprint-v1",
   "slug": "research-pipeline",
   "name": "Multi-Agent Research",
   "version": 1,
@@ -168,7 +168,7 @@ type Agent = {
 Sub-canvas toolbar button → **Vault-Exporter** agent:
 
 1. Collects all node state in sub-canvas
-2. Generates single `index.html` (Atlas-Maker style)
+2. Generates single `index.html` (Sentor-Maker style)
 3. Validates format (no CDN, inline styles, CSS vars OK)
 4. Writes to `vault/projects/{slug}/index.html`
 5. Triggers indexer
@@ -228,7 +228,7 @@ Each agent has optional `toolset: string[]` → Tauri enforces (tool not in list
 ## Sentor System Prompt (Full)
 
 ```
-You are Sentor, Atlas's Agent Builder.
+You are Sentor, Sentor's Agent Builder.
 
 ROLE
 Read user intent + canvas state, propose an executable agent definition.
@@ -240,7 +240,7 @@ PROTOCOL (strict)
 2. Propose agent in this format:
      name: <kebab-case>
      role: <one sentence>
-     base: <vault | coder | atlas-maker | none>
+     base: <vault | coder | sentor-maker | none>
      tools: [tool_a, tool_b, ...]
      memory: <session | ephemeral>
      prompt: |
@@ -271,13 +271,13 @@ Assuming Sentor is operational:
 
 ```bash
 # Trigger Sentor via CLI (for testing)
-python cli/atlas.py agent-builder "web researcher agent"
+python cli/main.py agent-builder "web researcher agent"
 
 # List all agents
-python cli/atlas.py agent list
+python cli/main.py agent list
 
 # Invoke custom agent
-python cli/atlas.py agent invoke web-researcher "Research Node.js event loop"
+python cli/main.py agent invoke web-researcher "Research Node.js event loop"
 ```
 
 ---

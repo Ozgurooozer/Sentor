@@ -32,7 +32,7 @@
 Tüm dosyayı aşağıdaki içerikle değiştir:
 
 ```typescript
-export const KEYRING_SERVICE = "atlas-ai";
+export const KEYRING_SERVICE = "sentor-ai";
 
 export type ProviderId = "opencode";
 
@@ -120,7 +120,7 @@ export const OPENCODE_DEFAULT_BASE_URL = "https://opencode.ai/zen/v1";
 export const MAX_AGENT_STEPS = 24;
 export const TERMINAL_BUFFER_LINES = 300;
 
-export const SYSTEM_PROMPT = `You are Atlas, an AI coding assistant in a developer IDE with access to a local knowledge vault (offline HTML notes the user has saved).
+export const SYSTEM_PROMPT = `You are Sentor, an AI coding assistant in a developer IDE with access to a local knowledge vault (offline HTML notes the user has saved).
 
 Each turn has a <terminal-context> block: workspace_root, active_terminal_cwd, active_file, terminal output. Use it as ground truth.
 
@@ -345,7 +345,7 @@ function buildModel(
   return buildLanguageModel(m.provider, keys, m.id, { providers });
 }
 
-export async function createAtlasAgent({
+export async function createSentorAgent({
   keys,
   modelId = DEFAULT_MODEL_ID,
   customInstructions,
@@ -367,7 +367,7 @@ export async function createAtlasAgent({
     : "";
   const memoryBlock =
     projectMemory && projectMemory.trim().length > 0
-      ? `\n\n## PROJECT — ATLAS.md\n${projectMemory.trim()}`
+      ? `\n\n## PROJECT — SENTOR.md\n${projectMemory.trim()}`
       : "";
   const selfContextBlock =
     agentSelfContext && agentSelfContext.trim().length > 0
@@ -410,9 +410,9 @@ export async function createAtlasAgent({
   });
 }
 
-export type AtlasAgent = Awaited<ReturnType<typeof createAtlasAgent>>;
+export type SentorAgent = Awaited<ReturnType<typeof createSentorAgent>>;
 
-export function createAtlasTransport(agent: AtlasAgent) {
+export function createSentorTransport(agent: SentorAgent) {
   return new DirectChatTransport({ agent });
 }
 ```
@@ -928,7 +928,7 @@ function EmbeddingBlock() {
       null,
       2,
     );
-    const path = workspaceRoot.replace(/[\\/]$/, "") + "/.atlas-embed.json";
+    const path = workspaceRoot.replace(/[\\/]$/, "") + "/.sentor-embed.json";
     try {
       await invoke("fs_write_file", { path, content: cfg });
       setWriteStatus("ok");
@@ -956,7 +956,7 @@ function EmbeddingBlock() {
         <p className="mt-0.5 text-[10.5px] leading-relaxed text-muted-foreground">
           Used by <code className="font-mono">tools/embedder.py</code> and{" "}
           <code className="font-mono">api/server.py</code> for semantic vault search. Writes{" "}
-          <code className="font-mono">.atlas-embed.json</code> to the workspace root.
+          <code className="font-mono">.sentor-embed.json</code> to the workspace root.
         </p>
       </div>
 
@@ -997,14 +997,14 @@ function EmbeddingBlock() {
       {!workspaceRoot && (
         <p className="text-[10.5px] text-amber-500">
           Set a workspace root in Preferences to auto-write{" "}
-          <code className="font-mono">.atlas-embed.json</code>.
+          <code className="font-mono">.sentor-embed.json</code>.
         </p>
       )}
       {writeStatus === "ok" && (
-        <p className="text-[10.5px] text-emerald-500">Config saved to .atlas-embed.json</p>
+        <p className="text-[10.5px] text-emerald-500">Config saved to .sentor-embed.json</p>
       )}
       {writeStatus === "fail" && (
-        <p className="text-[10.5px] text-destructive">Could not write .atlas-embed.json</p>
+        <p className="text-[10.5px] text-destructive">Could not write .sentor-embed.json</p>
       )}
     </div>
   );

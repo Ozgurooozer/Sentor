@@ -1,7 +1,7 @@
 import { useTheme } from "@/modules/theme";
 import type { SearchAddon } from "@xterm/addon-search";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { useTerminalSession, type AtlasOpenInput } from "./lib/useTerminalSession";
+import { useTerminalSession, type SentorOpenInput } from "./lib/useTerminalSession";
 
 export type TerminalPaneHandle = {
   write: (data: string) => void;
@@ -22,7 +22,7 @@ type Props = {
   onExit?: (leafId: number, code: number) => void;
   onCwd?: (leafId: number, cwd: string) => void;
   onDetectedLocalUrl?: (leafId: number, url: string) => void;
-  onAtlasOpen?: (leafId: number, input: AtlasOpenInput) => void;
+  onSentorOpen?: (leafId: number, input: SentorOpenInput) => void;
 };
 
 export const TerminalPane = forwardRef<TerminalPaneHandle, Props>(
@@ -36,7 +36,7 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, Props>(
       onExit,
       onCwd,
       onDetectedLocalUrl,
-      onAtlasOpen,
+      onSentorOpen,
     },
     ref,
   ) {
@@ -53,7 +53,7 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, Props>(
       onExit: (c) => onExit?.(leafId, c),
       onCwd: (c) => onCwd?.(leafId, c),
       onDetectedLocalUrl: (u) => onDetectedLocalUrl?.(leafId, u),
-      onAtlasOpen: (input) => onAtlasOpen?.(leafId, input),
+      onSentorOpen: (input) => onSentorOpen?.(leafId, input),
     });
 
     useEffect(() => {

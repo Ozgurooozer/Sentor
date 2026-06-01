@@ -23,7 +23,7 @@ python api/server.py [port]
 
 **Run CLI:**
 ```bash
-python cli/atlas.py <cmd>   # index | search "query" | list [category] | open cat/slug | serve [port] | chat
+python cli/main.py <cmd>   # index | search "query" | list [category] | open cat/slug | serve [port] | chat
 ```
 
 **Run API test suite** (custom runner, starts server on port 4299, NOT pytest):
@@ -48,7 +48,7 @@ Runs CPU/int8 by default. Restart if it crashes after a CUDA init attempt.
 **Start IDE** (API server optional — IDE works offline for keyword search):
 ```bash
 # Windows launcher — starts API then IDE
-atlas-ide.bat
+sentor.bat
 
 # Or manually from ide/ directory
 npm run tauri dev
@@ -85,9 +85,9 @@ cd ide && npx tsc --noEmit
 cd ide && npm run lint
 ```
 
-**Open browser search UI** — open `ui/index.html` directly. No server needed; `pages.js` loads as `window.ATLAS_INDEX` via `<script src>`, bypassing CORS.
+**Open browser search UI** — open `ui/index.html` directly. No server needed; `pages.js` loads as `window.SENTOR_INDEX` via `<script src>`, bypassing CORS.
 
-**Windows all-in-one launcher:** `atlas.bat` — interactive menu for serve / IDE / index / chat.
+**Windows all-in-one launcher:** `sentor.bat` — interactive menu for serve / IDE / index / chat.
 
 No build step, no `npm install`, no virtual environment for the Python side.
 
@@ -95,7 +95,7 @@ No build step, no `npm install`, no virtual environment for the Python side.
 
 ## Architecture
 
-Atlas OS is a zero-dependency personal knowledge base + AI IDE:
+Sentor is a zero-dependency personal knowledge base + AI IDE:
 
 ```
 vault/{category}/{slug}/index.html   ← source of truth; category = folder name
@@ -104,11 +104,11 @@ tools/indexer.py                     ← HTML parser, two-pass: extract → reso
 tools/embedder.py                    ← generates .index/embeddings.json (384-dim vectors)
     │
 .index/pages.json                    ← machine-readable (CLI, API)
-.index/pages.js                      ← browser-loadable (window.ATLAS_INDEX)
+.index/pages.js                      ← browser-loadable (window.SENTOR_INDEX)
 .index/embeddings.json               ← semantic vectors for cosine similarity search
     │
 ui/index.html + app.js + style.css   ← client-side fuzzy search (Fuse.js CDN)
-cli/atlas.py                         ← CLI (term-frequency scoring, chat loop)
+cli/main.py                         ← CLI (term-frequency scoring, chat loop)
 api/server.py                        ← REST API (stdlib http.server, port 4242)
 ide/                                 ← Tauri v2 + React AI IDE
 ```
@@ -117,7 +117,7 @@ ide/                                 ← Tauri v2 + React AI IDE
 
 **app.js** — 3-state view machine: `empty` → `no-results` → `results`. Fuse.js weights: title(3) > headings/desc(2) > body(1), threshold 0.35, `ignoreLocation: true`. All user content via `textContent`; only category badge uses `innerHTML` after `escapeHtml()`.
 
-**Scoring (CLI + API):** Shared module at `tools/scoring.py` — both `cli/atlas.py` and `api/server.py` `sys.path.insert("tools/")` then `from scoring import score as _score`. Edit the shared module, not the call sites.
+**Scoring (CLI + API):** Shared module at `tools/scoring.py` — both `cli/main.py` and `api/server.py` `sys.path.insert("tools/")` then `from scoring import score as _score`. Edit the shared module, not the call sites.
 
 **API endpoints** (port 4242):
 - `GET /api/search?q=&limit=&category=` — keyword search (TF-IDF-style)
@@ -152,7 +152,7 @@ ide/src-tauri/src/
 **fs path normalization:** `modules/fs/to_canon()` always returns forward-slash paths to the frontend, on all platforms.
 
 **MCP bridge:** Two surfaces, one mental model — queue file for state mutations, MCP stdio server for read access:
-- **External → IDE commands:** `.mcp-queue.json` (pushed by REST API); `mcp_watch_start` emits `atlas:mcp-cmd` on write; frontend drains on each event + 30s defensive timer.
+- **External → IDE commands:** `.mcp-queue.json` (pushed by REST API); `mcp_watch_start` emits `sentor:mcp-cmd` on write; frontend drains on each event + 30s defensive timer.
 - **External read access:** `tools/mcp_server.py` (stdio, zero-dep) — exposes `vault_search` / `vault_read` / `vault_categories` / `vault_pages`.
 
 **Cross-platform:** `set_click_through` is `#[cfg(target_os = "windows")]`-gated. Linux/macOS click-through is not implemented.
@@ -165,8 +165,8 @@ ide/src/modules/
     config.ts           ← 2 local providers (LM Studio, Ollama), 2 models; compact SYSTEM_PROMPT (~120 tokens)
     lib/
       agent.ts          ← agent runner loop; ProviderConfig/ProviderConfigs types,
-                          buildLanguageModel, createAtlasAgent, toDevProxyURL (dev CORS proxy)
-      agents.ts         ← 5 built-in agents: Vault (default), Atlas-Maker, Coder, Orkestra (coordinator), Vault-Exporter
+                          buildLanguageModel, createSentorAgent, toDevProxyURL (dev CORS proxy)
+      agents.ts         ← 5 built-in agents: Vault (default), Sentor-Maker, Coder, Orkestra (coordinator), Vault-Exporter
       transport.ts      ← AI HTTP transport (DirectChatTransport + live context injection)
       composer.tsx      ← React context for shared input state (text, files, voice, snippets)
       useComposer.ts    ← useComposer hook (separate file — Fast Refresh compliance)
@@ -206,10 +206,10 @@ ide/src/modules/
 
 **App-level components** (`ide/src/app/`):
 - `App.tsx` — root entry; routes `#v3-*` hashes to V3 shells, otherwise `CanvasAppShell`
-- `hooks/useApiKeys.ts` — load provider keys + listen for `atlas:keys-changed`
+- `hooks/useApiKeys.ts` — load provider keys + listen for `sentor:keys-changed`
 - `hooks/useDiffReloadTrigger.ts` — reload editor tabs when AI diff is approved
 - `hooks/useLeafLifecycle.ts` — dispose terminal sessions when pane-tree leaves disappear
-- `hooks/useMcpBridge.ts` — export canvas state + drain `.mcp-queue.json` on `atlas:mcp-cmd` events
+- `hooks/useMcpBridge.ts` — export canvas state + drain `.mcp-queue.json` on `sentor:mcp-cmd` events
 - `hooks/useVaultTrashCleanup.ts` — sweep `.vault-trash/` of >7-day-old backups on startup
 
 **Shared lib** (`ide/src/lib/`):
@@ -226,9 +226,9 @@ ide/src/modules/
 - `panels`, `connections`, `viewport`, `selectedIds` — active canvas
 - `canvases: CanvasRecord[]`, `activeCanvasId`, `canvasHistory` — multi-canvas navigation
 - `isSplit`, `secondaryPanels`, `secondaryConnections`, `secondaryViewport` — split view state
-- Canvas switching persists to `atlas-canvas-multi-{id}.json`.
+- Canvas switching persists to `sentor-canvas-multi-{id}.json`.
 
-**Variable store (`variableStore.ts`):** Global Zustand + LazyStore persist (`atlas-variables.json`). `setVariable(name, value)` / `getVariable(name)` / `listVariables()` / `hydrate()`. `CanvasAppShell` calls `hydrate()` on mount. `scheduleFlush()` reads fresh state inside the timeout — race-condition safe.
+**Variable store (`variableStore.ts`):** Global Zustand + LazyStore persist (`sentor-variables.json`). `setVariable(name, value)` / `getVariable(name)` / `listVariables()` / `hydrate()`. `CanvasAppShell` calls `hydrate()` on mount. `scheduleFlush()` reads fresh state inside the timeout — race-condition safe.
 
 **Wire system — `Connection.kind` semantics:**
 - `"data"` (blue) — explicit value wire; value shown in the chat badge row
@@ -246,15 +246,15 @@ ide/src/modules/
 **Canvas run engine (`canvasEngine.ts`):** `runCanvas(options, onEvent)` executes the full node graph — Kahn's BFS topo-sort on data/context wires (triggers ignored for ordering). Gate panels can block their downstream subgraph. Results written back to `canvasStore` via `setOutputData` so wires and panels see live output. ForEach panels iterate their upstream array and run downstream for each item.
 
 **Event communication rule:**
-- Cross-window: Tauri `emitTo` / `listen` with `atlas:` prefix
+- Cross-window: Tauri `emitTo` / `listen` with `sentor:` prefix
 - Same-window: Zustand store actions directly (no CustomEvent)
-- All `atlas:` events: `atlas:mcp-cmd`, `atlas:keys-changed`, `atlas:canvas-prompt`, `atlas:v3-message`, `atlas:v3-vault-message`, `atlas:wire-data`, `atlas:canvas-unlink`
+- All `sentor:` events: `sentor:mcp-cmd`, `sentor:keys-changed`, `sentor:canvas-prompt`, `sentor:v3-message`, `sentor:v3-vault-message`, `sentor:wire-data`, `sentor:canvas-unlink`
 
 **Browser tabs:** Two kinds — `vault` tab (asset:// iframe, `VaultBrowserPane.tsx`) and `web` tab (native Tauri child WebView, `WebBrowserPane.tsx`). Native WebView sits above the DOM compositor — use `web_set_visible(false)` when inactive, not CSS. Requires `features = ["unstable"]` in `Cargo.toml`.
 
 **Local file iframes use `asset://` not `file://`:** Tauri blocks `file://` in iframes. Use `convertFileSrc()` from `@tauri-apps/api/core`. Helper: `ide/src/modules/browser/assetUrl.ts` → `vaultPageAssetUrl(root, cat, slug)`.
 
-**Agents (current):** Five built-in — **Vault** (default, knowledge lookup), **Atlas-Maker** (writes vault HTML pages), **Coder** (edits source files), **Orkestra** (coordinator — delegates via `agent_invoke`, never edits files directly), **Vault-Exporter** (converts canvas panels to vault pages). Subagent types: `explore` + `general` only. Each agent supports a per-agent `model` override and a `thinking` boolean toggle (stored in `AgentConfig`, persisted in `agentsStore`).
+**Agents (current):** Five built-in — **Vault** (default, knowledge lookup), **Sentor-Maker** (writes vault HTML pages), **Coder** (edits source files), **Orkestra** (coordinator — delegates via `agent_invoke`, never edits files directly), **Vault-Exporter** (converts canvas panels to vault pages). Subagent types: `explore` + `general` only. Each agent supports a per-agent `model` override and a `thinking` boolean toggle (stored in `AgentConfig`, persisted in `agentsStore`).
 
 **Fast Refresh:** `useComposer` lives in `useComposer.ts`, `useTheme` in `useTheme.ts`. Do not re-merge hooks back into component files.
 
@@ -262,7 +262,7 @@ ide/src/modules/
 
 **CORS in dev mode:** `vite.config.ts` proxies `/lmstudio-proxy` → `:1234`, `/ollama-proxy` → `:11434`, and `/opencode-proxy` → `https://opencode.ai`. `agent.ts:toDevProxyURL()` rewrites LM Studio / Ollama URLs; `orkestraStore.ts:devProxy()` additionally handles `opencode.ai`. In production Tauri builds, providers need CORS enabled in their own settings.
 
-**Provider config shape:** `ProviderConfig = { baseURL?: string; modelId?: string }`. `chatStore.getProviders()` assembles the map from preferences and threads it through `transport` → `createAtlasAgent` → `buildLanguageModel`. Adding a provider is one entry in this map.
+**Provider config shape:** `ProviderConfig = { baseURL?: string; modelId?: string }`. `chatStore.getProviders()` assembles the map from preferences and threads it through `transport` → `createSentorAgent` → `buildLanguageModel`. Adding a provider is one entry in this map.
 
 **Tool approval policy:** Read-only tools auto-execute after security check. Mutating tools require user approval. `edit`/`multi_edit` enforce read-before-edit via `readCache`.
 
@@ -297,7 +297,7 @@ Read `interface-setup/.interface-design/system.md` before touching any UI. Key r
 ## Testing
 
 - `tools/test_api.py` uses a **custom runner** (`test()` → global `_passed`/`_failed`), not pytest/unittest. Starts server in a background thread on port 4299.
-- `tools/test_ollama.py` and `tools/test_multiturn.py` require a running Ollama instance and Atlas API — not CI-safe.
+- `tools/test_ollama.py` and `tools/test_multiturn.py` require a running Ollama instance and Sentor API — not CI-safe.
 - No CI workflow exists.
 
 ---

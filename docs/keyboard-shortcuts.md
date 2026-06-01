@@ -1,4 +1,4 @@
-# Atlas OS — Keyboard Shortcuts
+# Sentor — Keyboard Shortcuts
 
 ## Global
 
@@ -44,4 +44,4 @@
 
 ## Customising Shortcuts
 
-Open Settings → Keyboard to rebind any shortcut. Shortcuts are stored in `~/.atlas/keybindings.json`.
+Open Settings → Keyboard to rebind any shortcut. Shortcuts are stored in `~/.sentor/keybindings.json`.

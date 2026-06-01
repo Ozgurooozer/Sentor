@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Atlas OS — Office Renderer
+Sentor — Office Renderer
 
 Reads agent state.md + log.md + projects/* + meetings/* and fills the
 template at vault/templates/agent-office/index.html. Only the content

@@ -48,11 +48,11 @@ export function UpdaterDialog() {
               ? "Update ready"
               : downloading
                 ? "Downloading update…"
-                : `Atlas v${update?.version} is available`}
+                : `Sentor v${update?.version} is available`}
           </DialogTitle>
           <DialogDescription>
             {ready
-              ? "Restart Atlas to finish installing."
+              ? "Restart Sentor to finish installing."
               : downloading
                 ? progress !== null
                   ? `${progress.toFixed(0)}% — ${formatBytes(status.downloaded)}`

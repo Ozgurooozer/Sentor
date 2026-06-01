@@ -1,5 +1,5 @@
 """
-Atlas OS — Shared keyword scoring, default exclusions, and cosine similarity.
+Sentor — Shared keyword scoring, default exclusions, and cosine similarity.
 
 Canonical source. Import by every component that needs scoring or similarity.
 """

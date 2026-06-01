@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Atlas OS — CodeGraph Bridge
+ * Sentor OS — CodeGraph Bridge
  * Node.js HTTP server (port 4245) that wraps the CodeGraph library.
  * Gives the Coder agent code intelligence: search, callers, callees, impact.
  *

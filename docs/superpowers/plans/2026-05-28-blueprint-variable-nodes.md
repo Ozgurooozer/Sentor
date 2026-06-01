@@ -34,7 +34,7 @@
 
 ### Tasarım
 
-Her canvas session'ında değişkenler `LazyStore` (Tauri plugin-store) üzerinde persist edilir. Key: `atlas-variables.json`. Store global'dir — canvas'lar arası paylaşım.
+Her canvas session'ında değişkenler `LazyStore` (Tauri plugin-store) üzerinde persist edilir. Key: `sentor-variables.json`. Store global'dir — canvas'lar arası paylaşım.
 
 - [ ] **Adım 1.1 — variableStore.ts yaz:**
 
@@ -64,7 +64,7 @@ interface VariableActions {
   hydrate(): Promise<void>;
 }
 
-const _store = new LazyStore("atlas-variables.json", { autoSave: 400 });
+const _store = new LazyStore("sentor-variables.json", { autoSave: 400 });
 
 let _saveTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -132,7 +132,7 @@ export const useVariableStore = create<VariableState & VariableActions>((set, ge
 - [ ] **Adım 1.2 — TypeScript kontrolü:**
 
 ```bash
-cd "C:/Atlas OS/ide" && npx tsc --noEmit 2>&1
+cd "C:/Sentor/ide" && npx tsc --noEmit 2>&1
 ```
 
 Beklenen: 0 hata
@@ -140,7 +140,7 @@ Beklenen: 0 hata
 - [ ] **Adım 1.3 — Commit:**
 
 ```bash
-cd "C:/Atlas OS" && git add ide/src/modules/canvas/variableStore.ts
+cd "C:/Sentor" && git add ide/src/modules/canvas/variableStore.ts
 git commit -m "feat(canvas): add variableStore — Zustand + LazyStore persist"
 ```
 
@@ -213,7 +213,7 @@ Dosyada `type PanelType =` ile başlayan bloğu bul, en sona `| "audio"` gibi bi
 - [ ] **Adım 2.4 — TypeScript kontrolü:**
 
 ```bash
-cd "C:/Atlas OS/ide" && npx tsc --noEmit 2>&1
+cd "C:/Sentor/ide" && npx tsc --noEmit 2>&1
 ```
 
 Beklenen: 0 hata (PANEL_DEFAULTS artık Record<PanelType, ...> olduğundan eksik key TS hatası verir; yukarıdaki ekleme bunları kapatamalı)
@@ -221,7 +221,7 @@ Beklenen: 0 hata (PANEL_DEFAULTS artık Record<PanelType, ...> olduğundan eksik
 - [ ] **Adım 2.5 — Commit:**
 
 ```bash
-cd "C:/Atlas OS" && git add ide/src/modules/canvas/types.ts ide/src/modules/canvas/portDefs.ts ide/src/modules/canvas/canvasStore.ts
+cd "C:/Sentor" && git add ide/src/modules/canvas/types.ts ide/src/modules/canvas/portDefs.ts ide/src/modules/canvas/canvasStore.ts
 git commit -m "feat(canvas): add variable, if-else, for-each panel types + ports + defaults"
 ```
 
@@ -370,7 +370,7 @@ useEffect(() => {
 - [ ] **Adım 3.4 — TypeScript kontrolü:**
 
 ```bash
-cd "C:/Atlas OS/ide" && npx tsc --noEmit 2>&1
+cd "C:/Sentor/ide" && npx tsc --noEmit 2>&1
 ```
 
 Beklenen: 0 hata
@@ -378,7 +378,7 @@ Beklenen: 0 hata
 - [ ] **Adım 3.5 — Commit:**
 
 ```bash
-cd "C:/Atlas OS" && git add ide/src/modules/canvas/VariablePanel.tsx ide/src/modules/canvas/CanvasPanelContent.tsx ide/src/app/CanvasAppShell.tsx
+cd "C:/Sentor" && git add ide/src/modules/canvas/VariablePanel.tsx ide/src/modules/canvas/CanvasPanelContent.tsx ide/src/app/CanvasAppShell.tsx
 git commit -m "feat(canvas): add VariablePanel — wire-to-variable assignment + glass UI"
 ```
 
@@ -522,7 +522,7 @@ PANEL_REGISTRY:
 - [ ] **Adım 4.3 — TypeScript kontrolü:**
 
 ```bash
-cd "C:/Atlas OS/ide" && npx tsc --noEmit 2>&1
+cd "C:/Sentor/ide" && npx tsc --noEmit 2>&1
 ```
 
 Beklenen: 0 hata
@@ -530,7 +530,7 @@ Beklenen: 0 hata
 - [ ] **Adım 4.4 — Commit:**
 
 ```bash
-cd "C:/Atlas OS" && git add ide/src/modules/canvas/IfElsePanel.tsx ide/src/modules/canvas/CanvasPanelContent.tsx
+cd "C:/Sentor" && git add ide/src/modules/canvas/IfElsePanel.tsx ide/src/modules/canvas/CanvasPanelContent.tsx
 git commit -m "feat(canvas): add IfElsePanel — dataflow conditional routing"
 ```
 
@@ -666,7 +666,7 @@ PANEL_REGISTRY:
 - [ ] **Adım 5.3 — TypeScript kontrolü:**
 
 ```bash
-cd "C:/Atlas OS/ide" && npx tsc --noEmit 2>&1
+cd "C:/Sentor/ide" && npx tsc --noEmit 2>&1
 ```
 
 Beklenen: 0 hata
@@ -674,7 +674,7 @@ Beklenen: 0 hata
 - [ ] **Adım 5.4 — Commit:**
 
 ```bash
-cd "C:/Atlas OS" && git add ide/src/modules/canvas/ForEachPanel.tsx ide/src/modules/canvas/CanvasPanelContent.tsx
+cd "C:/Sentor" && git add ide/src/modules/canvas/ForEachPanel.tsx ide/src/modules/canvas/CanvasPanelContent.tsx
 git commit -m "feat(canvas): add ForEachPanel — dataflow list splitter"
 ```
 
@@ -758,7 +758,7 @@ ${varLines}
 - [ ] **Adım 6.5 — TypeScript kontrolü:**
 
 ```bash
-cd "C:/Atlas OS/ide" && npx tsc --noEmit 2>&1
+cd "C:/Sentor/ide" && npx tsc --noEmit 2>&1
 ```
 
 Beklenen: 0 hata
@@ -766,7 +766,7 @@ Beklenen: 0 hata
 - [ ] **Adım 6.6 — Commit:**
 
 ```bash
-cd "C:/Atlas OS" && git add ide/src/modules/canvas/orkestraStore.ts
+cd "C:/Sentor" && git add ide/src/modules/canvas/orkestraStore.ts
 git commit -m "feat(canvas): Orkestra var_set/var_get/var_list tools + variable context in buildSystem"
 ```
 
@@ -834,7 +834,7 @@ import { useVariableStore } from "@/modules/canvas/variableStore";
 - [ ] **Adım 7.3 — TypeScript kontrolü:**
 
 ```bash
-cd "C:/Atlas OS/ide" && npx tsc --noEmit 2>&1
+cd "C:/Sentor/ide" && npx tsc --noEmit 2>&1
 ```
 
 Beklenen: 0 hata
@@ -842,7 +842,7 @@ Beklenen: 0 hata
 - [ ] **Adım 7.4 — Commit:**
 
 ```bash
-cd "C:/Atlas OS" && git add ide/src/modules/ai/tools/canvas.ts
+cd "C:/Sentor" && git add ide/src/modules/ai/tools/canvas.ts
 git commit -m "feat(canvas): add variable_set/get/list AI SDK tools for full agents"
 ```
 
@@ -860,8 +860,8 @@ Yeni node tipleri "Variables" veya "Logic" kategorisinde palette görünmeli.
 - [ ] **Adım 8.1 — Mevcut palet yapısını bul:**
 
 ```bash
-grep -n "variable\|if-else\|for-each\|category\|CATEGORIES\|NodeCategory" "C:/Atlas OS/ide/src/modules/v3-canvas/V3NodePalette.tsx" 2>/dev/null | head -30
-grep -n "variable\|if-else\|for-each\|category\|AddPanel\|CATEGORIES" "C:/Atlas OS/ide/src/modules/canvas/CanvasFab.tsx" 2>/dev/null | head -30
+grep -n "variable\|if-else\|for-each\|category\|CATEGORIES\|NodeCategory" "C:/Sentor/ide/src/modules/v3-canvas/V3NodePalette.tsx" 2>/dev/null | head -30
+grep -n "variable\|if-else\|for-each\|category\|AddPanel\|CATEGORIES" "C:/Sentor/ide/src/modules/canvas/CanvasFab.tsx" 2>/dev/null | head -30
 ```
 
 Hangi dosyada kategori/panel listesi tutulduğunu gör.
@@ -881,13 +881,13 @@ Eğer kategori yoksa "Logic" kategorisi yarat ve bu 3 öğeyi ekle.
 - [ ] **Adım 8.3 — TypeScript kontrolü:**
 
 ```bash
-cd "C:/Atlas OS/ide" && npx tsc --noEmit 2>&1
+cd "C:/Sentor/ide" && npx tsc --noEmit 2>&1
 ```
 
 - [ ] **Adım 8.4 — Commit:**
 
 ```bash
-cd "C:/Atlas OS" && git add -p
+cd "C:/Sentor" && git add -p
 git commit -m "feat(canvas): add variable/if-else/for-each to node palette"
 ```
 
@@ -905,7 +905,7 @@ git commit -m "feat(canvas): add variable/if-else/for-each to node palette"
 ```markdown
 ### Phase L notes (v0.12 — Blueprint/Variable Node Sistemi)
 
-**Variable Store (`variableStore.ts`):** Global Zustand + LazyStore persisted değişken deposu. `setVariable(name, value)` / `getVariable(name)` / `listVariables()`. Key: `atlas-variables.json`. Uygulama başında `hydrate()` çağrılır.
+**Variable Store (`variableStore.ts`):** Global Zustand + LazyStore persisted değişken deposu. `setVariable(name, value)` / `getVariable(name)` / `listVariables()`. Key: `sentor-variables.json`. Uygulama başında `hydrate()` çağrılır.
 
 **Variable Panel (`type: "variable"`):** Gelen `set` wire'ı variableStore'a yazar ve output wire ile broadcast eder. `meta.varName` isimli değişkeni bağlar. Hiç wire yoksa `meta.initialValue` kullanılır.
 
@@ -925,7 +925,7 @@ Canvas-as-function (sub-canvas → callable blueprint), Voice Variable node, dra
 - [ ] **Adım 9.2 — Commit:**
 
 ```bash
-cd "C:/Atlas OS" && git add CLAUDE.md
+cd "C:/Sentor" && git add CLAUDE.md
 git commit -m "docs: update CLAUDE.md with Phase L notes"
 ```
 

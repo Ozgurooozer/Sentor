@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Local Model Tool Calling Kılavuzu — Atlas Forum</title>
-<meta name="description" content="[dev] LM Studio ve Ollama'da tool calling çalıştırmak için model seçimi, VRAM hesabı, MoE mimarisi ve Atlas OS'ta pratik test yöntemi.">
+<title>Local Model Tool Calling Kılavuzu — Sentor Forum</title>
+<meta name="description" content="[dev] LM Studio ve Ollama'da tool calling çalıştırmak için model seçimi, VRAM hesabı, MoE mimarisi ve Sentor'ta pratik test yöntemi.">
 <meta name="created" content="2026-05-28">
 <style>
   :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#5b8def;--green:#4db89a;--orange:#e07b54;--amber:#d4a843;}
@@ -58,11 +58,11 @@
   <span>LM Studio · Ollama · 8GB VRAM</span>
 </div>
 
-<p>Atlas OS canvas agent'larının araçları (tool) kullanabilmesi için hem doğru model seçimi hem de doğru altyapı gerekiyor. Bu sayfa iki altyapı yolunu, model seçim kriterlerini ve 8GB VRAM için pratik önerileri belgeliyor.</p>
+<p>Sentor canvas agent'larının araçları (tool) kullanabilmesi için hem doğru model seçimi hem de doğru altyapı gerekiyor. Bu sayfa iki altyapı yolunu, model seçim kriterlerini ve 8GB VRAM için pratik önerileri belgeliyor.</p>
 
 <h2>İki Farklı Tool Calling Altyapısı</h2>
 
-<p>Atlas OS'ta birbirinden farklı iki tool calling mekanizması var:</p>
+<p>Sentor'ta birbirinden farklı iki tool calling mekanizması var:</p>
 
 <table>
   <tr><th></th><th>Chat Node (AI SDK)</th><th>Orkestra Bar</th></tr>
@@ -124,7 +124,7 @@
 </table>
 
 <div class="callout green">
-  <strong>Öneri:</strong> Atlas OS canvas AI (Orkestra) için <code>Qwen3-Coder-30B-A3B Q4_K_M</code> — hem coding hem tool calling hem de 8GB'a sığıyor. Chat node (AI SDK) için <code>Qwen2.5-7B-Instruct</code> başlangıç için yeterli.
+  <strong>Öneri:</strong> Sentor canvas AI (Orkestra) için <code>Qwen3-Coder-30B-A3B Q4_K_M</code> — hem coding hem tool calling hem de 8GB'a sığıyor. Chat node (AI SDK) için <code>Qwen2.5-7B-Instruct</code> başlangıç için yeterli.
 </div>
 
 <h2>Paralel Model Çalıştırma (8GB)</h2>
@@ -155,7 +155,7 @@
 
 <h2>LM Studio Ayarları</h2>
 
-<p>Atlas IDE → Settings → Models'de:</p>
+<p>Sentor IDE → Settings → Models'de:</p>
 <ul>
   <li><strong>LM Studio Base URL:</strong> <code>http://localhost:1234</code></li>
   <li><strong>Chat Model ID:</strong> LM Studio'nun üstte gösterdiği model adını tam olarak yaz (örn: <code>qwen2.5-7b-instruct</code>)</li>
@@ -174,7 +174,7 @@
 </div>
 
 <div class="reply">
-  <div class="reply-author">atlas-maker</div>
+  <div class="reply-author">sentor-maker</div>
   <div class="reply-date">28 Mayıs 2026</div>
   <div class="reply-text">Qwen3-Coder-30B-A3B LM Studio'da <code>Qwen3-Coder</code> sekmesinden indirilebilir. Q4_K_M versiyonu ~5.2GB, 4060 8GB'a rahat sığıyor ve canvas AI için bu konuşmada test edilen en güçlü seçenek.</div>
 </div>

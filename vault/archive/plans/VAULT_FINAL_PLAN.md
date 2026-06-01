@@ -47,7 +47,7 @@ Sebep: Sıkıştırma olmadan agent loop başlangıcı sistem prompt'un yarısı
 
 **K18 — Embedder backend Ollama-only (`all-minilm`). Ollama yoksa keyword-only degraded mode.**
 
-Sebep: Sentence-transformers ~2 GB indir + 5 dk setup; Atlas "sıfır bağımlılık" hedefiyle çelişir. Ollama tek komut (`ollama pull all-minilm`). Ollama kurulu değilse keyword search (TF-IDF) hâlâ çalışır, kullanıcıya tek satır uyarı: "Semantic search için: ollama pull all-minilm".
+Sebep: Sentence-transformers ~2 GB indir + 5 dk setup; Sentor "sıfır bağımlılık" hedefiyle çelişir. Ollama tek komut (`ollama pull all-minilm`). Ollama kurulu değilse keyword search (TF-IDF) hâlâ çalışır, kullanıcıya tek satır uyarı: "Semantic search için: ollama pull all-minilm".
 
 ### Toplantı sonrası tespit edilen gap'ler (çözümleri)
 
@@ -74,7 +74,7 @@ prototypes/                    # YENİ — vault dışı, ayrı sistem
 ├─ qtlas/
 ├─ taslak/
 ├─ tlas/
-└─ atlas-root/
+└─ sentor-root/
 
 vault/
 ├─ home/                       # bilgi sayfaları
@@ -83,7 +83,7 @@ vault/
 ├─ archive/                    # salt-okunur
 │
 ├─ agents/                     # AGENT OFİSLERİ (Sentor YOK)
-│  └─ {slug}/                  # vault, coder, atlas-maker
+│  └─ {slug}/                  # vault, coder, sentor-maker
 │     ├─ index.html            # hibrit HTML, generated blok + user blok
 │     ├─ profile.md            # auto-sync, read-only (lib/agents.ts → buraya)
 │     ├─ state.md              # snapshot, agent:start/end blok + user blok
@@ -164,8 +164,8 @@ vault/
 
 **Kullanıcı kararları (alındı):**
 
-1. **Sentor agent** → SİLİNDİ. Built-in liste 4 → 3 (Vault, Coder, Atlas-Maker).
-2. **`prototypes/`** → vault dışına çıktı. Kök seviye `prototypes/` ayrı sistem, 6 varyant (htlas, otlas, qtlas, taslak, tlas, atlas-root) alt klasör olarak korunur.
+1. **Sentor agent** → SİLİNDİ. Built-in liste 4 → 3 (Vault, Coder, Sentor-Maker).
+2. **`prototypes/`** → vault dışına çıktı. Kök seviye `prototypes/` ayrı sistem, 6 varyant (htlas, otlas, qtlas, taslak, tlas, sentor-root) alt klasör olarak korunur.
 
 **Aksiyonlar:**
 - `vault/Interaction Log/` sil.
@@ -205,7 +205,7 @@ vault/
 
 **Çıkış kriteri:**
 - `python tools/indexer.py` 0'dan tüm vault'u indeksler, tipleri doğru.
-- `python tools/indexer.py --changed-files vault/home/atlas-os/index.html` sadece o dosyayı yeniden parse eder, diğerlerine dokunmaz (mtime kanıt).
+- `python tools/indexer.py --changed-files vault/home/sentor/index.html` sadece o dosyayı yeniden parse eder, diğerlerine dokunmaz (mtime kanıt).
 - `python tools/embedder.py` ikinci çağrıda 0 sayfa re-embed.
 - `GET /api/semantic?q=canvas&scope=agent:vault` sadece o scope'tan döner.
 
@@ -233,7 +233,7 @@ vault/
    - Bloğun dışındaki kullanıcı içeriği dokunulmaz
 
 4. Built-in agentler için seed ofis (script ile):
-   - `vault/agents/vault/`, `coder/`, `atlas-maker/` (3 agent, Sentor silindi)
+   - `vault/agents/vault/`, `coder/`, `sentor-maker/` (3 agent, Sentor silindi)
    - state.md (boş template, phase: ideation)
    - log.md (`{ISO} [start] ofis oluşturuldu`)
    - decisions.md (boş + K16 format başlığı)
@@ -310,7 +310,7 @@ vault/
    - `agents-office/AgentOfficePane.tsx` iframe reload (etkilenen agent ise)
 
 **Çıkış kriteri:**
-- Kullanıcı `vault/home/atlas-os/index.html` elle düzenler → 6 sn'de search'te yansır.
+- Kullanıcı `vault/home/sentor/index.html` elle düzenler → 6 sn'de search'te yansır.
 - 100 ardışık yazım → 1 re-index (debounce).
 - Watcher idle CPU < %1, aktif < %5.
 
@@ -359,7 +359,7 @@ vault/
 3. `vault_search` ve `vault_semantic` tool'larına `scope` parametresi.
 
 4. Built-in agent instructions güncellenir:
-   - Vault, Coder, Atlas-Maker: "Otomatik bağlam yüklendi. Detay için `vault_self_context(depth='full')`."
+   - Vault, Coder, Sentor-Maker: "Otomatik bağlam yüklendi. Detay için `vault_self_context(depth='full')`."
 
 5. **Token bütçesi telemetrisi (opsiyonel):** `vault_self_context` döndüğü içeriğin yaklaşık token sayısını da döner. UI status bar bunu gösterir.
 
@@ -440,7 +440,7 @@ vault/
 |---|---|---|
 | 0 | ✅ Tamam | Sentor silindi, prototypes vault dışına çıktı, Interaction Log silindi |
 | 1 | ✅ Tamam | `tools/indexer.py` v2 (esnek derinlik, segment-aware kurallar, MD, `--changed-files`) · `tools/embedder.py` Ollama-only + degraded mode · `api/server.py` scope params + `/api/agent/{slug}` + esnek `/api/page/{*path}` |
-| 2 | ✅ Tamam | 5 template, `tools/sync_profiles.py` (idempotent), `tools/render_office.py` (generated blok korumalı), 3 agent ofisi seed (vault/coder/atlas-maker) + `vault-rewrite` proje sayfası |
+| 2 | ✅ Tamam | 5 template, `tools/sync_profiles.py` (idempotent), `tools/render_office.py` (generated blok korumalı), 3 agent ofisi seed (vault/coder/sentor-maker) + `vault-rewrite` proje sayfası |
 | 3 (backend) | ✅ Tamam | `modules/vault/{mod, guard, agent, index_lookup}` · 7 yeni Tauri komutu · K16 otomatik decisions append · write-guard (secrets + path) · stub'lar gerçekleştirildi · cargo build temiz (0 uyarı) |
 | 3 (frontend) | ⏳ Sıradaki | `ai/tools/vault.ts` yeni komutlara sarmalama, dublike implementasyonların silinmesi |
 | 4 | ⏳ Bekliyor | Rust watcher (`notify` crate) + 5 sn debounce + `--changed-files` spawn + `vault:reindexed` event |

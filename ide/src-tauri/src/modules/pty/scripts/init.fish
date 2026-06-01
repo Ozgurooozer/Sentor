@@ -1,14 +1,14 @@
-# atlas-shell-integration (fish)
+# sentor-shell-integration (fish)
 # Emits OSC 7 (cwd) + OSC 133 A/B/C/D so the host tracks cwd and prompt
 # boundaries without re-parsing the prompt.
 
-if set -q __ATLAS_HOOKS_LOADED
+if set -q __SENTOR_HOOKS_LOADED
     exit 0
 end
-set -g __ATLAS_HOOKS_LOADED 1
+set -g __SENTOR_HOOKS_LOADED 1
 
 # URL-encode a path keeping `/` intact so it stays valid inside file://.
-function __atlas_urlencode_path
+function __sentor_urlencode_path
     set -l parts (string split '/' -- $argv[1])
     set -l out
     for p in $parts
@@ -21,29 +21,29 @@ function __atlas_urlencode_path
     string join '/' $out
 end
 
-function __atlas_restore_status
+function __sentor_restore_status
     return $argv[1]
 end
 
 if functions -q fish_prompt
-    functions -c fish_prompt __atlas_user_prompt
+    functions -c fish_prompt __sentor_user_prompt
 end
 
 function fish_prompt
-    set -l __atlas_status $status
-    printf '\e]133;D;%d\e\\' $__atlas_status
+    set -l __sentor_status $status
+    printf '\e]133;D;%d\e\\' $__sentor_status
     set -l host (hostname 2>/dev/null; or echo localhost)
-    printf '\e]7;file://%s%s\e\\' "$host" (__atlas_urlencode_path "$PWD")
+    printf '\e]7;file://%s%s\e\\' "$host" (__sentor_urlencode_path "$PWD")
     printf '\e]133;A\e\\'
-    __atlas_restore_status $__atlas_status
-    if functions -q __atlas_user_prompt
-        __atlas_user_prompt
+    __sentor_restore_status $__sentor_status
+    if functions -q __sentor_user_prompt
+        __sentor_user_prompt
     else
         printf '%s > ' (prompt_pwd)
     end
     printf '\e]133;B\e\\'
 end
 
-function __atlas_preexec --on-event fish_preexec
+function __sentor_preexec --on-event fish_preexec
     printf '\e]133;C\e\\'
 end

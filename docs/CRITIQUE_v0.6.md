@@ -1,4 +1,4 @@
-# Atlas OS — v0.6 Cleanup Sonrası Eleştiri Raporu
+# Sentor — v0.6 Cleanup Sonrası Eleştiri Raporu
 
 > Hazırlanma tarihi: 2026-05-21
 > Kapsam: v0.6 "yayına hazırlık" cleanup'ı bittikten sonraki proje durumu
@@ -21,7 +21,7 @@ Gerçek dosya dağılımı:
 | `ide/src/modules/terminal/` | 8 | PTY + xterm |
 | `ide/src/modules/browser/` | 7 | Web + Vault sekme tipleri |
 
-Atlas OS aslında üç ayrı ürünün toplamı:
+Sentor aslında üç ayrı ürünün toplamı:
 
 1. **"Second brain"** (vault + indexer + MCP) — tarifi sade, kodu temiz
 2. **AI IDE** (editor + terminal + AI agents + code graph + autocomplete) — kapsam belli, yöntem net
@@ -29,7 +29,7 @@ Atlas OS aslında üç ayrı ürünün toplamı:
 
 **Sonuç:** Evet, **scope creep var.** Üçüncü kova bağımsız bir ürün gibi. Bir kullanıcı "second brain istiyorum" diye gelirse %30'unu kullanır; "agent builder istiyorum" diye gelirse %40 hazır ama sunum yok.
 
-İsim de yardımcı olmuyor: `tauri.conf.json` "Atlas OS Studio" diyor, README "Atlas OS" diyor, bundle short description "Local-first AI knowledge base and IDE" diyor — üç farklı kimlik. Üstelik `atlasos.dev` ünlü bir Windows debloater'ın markası; pratik bir karışıklık riski.
+İsim de yardımcı olmuyor: `tauri.conf.json` "Sentor" diyor, README "Sentor" diyor, bundle short description "Local-first AI knowledge base and IDE" diyor — üç farklı kimlik. Üstelik `sentoros.dev` ünlü bir Windows debloater'ın markası; pratik bir karışıklık riski.
 
 ---
 
@@ -54,7 +54,7 @@ Atlas OS aslında üç ayrı ürünün toplamı:
 | Sorun | Etki |
 |-------|------|
 | **30 günde 3 commit, 60+ unstaged değişiklik** | Geliştirme ile yayınlanabilir state arasında uçurum. `git log` bu seansın işini yansıtmıyor; bir release tag çıkarmaya hazır değil. |
-| **Updater endpoints boş** (`"endpoints": []`) | Pubkey var ama Atlas yayınlandıktan sonra OTA güncelleme yapamaz. İlk release'den hemen sonra "update available" altyapısı çalışmaz. |
+| **Updater endpoints boş** (`"endpoints": []`) | Pubkey var ama Sentor yayınlandıktan sonra OTA güncelleme yapamaz. İlk release'den hemen sonra "update available" altyapısı çalışmaz. |
 | **Windows-dışı gerçek test yok** | `#[cfg(target_os="windows")]` guard'lar var; ama macOS/Linux'ta açılış-vault-indeksleme-yazma akışı denenmemiş. `bundle.linux.deb.depends` doğru paketleri listeliyor ama doğrulanmamış. |
 | **`webviewInstallMode: downloadBootstrapper`** | İlk açılışta WebView2 yoksa internet gerek. "Tamamen offline" mottosuyla çelişir; embed mode (`embedBootstrapper`) daha sağlam. |
 | **Vault dogfooding zayıf** | 377KB, 16 sayfa — çoğu prototype/agent-state. Geliştirici kendi tool'unu kullanmıyor; ergonomi edge case'leri yakalanmamış. |
@@ -87,9 +87,9 @@ Atlas OS aslında üç ayrı ürünün toplamı:
 - `tw-animate-css` — `motion/react` yerini doldurdu, `animate-in fade-in slide-in-from-*` utility'leri
 - `--radius-sm/md/lg/xl/2xl/3xl/4xl` — full token set tanımlı; **`4xl`/`3xl` atıl** (tasarım sistemi `rounded-lg`'yi yasaklıyor)
 
-### Tabaka 3 — Atlas özel
+### Tabaka 3 — Sentor özel
 
-- 2 custom keyframe (`launcherFadeIn`, `atlasShimmer`)
+- 2 custom keyframe (`launcherFadeIn`, `sentorShimmer`)
 - 3 layout modu: default + `data-chrome="borderless"` (Linux custom chrome) + `data-layout="focused"` (overlay transparent)
 - xterm.js + CodeMirror scrollbar override'ları (`!important` ile)
 - Global scrollbar disable (Linux/Windows için, native chunky scrollbar yerine shadcn `<ScrollArea>`)
@@ -114,7 +114,7 @@ Atlas OS aslında üç ayrı ürünün toplamı:
 
 ## 4. Tek paragraflık özet
 
-Atlas OS teknik olarak iyi mühendislik (güvenlik, schema, MCP, CSS, Tauri config), zayıf ürün odaklılık (üç farklı kimlik aynı kod tabanında — second brain + IDE + agent builder). **Yayına yarı hazır:** Windows beta + power user için bugünden çıkabilir; gerçek 1.0 için commit hijyeni, macOS/Linux gerçek testi, updater endpoint, ve "Atlas OS mu, Studio mu, agent builder mı" sorusunun cevabı gerek. Geliştirici kendi tool'unu kullanmıyor (16 vault sayfa = dogfood yok) — en kritik açık.
+Sentor teknik olarak iyi mühendislik (güvenlik, schema, MCP, CSS, Tauri config), zayıf ürün odaklılık (üç farklı kimlik aynı kod tabanında — second brain + IDE + agent builder). **Yayına yarı hazır:** Windows beta + power user için bugünden çıkabilir; gerçek 1.0 için commit hijyeni, macOS/Linux gerçek testi, updater endpoint, ve "Sentor mu, Studio mu, agent builder mı" sorusunun cevabı gerek. Geliştirici kendi tool'unu kullanmıyor (16 vault sayfa = dogfood yok) — en kritik açık.
 
 ---
 
@@ -126,7 +126,7 @@ Atlas OS teknik olarak iyi mühendislik (güvenlik, schema, MCP, CSS, Tauri conf
 | P0 | Updater endpoint URL → boş yerine GitHub release.json'a yönelt | 30 dk |
 | P0 | macOS gerçek smoke test (kişisel cihaz veya GitHub Actions runner) | 2 saat |
 | P1 | Ürün kimliği netleşsin: README başlığı + tauri productName tek isim, kapsam üç başlık | 1 saat |
-| P1 | Vault dogfood — kendi notlarını Atlas içinde tut, en az 50+ sayfa | 1 hafta (sürekli) |
+| P1 | Vault dogfood — kendi notlarını Sentor içinde tut, en az 50+ sayfa | 1 hafta (sürekli) |
 | P1 | NODE_SYSTEM_PLAN tamamla — N1 bitti, N1.5 sırada (canvas görsel dil) | 2-4 gün |
 | P2 | App.tsx layout JSX split (`WorkspaceLayout` / `FocusedLayout`) | 1 gün |
 | P2 | macOS code signing + notarization workflow | 1 gün |

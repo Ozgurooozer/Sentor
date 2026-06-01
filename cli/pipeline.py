@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Atlas Pipeline runner.
+Sentor Pipeline runner.
 
 Pipelines JSON olarak vault/agents/sentor/pipelines/<id>.json altında yaşar.
 Her pipeline: adımlar listesi, her adımda on_error/on_success mantığı.
@@ -10,11 +10,11 @@ Step tipleri:
   task    — kayıtlı Sentor görevi çalıştır
   notify  — bildirim gönder
 
-atlas.py'den çağrılır:
-  atlas pipeline list
-  atlas pipeline run <id> [key=value ...]
-  atlas pipeline new <id>
-  atlas pipeline show <id>
+main.py'den çağrılır:
+  sentor pipeline list
+  sentor pipeline run <id> [key=value ...]
+  sentor pipeline new <id>
+  sentor pipeline show <id>
 """
 
 import json
@@ -102,7 +102,7 @@ def list_pipelines():
     files = sorted(PIPELINES_DIR.glob('*.json'))
     print()
     if not files:
-        print(f'  {dim("no pipelines. create one with: atlas pipeline new <id>")}\n')
+        print(f'  {dim("no pipelines. create one with: sentor pipeline new <id>")}\n')
         return
     print(f'  {len(files)} pipeline{"s" if len(files) != 1 else ""}\n')
     for f in files:
@@ -196,7 +196,7 @@ def new_pipeline(pid=None):
         return
     _save_pipeline(tpl)
     print(f'\n  {ok("created")}  {dim(str(path))}')
-    print(f'  edit the JSON then run: {accent(f"atlas pipeline run {pid}")}\n')
+    print(f'  edit the JSON then run: {accent(f"sentor pipeline run {pid}")}\n')
 
 
 # ── Dispatcher ────────────────────────────────────────────────────────────────

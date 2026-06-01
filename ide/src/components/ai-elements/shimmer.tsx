@@ -30,13 +30,13 @@ const ShimmerComponent = ({
     Component,
     {
       className: cn(
-        "atlas-shimmer relative inline-block bg-[length:250%_100%,auto] bg-clip-text text-transparent",
+        "sentor-shimmer relative inline-block bg-[length:250%_100%,auto] bg-clip-text text-transparent",
         "[--bg:linear-gradient(90deg,#0000_calc(50%-var(--spread)),var(--color-background),#0000_calc(50%+var(--spread)))] [background-repeat:no-repeat,padding-box]",
         className,
       ),
       style: {
         "--spread": `${dynamicSpread}px`,
-        "--atlas-shimmer-duration": `${duration}s`,
+        "--sentor-shimmer-duration": `${duration}s`,
         backgroundImage:
           "var(--bg), linear-gradient(var(--color-muted-foreground), var(--color-muted-foreground))",
       } as CSSProperties,

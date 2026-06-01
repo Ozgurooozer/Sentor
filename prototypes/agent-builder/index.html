@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Atlas — Agent Builder & Orkestra</title>
+<title>Sentor — Agent Builder & Orkestra</title>
 <link href="https://fonts.googleapis.com/css2?family=Departure+Mono&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -234,7 +234,7 @@ footer { border-top: 1px solid var(--border); padding: 40px; text-align: center;
 <body>
 
 <nav>
-  <div class="nav-logo">Atlas <span>/ agent system</span></div>
+  <div class="nav-logo">Sentor <span>/ agent system</span></div>
   <div class="nav-links">
     <a href="#mimari" class="active">Mimari</a>
     <a href="#nodes">Node'lar</a>
@@ -250,9 +250,9 @@ footer { border-top: 1px solid var(--border); padding: 40px; text-align: center;
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-badge">Atlas OS — Agent Builder v0.1</div>
+  <div class="hero-badge">Sentor — Agent Builder v0.1</div>
   <h1>Canvas'ta agent üret,<br><em>orkestra ile yönet.</em></h1>
-  <p>Sentor agent tasarlar. Orkestra koordine eder. Blueprint'ler fonksiyona dönüşür, vault'ta saklanır, her canvas'ta yeniden kullanılır. Flowise'ın node tabanlı yaklaşımı; Atlas'ın vault-native, lokal-öncelikli felsefesi.</p>
+  <p>Sentor agent tasarlar. Orkestra koordine eder. Blueprint'ler fonksiyona dönüşür, vault'ta saklanır, her canvas'ta yeniden kullanılır. Flowise'ın node tabanlı yaklaşımı; Sentor'ın vault-native, lokal-öncelikli felsefesi.</p>
   <div class="hero-btns">
     <a href="#canvas" class="btn btn-primary">Canvas Demo →</a>
     <a href="#plan" class="btn btn-ghost">Faz Planı</a>
@@ -315,7 +315,7 @@ footer { border-top: 1px solid var(--border); padding: 40px; text-align: center;
       </div>
       <div class="arch-agent">
         <div class="arch-agent-name">Projeye Çevir</div>
-        <div class="arch-agent-desc">Sub canvas içeriği Vault-Exporter agent ile vault HTML sayfasına dönüşür. Format kontrol, Atlas-Maker stili, native bildirim.</div>
+        <div class="arch-agent-desc">Sub canvas içeriği Vault-Exporter agent ile vault HTML sayfasına dönüşür. Format kontrol, Sentor-Maker stili, native bildirim.</div>
         <span class="arch-agent-tag tag-blueprint">vault export</span>
       </div>
       <div class="arch-agent">
@@ -332,7 +332,7 @@ footer { border-top: 1px solid var(--border); padding: 40px; text-align: center;
 <!-- NODE PALETTE -->
 <section id="nodes">
   <div class="section-tag">// 02 · node taksonomisi</div>
-  <div class="section-title">12 node tipi. Flowise'tan ilham, Atlas'a uyarlandı.</div>
+  <div class="section-title">12 node tipi. Flowise'tan ilham, Sentor'a uyarlandı.</div>
   <p class="section-sub">Her node'un <strong>inputs[]</strong> ve <strong>outputs[]</strong> portları var. Port tipleri: text · json · trigger · stream. Edge sadece uyumlu portları bağlar.</p>
 
   <div class="palette">
@@ -490,7 +490,7 @@ footer { border-top: 1px solid var(--border); padding: 40px; text-align: center;
               <div class="ae-chip active">Sıfırdan</div>
               <div class="ae-chip" onclick="toggleChip(this)">Vault</div>
               <div class="ae-chip" onclick="toggleChip(this)">Coder</div>
-              <div class="ae-chip" onclick="toggleChip(this)">Atlas-Maker</div>
+              <div class="ae-chip" onclick="toggleChip(this)">Sentor-Maker</div>
             </div>
           </div>
           <div class="ae-field">
@@ -512,7 +512,7 @@ footer { border-top: 1px solid var(--border); padding: 40px; text-align: center;
           </div>
           <div class="ae-field">
             <label class="ae-label">SISTEM PROMPTU</label>
-            <textarea class="ae-textarea">You are Sentor, Atlas's Agent Builder. Read the current canvas via canvas_read_state. Propose an agent design (name, role, tools, base) in 3-5 lines. Wait for confirmation, then call agent_spawn.</textarea>
+            <textarea class="ae-textarea">You are Sentor, Sentor's Agent Builder. Read the current canvas via canvas_read_state. Propose an agent design (name, role, tools, base) in 3-5 lines. Wait for confirmation, then call agent_spawn.</textarea>
           </div>
         </div>
         <div class="ae-actions">
@@ -611,7 +611,7 @@ footer { border-top: 1px solid var(--border); padding: 40px; text-align: center;
 <section id="blueprint">
   <div class="section-tag">// 04 · blueprint sistemi</div>
   <div class="section-title">Node zinciri → kayıt → fonksiyon.</div>
-  <p class="section-sub">Yaptığın çalışmayı tekrar kullanılabilir fonksiyona dönüştür. Blueprint çoğaldıkça Atlas'ın kabiliyeti birikir. Bir blueprint başka blueprint içinde <code>SubCanvas</code> node olarak da kullanılabilir.</p>
+  <p class="section-sub">Yaptığın çalışmayı tekrar kullanılabilir fonksiyona dönüştür. Blueprint çoğaldıkça Sentor'ın kabiliyeti birikir. Bir blueprint başka blueprint içinde <code>SubCanvas</code> node olarak da kullanılabilir.</p>
 
   <div class="blueprint-detail">
     <div class="bp-demo">
@@ -688,7 +688,7 @@ footer { border-top: 1px solid var(--border); padding: 40px; text-align: center;
       <div class="orch-arrow">↓</div>
       <div class="orch-item"><div class="orch-item-name">Canvas State</div><div class="orch-item-desc">Hangi paneller açık, vault dosyaları, aktif node bağlantıları</div></div>
       <div class="orch-arrow">↓</div>
-      <div class="orch-item"><div class="orch-item-name">Agent Listesi</div><div class="orch-item-desc">Vault, Coder, Atlas-Maker, Sentor + custom agentler</div></div>
+      <div class="orch-item"><div class="orch-item-name">Agent Listesi</div><div class="orch-item-desc">Vault, Coder, Sentor-Maker, Sentor + custom agentler</div></div>
     </div>
     <div class="orch-divider"></div>
     <div class="orch-col">
@@ -765,7 +765,7 @@ footer { border-top: 1px solid var(--border); padding: 40px; text-align: center;
       <div class="scn-body">
         Sub canvas'ta bir araştırma yapıldı, 3 vault dosyası okundu, agent yorumlar üretti.<br>
         → Toolbar → <strong>Projeye Çevir</strong> butonu.<br>
-        → Vault-Exporter agent canvas state'i toplar, HTML üretir, Atlas-Maker stil rulebook'una göre formatlar.<br>
+        → Vault-Exporter agent canvas state'i toplar, HTML üretir, Sentor-Maker stil rulebook'una göre formatlar.<br>
         → <em>"Vault'a Hazır: vault/projects/aralık-araştırma/"</em> bildirimi gelir. Indexer otomatik çalışır.
       </div>
     </div>
@@ -832,7 +832,7 @@ footer { border-top: 1px solid var(--border); padding: 40px; text-align: center;
       <div style="padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--bg2);">
         <div style="font-family: var(--mono); font-size: 10px; color: var(--purple); letter-spacing: 0.1em;">// SENTOR SİSTEM PROMPTU (özet)</div>
       </div>
-      <pre style="padding: 18px 22px; font-family: var(--mono); font-size: 11px; color: var(--text); line-height: 1.7; margin: 0; white-space: pre-wrap; background: transparent;">You are Sentor, Atlas's Agent Builder.
+      <pre style="padding: 18px 22px; font-family: var(--mono); font-size: 11px; color: var(--text); line-height: 1.7; margin: 0; white-space: pre-wrap; background: transparent;">You are Sentor, Sentor's Agent Builder.
 
 1. Ambiguous? Ask ONE clarifying question.
 2. Propose spec (YAML):
@@ -848,7 +848,7 @@ REFUSALS
 • Never spawn empty tools[]
 • Never include agent_spawn in tools
 • Never expose vault_write
-  unless Atlas-Maker pattern</pre>
+  unless Sentor-Maker pattern</pre>
     </div>
 
     <div style="background: var(--bg1); border: 1px solid rgba(91,141,239,0.3); border-radius: 8px; overflow: hidden;">
@@ -953,7 +953,7 @@ type Result =
 <section id="guvenlik">
   <div class="section-tag">// 08 · güvenlik & izolasyon</div>
   <div class="section-title">Kimin nereye yazma izni var?</div>
-  <p class="section-sub">Canvas izolasyon matrisi + tool whitelist + blueprint import sandbox + onay flow. Atlas'ın mevcut "read-only auto, mutating prompt" deseni üzerine kurulu.</p>
+  <p class="section-sub">Canvas izolasyon matrisi + tool whitelist + blueprint import sandbox + onay flow. Sentor'ın mevcut "read-only auto, mutating prompt" deseni üzerine kurulu.</p>
 
   <!-- Canvas isolation matrix -->
   <div style="margin-top: 48px; background: var(--bg1); border: 1px solid var(--border); border-radius: 8px; padding: 24px;">
@@ -1028,7 +1028,7 @@ type Result =
       </div>
       <div>
         <div style="font-family: var(--mono); font-size: 11px; color: var(--red); margin-bottom: 6px;">2. Schema</div>
-        <div style="font-size: 11px; color: var(--muted2); line-height: 1.6;"><code>$schema: "atlas-blueprint-v1"</code> zorunlu. JSON schema doğrulama.</div>
+        <div style="font-size: 11px; color: var(--muted2); line-height: 1.6;"><code>$schema: "sentor-blueprint-v1"</code> zorunlu. JSON schema doğrulama.</div>
       </div>
       <div>
         <div style="font-family: var(--mono); font-size: 11px; color: var(--red); margin-bottom: 6px;">3. Agent onayı</div>
@@ -1147,7 +1147,7 @@ type Result =
 </section>
 
 <footer>
-  ATLAS OS — Agent Builder Prototip · v0.1 · prototypes/agent-builder/index.html
+  Sentor — Agent Builder Prototip · v0.1 · prototypes/agent-builder/index.html
 </footer>
 
 <script>

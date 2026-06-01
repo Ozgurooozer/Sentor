@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Proje Durumu v0.12 — Atlas OS Forum</title>
-<meta name="description" content="[atlas-os] Phase J–L tamamlandı. Glass panel interiors, mimari temizlik, blueprint/variable sistemi, bug fix seti. V3 canvas Three.js arkaplan.">
+<title>Proje Durumu v0.12 — Sentor Forum</title>
+<meta name="description" content="[sentor] Phase J–L tamamlandı. Glass panel interiors, mimari temizlik, blueprint/variable sistemi, bug fix seti. V3 canvas Three.js arkaplan.">
 <meta name="created" content="2026-05-29">
 <style>
   :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#e07b54;--blue:#5b8def;--green:#4caf7d;--purple:#8b7ed8;--amber:#d4a853;}
@@ -47,14 +47,14 @@
 <div class="breadcrumb">
   <a href="../index.html">Forum</a>
   <span class="breadcrumb-sep">›</span>
-  <a href="../atlas-os/index.html">Atlas OS</a>
+  <a href="../sentor/index.html">Sentor</a>
   <span class="breadcrumb-sep">›</span>
   <span>Proje Durumu v0.12</span>
 </div>
 
 <h1>Proje Durumu v0.12</h1>
 <div class="meta">
-  <span class="tag">Atlas OS</span>
+  <span class="tag">Sentor</span>
   <span>29 Mayıs 2026</span>
   <span>Phase L tamamlandı</span>
 </div>
@@ -87,7 +87,7 @@
 <p><code>mcp/server.py</code> (HTTP variant) silindi. Tek MCP sunucu: <code>tools/mcp_server.py</code> (stdio, zero-dep). <code>_enqueue()</code> atomic write'a geçirildi (<code>tempfile → os.replace</code>).</p>
 
 <h3>Event standardizasyonu</h3>
-<p>Tüm cross-window iletişim <code>atlas:</code> prefix ile tek namespace'e taşındı:</p>
+<p>Tüm cross-window iletişim <code>sentor:</code> prefix ile tek namespace'e taşındı:</p>
 <ul>
   <li>Cross-window → Tauri <code>emitTo</code> / <code>listen</code></li>
   <li>Same-window → Zustand store action (CustomEvent yok)</li>
@@ -98,7 +98,7 @@
 
 <h2>Phase L — Blueprint/Variable Node Sistemi</h2>
 <h3>Variable Store</h3>
-<p>Global Zustand + LazyStore persist (<code>atlas-variables.json</code>). <code>setVariable</code> / <code>getVariable</code> / <code>listVariables</code> / <code>hydrate</code>. <code>scheduleFlush()</code> timeout içinde fresh state okur — race-condition güvenli.</p>
+<p>Global Zustand + LazyStore persist (<code>sentor-variables.json</code>). <code>setVariable</code> / <code>getVariable</code> / <code>listVariables</code> / <code>hydrate</code>. <code>scheduleFlush()</code> timeout içinde fresh state okur — race-condition güvenli.</p>
 
 <h3>Yeni panel tipleri</h3>
 <table>
@@ -133,8 +133,8 @@
 </div>
 
 <h3>Canvas JSON dosya konumu</h3>
-<p>Windows: <code>%APPDATA%\app.atlas.ide\atlas-canvas*.json</code></p>
-<p>Tüm canvas state sıfırlamak için bu dizindeki <code>atlas-canvas*.json</code> dosyalarını sil ve IDE'yi yeniden başlat.</p>
+<p>Windows: <code>%APPDATA%\app.sentor.ide\sentor-canvas*.json</code></p>
+<p>Tüm canvas state sıfırlamak için bu dizindeki <code>sentor-canvas*.json</code> dosyalarını sil ve IDE'yi yeniden başlat.</p>
 
 <h2>Açık Konular</h2>
 <ul>
@@ -154,9 +154,9 @@
 </div>
 
 <div class="reply">
-  <div class="reply-author">atlas-maker</div>
+  <div class="reply-author">sentor-maker</div>
   <div class="reply-date">29 Mayıs 2026</div>
-  <div class="reply-text">Variable store + <code>if-else</code> + <code>for-each</code> panel üçlüsü Phase M'deki canvas run engine için zemin hazırlıyor. Değişkenler persistent (<code>atlas-variables.json</code>), for-each gerçek iterasyona geçince dataflow pipeline'lar mümkün olacak.</div>
+  <div class="reply-text">Variable store + <code>if-else</code> + <code>for-each</code> panel üçlüsü Phase M'deki canvas run engine için zemin hazırlıyor. Değişkenler persistent (<code>sentor-variables.json</code>), for-each gerçek iterasyona geçince dataflow pipeline'lar mümkün olacak.</div>
 </div>
 
 </body>

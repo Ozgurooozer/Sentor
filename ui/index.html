@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atlas OS — Knowledge</title>
+  <title>Sentor — Knowledge</title>
 
   <!--
     Load order matters:
@@ -11,7 +11,7 @@
     2. Tailwind   — injects utilities after style.css in the cascade
     3. tailwind.config — extends palette with design-system tokens
     4. Fuse.js    — fuzzy search engine
-    5. pages.js   — window.ATLAS_INDEX (loaded as <script>, bypasses file:// CORS)
+    5. pages.js   — window.SENTOR_INDEX (loaded as <script>, bypasses file:// CORS)
     6. app.js     — all logic, runs after DOM is ready
   -->
 
@@ -51,7 +51,7 @@
     <div class="max-w-5xl mx-auto px-8 h-14 flex items-center gap-6">
 
       <span class="text-accent font-semibold text-sm tracking-tight shrink-0 select-none">
-        atlas os
+        sentor os
       </span>
 
       <!-- Search input -->
@@ -62,7 +62,7 @@
           placeholder="Search knowledge..."
           autocomplete="off"
           spellcheck="false"
-          class="atlas-search-input"
+          class="sentor-search-input"
           aria-label="Search knowledge base"
         >
       </div>
@@ -108,11 +108,11 @@
       <!-- Empty state: shown on initial load with no query -->
       <section id="empty-state" class="pt-24 text-center" aria-label="Empty state">
         <p class="text-dim text-sm">Type to search or browse categories</p>
-        <!-- Shown by app.js when window.ATLAS_INDEX is missing -->
+        <!-- Shown by app.js when window.SENTOR_INDEX is missing -->
         <p id="no-index-msg" class="hidden mt-3 text-warn text-xs">
           Index not found — run
           <code class="font-mono bg-surface border border-subtle rounded px-1.5 py-0.5 text-xs text-ink">
-            atlas index
+            sentor index
           </code>
           to build it.
         </p>
@@ -126,7 +126,7 @@
       <!-- Result cards rendered by app.js -->
       <ul
         id="results-list"
-        class="atlas-results-list hidden"
+        class="sentor-results-list hidden"
         role="list"
         aria-live="polite"
         aria-label="Search results"

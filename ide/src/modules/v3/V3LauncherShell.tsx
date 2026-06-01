@@ -17,7 +17,7 @@ async function scaffoldProject(path: string, name: string): Promise<void> {
   const norm = path.replace(/\\/g, "/");
   await mkdirSafe(`${norm}/vault`);
   await mkdirSafe(`${norm}/vault/notes`);
-  await mkdirSafe(`${norm}/.atlas`);
+  await mkdirSafe(`${norm}/.sentor`);
   const vaultHome = `<!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -33,7 +33,7 @@ async function scaffoldProject(path: string, name: string): Promise<void> {
 </html>`;
   await invoke("fs_write_file", { path: `${norm}/vault/index.html`, content: vaultHome });
   const config = JSON.stringify({ name, created: new Date().toISOString(), version: "1" }, null, 2);
-  await invoke("fs_write_file", { path: `${norm}/.atlas/config.json`, content: config });
+  await invoke("fs_write_file", { path: `${norm}/.sentor/config.json`, content: config });
 }
 
 export function V3LauncherShell() {
@@ -110,10 +110,10 @@ export function V3LauncherShell() {
             className="flex h-[28px] w-[28px] items-center justify-center rounded-[8px] text-[12px] font-bold text-white"
             style={{ background: "linear-gradient(135deg,#5b8def,#9b72ef)" }}
           >
-            A
+            S
           </div>
           <div>
-            <div className="text-[13px] font-semibold" style={{ color: "#e8e8ec" }}>Atlas OS</div>
+            <div className="text-[13px] font-semibold" style={{ color: "#e8e8ec" }}>Sentor</div>
             <div className="text-[10px]" style={{ color: "rgba(255,255,255,0.25)" }}>Çalışma alanı seç</div>
           </div>
         </div>

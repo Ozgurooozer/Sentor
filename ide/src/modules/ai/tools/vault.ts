@@ -6,7 +6,7 @@ import { native } from "@/modules/ai/lib/native";
 import { LMSTUDIO_DEFAULT_BASE_URL, OLLAMA_DEFAULT_BASE_URL } from "@/modules/ai/config";
 import type { ToolContext } from "./context";
 
-const ATLAS_API = "http://127.0.0.1:4242";
+const SENTOR_API = "http://127.0.0.1:4242";
 
 export async function findPython(workspaceRoot: string): Promise<string | null> {
   for (const candidate of ["py", "python3", "python"]) {
@@ -216,7 +216,7 @@ async function semanticSearch(
     const params = new URLSearchParams({ q: query, limit: String(limit) });
     if (category) params.set("category", category);
     if (scope) params.set("scope", scope);
-    const res = await fetch(`${ATLAS_API}/api/semantic?${params}`, {
+    const res = await fetch(`${SENTOR_API}/api/semantic?${params}`, {
       signal: ctrl.signal,
     });
     clearTimeout(timer);
@@ -333,7 +333,7 @@ export function searchVaultDirect(
 export function buildVaultTools(ctx: ToolContext) {
   return {
     vault_search: tool({
-      description: `Search the Atlas OS knowledge vault (your persistent memory). Hybrid search: fast local keyword index first, augmented with semantic (embedding) search when keyword results are weak and the local API is reachable. ALWAYS call this before answering any question about the user's notes or knowledge base.
+      description: `Search the Sentor knowledge vault (your persistent memory). Hybrid search: fast local keyword index first, augmented with semantic (embedding) search when keyword results are weak and the local API is reachable. ALWAYS call this before answering any question about the user's notes or knowledge base.
 
 Returns: title, category, slug, description, snippet, score, source ("keyword" | "semantic" | "hybrid"). Use vault_read for full content. Pass mode="semantic" to force embedding search for fuzzy / conceptual queries.
 
@@ -348,7 +348,7 @@ Use scope to isolate results to a specific agent office (e.g. "agent:vault") or 
           .string()
           .optional()
           .describe(
-            'Scope filter: "agent:vault", "agent:coder", "agent:atlas-maker", "agent:sentor" to limit to one agent\'s office, or "vault" for all user notes. Omit for global search.',
+            'Scope filter: "agent:vault", "agent:coder", "agent:sentor-maker", "agent:sentor" to limit to one agent\'s office, or "vault" for all user notes. Omit for global search.',
           ),
         include_archive: z
           .boolean()
@@ -412,7 +412,7 @@ Use scope to isolate results to a specific agent office (e.g. "agent:vault") or 
 
         let semantic: SemanticResult[] = [];
         if (needSemantic) {
-          // Try Atlas API first; if offline, fall back to local embeddings + Ollama/LM Studio
+          // Try Sentor API first; if offline, fall back to local embeddings + Ollama/LM Studio
           semantic = await semanticSearch(query, cap * 2, category, scope);
           if (semantic.length === 0) {
             const prefs = (await import("@/modules/settings/preferences"))
@@ -464,7 +464,7 @@ Use scope to isolate results to a specific agent office (e.g. "agent:vault") or 
           const ctrl = new AbortController();
           const timer = setTimeout(() => ctrl.abort(), 1500);
           const res = await fetch(
-            `${ATLAS_API}/api/page/${encodeURIComponent(category)}/${encodeURIComponent(slug)}`,
+            `${SENTOR_API}/api/page/${encodeURIComponent(category)}/${encodeURIComponent(slug)}`,
             { signal: ctrl.signal },
           );
           clearTimeout(timer);
@@ -601,7 +601,7 @@ Use scope to isolate results to a specific agent office (e.g. "agent:vault") or 
           })();
         }
 
-        await emit("atlas://vault-page-written", {
+        await emit("sentor://vault-page-written", {
           path: filePath,
           category,
           slug,

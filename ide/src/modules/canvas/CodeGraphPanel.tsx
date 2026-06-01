@@ -267,7 +267,7 @@ export function CodeGraphPanel({ panel }: { panel: CanvasPanelNode }) {
             <div className="flex flex-col items-center gap-1.5 text-center">
               <span className="text-[11px] text-[#f5f5f5]">Bridge not running</span>
               <span className="text-[9px] text-[#555]">
-                node tools/codegraph_bridge.js &quot;C:\Atlas OS&quot;
+                node tools/codegraph_bridge.js &quot;C:\Sentor&quot;
               </span>
               <button
                 type="button"

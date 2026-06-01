@@ -26,7 +26,7 @@ type Args = {
  *     (add/remove panel, open tab, send AI message).
  *
  * Rust starts a filesystem watcher on the queue file via `mcp_watch_start`,
- * which emits `atlas:mcp-cmd` whenever an external tool writes to the
+ * which emits `sentor:mcp-cmd` whenever an external tool writes to the
  * queue — we drain immediately on each event. A slow polling fallback
  * (every 30s) catches the rare case where the watcher misses an event
  * (e.g. queue dir didn't exist when the watcher was started).
@@ -131,7 +131,7 @@ export function useMcpBridge({
     // events. The 30s polling timer is a defensive fallback only.
     void safeInvoke("mcp_watch_start", { root: workspaceRoot });
     void drain();
-    const unlistenP = listen("atlas:mcp-cmd", () => void drain());
+    const unlistenP = listen("sentor:mcp-cmd", () => void drain());
     const timer = setInterval(() => void drain(), 30_000);
     return () => {
       clearInterval(timer);

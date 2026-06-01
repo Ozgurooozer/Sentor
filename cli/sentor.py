@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Sentor Worker — Atlas CLI görev katmanı.
+Sentor Worker — Sentor CLI görev katmanı.
 
 Görevler JSON olarak vault/agents/sentor/tasks/<id>.json altında yaşar.
 Her görev: provider tercihi, vault scope, izinler, prompt, on_done/on_error.
 
-Public API (atlas.py'den çağrılır):
+Public API (main.py'den çağrılır):
   new_task(args)        — interaktif wizard
   run_task(task_id)     — JSON yükle, provider çağır, sonucu logla
   list_tasks()          — kayıtlı görevleri listele
@@ -207,14 +207,14 @@ def new_task(args):
 
     path = _save_task(task)
     print(f'\n  {ok("saved")}  {dim(str(path))}')
-    print(f'  run: {accent(f"atlas run {task_id}")}\n')
+    print(f'  run: {accent(f"sentor run {task_id}")}\n')
 
 
 def list_tasks():
     files = sorted(TASKS_DIR.glob('*.json'))
     print()
     if not files:
-        print(f'  {dim("no tasks. create one with: atlas new-task")}\n')
+        print(f'  {dim("no tasks. create one with: sentor new-task")}\n')
         return
     print(f'  {len(files)} task{"s" if len(files) != 1 else ""}\n')
     for f in files:
@@ -412,7 +412,7 @@ def _notify(msg, error=False):
             ps = (
                 f'powershell -NoProfile -Command '
                 f'"[reflection.assembly]::loadwithpartialname(\'System.Windows.Forms\') | Out-Null; '
-                f'[System.Windows.Forms.MessageBox]::Show(\'{msg}\',\'Atlas Sentor\') | Out-Null"'
+                f'[System.Windows.Forms.MessageBox]::Show(\'{msg}\',\'Sentor\') | Out-Null"'
             )
             # MessageBox bloklayıcı, kullanma. Sadece log + console yeter.
             _ = ps
@@ -424,10 +424,10 @@ def notify(msg):
     _notify(msg, error=False)
 
 
-# ── CLI entry (atlas.py'den çağrılır) ────────────────────────────────────────
+# ── CLI entry (main.py'den çağrılır) ────────────────────────────────────────
 
 def dispatch(args):
-    """atlas.py içinden çağrılan dispatcher."""
+    """main.py içinden çağrılan dispatcher."""
     cmd = args.cmd
 
     if cmd == 'new-task':

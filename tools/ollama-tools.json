@@ -1,7 +1,7 @@
 {
   "_meta": {
-    "description": "Ollama function-calling tool definitions for the Atlas OS knowledge API.",
-    "usage": "Include the 'tools' array in your /api/chat request body. Start the API first with: atlas serve",
+    "description": "Ollama function-calling tool definitions for the Sentor knowledge API.",
+    "usage": "Include the 'tools' array in your /api/chat request body. Start the API first with: sentor serve",
     "api_base": "http://localhost:4242",
     "recommended_workflow": "1. Call search_knowledge to find relevant pages. 2. Call get_page on the top result to read full content."
   },
@@ -11,7 +11,7 @@
       "type": "function",
       "function": {
         "name": "search_knowledge",
-        "description": "Search the local Atlas OS knowledge base. Returns ranked pages whose title, headings, description, or body text match the query. Use this first to discover what is available, then call get_page for the full content of a specific page.",
+        "description": "Search the local Sentor knowledge base. Returns ranked pages whose title, headings, description, or body text match the query. Use this first to discover what is available, then call get_page for the full content of a specific page.",
         "parameters": {
           "type": "object",
           "properties": {

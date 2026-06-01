@@ -395,7 +395,7 @@ function EmbeddingBlock() {
       null,
       2,
     );
-    const path = workspaceRoot.replace(/[\\/]$/, "") + "/.atlas-embed.json";
+    const path = workspaceRoot.replace(/[\\/]$/, "") + "/.sentor-embed.json";
     try {
       await invoke("fs_write_file", { path, content: cfg });
       setWriteStatus("ok");
@@ -423,7 +423,7 @@ function EmbeddingBlock() {
         <p className="mt-0.5 text-[10.5px] leading-relaxed text-muted-foreground">
           Used by <code className="font-mono">tools/embedder.py</code> and{" "}
           <code className="font-mono">api/server.py</code> for semantic vault search. Writes{" "}
-          <code className="font-mono">.atlas-embed.json</code> to the workspace root.
+          <code className="font-mono">.sentor-embed.json</code> to the workspace root.
         </p>
       </div>
 
@@ -464,14 +464,14 @@ function EmbeddingBlock() {
       {!workspaceRoot && (
         <p className="text-[10.5px] text-amber-500">
           Set a workspace root in Preferences to auto-write{" "}
-          <code className="font-mono">.atlas-embed.json</code>.
+          <code className="font-mono">.sentor-embed.json</code>.
         </p>
       )}
       {writeStatus === "ok" && (
-        <p className="text-[10.5px] text-emerald-500">Config saved to .atlas-embed.json</p>
+        <p className="text-[10.5px] text-emerald-500">Config saved to .sentor-embed.json</p>
       )}
       {writeStatus === "fail" && (
-        <p className="text-[10.5px] text-destructive">Could not write .atlas-embed.json</p>
+        <p className="text-[10.5px] text-destructive">Could not write .sentor-embed.json</p>
       )}
     </div>
   );

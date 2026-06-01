@@ -1,6 +1,6 @@
-# Atlas IDE
+# Sentor IDE
 
-**Atlas**, Tauri 2, Rust ve React 19 ile geliştirilmiş, yerel öncelikli, açık kaynaklı ve hafif bir AI-native terminal ve geliştirme ortamıdır (ADE).
+**Sentor**, Tauri 2, Rust ve React 19 ile geliştirilmiş, yerel öncelikli, açık kaynaklı ve hafif bir AI-native terminal ve geliştirme ortamıdır (ADE).
 
 ## Özellikler
 

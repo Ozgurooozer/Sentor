@@ -11,7 +11,7 @@ import {
   type AgentConfig,
 } from "../lib/agents";
 
-const CHANGED_EVENT = "atlas://ai-agents-changed";
+const CHANGED_EVENT = "sentor://ai-agents-changed";
 
 type AgentsState = {
   hydrated: boolean;

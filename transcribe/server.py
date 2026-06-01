@@ -1,5 +1,5 @@
 """
-atlas-transcribe/server.py
+sentor-transcribe/server.py
 
 Pipeline:
     POST /transcribe  (multipart, field: "audio")
@@ -144,6 +144,6 @@ def transcribe():
 
 
 if __name__ == "__main__":
-    print(f"atlas-transcribe → http://localhost:{PORT}/transcribe")
+    print(f"sentor-transcribe → http://localhost:{PORT}/transcribe")
     print(f"  WHISPER_MODEL={MODEL_SIZE}  WHISPER_DEVICE={DEVICE}\n")
     app.run(host="0.0.0.0", port=PORT, debug=False)

@@ -197,7 +197,7 @@ export function AiInputBar({ bare }: { bare?: boolean }) {
                     c.submit();
                   }
                 }}
-                placeholder="Ask Atlas anything   -   # for snippets and commands"
+                placeholder="Ask Sentor anything   -   # for snippets and commands"
                 rows={1}
                 disabled={c.isBusy}
                 className={cn(

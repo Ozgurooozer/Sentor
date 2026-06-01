@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-atlas node — unified node manager (pipelines + tasks).
+sentor node — unified node manager (pipelines + tasks).
 
-  atlas node list                       list all nodes
-  atlas node run <id> [key=value]       run a node; stdin → ctx['input']
-  atlas node pipe <id> <id> ... [key=value]  chain nodes (output → next input)
-  atlas node show <id>                  print node JSON
-  atlas node log <id>                   show run history
-  atlas node edit <id>                  open node JSON in $EDITOR
-  atlas node new <id>                   create a template pipeline node
-  atlas node delete <id>                delete a node
+  sentor node list                       list all nodes
+  sentor node run <id> [key=value]       run a node; stdin → ctx['input']
+  sentor node pipe <id> <id> ... [key=value]  chain nodes (output → next input)
+  sentor node show <id>                  print node JSON
+  sentor node log <id>                   show run history
+  sentor node edit <id>                  open node JSON in $EDITOR
+  sentor node new <id>                   create a template pipeline node
+  sentor node delete <id>                delete a node
 """
 
 import contextlib
@@ -67,7 +67,7 @@ def list_nodes():
     total = len(pipelines) + len(tasks)
     print()
     if not total:
-        print(f'  {dim("no nodes yet. create one: atlas node new <id>")}\n')
+        print(f'  {dim("no nodes yet. create one: sentor node new <id>")}\n')
         return
     print(f'  {total} node{"s" if total != 1 else ""}\n')
     for f in pipelines:
@@ -232,7 +232,7 @@ def new_node(node_id: str | None = None):
     }
     path.write_text(json.dumps(tpl, indent=2, ensure_ascii=False), encoding='utf-8')
     print(f'\n  {ok("created")}  {dim(str(path))}')
-    print(f'  edit the JSON then run: {acc(f"atlas node run {node_id}")}\n')
+    print(f'  edit the JSON then run: {acc(f"sentor node run {node_id}")}\n')
 
 
 def delete_node(node_id: str):

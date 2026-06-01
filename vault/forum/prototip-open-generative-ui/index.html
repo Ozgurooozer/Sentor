@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prototip: OpenGenerativeUI — Atlas OS Entegrasyonu</title>
-<meta name="description" content="[dev] CopilotKit OpenGenerativeUI prototipi Atlas OS'a taşınıyor. AI-generated UI, sandboxed iframe render, LangGraph Deep Agent entegrasyonu.">
+<title>Prototip: OpenGenerativeUI — Sentor Entegrasyonu</title>
+<meta name="description" content="[dev] CopilotKit OpenGenerativeUI prototipi Sentor'a taşınıyor. AI-generated UI, sandboxed iframe render, LangGraph Deep Agent entegrasyonu.">
 <meta name="created" content="2026-05-29">
 <style>
   :root{--bg:#0a0a0a;--surface:#111111;--elevated:#1a1a1a;--subtle:#2a2a2a;--ink:#f5f5f5;--dim:#888888;--muted:#555555;--accent:#8b7ed8;--blue:#5b8def;--green:#4caf7d;--amber:#d4a853;}
@@ -51,7 +51,7 @@
   <span>Prototip: OpenGenerativeUI</span>
 </div>
 
-<h1>Prototip: OpenGenerativeUI — Atlas OS Entegrasyonu</h1>
+<h1>Prototip: OpenGenerativeUI — Sentor Entegrasyonu</h1>
 <div class="meta">
   <span class="tag">Prototip</span>
   <span>29 Mayıs 2026</span>
@@ -74,33 +74,33 @@
   <tr><th>Adım</th><th>Açıklama</th><th>Durum</th></tr>
   <tr><td>1</td><td>Repo <code>prototypes/open-generative-ui/</code> klasörüne klonlandı</td><td class="status-done">tamam</td></tr>
   <tr><td>2</td><td>Proje yapısı incelendi — Next.js 16 + LangGraph Python agent + MCP server</td><td class="status-done">tamam</td></tr>
-  <tr><td>3</td><td>Atlas OS modülü olarak panel tipi tanımlama</td><td class="status-open">plan</td></tr>
+  <tr><td>3</td><td>Sentor modülü olarak panel tipi tanımlama</td><td class="status-open">plan</td></tr>
   <tr><td>4</td><td>iframe tabanlı Generative UI paneli (CopilotKit <code>useComponent</code>)</td><td class="status-open">plan</td></tr>
   <tr><td>5</td><td>Canvas wire entegrasyonu — agent output'u panel'e bağlama</td><td class="status-open">plan</td></tr>
-  <tr><td>6</td><td>MCP server'ı Atlas OS MCP tool'larına ekleme</td><td class="status-open">plan</td></tr>
+  <tr><td>6</td><td>MCP server'ı Sentor MCP tool'larına ekleme</td><td class="status-open">plan</td></tr>
   <tr><td>7</td><td>Vault forum + canvas üzerinden test ve geri bildirim</td><td class="status-open">plan</td></tr>
 </table>
 
 <h2>Entegrasyon Planı</h2>
 
-<h3>1. Atlas OS Modül Yapısı</h3>
-<p><code>modules/open-generative-ui/</code> altında bağımsız bir modül olarak çalışacak. Kendi <code>package.json</code>'ı ile bağımsız build alabilir, Atlas OS IDE bundler'ı ile dahil edilebilir.</p>
+<h3>1. Sentor Modül Yapısı</h3>
+<p><code>modules/open-generative-ui/</code> altında bağımsız bir modül olarak çalışacak. Kendi <code>package.json</code>'ı ile bağımsız build alabilir, Sentor IDE bundler'ı ile dahil edilebilir.</p>
 
 <h3>2. Canvas Paneli</h3>
 <p>Yeni bir panel tipi (<code>generative-ui</code>) eklenerek CopilotKit'in <code>useComponent</code> hook'unu saran bir React komponenti yapılacak. Agent mesajlarındaki HTML/SVG çıktılarını sandboxed iframe'de gösterecek.</p>
 
 <h3>3. Agent Entegrasyonu</h3>
-<p>Atlas OS Canvas AI agent'ı (Orkestra), OpenGenerativeUI'nin LangGraph Deep Agent'ını bir alt-agent veya tool olarak çağırabilecek. Bu sayede kullanıcı "bana binary search görselleştirmesi yap" dediğinde canvas'ta bir Generative UI paneli açılacak.</p>
+<p>Sentor Canvas AI agent'ı (Orkestra), OpenGenerativeUI'nin LangGraph Deep Agent'ını bir alt-agent veya tool olarak çağırabilecek. Bu sayede kullanıcı "bana binary search görselleştirmesi yap" dediğinde canvas'ta bir Generative UI paneli açılacak.</p>
 
 <h3>4. MCP Server</h3>
-<p>OpenGenerativeUI'nin kendi MCP server'ı (<code>apps/mcp</code>) Atlas OS MCP tool'larına eklenecek. <code>assemble_document</code> ve skill resource'ları kullanılabilecek.</p>
+<p>OpenGenerativeUI'nin kendi MCP server'ı (<code>apps/mcp</code>) Sentor MCP tool'larına eklenecek. <code>assemble_document</code> ve skill resource'ları kullanılabilecek.</p>
 
 <h2>Teknik Zorluklar</h2>
 <ul>
   <li><strong>Model gereksinimi:</strong> Generative UI güçlü modeller ister (GPT-5.4, Claude Opus 4, Gemini 3.1 Pro). Küçük modellerde çıktı kalitesi düşer.</li>
   <li><strong>Sandbox güvenliği:</strong> iframe içinde üretilen HTML'in güvenli şekilde render edilmesi (sandbox attribute, CSP).</li>
-  <li><strong>State yönetimi:</strong> CopilotKit agent state pattern ile Atlas OS variable store arasında köprü.</li>
-  <li><strong>Bağımlılık yükü:</strong> Next.js 16 + Turborepo + pnpm — Atlas OS'un zero-dep felsefesiyle çelişebilir.</li>
+  <li><strong>State yönetimi:</strong> CopilotKit agent state pattern ile Sentor variable store arasında köprü.</li>
+  <li><strong>Bağımlılık yükü:</strong> Next.js 16 + Turborepo + pnpm — Sentor'un zero-dep felsefesiyle çelişebilir.</li>
 </ul>
 
 <h2>Karar Noktaları</h2>

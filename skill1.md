@@ -12,7 +12,7 @@
 - **Hybrid search:** keyword + semantic skorları normalize edip `alpha` ağırlığıyla merge; Ollama çevrimdışıysa graceful degradation
 - **Path traversal koruması:** `file.is_relative_to(ROOT.resolve())` kontrolü (satır 899)
 - **Thread-safe IDE queue:** `threading.Lock` + atomic file write (satır 56–67)
-- **Auth sistemi:** Bearer token + X-Atlas-Token, public path listesi, OPTIONS preflight
+- **Auth sistemi:** Bearer token + X-Sentor-Token, public path listesi, OPTIONS preflight
 
 ---
 
@@ -58,7 +58,7 @@ mode = 'hybrid' if sem_available and sem_scores else ('keyword' if sem_available
 ## Genel Yapı
 
 ```
-Atlas OS/
+Sentor/
 ├── api/            ← REST API (1 dosya)
 ├── cli/            ← CLI araçları
 ├── tools/          ← indexer, embedder, MCP server, test runner
@@ -87,7 +87,7 @@ Atlas OS/
 ### 1. Root'ta dağıtık döküman dosyaları
 Aşağıdaki dosyalar root'ta duruyordu, `docs/` altına taşındı:
 - `KOD_ANALIZI.md` → `docs/`
-- `ATLAS_AI_TECHNICAL_REPORT.md` → `docs/`
+- `SENTOR_AI_TECHNICAL_REPORT.md` → `docs/`
 - `opencode-codereview-1.md` → `docs/`
 - `opencode-codereview-1-en.md` → `docs/`
 
@@ -104,14 +104,14 @@ Silindi:
 
 ---
 
-# Skill 3 — Atlas0fis Toplantısı + K-1→K-5 Kararları
+# Skill 3 — Sentor0fis Toplantısı + K-1→K-5 Kararları
 
 ## Toplantı
 - **Tarih:** 2026-05-30
 - **Motor:** Ultracode (12 persona paralel subagent + sentez + self-check)
 - **Yeni personalar:** Sıla (Teknik Borç Şefi), Berk (CI/Test Şefi)
-- **Kayıt:** `vault/forum/atlas0fis/toplantilar/2026-05-30-kod-kalitesi/index.html`
-- **Forum:** `vault/forum/atlas-os-kod-kalitesi/index.html`
+- **Kayıt:** `vault/forum/sentor0fis/toplantilar/2026-05-30-kod-kalitesi/index.html`
+- **Forum:** `vault/forum/sentor-kod-kalitesi/index.html`
 
 ## Self-Check Bulguları (Can + Sena)
 - `ThreadingHTTPServer` lock'suz açılırsa race'i gizler, çözmez
@@ -140,7 +140,7 @@ Silindi:
 ## Dosyalar
 | Dosya | Satır | Rol |
 |-------|-------|-----|
-| `atlas.py` | 519 | Ana CLI giriş noktası, argparse + dispatch |
+| `main.py` | 519 | Ana CLI giriş noktası, argparse + dispatch |
 | `sentor.py` | 451 | LLM görev yöneticisi |
 | `node.py` | 275 | Pipeline + task birleşik node yöneticisi |
 | `pipeline.py` | 220 | JSON pipeline çalıştırıcı |
@@ -149,7 +149,7 @@ Silindi:
 
 ## Güçlü Yönler
 
-- `atlas.py` lazy import + dispatch pattern — her modül yalnızca kullanıldığında yükleniyor
+- `main.py` lazy import + dispatch pattern — her modül yalnızca kullanıldığında yükleniyor
 - `pipeline.py`: `shlex.split() + subprocess.run(shell=False)` — shell injection yok
 - `node.py`: `contextlib.redirect_stdout(buf)` ile pipe chain output yakalanıyor
 - `pipeline.py` `on_error` mantığı: `stop / notify / continue` — adım bazlı kontrol
@@ -164,7 +164,7 @@ except Exception:
 ```
 **Düzeltme:** `except Exception as exc: print(..., file=sys.stderr)`
 
-### 2. `atlas.py` inline import'lar
+### 2. `main.py` inline import'lar
 `cmd_chat()` içinde `import urllib.request, urllib.error` ve `import urllib.parse` tanımlıydı.
 **Düzeltme:** Dosya başına taşındı.
 
@@ -226,7 +226,7 @@ subprocess.run([editor, str(path)])
 Temiz refactor: `resolveInput()` if-chain → `RESOLVE_RULES` tuple array. Fonksiyonel olarak özdeş.
 
 ### `V3NodePalette.tsx`
-Palette sadeleştirildi: 24 node type → 3 (Terminal, Chat, Input). 2D/3D sekme kaldırıldı, Atlas0fis entry kaldırıldı (`convertFileSrc` + `workspaceRoot` bağımlılığı ortadan kalktı). Phase M temizliği.
+Palette sadeleştirildi: 24 node type → 3 (Terminal, Chat, Input). 2D/3D sekme kaldırıldı, Sentor0fis entry kaldırıldı (`convertFileSrc` + `workspaceRoot` bağımlılığı ortadan kalktı). Phase M temizliği.
 
 ## Güvenlik-Kritik Dosyalar
 

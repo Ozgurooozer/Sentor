@@ -3,7 +3,7 @@ export { TerminalStack } from "./TerminalStack";
 export {
   disposeSession,
   respawnSession,
-  type AtlasOpenInput,
+  type SentorOpenInput,
 } from "./lib/useTerminalSession";
 export {
   hasLeaf,

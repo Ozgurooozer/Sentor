@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Atlas OS Studio",
+  "productName": "Sentor",
   "version": "0.6.1",
-  "identifier": "app.atlas.ide",
+  "identifier": "app.sentor.ide",
   "build": {
     "beforeDevCommand": "npx vite",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
   "app": {
     "windows": [
       {
-        "title": "Atlas OS Studio",
+        "title": "Sentor",
         "width": 800,
         "height": 600,
         "minWidth": 420,
@@ -29,11 +29,13 @@
       "assetProtocol": {
         "enable": true,
         "scope": [
-          "$HOME/Atlas OS/**",
-          "$HOME/.atlas/**",
-          "$APPDATA/atlas/**",
-          "$LOCALAPPDATA/atlas/**",
-          "C:/Atlas OS/**"
+          "$HOME/Sentor/**",
+          "$HOME/Sentor/**",
+          "$HOME/.sentor/**",
+          "$APPDATA/sentor/**",
+          "$LOCALAPPDATA/sentor/**",
+          "C:/Sentor/**",
+          "C:/Sentor/**"
         ]
       }
     }
@@ -79,7 +81,7 @@
     },
     "category": "DeveloperTool",
     "shortDescription": "Local-first AI knowledge base and IDE",
-    "longDescription": "Atlas OS is a local-first second brain and AI IDE. Store your knowledge as vault pages, chat with local AI (LM Studio/Ollama), browse the web, and write code — all offline, all on your machine."
+    "longDescription": "Sentor is a local-first second brain and AI IDE. Store your knowledge as vault pages, chat with local AI (LM Studio/Ollama), browse the web, and write code — all offline, all on your machine."
   },
   "plugins": {
     "updater": {

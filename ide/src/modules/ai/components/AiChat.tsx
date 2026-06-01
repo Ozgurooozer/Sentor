@@ -16,7 +16,7 @@ import {
 } from "@/components/ai-elements/reasoning";
 import { Tool } from "@/components/ai-elements/tool";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { SLASH_COMMANDS, ATLAS_CMD_RE } from "../lib/slashCommands";
+import { SLASH_COMMANDS, SENTOR_CMD_RE } from "../lib/slashCommands";
 import { Spinner } from "@/components/ui/spinner";
 import type {
   ChatStatus,
@@ -96,8 +96,8 @@ export function AiChatView({
       const el = document.querySelector('[data-ai-mini-window] [role="log"]') as HTMLElement | null;
       if (el) el.scrollTo({ top: 0, behavior: "smooth" });
     };
-    window.addEventListener("atlas:scroll-chat-top", handler);
-    return () => window.removeEventListener("atlas:scroll-chat-top", handler);
+    window.addEventListener("sentor:scroll-chat-top", handler);
+    return () => window.removeEventListener("sentor:scroll-chat-top", handler);
   }, []);
 
   if (messages.length === 0) {
@@ -105,7 +105,7 @@ export function AiChatView({
       <Conversation>
         <ConversationContent>
           <ConversationEmptyState
-            title="Ask Atlas anything"
+            title="Ask Sentor anything"
             description="Explain command output, fix errors, generate snippets, or run a task."
           />
         </ConversationContent>
@@ -159,7 +159,7 @@ const RenderedMessage = memo(function RenderedMessage({
       .map((p) => p.text)
       .join("\n");
 
-    const cmdMatch = rawText.match(ATLAS_CMD_RE);
+    const cmdMatch = rawText.match(SENTOR_CMD_RE);
     const commandName = cmdMatch?.[1] ?? null;
     const text = cmdMatch ? rawText.slice(cmdMatch[0].length) : rawText;
 

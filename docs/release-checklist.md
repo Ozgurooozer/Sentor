@@ -1,4 +1,4 @@
-# Atlas OS — Release Checklist
+# Sentor — Release Checklist
 
 Complete every item before tagging a new release.
 
@@ -13,14 +13,14 @@ Complete every item before tagging a new release.
 ## 2 — Security
 
 - [ ] `curl http://localhost:4242/api/pages` (no auth header) → `401 Unauthorised`
-- [ ] `curl -H "Authorization: Bearer $(cat ~/.atlas/api-token)" http://localhost:4242/api/pages` → 200
+- [ ] `curl -H "Authorization: Bearer $(cat ~/.sentor/api-token)" http://localhost:4242/api/pages` → 200
 - [ ] `curl http://localhost:4242/api/categories` (no auth) → 200 (public endpoint)
 - [ ] Open a malicious page in the Web tab that tries `fetch('http://localhost:4242/api/pages')` → network error (CORS blocked)
 - [ ] Check CSP in DevTools → no CSP violations in console
 
 ## 3 — First-Run Experience
 
-- [ ] On a clean system (no `~/.atlas/` directory), launch Atlas OS
+- [ ] On a clean system (no `~/.sentor/` directory), launch Sentor
 - [ ] Onboarding wizard appears automatically
 - [ ] Wizard correctly detects Ollama / LM Studio as present/absent
 - [ ] "Download Ollama" button opens browser (doesn't crash)
@@ -31,7 +31,7 @@ Complete every item before tagging a new release.
 
 - [ ] Vault Home opens on first tab, search works
 - [ ] AI Chat responds (with any local provider)
-- [ ] Atlas-Maker writes a vault page → page appears in search
+- [ ] Sentor-Maker writes a vault page → page appears in search
 - [ ] Vault browser tab opens a vault page via `asset://`
 - [ ] Web tab opens `https://example.com`
 - [ ] Graph view (`Ctrl+Shift+G`) renders vault nodes
@@ -45,11 +45,11 @@ Complete every item before tagging a new release.
 - [ ] Install on a clean Windows VM: no SmartScreen block (or if unsigned, document the workaround)
 - [ ] Installer creates Desktop shortcut
 - [ ] Installer creates Start Menu entry
-- [ ] Uninstaller works (Settings → Apps → Atlas OS Studio → Uninstall)
+- [ ] Uninstaller works (Settings → Apps → Sentor → Uninstall)
 
 ## 6 — Updater (if signing configured)
 
-- [ ] `~/.atlas/api-token` exists after install
+- [ ] `~/.sentor/api-token` exists after install
 - [ ] `tauri.conf.json` updater endpoint points to correct GitHub repo
 - [ ] Simulate update: deploy v+1 release, launch old version → update notification appears
 

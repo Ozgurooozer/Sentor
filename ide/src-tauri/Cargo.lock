@@ -257,52 +257,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "atlas"
-version = "0.6.1"
-dependencies = [
- "base64 0.22.1",
- "chrono",
- "dirs 5.0.1",
- "globset",
- "grep-matcher",
- "grep-regex",
- "grep-searcher",
- "ignore",
- "keyring",
- "log",
- "ndarray 0.15.6",
- "notify",
- "ort",
- "portable-pty",
- "raw-window-handle",
- "regex",
- "reqwest 0.12.28",
- "rusqlite",
- "scraper",
- "serde",
- "serde_json",
- "shared_child",
- "tauri",
- "tauri-build",
- "tauri-plugin-autostart",
- "tauri-plugin-dialog",
- "tauri-plugin-log",
- "tauri-plugin-opener",
- "tauri-plugin-os",
- "tauri-plugin-process",
- "tauri-plugin-store",
- "tauri-plugin-updater",
- "tauri-plugin-window-state",
- "tokenizers",
- "tokio",
- "urlencoding",
- "uuid",
- "walkdir",
- "window-vibrancy 0.5.3",
- "windows-sys 0.59.0",
-]
-
-[[package]]
 name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4991,6 +4945,52 @@ checksum = "8a7852d02fc848982e0c167ef163aaff9cd91dc640ba85e263cb1ce46fae51cd"
 dependencies = [
  "serde",
  "serde_core",
+]
+
+[[package]]
+name = "sentor"
+version = "0.6.1"
+dependencies = [
+ "base64 0.22.1",
+ "chrono",
+ "dirs 5.0.1",
+ "globset",
+ "grep-matcher",
+ "grep-regex",
+ "grep-searcher",
+ "ignore",
+ "keyring",
+ "log",
+ "ndarray 0.15.6",
+ "notify",
+ "ort",
+ "portable-pty",
+ "raw-window-handle",
+ "regex",
+ "reqwest 0.12.28",
+ "rusqlite",
+ "scraper",
+ "serde",
+ "serde_json",
+ "shared_child",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-autostart",
+ "tauri-plugin-dialog",
+ "tauri-plugin-log",
+ "tauri-plugin-opener",
+ "tauri-plugin-os",
+ "tauri-plugin-process",
+ "tauri-plugin-store",
+ "tauri-plugin-updater",
+ "tauri-plugin-window-state",
+ "tokenizers",
+ "tokio",
+ "urlencoding",
+ "uuid",
+ "walkdir",
+ "window-vibrancy 0.5.3",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
