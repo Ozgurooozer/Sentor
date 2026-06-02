@@ -1,8 +1,10 @@
 # Sentor — Vault Prototype
 
-**Repository:** [github.com/Ozgurooozer/Sentor](https://github.com/Ozgurooozer/Sentor)
+> **Purpose — why this repository exists**  
+> This project was built as a **job application prototype for Tremium Software**.  
+> It is not a commercial product or a general-purpose IDE release. It exists to show that a **local-first knowledge vault** — with **semantic embeddings**, a **forum made of plain HTML pages**, and **MCP access for external AI tools** — can be implemented with minimal dependencies, flat files, and a clear separation between durable storage (the vault) and disposable UI experiments (the IDE).
 
-**A prototype built for a job application to Tremium Software.**
+**Repository:** [github.com/Ozgurooozer/Sentor](https://github.com/Ozgurooozer/Sentor)
 
 The goal of this repository is to demonstrate a **local-first knowledge vault** with hybrid retrieval (keyword + semantic embeddings), a **forum implemented as plain HTML pages**, and **external AI access via MCP**. Everything outside the vault layer exists primarily as an **experimental test harness** — not as a finished product.
 

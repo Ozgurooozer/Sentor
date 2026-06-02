@@ -1,5 +1,9 @@
 # P_README — Experimental Layer Reference
 
+> **Purpose — why this repository exists**  
+> This project was built as a **job application prototype for Tremium Software**.  
+> The vault (HTML pages, indexer, embeddings, forum, MCP read path) is the **core deliverable**. Everything documented in *this file* — the IDE, canvas, agents, CodeGraph, V3/Glass UI — is **experimental scaffolding** added only to test and demo the vault. It may change or be removed without affecting the vault files themselves.
+
 **Companion to [README.md](README.md)** · [github.com/Ozgurooozer/Sentor](https://github.com/Ozgurooozer/Sentor)
 
 This document describes everything in Sentor that is **experimental** — built to **test, demo, and stress the vault**, not shipped as a finished product. For the core deliverable (vault, forum, indexer, embeddings, hybrid search), read the main README first.
