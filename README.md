@@ -23,6 +23,8 @@ The goal of this repository is to demonstrate a **local-first knowledge vault** 
 
 If you are reviewing this project: **start with the vault pipeline** (`tools/indexer.py`, `tools/embedder.py`, `tools/scoring.py`, `vault/forum/`). The IDE is a convenient shell around it, not the main claim.
 
+For full documentation of the **experimental layer** (IDE, canvas, agents, CodeGraph, MCP canvas bridge, V3/Glass UI), see **[P_README.md](P_README.md)**.
+
 ---
 
 ## The Vault
