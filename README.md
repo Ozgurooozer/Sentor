@@ -1,7 +1,7 @@
 # Sentor — Vault Prototype
 
 > **Purpose — why this repository exists**  
-> This project was built as a **job application prototype for Tremium Software**.  
+> This project was built as a **job application **.  
 > It is not a commercial product or a general-purpose IDE release. It exists to show that a **local-first knowledge vault** — with **semantic embeddings**, a **forum made of plain HTML pages**, and **MCP access for external AI tools** — can be implemented with minimal dependencies, flat files, and a clear separation between durable storage (the vault) and disposable UI experiments (the IDE).
 
 **Repository:** [github.com/Ozgurooozer/Sentor](https://github.com/Ozgurooozer/Sentor)
